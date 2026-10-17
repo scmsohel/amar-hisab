@@ -80,3 +80,20 @@
  .header-brand small{display:none}
  .crumb{gap:6px}
 }
+
+
+/* Sidebar top control; brand lockup lives in the header */
+.brand{justify-content:center;padding:0 0 28px;min-height:52px}
+.brand-menu{width:40px;height:40px;display:grid;place-items:center;border:1px solid var(--border);border-radius:12px;background:var(--surface2);color:var(--text)}
+.brand-menu:hover{background:#e6f7ef;color:#07875d}
+.sidebar.collapsed .brand{padding-inline:0}
+.header-brand{display:flex;flex-direction:row;align-items:center;gap:10px;margin-right:4px;white-space:nowrap}
+.header-brand .brand-icon{width:39px;height:39px}
+.header-brand>div:last-child{display:flex;flex-direction:column;gap:0;line-height:1.15}
+.header-brand b{font-size:16px;font-weight:700;color:var(--text)}
+.header-brand small{font-size:10px;color:var(--muted);letter-spacing:.02em}
+@media(max-width:700px){
+ .header-brand .brand-icon{width:32px;height:32px}
+ .header-brand b{font-size:14px}
+ .header-brand small{display:block;font-size:9px}
+}

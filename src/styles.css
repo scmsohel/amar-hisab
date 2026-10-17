@@ -66,3 +66,17 @@
   .sidebar.collapsed .theme{justify-content:flex-start;padding:0 8px}
   .sidebar.collapsed .collapse{justify-content:flex-start;padding:0 8px}
 }
+
+
+/* Keep the app mark in the sidebar and move the brand name into the header */
+.sidebar .brand{justify-content:center}
+.sidebar .brand .brand-icon{flex:0 0 auto}
+.header-brand{display:flex;flex-direction:column;gap:0;line-height:1.15;margin-right:4px;white-space:nowrap}
+.header-brand b{font-size:16px;font-weight:700;color:var(--text)}
+.header-brand small{font-size:10px;color:var(--muted);letter-spacing:.02em}
+.crumb{gap:10px}
+@media(max-width:700px){
+ .header-brand b{font-size:14px}
+ .header-brand small{display:none}
+ .crumb{gap:6px}
+}

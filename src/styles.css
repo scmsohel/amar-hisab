@@ -439,3 +439,19 @@
 .wallet-box .wallet-brand-icon img{display:block;width:100%;height:100%;object-fit:contain}
 .wallet-box .bkash-brand,.wallet-box .nagad-brand{background:#fff!important}
 .wallet-box .bkash-brand img,.wallet-box .nagad-brand img{width:24px;height:24px;object-fit:contain}
+
+
+/* Make wallet brand marks larger and easier to recognize */
+@media(min-width:1251px){
+ .dashboard-main .wallet-panel .wallet-box{grid-template-columns:34px minmax(0,1fr);grid-template-rows:34px auto;column-gap:7px;row-gap:3px;padding:6px 8px}
+ .dashboard-main .wallet-panel .wallet-box>span{width:34px;height:34px;flex:0 0 34px}
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon img{width:34px;height:34px;object-fit:contain}
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon svg{width:25px;height:25px}
+ .dashboard-main .wallet-panel .wallet-box b{font-size:12px}
+ .dashboard-main .wallet-panel .wallet-box strong{font-size:13px}
+}
+@media(max-width:1250px){
+ .wallet-panel .wallet-box>span{width:34px;height:34px;flex:0 0 34px}
+ .wallet-panel .wallet-box .wallet-brand-icon img{width:34px;height:34px;object-fit:contain}
+ .wallet-panel .wallet-box .wallet-brand-icon svg{width:25px;height:25px}
+}

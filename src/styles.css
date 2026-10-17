@@ -501,3 +501,22 @@
  .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img,
  .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand img{width:48px;height:48px;max-width:none;object-fit:contain;transform:translate(-6px,-6px)}
 }
+
+
+/* Use only the symbol portion of the MFS lockups; keep wordmarks as card labels */
+@media(min-width:1251px){
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand,
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand{width:36px;height:36px;overflow:hidden;position:relative;border-radius:10px}
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img,
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand img{position:absolute;top:-12px;width:90px;height:60px;max-width:none;object-fit:fill;transform:none}
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{left:-54px}
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand img{left:0}
+}
+@media(max-width:1250px){
+ .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand,
+ .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand{width:36px;height:36px;overflow:hidden;position:relative;border-radius:10px}
+ .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img,
+ .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand img{position:absolute;top:-12px;width:90px;height:60px;max-width:none;object-fit:fill;transform:none}
+ .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{left:-54px}
+ .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand img{left:0}
+}

@@ -166,3 +166,34 @@
  .stat{padding:12px}
  .transactions td,.transactions th{padding:8px 9px}
 }
+
+
+/* Reference-inspired top row: balance, wallet collection and debts side by side */
+@media(min-width:1251px){
+ .hero-grid{grid-template-columns:minmax(0,1.05fr) minmax(0,1.45fr) minmax(0,1.05fr);align-items:stretch;gap:12px}
+ .balance{display:flex;flex-direction:column;min-height:0}
+ .balance-top{flex:1;min-height:125px;padding:18px 18px 14px}
+ .balance .big{font-size:30px}
+ .wallet-panel{padding:15px;min-width:0}
+ .wallet-panel>.panel-title{padding:0 0 10px}
+ .wallet-panel .wallets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:0;gap:8px}
+ .wallet-panel .wallet-box{min-width:0;padding:10px 9px;min-height:58px}
+ .wallet-panel .wallet-box strong{font-size:12px}
+ .hero-debts{padding:15px;min-width:0}
+ .hero-debts>.panel-title{padding:0 0 8px}
+ .hero-debts .debt-row{padding:12px 0;gap:8px}
+ .hero-debts .debt-row strong{font-size:13px}
+ .stats{margin-top:12px}
+ .charts{grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr)}
+}
+@media(max-width:1250px){
+ .hero-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .wallet-panel{grid-column:1/-1;grid-row:2}
+ .wallet-panel .wallets{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media(max-width:700px){
+ .hero-grid{grid-template-columns:minmax(0,1fr)}
+ .wallet-panel{grid-column:auto;grid-row:auto}
+ .wallet-panel .wallets{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .hero-debts{grid-column:auto}
+}

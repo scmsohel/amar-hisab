@@ -251,3 +251,13 @@
  .debt-person b,.debt-person div small{display:block}
  .debt-person div small{font-size:10px;color:var(--muted)}
 }
+
+
+/* Row 1: cards should use their content height, not stretch to the tallest sibling */
+@media(min-width:1251px){
+ .hero-grid{align-items:start}
+ .balance{align-self:start;height:auto;min-height:0}
+ .balance-top{flex:0 0 auto;min-height:0;height:auto;padding:18px 17px 13px}
+ .wallet-panel,.hero-debts{align-self:start;height:auto;min-height:0}
+ .wallet-panel .wallet-box{min-height:58px}
+}

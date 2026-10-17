@@ -97,3 +97,24 @@
  .header-brand b{font-size:14px}
  .header-brand small{display:block;font-size:9px}
 }
+
+
+/* Sidebar bottom cards align to the full usable sidebar width */
+.sidebar .promo{width:100%;margin:18px 0 12px;padding:14px;flex-shrink:0}
+.sidebar .side-bottom{width:100%;padding-top:12px;flex-shrink:0}
+.sidebar .user{width:100%;border:1px solid var(--border);border-radius:12px;background:var(--surface2);padding:10px 9px;min-height:54px}
+.sidebar .theme{margin-top:8px;width:100%;border:1px solid var(--border);border-radius:12px;background:var(--surface2);height:42px;padding:0 10px}
+.sidebar .theme .toggle{display:block;flex:0 0 30px;height:18px;border-radius:20px;background:#d8e0e5;position:relative;margin-left:auto}
+.sidebar .theme .toggle:after{content:"";position:absolute;width:14px;height:14px;left:2px;top:2px;border-radius:50%;background:#fff;box-shadow:0 1px 2px #0002;transition:transform .2s}
+.sidebar .theme .toggle.on{background:#079b6b}
+.sidebar .theme .toggle.on:after{transform:translateX(12px)}
+.sidebar.collapsed .side-bottom{padding-top:10px}
+.sidebar.collapsed .user{justify-content:center;padding:8px 0;min-height:48px}
+.sidebar.collapsed .theme{justify-content:center;gap:0;padding:0 6px}
+.sidebar.collapsed .theme svg{flex:0 0 17px}
+.sidebar.collapsed .theme .toggle{flex:0 0 22px;width:22px;height:14px;margin-left:2px}
+.sidebar.collapsed .theme .toggle:after{width:10px;height:10px}
+.sidebar.collapsed .theme .toggle.on:after{transform:translateX(8px)}
+@media(max-width:700px){
+ .sidebar:not(.collapsed) .promo{margin-top:16px}
+}

@@ -294,3 +294,22 @@
  .stats{margin-top:10px;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
  .stat{min-height:142px;padding:14px}
 }
+
+
+/* Final proportion adjustment for the first row: reduce four-wallet column, widen debts */
+@media(min-width:1251px){
+ .hero-grid{grid-template-columns:minmax(0,0.92fr) minmax(0,1.32fr) minmax(0,1.18fr);gap:10px}
+ .balance{min-width:0}
+ .wallet-panel{min-width:0}
+ .wallet-panel .wallets{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+ .wallet-panel .wallet-box{padding:6px 5px;gap:4px}
+ .wallet-panel .wallet-box>span{width:22px;height:22px}
+ .wallet-panel .wallet-box strong{font-size:10px}
+ .hero-debts{min-width:0}
+ .debt-summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+ .debt-total{padding:6px;gap:6px}
+ .debt-total>span{width:28px;height:28px}
+ .debt-total b{font-size:13px}
+ .debt-person{gap:6px}
+ .due{padding:4px 5px;font-size:8px}
+}

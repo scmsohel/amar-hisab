@@ -313,3 +313,47 @@
  .debt-person{gap:6px}
  .due{padding:4px 5px;font-size:8px}
 }
+
+
+/* Dashboard top section: four summary cards stay under the main cards; debt panel spans both rows */
+@media(min-width:1251px){
+ .dashboard-top{display:grid;grid-template-columns:minmax(0,2fr) minmax(340px,1fr);gap:12px;align-items:stretch;margin-bottom:14px}
+ .dashboard-main{display:grid;grid-template-rows:auto auto;gap:10px;min-width:0}
+ .dashboard-main .hero-grid{display:grid;grid-template-columns:minmax(0,0.92fr) minmax(0,1.32fr);gap:10px;align-items:start;margin:0}
+ .dashboard-main .balance,.dashboard-main .wallet-panel{height:142px;min-height:142px}
+ .dashboard-main .balance-top{height:100%;min-height:0}
+ .dashboard-main .wallet-panel{padding:12px;overflow:hidden}
+ .dashboard-main .wallet-panel .wallets{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+ .dashboard-main .wallet-panel .wallet-box{height:48px;min-height:48px;padding:5px 7px;display:grid;grid-template-columns:24px minmax(0,1fr);grid-template-rows:auto auto;column-gap:6px;row-gap:0;align-items:center}
+ .dashboard-main .wallet-panel .wallet-box>span{grid-row:1/3;width:23px;height:23px}
+ .dashboard-main .wallet-panel .wallet-box div{min-width:0}
+ .dashboard-main .wallet-panel .wallet-box b{font-size:10px}
+ .dashboard-main .wallet-panel .wallet-box small{font-size:8px}
+ .dashboard-main .wallet-panel .wallet-box strong{grid-column:2;font-size:11px;line-height:1.1}
+ .dashboard-main .stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0}
+ .dashboard-main .stat{height:102px;min-height:102px;padding:10px;overflow:hidden}
+ .dashboard-main .stat-top{gap:5px}
+ .dashboard-main .stat-icon{width:32px;height:32px}
+ .dashboard-main .stat-context{font-size:8px}
+ .dashboard-main .stat p{font-size:10px;margin:5px 0 2px}
+ .dashboard-main .stat strong{font-size:17px;white-space:nowrap}
+ .dashboard-main .stat .muted{font-size:8px}
+ .dashboard-top>.hero-debts{height:auto;min-height:254px;align-self:stretch;padding:13px;overflow:visible}
+ .dashboard-top>.hero-debts .debt-summary{gap:6px}
+ .dashboard-top>.hero-debts .debt-total{padding:7px;gap:6px}
+ .dashboard-top>.hero-debts .debt-total>span{width:28px;height:28px;font-size:19px}
+ .dashboard-top>.hero-debts .debt-total b{font-size:13px}
+ .dashboard-top>.hero-debts .debt-total em{font-size:8px}
+ .dashboard-top>.hero-debts .debt-person{padding:9px 0}
+}
+@media(max-width:1250px){
+ .dashboard-top{display:flex;flex-direction:column;gap:12px}
+ .dashboard-main{display:flex;flex-direction:column;gap:12px;min-width:0}
+ .dashboard-main .hero-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .dashboard-main .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .dashboard-top>.hero-debts{height:auto;min-height:0;overflow:visible}
+}
+@media(max-width:700px){
+ .dashboard-main .hero-grid{grid-template-columns:minmax(0,1fr)}
+ .dashboard-main .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}

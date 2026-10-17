@@ -424,3 +424,13 @@
  .dashboard-main .wallet-panel .wallet-box small{display:block;font-size:8px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
  .dashboard-main .wallet-panel .wallet-box strong{grid-column:1/-1;grid-row:2;justify-self:start;padding-left:0;font-size:13px;line-height:1.1;white-space:nowrap;flex:initial}
 }
+
+
+/* Distinct brand colors and marks for each wallet type */
+.wallet-box .wallet-brand-icon{display:grid;place-items:center;flex-shrink:0}
+.wallet-box .wallet-brand-icon svg{width:19px;height:19px;stroke:currentColor}
+.wallet-box .bkash-brand{background:#fff0f6!important;color:#e2136e!important}
+.wallet-box .bkash-brand svg,.wallet-box .nagad-brand svg{width:23px;height:23px;stroke:none}
+.wallet-box .nagad-brand{background:#fff3e7!important;color:#f58220!important}
+.wallet-box.wallet-bank .wallet-brand-icon{background:#e8f2ff!important;color:#0878f9!important}
+.wallet-box.wallet-cash .wallet-brand-icon{background:#dff8ed!important;color:#009f6b!important}

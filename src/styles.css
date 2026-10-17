@@ -486,3 +486,18 @@
  .wallet-panel .wallet-box b{font-size:13px}
  .wallet-panel .wallet-box strong{font-size:15px}
 }
+
+
+/* Fix MFS logo artwork appearing undersized inside its image canvas */
+@media(min-width:1251px){
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand,
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand{overflow:visible}
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img,
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand img{width:48px;height:48px;max-width:none;object-fit:contain;transform:translate(-6px,-6px)}
+}
+@media(max-width:1250px){
+ .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand,
+ .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand{overflow:visible}
+ .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img,
+ .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand img{width:48px;height:48px;max-width:none;object-fit:contain;transform:translate(-6px,-6px)}
+}

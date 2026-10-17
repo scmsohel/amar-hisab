@@ -389,3 +389,22 @@
  .dashboard-top>.hero-debts .debt-person div small{font-size:8px}
  .dashboard-top>.hero-debts .due{font-size:8px;padding:3px 5px}
 }
+
+
+/* Debt/receivables must show both people: span the height of balance + summary row */
+@media(min-width:1251px){
+ .dashboard-top{align-items:stretch}
+ .dashboard-top>.hero-debts{height:254px;min-height:254px;align-self:stretch;overflow:visible;padding:13px}
+ .dashboard-top>.hero-debts .panel-title{padding-bottom:8px}
+ .dashboard-top>.hero-debts .debt-summary{gap:7px}
+ .dashboard-top>.hero-debts .debt-total{padding:7px;gap:6px}
+ .dashboard-top>.hero-debts .debt-total>span{width:29px;height:29px;font-size:19px}
+ .dashboard-top>.hero-debts .debt-total small{font-size:9px}
+ .dashboard-top>.hero-debts .debt-total b{font-size:13px}
+ .dashboard-top>.hero-debts .debt-total em{font-size:8px}
+ .dashboard-top>.hero-debts .debt-person{padding:9px 0;gap:7px}
+ .dashboard-top>.hero-debts .person-icon{width:28px;height:28px;font-size:15px}
+ .dashboard-top>.hero-debts .debt-person b{font-size:10px}
+ .dashboard-top>.hero-debts .debt-person div small{font-size:9px}
+ .dashboard-top>.hero-debts .due{font-size:9px;padding:4px 6px}
+}

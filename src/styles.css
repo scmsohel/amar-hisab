@@ -357,3 +357,35 @@
  .dashboard-main .hero-grid{grid-template-columns:minmax(0,1fr)}
  .dashboard-main .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+
+/* Refine first row: restore four horizontal wallet tiles and shorten debts panel */
+@media(min-width:1251px){
+ .dashboard-top{grid-template-columns:minmax(0,2fr) minmax(300px,0.82fr);gap:12px;align-items:start}
+ .dashboard-main{grid-template-rows:auto auto;align-content:start;gap:10px}
+ .dashboard-main .hero-grid{grid-template-columns:minmax(0,0.88fr) minmax(0,1.42fr);gap:10px;align-items:start}
+ .dashboard-main .balance{height:142px;min-height:142px}
+ .dashboard-main .wallet-panel{height:142px;min-height:142px;padding:12px;overflow:hidden}
+ .dashboard-main .wallet-panel .panel-title{padding-bottom:8px}
+ .dashboard-main .wallet-panel .panel-title p{display:block}
+ .dashboard-main .wallet-panel .wallets{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+ .dashboard-main .wallet-panel .wallet-box{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;height:78px;min-height:78px;padding:7px 6px;flex-wrap:nowrap;overflow:hidden}
+ .dashboard-main .wallet-panel .wallet-box>span{width:24px;height:24px;flex:0 0 24px}
+ .dashboard-main .wallet-panel .wallet-box div{flex:0 1 auto;min-width:0}
+ .dashboard-main .wallet-panel .wallet-box b{font-size:10px;line-height:1.1}
+ .dashboard-main .wallet-panel .wallet-box small{font-size:8px;line-height:1.1;white-space:nowrap}
+ .dashboard-main .wallet-panel .wallet-box strong{flex:0 0 auto;padding-left:0;font-size:11px;line-height:1.1;white-space:nowrap}
+ .dashboard-top>.hero-debts{height:142px;min-height:142px;align-self:start;padding:10px 12px;overflow:hidden}
+ .dashboard-top>.hero-debts .panel-title{padding-bottom:6px}
+ .dashboard-top>.hero-debts .debt-summary{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+ .dashboard-top>.hero-debts .debt-total{padding:5px;gap:5px}
+ .dashboard-top>.hero-debts .debt-total>span{width:25px;height:25px;font-size:17px}
+ .dashboard-top>.hero-debts .debt-total small{font-size:8px}
+ .dashboard-top>.hero-debts .debt-total b{font-size:12px}
+ .dashboard-top>.hero-debts .debt-total em{font-size:7px}
+ .dashboard-top>.hero-debts .debt-person{padding:5px 0;gap:5px}
+ .dashboard-top>.hero-debts .person-icon{width:23px;height:23px;font-size:12px}
+ .dashboard-top>.hero-debts .debt-person b{font-size:9px}
+ .dashboard-top>.hero-debts .debt-person div small{font-size:8px}
+ .dashboard-top>.hero-debts .due{font-size:8px;padding:3px 5px}
+}

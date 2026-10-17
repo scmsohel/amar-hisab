@@ -261,3 +261,36 @@
  .wallet-panel,.hero-debts{align-self:start;height:auto;min-height:0}
  .wallet-panel .wallet-box{min-height:58px}
 }
+
+
+/* Compact first row to the reference: keep the debts card from creating a large blank band */
+@media(min-width:1251px){
+ .hero-grid{align-items:start;gap:10px;margin-bottom:0}
+ .balance{height:142px;min-height:142px}
+ .balance-top{height:100%;min-height:0;padding:18px 17px 12px}
+ .wallet-panel{height:142px;min-height:142px;padding:12px}
+ .wallet-panel>.panel-title{padding:0 0 7px}
+ .wallet-panel .panel-title p{display:none}
+ .wallet-panel .wallets{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+ .wallet-panel .wallet-box{height:75px;min-height:75px;padding:7px 6px;gap:4px}
+ .wallet-panel .wallet-box>span{width:24px;height:24px}
+ .wallet-panel .wallet-box div{flex:1 1 calc(100% - 30px)}
+ .wallet-panel .wallet-box b{font-size:10px}
+ .wallet-panel .wallet-box small{font-size:8px}
+ .wallet-panel .wallet-box strong{font-size:11px}
+ .hero-debts{height:142px;min-height:142px;padding:10px 12px;overflow:hidden}
+ .hero-debts>.panel-title{padding:0 0 6px}
+ .debt-summary{gap:5px}
+ .debt-total{padding:5px;gap:5px}
+ .debt-total>span{width:25px;height:25px;font-size:17px}
+ .debt-total small{font-size:8px}
+ .debt-total b{font-size:12px}
+ .debt-total em{font-size:7px}
+ .debt-person{padding:5px 0;gap:5px}
+ .person-icon{width:23px;height:23px;font-size:12px}
+ .debt-person b{font-size:9px}
+ .debt-person div small{font-size:8px}
+ .due{font-size:8px;padding:3px 5px}
+ .stats{margin-top:10px;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+ .stat{min-height:142px;padding:14px}
+}

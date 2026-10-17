@@ -11,3 +11,5 @@
 
 /* Transaction row actions */
 .row-actions{display:flex;align-items:center;justify-content:flex-end;gap:4px;white-space:nowrap}.row-actions .icon{width:30px;height:30px;border-radius:9px;color:var(--muted)}.row-actions .icon:hover{background:var(--soft);color:var(--text)}
+
+.amount-transfer{color:var(--muted);font-weight:700}

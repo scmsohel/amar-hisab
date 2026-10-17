@@ -434,3 +434,8 @@
 .wallet-box .nagad-brand{background:#fff3e7!important;color:#f58220!important}
 .wallet-box.wallet-bank .wallet-brand-icon{background:#e8f2ff!important;color:#0878f9!important}
 .wallet-box.wallet-cash .wallet-brand-icon{background:#dff8ed!important;color:#009f6b!important}
+
+
+.wallet-box .wallet-brand-icon img{display:block;width:100%;height:100%;object-fit:contain}
+.wallet-box .bkash-brand,.wallet-box .nagad-brand{background:#fff!important}
+.wallet-box .bkash-brand img,.wallet-box .nagad-brand img{width:24px;height:24px;object-fit:contain}

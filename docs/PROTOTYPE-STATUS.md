@@ -16,7 +16,7 @@ Main branch: unchanged; this prototype has not been merged or deployed.
 ## Not production-ready
 - No backend/API or PostgreSQL connection.
 - Demo baseline amounts are sample figures; localStorage data is not shared across browsers/devices and is not a safe financial database.
-- Dashboard navigation pages other than Dashboard and Transactions are placeholders.
+- Dedicated working demo pages now exist for debts/receivables, bills, loans, wallets, categories, budgets, reports, savings goals and settings. These records persist locally in the browser; they are not yet connected to the backend.
 - No authentication, multi-user access, backup/restore or production test suite.
 
 ## Proxmox preview packaging
@@ -37,5 +37,6 @@ This config uses host port 8088 by default. If that port is already occupied, se
 ## Next
 1. CI checks both the TypeScript/Vite build and the Docker image.
 2. Deploy this isolated preview to the intended Proxmox VM/LXC.
-3. Review the UI in a browser.
-4. Only after UI review, plan API/database integration and production deployment.
+3. Review the UI in a browser, including mobile layout and all management forms.
+4. Connect the UI to the existing backend/API and PostgreSQL before treating it as a real financial app.
+5. Add authentication, data validation, backup/restore and automated functional tests before production.

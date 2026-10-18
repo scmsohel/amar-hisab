@@ -517,3 +517,25 @@
  .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{position:static;display:block;width:62px;height:62px;max-width:none;object-fit:contain;transform:translate(-13px,-13px)}
  .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand img{position:static;display:block;width:32px;height:32px;max-width:100%;object-fit:contain;transform:none}
 }
+
+
+/* Compact wallet panel to align with the total-balance card */
+@media(min-width:1251px){
+ .dashboard-main .wallet-panel{height:142px;min-height:142px;padding:12px}
+ .dashboard-main .wallet-panel>.panel-title{padding-bottom:7px}
+ .dashboard-main .wallet-panel .wallets{gap:7px}
+ .dashboard-main .wallet-panel .wallet-box{height:76px;min-height:76px;padding:7px 8px;grid-template-columns:32px minmax(0,1fr);grid-template-rows:32px auto;column-gap:6px;row-gap:3px}
+ .dashboard-main .wallet-panel .wallet-box>span{width:32px;height:32px;flex:0 0 32px}
+ .dashboard-main .wallet-panel .wallet-box b{font-size:12px}
+ .dashboard-main .wallet-panel .wallet-box strong{font-size:14px;line-height:1.1}
+}
+@media(min-width:701px) and (max-width:1250px){
+ .wallet-panel>.panel-title{padding-bottom:7px}
+ .wallet-panel .wallet-box{min-height:76px;padding:8px;gap:5px}
+ .wallet-panel .wallet-box small{display:none}
+}
+@media(max-width:700px){
+ .wallet-panel>.panel-title{padding-bottom:6px}
+ .wallet-panel .wallet-box{min-height:70px;padding:7px;gap:4px}
+ .wallet-panel .wallet-box small{display:none}
+}

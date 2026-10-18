@@ -1019,3 +1019,25 @@
  .dashboard-top>.hero-debts .debt-date{font-size:11px}
  .dashboard-top>.hero-debts .debt-person .due{font-size:12px;padding:8px 10px;font-weight:700}
 }
+
+
+/* Align debt dates centrally and match wallet/debt section heading typography */
+@media(min-width:1251px){
+ .dashboard-top>.hero-debts>.panel-title h3,
+ .dashboard-main>.hero-grid>.wallet-panel>.panel-title h3{
+  font-size:18px;
+  font-weight:800;
+  line-height:1.35;
+ }
+ .dashboard-top>.hero-debts .debt-person{
+  grid-template-columns:36px minmax(90px,1fr) minmax(110px,auto) auto;
+  column-gap:10px;
+ }
+ .dashboard-top>.hero-debts .debt-date{
+  display:block;
+  text-align:center;
+  justify-self:center;
+  padding:0 8px;
+  white-space:nowrap;
+ }
+}

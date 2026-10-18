@@ -672,3 +672,13 @@
  .sidebar.collapsed .sidebar-profile{justify-content:flex-start;padding:9px 5px 2px}
  .sidebar.collapsed .sidebar-profile-copy{display:block}
 }
+
+
+/* Remove the empty desktop title strip; keep mobile navigation access */
+@media(min-width:701px){
+ .topbar{display:none}
+}
+.sidebar.collapsed .side-bottom{align-items:center}
+.sidebar.collapsed .sidebar-notification{align-self:center;justify-content:center;align-items:center}
+.sidebar.collapsed .sidebar-notification svg{display:block;margin:0 auto}
+.sidebar.collapsed .sidebar-profile .avatar{margin-inline:auto}

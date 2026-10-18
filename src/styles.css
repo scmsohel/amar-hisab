@@ -824,3 +824,31 @@
  .stats .stat-copy strong{font-size:16px}
  .stats .stat-caption{font-size:8px;padding:3px 5px}
 }
+
+
+/* Slightly smaller inner content for the four summary cards; preserve card dimensions */
+.stats .stat{gap:10px;padding:15px 14px}
+.stats .stat-icon{width:42px;height:42px;flex-basis:42px}
+.stats .stat-icon svg{width:21px;height:21px}
+.stats .stat-copy p{font-size:11px;margin-bottom:4px}
+.stats .stat-copy strong{font-size:21px;letter-spacing:-.3px}
+.stats .stat-caption{font-size:9px;margin-top:6px;padding:4px 7px}
+.stats .stat-mini-bars{right:10px;bottom:12px;height:23px;gap:3px}
+.stats .stat-mini-bars i{width:5px;height:8px}
+.stats .stat-mini-bars i:nth-child(2){height:13px}
+.stats .stat-mini-bars i:nth-child(3){height:18px}
+.stats .stat-mini-bars i:nth-child(4){height:23px}
+@media(max-width:1100px){
+ .stats .stat{gap:9px;padding:13px 10px}
+ .stats .stat-icon{width:38px;height:38px;flex-basis:38px}
+ .stats .stat-icon svg{width:19px;height:19px}
+ .stats .stat-copy strong{font-size:19px}
+}
+@media(max-width:700px){
+ .stats .stat{padding:11px 8px;gap:7px}
+ .stats .stat-icon{width:31px;height:31px;flex-basis:31px}
+ .stats .stat-icon svg{width:17px;height:17px}
+ .stats .stat-copy p{font-size:9px}
+ .stats .stat-copy strong{font-size:15px}
+ .stats .stat-caption{font-size:8px;padding:3px 5px}
+}

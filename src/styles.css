@@ -1041,3 +1041,21 @@
   white-space:nowrap;
  }
 }
+
+
+/* Final date alignment: center dates in the flexible space between person details and due badge */
+@media(min-width:1251px){
+ .dashboard-top>.hero-debts .debt-person{
+  grid-template-columns:36px minmax(90px,1fr) minmax(0,1fr) auto;
+  column-gap:10px;
+ }
+ .dashboard-top>.hero-debts .debt-date{
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  justify-self:stretch;
+  text-align:center;
+  padding:0 4px;
+  white-space:nowrap;
+ }
+}

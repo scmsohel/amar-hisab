@@ -931,3 +931,40 @@
  .hero-debts .debt-person div small{font-size:9px}
  .hero-debts .debt-person .due{font-size:8px;padding:5px 6px}
 }
+
+
+/* Final visual clarity pass for the debt panel: stronger text and more readable rows */
+.hero-debts{padding:15px 14px 12px}
+.hero-debts>.panel-title{padding-bottom:10px}
+.hero-debts>.panel-title h3{font-size:16px;font-weight:800;color:var(--text)}
+.hero-debts>.panel-title .link{font-size:12px;font-weight:700}
+.hero-debts .debt-summary{gap:9px;margin-bottom:8px}
+.hero-debts .debt-total{min-height:74px;padding:10px 11px;gap:10px;border-radius:12px}
+.hero-debts .debt-total>span{width:44px;height:44px;font-size:27px}
+.hero-debts .debt-total small{font-size:12px;font-weight:600}
+.hero-debts .debt-total b{font-size:17px;font-weight:800;letter-spacing:-.2px}
+.hero-debts .debt-total em{font-size:10px;font-weight:500;margin-top:3px}
+.hero-debts .debt-person{padding:10px 0;min-height:60px;column-gap:10px}
+.hero-debts .person-icon{width:34px;height:34px}
+.hero-debts .person-icon svg{width:19px;height:19px}
+.hero-debts .debt-person b{font-size:13px;font-weight:800}
+.hero-debts .debt-person div small{font-size:11px;font-weight:500;margin-top:3px}
+.hero-debts .debt-date{font-size:11px;font-weight:500}
+.hero-debts .debt-person .due{font-size:11px;font-weight:700;padding:8px 10px;border-radius:10px}
+@media(max-width:1100px){
+ .hero-debts .debt-person{grid-template-columns:32px minmax(70px,1fr) auto;column-gap:8px}
+ .hero-debts .debt-date{display:none}
+}
+@media(max-width:700px){
+ .hero-debts{padding:12px}
+ .hero-debts>.panel-title h3{font-size:14px}
+ .hero-debts .debt-total{min-height:65px;padding:8px 7px;gap:6px}
+ .hero-debts .debt-total>span{width:32px;height:32px;font-size:19px}
+ .hero-debts .debt-total small{font-size:9px}
+ .hero-debts .debt-total b{font-size:12px}
+ .hero-debts .debt-total em{font-size:8px}
+ .hero-debts .debt-person{grid-template-columns:28px minmax(70px,1fr) auto;gap:6px;padding:9px 0}
+ .hero-debts .debt-person b{font-size:10px}
+ .hero-debts .debt-person div small{font-size:9px}
+ .hero-debts .debt-person .due{font-size:8px;padding:5px 6px}
+}

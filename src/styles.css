@@ -852,3 +852,14 @@
  .stats .stat-copy strong{font-size:15px}
  .stats .stat-caption{font-size:8px;padding:3px 5px}
 }
+
+
+/* Give each wallet tile its own soft pastel background */
+.wallet-box.wallet-cash{background:linear-gradient(135deg,#effbf5,#e5f8ef);border-color:#d7f1e4}
+.wallet-box.wallet-bank{background:linear-gradient(135deg,#f0f7ff,#e5f1ff);border-color:#d9e9ff}
+.wallet-box.wallet-bkash{background:linear-gradient(135deg,#fff3f7,#fdeaf1);border-color:#f8dfe9}
+.wallet-box.wallet-nagad{background:linear-gradient(135deg,#fff8ed,#fff0dc);border-color:#f7e6cf}
+.dark .wallet-box.wallet-cash{background:linear-gradient(135deg,#19382f,#203b32);border-color:#2a5746}
+.dark .wallet-box.wallet-bank{background:linear-gradient(135deg,#1d3043,#22374d);border-color:#2d4964}
+.dark .wallet-box.wallet-bkash{background:linear-gradient(135deg,#3b2632,#382732);border-color:#573646}
+.dark .wallet-box.wallet-nagad{background:linear-gradient(135deg,#3c3024,#392e25);border-color:#5b4731}

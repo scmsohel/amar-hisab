@@ -682,3 +682,29 @@
 .sidebar.collapsed .sidebar-notification{align-self:center;justify-content:center;align-items:center}
 .sidebar.collapsed .sidebar-notification svg{display:block;margin:0 auto}
 .sidebar.collapsed .sidebar-profile .avatar{margin-inline:auto}
+
+
+/* Center only the notification bell in the collapsed desktop sidebar */
+@media(min-width:701px){
+ .sidebar.collapsed .side-bottom .sidebar-notification{
+  width:42px;
+  min-width:42px;
+  align-self:center;
+  justify-content:center;
+  padding:0;
+  margin-inline:auto;
+  position:relative;
+ }
+ .sidebar.collapsed .side-bottom .sidebar-notification svg{
+  width:19px;
+  height:19px;
+  margin:0;
+  flex:0 0 19px;
+ }
+ .sidebar.collapsed .side-bottom .sidebar-notification i{
+  position:absolute;
+  top:0;
+  right:0;
+  transform:translate(25%,-20%);
+ }
+}

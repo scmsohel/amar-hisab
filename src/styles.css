@@ -590,3 +590,28 @@
  .sidebar.collapsed .sidebar-logo{justify-content:flex-start;width:auto;height:auto}
  .sidebar.collapsed .sidebar-brand-copy{display:block!important}
 }
+
+
+/* Compact sidebar spacing while keeping the logo and labels readable */
+.sidebar{padding:16px 12px 10px}
+.sidebar.collapsed{padding-inline:10px}
+.sidebar .brand{gap:7px;padding:0 3px 16px;min-height:44px}
+.sidebar .sidebar-logo{gap:8px}
+.sidebar .sidebar-logo .brand-icon{width:34px;height:34px;flex-basis:34px;border-radius:10px}
+.sidebar .sidebar-brand-copy b{font-size:14px}
+.sidebar .sidebar-brand-copy small{font-size:9px;margin-top:1px}
+.sidebar .overline{padding:0 10px 7px;font-size:9px}
+.sidebar nav{gap:2px}
+.sidebar .nav{height:38px;gap:10px;padding:0 10px;font-size:12px;border-radius:9px}
+.sidebar .nav svg{width:16px;height:16px}
+.sidebar .nav i{font-size:9px;padding:2px 5px}
+.sidebar .side-bottom{padding-top:12px}
+.sidebar.collapsed .brand{padding-bottom:16px}
+.sidebar.collapsed .sidebar-logo{width:38px;height:38px}
+.sidebar.collapsed .sidebar-logo .brand-icon{width:34px;height:34px}
+@media(max-width:700px){
+ .sidebar{padding:16px 12px 10px}
+ .sidebar .brand{padding:0 3px 16px;min-height:44px}
+ .sidebar .nav{height:40px}
+ .sidebar.collapsed .brand{padding:0 3px 16px}
+}

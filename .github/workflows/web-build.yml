@@ -1,4 +1,4 @@
-name: Web prototype build and Pages preview
+name: Web prototype build
 
 on:
   push:
@@ -25,33 +25,3 @@ jobs:
         run: npm run build
       - name: Build Proxmox preview image
         run: docker build -t amar-hisab-web-preview:test .
-
-  deploy-pages:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/web-prototype'
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-      - name: Install dependencies
-        run: npm install
-      - name: Build for GitHub Pages
-        run: npm run build -- --mode github-pages
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4

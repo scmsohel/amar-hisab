@@ -991,3 +991,14 @@
   align-self:start!important;
  }
 }
+
+
+/* Correct selector: debts is a sibling of dashboard-main inside dashboard-top */
+@media(min-width:1251px){
+ .dashboard-top>.hero-debts{
+  height:276px!important;
+  min-height:276px!important;
+  align-self:start!important;
+  box-sizing:border-box;
+ }
+}

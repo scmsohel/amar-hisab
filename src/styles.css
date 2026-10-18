@@ -615,3 +615,10 @@
  .sidebar .nav{height:40px}
  .sidebar.collapsed .brand{padding:0 3px 16px}
 }
+
+
+/* Reduce expanded sidebar width only; keep navigation spacing unchanged */
+@media(min-width:701px){
+ .sidebar:not(.collapsed){width:200px}
+ .sidebar:not(.collapsed)~.main{margin-left:200px}
+}

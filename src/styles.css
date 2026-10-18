@@ -640,3 +640,35 @@
  .sidebar .nav{height:38px}
  .sidebar .nav svg{width:19px;height:19px}
 }
+
+
+/* Keep the top header minimal; notification and profile live in the sidebar */
+.topbar{justify-content:flex-start}
+.topbar .crumb{min-width:0}
+.sidebar .side-bottom{display:flex;flex-direction:column;gap:7px;border-top:1px solid var(--border);padding-top:12px}
+.sidebar-notification{position:relative;width:100%;min-height:38px;display:flex;align-items:center;gap:11px;padding:0 10px;border:0;border-radius:9px;background:transparent;color:var(--muted);text-align:left;font-size:12px}
+.sidebar-notification svg{flex:0 0 19px}
+.sidebar-notification>span{flex:1}
+.sidebar-notification i{font:600 9px Inter,sans-serif;font-style:normal;background:#ffe8e7;color:#dc5d5d;border-radius:6px;padding:3px 5px}
+.sidebar-notification:hover{background:var(--surface2);color:var(--text)}
+.sidebar-profile{display:flex;align-items:center;gap:9px;padding:9px 5px 2px;border-top:1px solid var(--border);min-width:0}
+.sidebar-profile .avatar{width:32px;height:32px;flex:0 0 32px;font-size:12px}
+.sidebar-profile-copy{min-width:0;display:block;overflow:hidden;white-space:nowrap}
+.sidebar-profile-copy b,.sidebar-profile-copy small{display:block;overflow:hidden;text-overflow:ellipsis}
+.sidebar-profile-copy b{font-size:12px}
+.sidebar-profile-copy small{font-size:9px;color:var(--muted);margin-top:2px}
+.sidebar.collapsed .side-bottom{align-items:center}
+.sidebar.collapsed .sidebar-notification{justify-content:center;width:42px;padding:0}
+.sidebar.collapsed .sidebar-notification>span{display:none}
+.sidebar.collapsed .sidebar-notification i{position:absolute;top:1px;right:1px;padding:2px 4px}
+.sidebar.collapsed .sidebar-profile{justify-content:center;width:100%;padding:9px 0 2px}
+.sidebar.collapsed .sidebar-profile-copy{display:none}
+@media(max-width:700px){
+ .topbar{justify-content:space-between}
+ .sidebar .side-bottom{display:flex}
+ .sidebar.collapsed .sidebar-notification{justify-content:flex-start;width:100%;padding:0 10px}
+ .sidebar.collapsed .sidebar-notification>span{display:block}
+ .sidebar.collapsed .sidebar-notification i{position:static}
+ .sidebar.collapsed .sidebar-profile{justify-content:flex-start;padding:9px 5px 2px}
+ .sidebar.collapsed .sidebar-profile-copy{display:block}
+}

@@ -968,3 +968,9 @@
  .hero-debts .debt-person div small{font-size:9px}
  .hero-debts .debt-person .due{font-size:8px;padding:5px 6px}
 }
+
+
+/* Extend the debt panel down to the bottom edge of the summary-card row */
+@media(min-width:1251px){
+ .dashboard-main .hero-debts{min-height:276px;height:100%;align-self:stretch}
+}

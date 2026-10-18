@@ -974,3 +974,9 @@
 @media(min-width:1251px){
  .dashboard-main .hero-debts{min-height:276px;height:100%;align-self:stretch}
 }
+
+
+/* Slightly extend the debt panel downward to match the highlighted target height */
+@media(min-width:1251px){
+ .dashboard-main .hero-debts{min-height:292px;height:100%;align-self:stretch}
+}

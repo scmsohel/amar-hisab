@@ -553,3 +553,20 @@
 @media(min-width:1251px){.balance-top{gap:13px;padding:17px 18px 15px}.balance-top .wallet-art{width:52px;height:52px;flex-basis:52px}.balance-content .big{font-size:29px}.balance-sparkline{width:96px;height:56px;right:10px}}
 @media(max-width:1250px){.balance-top{gap:12px;padding:18px 18px 15px}.balance-top .wallet-art{width:48px;height:48px;flex-basis:48px}.balance-content .big{font-size:28px}.balance-sparkline{width:82px;height:48px;right:8px;bottom:10px}}
 @media(max-width:700px){.balance-top{gap:10px;padding:18px 14px 13px;min-height:126px}.balance-top .wallet-art{width:42px;height:42px;flex-basis:42px}.balance-top .wallet-art>svg{width:20px;height:20px}.balance-content .big{font-size:24px}.balance-content .change{font-size:9px;padding:4px}.balance-content .change span{font-size:9px}.balance-sparkline{width:55px;height:34px;right:5px;bottom:8px;opacity:.6}}
+
+
+/* Balance card typography spacing: lift label, tighten amount gap, clarify monthly change */
+.balance-content .label{transform:translateY(-3px)}
+.balance-content .big{margin-top:0;line-height:1.12}
+.balance-content .change{margin-top:4px;font-size:11px;padding:5px 7px;gap:6px}
+.balance-content .change svg{width:14px;height:14px;flex:0 0 14px}
+.balance-content .change span{font-size:11px}
+@media(max-width:1250px){
+ .balance-content .change{font-size:10px;padding:5px 6px}
+ .balance-content .change span{font-size:10px}
+}
+@media(max-width:700px){
+ .balance-content .label{transform:translateY(-2px)}
+ .balance-content .change{font-size:9px;padding:4px 5px;gap:4px}
+ .balance-content .change span{font-size:9px}
+}

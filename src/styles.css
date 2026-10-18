@@ -980,3 +980,14 @@
 @media(min-width:1251px){
  .dashboard-main .hero-debts{min-height:292px;height:100%;align-self:stretch}
 }
+
+
+/* Desktop alignment fix: debt card should reach the bottom of the four summary cards */
+@media(min-width:1251px){
+ .dashboard-main .hero-grid>.hero-debts{
+  height:276px!important;
+  min-height:276px!important;
+  box-sizing:border-box;
+  align-self:start!important;
+ }
+}

@@ -794,3 +794,33 @@
  .stats .stat-mini-bars i:nth-child(3){height:18px}
  .stats .stat-mini-bars i:nth-child(4){height:23px}
 }
+
+
+/* Keep summary card dimensions unchanged; compact only the inner content */
+.stats .stat{gap:12px;padding:16px 15px}
+.stats .stat-icon{width:48px;height:48px;flex-basis:48px}
+.stats .stat-icon svg{width:24px;height:24px;stroke-width:2.5}
+.stats .stat-copy p{font-size:12px;margin-bottom:5px}
+.stats .stat-copy strong{font-size:23px;letter-spacing:-.4px}
+.stats .stat-caption{font-size:10px;margin-top:7px;padding:4px 8px}
+.stats .stat-mini-bars{right:11px;bottom:13px;height:27px;gap:3px;opacity:.42}
+.stats .stat-mini-bars i{width:5px;height:9px}
+.stats .stat-mini-bars i:nth-child(2){height:15px}
+.stats .stat-mini-bars i:nth-child(3){height:21px}
+.stats .stat-mini-bars i:nth-child(4){height:27px}
+@media(max-width:1100px){
+ .stats .stat{gap:10px;padding:14px 11px}
+ .stats .stat-icon{width:42px;height:42px;flex-basis:42px}
+ .stats .stat-icon svg{width:21px;height:21px}
+ .stats .stat-copy p{font-size:11px}
+ .stats .stat-copy strong{font-size:20px}
+ .stats .stat-caption{font-size:9px;padding:4px 7px}
+}
+@media(max-width:700px){
+ .stats .stat{padding:12px 9px;gap:8px}
+ .stats .stat-icon{width:34px;height:34px;flex-basis:34px}
+ .stats .stat-icon svg{width:18px;height:18px}
+ .stats .stat-copy p{font-size:10px}
+ .stats .stat-copy strong{font-size:16px}
+ .stats .stat-caption{font-size:8px;padding:3px 5px}
+}

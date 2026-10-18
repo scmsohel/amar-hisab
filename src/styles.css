@@ -570,3 +570,23 @@
  .balance-content .change{font-size:9px;padding:4px 5px;gap:4px}
  .balance-content .change span{font-size:9px}
 }
+
+
+/* Sidebar branding: the logo itself toggles expanded/collapsed mode */
+.sidebar .brand{justify-content:flex-start;gap:8px;padding:0 4px 24px;min-height:52px}
+.sidebar .sidebar-logo{display:flex;align-items:center;gap:10px;min-width:0;flex:1;border:0;padding:0;background:transparent;color:var(--text);text-align:left;border-radius:10px}
+.sidebar .sidebar-logo:focus-visible{outline:3px solid #55cba4;outline-offset:3px}
+.sidebar .sidebar-logo .brand-icon{width:39px;height:39px;border-radius:11px;flex:0 0 39px}
+.sidebar .sidebar-brand-copy{display:block;min-width:0;overflow:hidden;white-space:nowrap}
+.sidebar .sidebar-brand-copy b{display:block;font-size:16px;line-height:1.2;white-space:nowrap}
+.sidebar .sidebar-brand-copy small{display:block;font:10px Inter,sans-serif;color:var(--muted);margin-top:2px;white-space:nowrap}
+.sidebar.collapsed .brand{justify-content:center;padding:0 0 24px}
+.sidebar.collapsed .sidebar-logo{flex:0 0 auto;justify-content:center;width:42px;height:42px}
+.sidebar.collapsed .sidebar-logo .brand-icon{width:39px;height:39px}
+.sidebar.collapsed .sidebar-brand-copy{display:none!important}
+@media(max-width:700px){
+ .sidebar .brand{justify-content:flex-start;padding:0 4px 24px}
+ .sidebar.collapsed .brand{justify-content:flex-start;padding:0 4px 24px}
+ .sidebar.collapsed .sidebar-logo{justify-content:flex-start;width:auto;height:auto}
+ .sidebar.collapsed .sidebar-brand-copy{display:block!important}
+}

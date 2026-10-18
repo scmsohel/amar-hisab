@@ -708,3 +708,29 @@
   transform:translate(25%,-20%);
  }
 }
+
+
+/* Subtle, consistent hover feedback for dashboard cards */
+.balance,.wallet-box,.stat,.quick-row,.bill-row,.debt-row{
+ transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+}
+.balance:hover{
+ box-shadow:0 10px 26px #0a9b6b18;
+ border-color:#a8e5cb;
+}
+.wallet-box:hover{
+ transform:translateY(-3px);
+ box-shadow:0 7px 18px #0a9b6b17;
+ border-color:#a8e5cb;
+}
+.stat:hover{
+ box-shadow:0 9px 22px #1d344812;
+ border-color:#c5e8d8;
+}
+.dark .balance:hover,.dark .wallet-box:hover,.dark .stat:hover{
+ box-shadow:0 10px 24px #0003;
+ border-color:#34785d;
+}
+@media(prefers-reduced-motion:reduce){
+ .balance,.wallet-box,.stat,.quick-row,.bill-row,.debt-row{transition:none}
+}

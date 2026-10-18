@@ -622,3 +622,21 @@
  .sidebar:not(.collapsed){width:200px}
  .sidebar:not(.collapsed)~.main{margin-left:200px}
 }
+
+
+/* Final expanded sidebar tuning: narrower width, hide section caption, tighter rows, larger icons */
+@media(min-width:701px){
+ .sidebar:not(.collapsed){width:180px}
+ .sidebar:not(.collapsed)~.main{margin-left:180px}
+}
+.sidebar .overline{display:none!important}
+.sidebar nav{gap:1px}
+.sidebar .nav{height:36px;gap:9px}
+.sidebar .nav svg{width:19px;height:19px}
+.sidebar .nav i{font-size:9px}
+@media(max-width:700px){
+ .sidebar .overline{display:none!important}
+ .sidebar nav{gap:1px}
+ .sidebar .nav{height:38px}
+ .sidebar .nav svg{width:19px;height:19px}
+}

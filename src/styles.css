@@ -539,3 +539,17 @@
  .wallet-panel .wallet-box{min-height:66px;padding:7px;gap:4px}
  .wallet-panel .wallet-box small{display:none}
 }
+
+
+/* Balance card: icon first, details next, and a subtle trend line on the right */
+.balance-top{display:flex;align-items:center;gap:14px;padding:18px 18px 16px;min-height:145px}
+.balance-top .wallet-art{position:relative;inset:auto;right:auto;top:auto;width:56px;height:56px;flex:0 0 56px;border-radius:50%;transform:none;box-shadow:none;background:linear-gradient(145deg,#10aa76,#087f59)}
+.balance-top .wallet-art>svg{width:24px;height:24px}
+.balance-top .wallet-art b{right:7px;top:5px}
+.balance-content{position:relative;z-index:1;min-width:0;flex:1}
+.balance-content .big{font-size:30px;letter-spacing:-.7px;margin-top:4px}
+.balance-content .change{margin-top:6px}
+.balance-sparkline{position:absolute;width:104px;height:62px;right:12px;bottom:13px;opacity:.72;pointer-events:none}
+@media(min-width:1251px){.balance-top{gap:13px;padding:17px 18px 15px}.balance-top .wallet-art{width:52px;height:52px;flex-basis:52px}.balance-content .big{font-size:29px}.balance-sparkline{width:96px;height:56px;right:10px}}
+@media(max-width:1250px){.balance-top{gap:12px;padding:18px 18px 15px}.balance-top .wallet-art{width:48px;height:48px;flex-basis:48px}.balance-content .big{font-size:28px}.balance-sparkline{width:82px;height:48px;right:8px;bottom:10px}}
+@media(max-width:700px){.balance-top{gap:10px;padding:18px 14px 13px;min-height:126px}.balance-top .wallet-art{width:42px;height:42px;flex-basis:42px}.balance-top .wallet-art>svg{width:20px;height:20px}.balance-content .big{font-size:24px}.balance-content .change{font-size:9px;padding:4px}.balance-content .change span{font-size:9px}.balance-sparkline{width:55px;height:34px;right:5px;bottom:8px;opacity:.6}}

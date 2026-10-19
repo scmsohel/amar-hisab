@@ -1570,3 +1570,25 @@
     text-shadow:none!important;
   }
 }
+
+
+/* Consistent subtle hover effect for the three analytics cards */
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+  .charts>.chart-panel,
+  .charts>.best-expenses,
+  .charts>.category{
+    transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease;
+  }
+  .charts>.chart-panel:hover,
+  .charts>.best-expenses:hover,
+  .charts>.category:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 24px #1d34481a;
+    border-color:#cfe9df;
+  }
+}
+.dark .charts>.chart-panel:hover,
+.dark .charts>.best-expenses:hover,
+.dark .charts>.category:hover{
+  border-color:#36594d;
+}

@@ -1516,3 +1516,25 @@
   }
   .charts>.category .cat-row .cat-values span{min-width:44px;text-align:right}
 }
+
+
+/* Increase readability of the income/expense chart labels and summary */
+@media(min-width:1251px){
+  .charts>.chart-panel .panel-title p{
+    font-size:13px!important;
+    line-height:1.45;
+  }
+  .charts>.chart-panel .legend{
+    font-size:12px!important;
+  }
+  .charts>.chart-panel .chart-foot{
+    font-size:12px!important;
+  }
+  .charts>.chart-panel .chart-foot b,
+  .charts>.chart-panel .chart-foot strong{
+    font-size:12px!important;
+  }
+  .charts>.chart-panel .chart .recharts-cartesian-axis-tick-value{
+    font-size:12px!important;
+  }
+}

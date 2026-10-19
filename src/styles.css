@@ -485,15 +485,23 @@
 }
 
 
-/* Use the supplied 62px bKash mark only in wallet cards; leave Nagad unchanged */
+/* Align the supplied bKash mark with the wallet label; keep Nagad unchanged */
 @media(min-width:1251px){
- .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand{overflow:visible}
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand{
+  width:62px;height:62px;flex:0 0 62px;overflow:visible;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  background:transparent!important;background-color:transparent!important
+ }
  .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{
   display:block;width:62px;height:62px;max-width:none;object-fit:contain;transform:none
  }
 }
 @media(max-width:1250px){
- .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand{overflow:visible}
+ .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand{
+  width:62px;height:62px;flex:0 0 62px;overflow:visible;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  background:transparent!important;background-color:transparent!important
+ }
  .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{
   display:block;width:62px;height:62px;max-width:none;object-fit:contain;transform:none
  }

@@ -1296,6 +1296,34 @@
 }
 
 
+
+/* Match analytics-row typography with the upper dashboard cards */
+@media(min-width:1251px){
+  .charts>.chart-panel .panel-title h3,
+  .charts>.best-expenses .panel-title h3,
+  .charts>.category .panel-title h3{
+    font-size:18px;
+    line-height:1.35;
+    font-weight:800;
+  }
+  .charts>.chart-panel .panel-title p,
+  .charts>.best-expenses .panel-title p,
+  .charts>.category .panel-title p{
+    font-size:11px;
+    line-height:1.45;
+  }
+  .charts>.chart-panel .legend{font-size:10px}
+  .charts>.chart-panel .chart-foot{font-size:10px}
+  .charts>.chart-panel .chart-foot b,
+  .charts>.chart-panel .chart-foot strong{font-size:10px}
+  .charts>.best-expenses .best-expense-name{font-size:12px}
+  .charts>.best-expenses .best-expense-row small{font-size:11px}
+  .charts>.best-expenses .best-expense-row b{font-size:11px}
+  .charts>.category .cat-row{font-size:11px}
+  .charts>.category .cat-row b{font-size:11px}
+  .charts>.category>.link{font-size:11px}
+}
+
 /* Three-card analytics row: trend, best expense categories, expense breakdown */
 @media(min-width:1251px){
   .charts{

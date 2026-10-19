@@ -1174,25 +1174,23 @@
 }
 @media(min-width:1251px){
  .dashboard-top>.hero-debts .debt-person{
-  grid-template-columns:36px minmax(90px,1fr) minmax(0,1fr) auto;
-  column-gap:12px;
+  grid-template-columns:34px minmax(65px,1fr) minmax(0,auto) auto;
+  column-gap:8px;
  }
  .dashboard-top>.hero-debts .debt-date{
-  grid-column:4;
-  padding:0 2px;
-  font-size:13px;
+  grid-column:auto;
+  padding:0;
+  font-size:12px;
   white-space:nowrap;
   line-height:1.4;
   overflow-wrap:normal;
   text-align:center;
  }
  .dashboard-top>.hero-debts .debt-person .due{
-  grid-column:3;
+  grid-column:auto;
   justify-self:start;
-  margin-left:0;
-  margin-right:0;
+  margin:0;
  }
- .dashboard-top>.hero-debts .debt-person .due{margin-left:4px;margin-right:8px}
 }
 
 

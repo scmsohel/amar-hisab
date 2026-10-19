@@ -2103,20 +2103,38 @@
 @media(max-width:480px){.transaction-datetime-fields{gap:8px}}
 
 
-/* Keep wallet panel dimensions unchanged; fit wallet contents inside the existing card */
+/* Wallet layout refinement: preserve the current card dimensions */
 .dashboard-main .wallet-panel{min-width:0;min-height:0;overflow:visible}
-.dashboard-main .wallet-panel .wallets{min-width:0;align-items:stretch;gap:8px}
+.dashboard-main .wallet-panel .wallets{
+ min-width:0;align-items:stretch;gap:8px
+}
 .dashboard-main .wallet-panel .wallet-box{
  box-sizing:border-box;min-width:0;min-height:0;height:100%;
- padding:8px 7px;gap:7px;overflow:visible;align-items:center
+ padding:8px 7px;gap:9px;overflow:visible;align-items:center
 }
 .dashboard-main .wallet-panel .wallet-box>.wallet-brand-icon{
- width:42px;height:42px;flex:0 0 42px;min-width:0
+ width:42px;height:42px;flex:0 0 42px;min-width:0;border-radius:50%;
+ display:grid;place-items:center;overflow:hidden
 }
-.dashboard-main .wallet-panel .wallet-box>.wallet-brand-icon svg{width:30px;height:30px;max-width:100%}
-.dashboard-main .wallet-panel .wallet-box>.wallet-brand-icon img{max-width:100%;max-height:100%;object-fit:contain}
+.dashboard-main .wallet-panel .wallet-box.wallet-cash>.wallet-brand-icon{background:#d5f7e9}
+.dashboard-main .wallet-panel .wallet-box.wallet-bank>.wallet-brand-icon{background:#dcecff}
+.dashboard-main .wallet-panel .wallet-box.wallet-bkash>.wallet-brand-icon{background:#ffe0eb}
+.dashboard-main .wallet-panel .wallet-box.wallet-nagad>.wallet-brand-icon{background:#ffebd0}
+.dashboard-main .wallet-panel .wallet-box>.wallet-brand-icon svg{
+ width:30px;height:30px;max-width:100%
+}
+.dashboard-main .wallet-panel .wallet-box>.wallet-brand-icon img{
+ width:34px;height:34px;max-width:100%;max-height:100%;object-fit:contain;transform:none
+}
+.dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{
+ width:38px;height:38px;max-width:100%;max-height:100%;object-fit:contain;transform:none
+}
+.dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand img{
+ width:32px;height:32px;max-width:100%;max-height:100%;object-fit:contain;transform:none
+}
 .dashboard-main .wallet-panel .wallet-box .wallet-info{
- min-width:0;max-width:100%;overflow:visible;gap:4px
+ min-width:0;max-width:100%;overflow:visible;gap:4px;
+ display:flex;flex-direction:column;align-items:flex-start;justify-content:center
 }
 .dashboard-main .wallet-panel .wallet-box .wallet-info b{
  max-width:100%;font-size:13px;line-height:1.2;white-space:nowrap
@@ -2128,6 +2146,10 @@
 @media(min-width:701px) and (max-width:1250px){
  .dashboard-main .wallet-panel .wallet-box{padding:7px;gap:6px}
  .dashboard-main .wallet-panel .wallet-box>.wallet-brand-icon{width:38px;height:38px;flex-basis:38px}
+ .dashboard-main .wallet-panel .wallet-box>.wallet-brand-icon svg{width:27px;height:27px}
+ .dashboard-main .wallet-panel .wallet-box>.wallet-brand-icon img{width:30px;height:30px}
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{width:34px;height:34px}
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand img{width:28px;height:28px}
  .dashboard-main .wallet-panel .wallet-box .wallet-info b{font-size:12px}
  .dashboard-main .wallet-panel .wallet-box .wallet-info strong{font-size:15px}
 }
@@ -2135,6 +2157,9 @@
  .dashboard-main .wallet-panel .wallet-box{padding:7px;gap:6px}
  .dashboard-main .wallet-panel .wallet-box>.wallet-brand-icon{width:34px;height:34px;flex-basis:34px}
  .dashboard-main .wallet-panel .wallet-box>.wallet-brand-icon svg{width:25px;height:25px}
+ .dashboard-main .wallet-panel .wallet-box>.wallet-brand-icon img{width:28px;height:28px}
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{width:32px;height:32px}
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand img{width:26px;height:26px}
  .dashboard-main .wallet-panel .wallet-box .wallet-info b{font-size:11px}
  .dashboard-main .wallet-panel .wallet-box .wallet-info strong{font-size:13px}
 }

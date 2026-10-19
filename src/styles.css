@@ -2224,3 +2224,21 @@
   border-color:#36594d;
  }
 }
+
+
+/* Final debt-card hover override: neutralize older conflicting rules */
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+ .dashboard-top>.hero-debts{
+  transition:translate .28s cubic-bezier(.2,.75,.25,1),box-shadow .28s ease,border-color .28s ease!important;
+  will-change:translate;
+ }
+ .dashboard-top>.hero-debts:hover{
+  translate:0 -3px!important;
+  box-shadow:0 12px 26px #1d34481a!important;
+  border-color:#b8e5d2!important;
+ }
+ .dark .dashboard-top>.hero-debts:hover{
+  box-shadow:0 12px 28px #0003!important;
+  border-color:#36594d!important;
+ }
+}

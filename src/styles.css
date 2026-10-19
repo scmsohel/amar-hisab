@@ -1297,6 +1297,16 @@
 
 
 
+/* Final typography adjustments requested for the three analytics cards */
+@media(min-width:1251px){
+  .charts>.chart-panel .panel-title h3{font-size:18px}
+  .charts>.best-expenses .panel-title p{font-size:13px;line-height:1.45}
+  .charts>.category .donut-hole small{font-size:10px}
+  .charts>.category .donut-hole b{font-size:14px}
+  .charts>.category .cat-row{font-size:12px}
+  .charts>.category .cat-row b{font-size:12px}
+}
+
 /* Match analytics-row typography with the upper dashboard cards */
 @media(min-width:1251px){
   .charts>.chart-panel .panel-title h3,

@@ -1643,14 +1643,10 @@
     from{transform:scaleX(0)}
     to{transform:scaleX(1)}
   }
-  @property --donut-seg1{syntax:"<percentage>";inherits:false;initial-value:0%}
-  @property --donut-seg2{syntax:"<percentage>";inherits:false;initial-value:32%}
-  @property --donut-seg3{syntax:"<percentage>";inherits:false;initial-value:58%}
-  @property --donut-seg4{syntax:"<percentage>";inherits:false;initial-value:74%}
-  @property --donut-seg5{syntax:"<percentage>";inherits:false;initial-value:88%}
+  @property --donut-reveal{syntax:"<angle>";inherits:false;initial-value:0deg}
   @keyframes dashboard-donut-fill{
-    from{--donut-seg1:0%;--donut-seg2:32%;--donut-seg3:58%;--donut-seg4:74%;--donut-seg5:88%}
-    to{--donut-seg1:32%;--donut-seg2:58%;--donut-seg3:74%;--donut-seg4:88%;--donut-seg5:100%}
+    from{--donut-reveal:0deg}
+    to{--donut-reveal:360deg}
   }
   .content>.welcome{
     animation:dashboard-enter .42s cubic-bezier(.2,.7,.2,1) both;
@@ -1682,19 +1678,25 @@
     animation:dashboard-bar-grow .8s cubic-bezier(.2,.7,.2,1) .35s both;
   }
   .charts>.category .donut{
-    --donut-seg1:32%;--donut-seg2:58%;--donut-seg3:74%;--donut-seg4:88%;--donut-seg5:100%;
-    background:conic-gradient(
-      #10a875 0 var(--donut-seg1),
-      var(--surface) var(--donut-seg1) 32%,
-      #71cdb0 32% var(--donut-seg2),
-      var(--surface) var(--donut-seg2) 58%,
-      #94b9fb 58% var(--donut-seg3),
-      var(--surface) var(--donut-seg3) 74%,
-      #ffc878 74% var(--donut-seg4),
-      var(--surface) var(--donut-seg4) 88%,
-      #c8cfe0 88% var(--donut-seg5)
-    );
-    animation:dashboard-donut-fill 1.15s cubic-bezier(.2,.7,.2,1) .24s both;
+    position:relative;
+    isolation:isolate;
+  }
+  /* Reveal the existing, data-driven color segments in place; never rotate or replace the chart */
+  .charts>.category .donut::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:50%;
+    background:var(--surface);
+    pointer-events:none;
+    z-index:1;
+    -webkit-mask:conic-gradient(transparent 0deg var(--donut-reveal),#000 var(--donut-reveal) 360deg);
+    mask:conic-gradient(transparent 0deg var(--donut-reveal),#000 var(--donut-reveal) 360deg);
+    animation:dashboard-donut-fill 1.35s cubic-bezier(.2,.7,.2,1) .2s both;
+  }
+  .charts>.category .donut-hole{
+    position:relative;
+    z-index:2;
   }
   .charts>.chart-panel .recharts-area-curve{
     animation:dashboard-chart-line .9s ease-out .28s both;
@@ -1715,6 +1717,7 @@
   .charts>.category,
   .charts>.best-expenses .best-expense-track>i,
   .charts>.category .donut,
+  .charts>.category .donut::before,
   .charts>.chart-panel .recharts-area-curve{
     animation:none!important;
   }

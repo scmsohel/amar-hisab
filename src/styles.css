@@ -2188,3 +2188,36 @@
   width:46px;height:46px;max-width:none;max-height:none;transform:none
  }
 }
+
+
+/* Restore hover lift after dashboard entrance animations */
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+ .dashboard-top>.dashboard-main .hero-grid>.balance,
+ .dashboard-top>.dashboard-main .hero-grid>.wallet-panel,
+ .dashboard-top>.dashboard-main .stats>.stat,
+ .dashboard-top>.dashboard-main .charts>.chart-panel,
+ .dashboard-top>.dashboard-main .charts>.best-expenses,
+ .dashboard-top>.dashboard-main .charts>.category{
+  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+ }
+ .dashboard-top>.dashboard-main .hero-grid>.balance:hover,
+ .dashboard-top>.dashboard-main .hero-grid>.wallet-panel:hover,
+ .dashboard-top>.dashboard-main .stats>.stat:hover,
+ .dashboard-top>.dashboard-main .charts>.chart-panel:hover,
+ .dashboard-top>.dashboard-main .charts>.best-expenses:hover,
+ .dashboard-top>.dashboard-main .charts>.category:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 26px #1d34481a;
+  border-color:#b8e5d2;
+  animation:none;
+ }
+ .dark .dashboard-top>.dashboard-main .hero-grid>.balance:hover,
+ .dark .dashboard-top>.dashboard-main .hero-grid>.wallet-panel:hover,
+ .dark .dashboard-top>.dashboard-main .stats>.stat:hover,
+ .dark .dashboard-top>.dashboard-main .charts>.chart-panel:hover,
+ .dark .dashboard-top>.dashboard-main .charts>.best-expenses:hover,
+ .dark .dashboard-top>.dashboard-main .charts>.category:hover{
+  box-shadow:0 12px 28px #0003;
+  border-color:#36594d;
+ }
+}

@@ -1893,3 +1893,41 @@
  .dashboard-transaction-filter-row .transaction-sort{margin-left:0}
  .dashboard-transactions .transaction-pagination{padding:11px 13px}
 }
+
+
+/* Increase typography throughout the dashboard recent-transactions card */
+.dashboard-transactions .dashboard-transaction-heading>h3{font-size:21px}
+.dashboard-transactions .dashboard-transaction-heading{padding:16px 20px 14px}
+.dashboard-transactions .transaction-heading-controls .transaction-search,
+.dashboard-transactions .transaction-heading-controls .transaction-search input,
+.dashboard-transactions .transaction-heading-controls .transaction-month select,
+.dashboard-transactions .transaction-heading-controls>.btn{font-size:14px}
+.dashboard-transactions .transaction-heading-controls .transaction-month{min-height:42px}
+.dashboard-transactions .transaction-heading-controls .transaction-filter-button{height:42px}
+.dashboard-transactions .transaction-filter-row .transaction-chip{font-size:14px;height:38px;padding-inline:14px}
+.dashboard-transactions .transaction-filter-row .transaction-select select{font-size:13px}
+.dashboard-transactions .transaction-filter-row>.transaction-select,
+.dashboard-transactions .transaction-filter-row .transaction-sort .transaction-select{min-height:38px}
+.dashboard-transactions .transaction-table th{font-size:13px;padding:12px 10px}
+.dashboard-transactions .transaction-table td{font-size:13px;padding:11px 10px}
+.dashboard-transactions .transaction-table .transaction-date-cell{font-size:12px}
+.dashboard-transactions .transaction-description b{font-size:14px}
+.dashboard-transactions .transaction-category,
+.dashboard-transactions .transaction-kind,
+.dashboard-transactions .transaction-wallet{font-size:12px}
+.dashboard-transactions .transaction-amount{font-size:14px!important;font-weight:650}
+.dashboard-transactions .transaction-balance{font-size:12px}
+.dashboard-transactions .transaction-pagination,
+.dashboard-transactions .transaction-pagination>span,
+.dashboard-transactions .transaction-pagination-controls,
+.dashboard-transactions .transaction-pagination-controls label{font-size:13px}
+.dashboard-transactions .transaction-pagination-controls button,
+.dashboard-transactions .transaction-pagination-controls select{font-size:13px;min-height:34px}
+.dashboard-transactions .transaction-pagination{padding:14px 20px}
+@media(max-width:700px){
+ .dashboard-transactions .dashboard-transaction-heading>h3{font-size:19px}
+ .dashboard-transactions .transaction-table th{font-size:12px}
+ .dashboard-transactions .transaction-table td{font-size:12px}
+ .dashboard-transactions .transaction-description b{font-size:13px}
+ .dashboard-transactions .transaction-amount{font-size:13px!important}
+}

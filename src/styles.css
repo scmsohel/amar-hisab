@@ -1643,9 +1643,14 @@
     from{transform:scaleX(0)}
     to{transform:scaleX(1)}
   }
+  @property --donut-seg1{syntax:"<percentage>";inherits:false;initial-value:0%}
+  @property --donut-seg2{syntax:"<percentage>";inherits:false;initial-value:32%}
+  @property --donut-seg3{syntax:"<percentage>";inherits:false;initial-value:58%}
+  @property --donut-seg4{syntax:"<percentage>";inherits:false;initial-value:74%}
+  @property --donut-seg5{syntax:"<percentage>";inherits:false;initial-value:88%}
   @keyframes dashboard-donut-fill{
-    from{background:conic-gradient(var(--surface) 0turn,#10a875 0turn)}
-    to{background:conic-gradient(#10a875 0 32%,#71cdb0 32% 58%,#94b9fb 58% 74%,#ffc878 74% 88%,#c8cfe0 88%)}
+    from{--donut-seg1:0%;--donut-seg2:32%;--donut-seg3:58%;--donut-seg4:74%;--donut-seg5:88%}
+    to{--donut-seg1:32%;--donut-seg2:58%;--donut-seg3:74%;--donut-seg4:88%;--donut-seg5:100%}
   }
   .content>.welcome{
     animation:dashboard-enter .42s cubic-bezier(.2,.7,.2,1) both;
@@ -1677,7 +1682,19 @@
     animation:dashboard-bar-grow .8s cubic-bezier(.2,.7,.2,1) .35s both;
   }
   .charts>.category .donut{
-    animation:dashboard-donut-fill .95s cubic-bezier(.2,.7,.2,1) .24s both;
+    --donut-seg1:32%;--donut-seg2:58%;--donut-seg3:74%;--donut-seg4:88%;--donut-seg5:100%;
+    background:conic-gradient(
+      #10a875 0 var(--donut-seg1),
+      var(--surface) var(--donut-seg1) 32%,
+      #71cdb0 32% var(--donut-seg2),
+      var(--surface) var(--donut-seg2) 58%,
+      #94b9fb 58% var(--donut-seg3),
+      var(--surface) var(--donut-seg3) 74%,
+      #ffc878 74% var(--donut-seg4),
+      var(--surface) var(--donut-seg4) 88%,
+      #c8cfe0 88% var(--donut-seg5)
+    );
+    animation:dashboard-donut-fill 1.15s cubic-bezier(.2,.7,.2,1) .24s both;
   }
   .charts>.chart-panel .recharts-area-curve{
     animation:dashboard-chart-line .9s ease-out .28s both;

@@ -1627,3 +1627,7 @@
 }
 .chart-range-menu button:hover,
 .chart-range-menu button.active{background:var(--surface2);color:#079b6b}
+
+
+/* Show three time-range choices at once; scroll for the remaining options */
+.chart-range-menu{max-height:102px;overflow-y:auto;overscroll-behavior:contain}

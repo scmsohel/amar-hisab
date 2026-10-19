@@ -1185,3 +1185,15 @@
  }
  .dashboard-top>.hero-debts .debt-person .due{margin-left:4px;margin-right:8px}
 }
+
+
+/* Make Bengali numerals in the welcome date easier to distinguish */
+@media(min-width:701px){
+ .welcome p span{
+  font-family:'Hind Siliguri',sans-serif;
+  font-weight:600;
+  letter-spacing:.15px;
+  word-spacing:1px;
+  text-rendering:geometricPrecision;
+ }
+}

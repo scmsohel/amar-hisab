@@ -1476,3 +1476,12 @@
   .charts>.category .cat-row{font-size:13px!important}
   .charts>.category .cat-row b{font-size:13px!important}
 }
+
+
+/* Enlarge the expense breakdown subtitle */
+@media(min-width:1251px){
+  .charts>.category .panel-title p{
+    font-size:13px!important;
+    line-height:1.45;
+  }
+}

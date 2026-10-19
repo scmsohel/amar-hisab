@@ -1538,3 +1538,24 @@
     font-size:12px!important;
   }
 }
+
+
+/* Hover only the receivable/payable summary boxes, not the full debt card */
+.dashboard-top>.hero-debts{
+  transition:none!important;
+}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+  .dashboard-top>.hero-debts:hover{
+    transform:none!important;
+    box-shadow:var(--shadow)!important;
+    border-color:var(--border)!important;
+  }
+  .dashboard-top>.hero-debts .debt-total{
+    transition:box-shadow .18s ease,filter .18s ease,transform .18s ease;
+  }
+  .dashboard-top>.hero-debts .debt-total:hover{
+    filter:saturate(1.08) brightness(.985);
+    box-shadow:0 5px 14px #1d344812;
+    transform:translateY(-2px);
+  }
+}

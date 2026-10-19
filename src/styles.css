@@ -1740,7 +1740,11 @@
 .transaction-table tbody tr:hover{background:var(--surface2)}
 .transaction-table input[type=checkbox]{width:15px;height:15px;accent-color:#079b6b;cursor:pointer}
 .transaction-table .select-cell{width:35px;padding-left:4px;padding-right:4px}
-.transaction-table .transaction-date-cell{color:var(--muted);font-size:10px}
+.transaction-table .transaction-date-cell{color:#526575;font-family:'Noto Serif Bengali','Hind Siliguri',serif;font-size:12px;font-weight:500;line-height:1.45;vertical-align:middle}
+.transaction-table .transaction-date-text{display:block;color:#344b5d;font-family:'Noto Serif Bengali','Hind Siliguri',serif;font-size:12px;font-weight:500;line-height:1.45}
+.transaction-table .transaction-time-cell{display:block;margin-top:3px;color:#718393;font-family:'Noto Serif Bengali','Hind Siliguri',serif;font-size:11px;font-weight:400;line-height:1.35}
+.dark .transaction-table .transaction-date-cell,.dark .transaction-table .transaction-date-text{color:#d0dce4}
+.dark .transaction-table .transaction-time-cell{color:#9aabb8}
 .transaction-description b{font-size:12px;font-weight:700;color:var(--text)}
 .transaction-category,.transaction-kind{display:inline-flex;align-items:center;justify-content:center;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:600}
 .category-income,.kind-income{background:#e2f8ed;color:#079b6b}

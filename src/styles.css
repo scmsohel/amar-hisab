@@ -1643,9 +1643,9 @@
     from{transform:scaleX(0)}
     to{transform:scaleX(1)}
   }
-  @keyframes dashboard-donut-enter{
-    from{opacity:.35;transform:rotate(-35deg) scale(.94)}
-    to{opacity:1;transform:rotate(0) scale(1)}
+  @keyframes dashboard-donut-fill{
+    from{background:conic-gradient(var(--surface) 0turn,#10a875 0turn)}
+    to{background:conic-gradient(#10a875 0 32%,#71cdb0 32% 58%,#94b9fb 58% 74%,#ffc878 74% 88%,#c8cfe0 88%)}
   }
   .content>.welcome{
     animation:dashboard-enter .42s cubic-bezier(.2,.7,.2,1) both;
@@ -1677,7 +1677,7 @@
     animation:dashboard-bar-grow .8s cubic-bezier(.2,.7,.2,1) .35s both;
   }
   .charts>.category .donut{
-    animation:dashboard-donut-enter .75s cubic-bezier(.2,.7,.2,1) .24s both;
+    animation:dashboard-donut-fill .95s cubic-bezier(.2,.7,.2,1) .24s both;
   }
   .charts>.chart-panel .recharts-area-curve{
     animation:dashboard-chart-line .9s ease-out .28s both;

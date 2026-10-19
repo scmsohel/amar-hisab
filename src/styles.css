@@ -1485,3 +1485,15 @@
     line-height:1.45;
   }
 }
+
+
+/* Align every best-expense progress bar to the same starting column */
+@media(min-width:1251px){
+  .charts>.best-expenses .best-expense-row{
+    grid-template-columns:120px minmax(38px,1fr) 38px auto!important;
+  }
+  .charts>.best-expenses .best-expense-name{
+    min-width:0;
+    white-space:nowrap;
+  }
+}

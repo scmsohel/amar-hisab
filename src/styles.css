@@ -1197,3 +1197,17 @@
   text-rendering:geometricPrecision;
  }
 }
+
+
+/* Use a Bengali UI font with clearer numeral shapes specifically for the date */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap');
+@media(min-width:701px){
+ .welcome p span{
+  font-family:'Noto Sans Bengali','Hind Siliguri',sans-serif;
+  font-size:13px;
+  font-weight:500;
+  letter-spacing:0;
+  word-spacing:0;
+  font-variant-numeric:normal;
+ }
+}

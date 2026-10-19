@@ -1162,3 +1162,26 @@
  .welcome p{font-size:13px}
  .welcome p span{font-size:13px}
 }
+
+
+/* Prevent summary badges/charts and debt dates/badges from crowding each other */
+@media(min-width:701px){
+ .stats .stat{min-width:0}
+ .stats .stat-copy{min-width:0;padding-right:16px}
+ .stats .stat-caption{max-width:100%;white-space:normal;line-height:1.35;margin-top:8px}
+ .stats .stat-mini-bars{right:10px;bottom:10px;gap:3px;pointer-events:none}
+ .stats .stat-copy strong{line-height:1.2;margin-bottom:2px}
+}
+@media(min-width:1251px){
+ .dashboard-top>.hero-debts .debt-person{
+  grid-template-columns:36px minmax(90px,1fr) minmax(0,1fr) auto;
+  column-gap:12px;
+ }
+ .dashboard-top>.hero-debts .debt-date{
+  padding:0 8px;
+  white-space:normal;
+  line-height:1.4;
+  overflow-wrap:anywhere;
+ }
+ .dashboard-top>.hero-debts .debt-person .due{margin-left:4px;margin-right:8px}
+}

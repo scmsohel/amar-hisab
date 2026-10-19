@@ -1304,18 +1304,28 @@
   }
   .charts>.chart-panel,
   .charts>.best-expenses,
-  .charts>.category{min-width:0;padding:16px}
-  .charts>.chart-panel .chart{height:205px}
+  .charts>.category{min-width:0;padding:12px;border-radius:12px}
+  .charts>.chart-panel .panel-title h3,
+  .charts>.best-expenses .panel-title h3,
+  .charts>.category .panel-title h3{font-size:12px}
+  .charts>.chart-panel .panel-title p,
+  .charts>.best-expenses .panel-title p,
+  .charts>.category .panel-title p{font-size:8px;margin-top:2px}
+  .charts>.chart-panel .chart{height:105px;margin-top:3px}
+  .charts>.chart-panel .legend{margin-top:8px;font-size:8px;gap:10px}
+  .charts>.chart-panel .chart-foot{padding-top:7px;gap:8px;font-size:8px}
+  .charts>.chart-panel .chart-foot b{font-size:8px}
+  .charts>.chart-panel .chart-foot strong{padding:4px 6px;font-size:8px}
   .charts>.best-expenses .panel-title,
-  .charts>.category .panel-title{margin-bottom:12px}
+  .charts>.category .panel-title{margin-bottom:7px}
   .charts>.best-expenses .panel-title h3,
   .charts>.category .panel-title h3{font-size:14px;font-weight:800}
   .best-expense-row{
     display:grid;
     grid-template-columns:minmax(75px,auto) minmax(38px,1fr) 38px auto;
     align-items:center;
-    gap:7px;
-    margin:17px 0;
+    gap:6px;
+    margin:10px 0;
     min-width:0;
   }
   .best-expense-name{
@@ -1334,10 +1344,14 @@
   .best-expense-track i{display:block;height:100%;border-radius:20px;min-width:4px}
   .best-expense-row small{font-size:9px;color:var(--muted);text-align:right}
   .best-expense-row b{font:600 10px Inter,sans-serif;white-space:nowrap;color:var(--text)}
-  .charts>.category .donut{width:145px;height:145px;margin:12px auto}
-  .charts>.category .donut-hole{width:98px;height:98px}
-  .charts>.category .donut-hole b{font-size:15px}
-  .charts>.category .cat-row{margin:8px 0;font-size:9px}
+  .charts>.category .donut{width:105px;height:105px;margin:5px auto 8px}
+  .charts>.category .donut-hole{width:72px;height:72px}
+  .charts>.category .donut-hole b{font-size:11px;margin:2px 0}
+  .charts>.category .donut-hole small{font-size:7px}
+  .charts>.category .cat-row{margin:5px 0;font-size:8px}
+  .charts>.category .cat-row b{font-size:8px}
+  .charts>.category .link{font-size:9px;margin-top:5px}
+
 }
 @media(max-width:1250px){
   .charts{grid-template-columns:minmax(0,1.4fr) minmax(220px,1fr)}

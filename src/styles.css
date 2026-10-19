@@ -1947,3 +1947,44 @@
 }
 .dashboard-transactions .wallet-brand-bkash .transaction-wallet-logo,
 .dashboard-transactions .wallet-brand-nagad .transaction-wallet-logo{border-radius:3px}
+
+
+/* Scrollable custom category dropdown: show only about five options at once */
+.dashboard-transactions .transaction-category-dropdown{
+ position:relative;display:inline-flex;min-width:132px;flex:0 0 auto;z-index:20
+}
+.dashboard-transactions .transaction-category-trigger{
+ display:flex;align-items:center;justify-content:space-between;gap:12px;
+ width:100%;min-height:36px;padding:0 10px;border:1px solid var(--border);
+ border-radius:9px;background:var(--surface);color:var(--text);
+ font:inherit;font-size:13px;white-space:nowrap;cursor:pointer
+}
+.dashboard-transactions .transaction-category-dropdown.is-open{z-index:60}
+.dashboard-transactions .transaction-category-dropdown.is-open .transaction-category-trigger{
+ border-color:var(--primary);box-shadow:0 0 0 2px color-mix(in srgb,var(--primary) 12%,transparent)
+}
+.dashboard-transactions .transaction-category-trigger>span{
+ overflow:hidden;text-overflow:ellipsis;max-width:150px
+}
+.dashboard-transactions .transaction-category-menu{
+ position:absolute;left:0;top:calc(100% + 5px);width:max(100%,190px);
+ max-height:210px;overflow-y:auto;overscroll-behavior:contain;
+ padding:5px;background:var(--surface);border:1px solid var(--border);
+ border-radius:10px;box-shadow:0 12px 30px #172b4d24;
+ z-index:100;scrollbar-width:thin;scrollbar-color:var(--muted) transparent
+}
+.dashboard-transactions .transaction-category-menu::-webkit-scrollbar{width:6px}
+.dashboard-transactions .transaction-category-menu::-webkit-scrollbar-thumb{background:var(--muted);border-radius:8px}
+.dashboard-transactions .transaction-category-menu>button{
+ display:flex;align-items:center;width:100%;min-height:35px;padding:7px 10px;
+ border:0;border-radius:6px;background:transparent;color:var(--text);
+ text-align:left;font:inherit;font-size:13px;white-space:nowrap;cursor:pointer
+}
+.dashboard-transactions .transaction-category-menu>button:hover,
+.dashboard-transactions .transaction-category-menu>button.active{
+ background:var(--surface2);color:var(--primary)
+}
+.dashboard-transactions .transaction-category-menu>button.active{font-weight:650}
+@media(max-width:700px){
+ .dashboard-transactions .transaction-category-menu{max-height:190px}
+}

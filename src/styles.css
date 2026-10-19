@@ -1988,3 +1988,21 @@
 @media(max-width:700px){
  .dashboard-transactions .transaction-category-menu{max-height:190px}
 }
+
+
+/* Normalize wallet logo sizing: prevent oversized bKash artwork and keep Nagad visible */
+@media(min-width:1251px){
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{
+  width:40px;height:40px;max-width:none;object-fit:contain;transform:translate(-2px,-2px)
+ }
+}
+@media(max-width:1250px){
+ .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{
+  width:40px;height:40px;max-width:none;object-fit:contain;transform:translate(-2px,-2px)
+ }
+}
+.dashboard-transactions .transaction-wallet-logo{
+ width:23px;height:23px;flex:0 0 23px;display:block;object-fit:contain;background:transparent
+}
+.dashboard-transactions .transaction-wallet-logo-bkash{width:23px;height:23px;transform:none}
+.dashboard-transactions .transaction-wallet-logo-nagad{width:23px;height:23px;transform:none}

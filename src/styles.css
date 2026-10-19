@@ -485,7 +485,7 @@
 }
 
 
-/* Wallet logo sizing: bKash 60px, Nagad 34px */
+/* Wallet logo sizing: bKash 60px, Nagad 35px, centered in its icon slot */
 @media(min-width:1251px){
  .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand{
   width:36px;height:36px;flex:0 0 36px;overflow:visible;position:static;
@@ -495,8 +495,13 @@
  .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{
   display:block;width:60px;height:60px;max-width:none;object-fit:contain;transform:none
  }
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand{
+  width:36px;height:36px;flex:0 0 36px;overflow:visible;position:static;
+  display:flex;align-items:center;justify-content:center;
+  background:transparent!important;background-color:transparent!important
+ }
  .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand img{
-  display:block;width:34px;height:34px;max-width:100%;object-fit:contain;transform:none
+  display:block;width:35px;height:35px;max-width:100%;object-fit:contain;transform:none
  }
 }
 @media(max-width:1250px){
@@ -508,8 +513,13 @@
  .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{
   display:block;width:60px;height:60px;max-width:none;object-fit:contain;transform:none
  }
+ .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand{
+  width:36px;height:36px;flex:0 0 36px;overflow:visible;position:static;
+  display:flex;align-items:center;justify-content:center;
+  background:transparent!important;background-color:transparent!important
+ }
  .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand img{
-  display:block;width:34px;height:34px;max-width:100%;object-fit:contain;transform:none
+  display:block;width:35px;height:35px;max-width:100%;object-fit:contain;transform:none
  }
 }
 

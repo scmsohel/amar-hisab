@@ -1243,3 +1243,20 @@
 .dark .dashboard-top>.hero-debts:hover{
   border-color:#36594d;
 }
+
+
+/* Keep bKash and Nagad logo artwork transparent over their wallet tile colors */
+.wallet-panel .wallet-box .wallet-brand-icon.bkash-brand,
+.wallet-panel .wallet-box .wallet-brand-icon.nagad-brand,
+.dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand,
+.dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand{
+  background:transparent!important;
+  background-color:transparent!important;
+}
+.wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img,
+.wallet-panel .wallet-box .wallet-brand-icon.nagad-brand img,
+.dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img,
+.dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand img{
+  background:transparent!important;
+  background-color:transparent!important;
+}

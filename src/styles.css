@@ -1227,3 +1227,19 @@
   font-weight:500;
   font-variant-numeric:normal;
 }
+
+
+/* Hover effect only for the debt & receivables card */
+.dashboard-top>.hero-debts{
+  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+  .dashboard-top>.hero-debts:hover{
+    transform:translateY(-3px);
+    box-shadow:0 12px 28px #1d34481a;
+    border-color:#cfe9df;
+  }
+}
+.dark .dashboard-top>.hero-debts:hover{
+  border-color:#36594d;
+}

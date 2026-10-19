@@ -1270,3 +1270,27 @@
   .stats .stat-mini-bars{right:7px!important;bottom:8px!important;z-index:0}
   .stats .stat-copy{position:relative;z-index:1}
 }
+
+
+/* Keep the summary pills on one line; decorative bars stay behind at the right */
+@media(min-width:701px){
+  .stats .stat-copy{padding-right:0!important;min-width:0}
+  .stats .stat-caption{
+    display:inline-block;
+    width:max-content;
+    max-width:100%!important;
+    white-space:nowrap!important;
+    overflow:visible;
+    font-size:10px;
+    padding:5px 8px;
+    line-height:1.25;
+    position:relative;
+    z-index:2;
+  }
+  .stats .stat-mini-bars{
+    right:7px!important;
+    bottom:8px!important;
+    z-index:0;
+    opacity:.32;
+  }
+}

@@ -8,7 +8,7 @@ const initial:Tx[]=[{id:1,title:"মাসিক বেতন",category:"বে�
 const money=(n:number)=>"৳ "+Math.abs(n).toLocaleString("en-BD",{maximumFractionDigits:0});
 const dhakaDateTime=()=>{const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Dhaka",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(new Date());const p=Object.fromEntries(parts.map(x=>[x.type,x.value]));return {date:`${p.year}-${p.month}-${p.day}`,time:`${p.hour}:${p.minute}`};};
 const displayDate=(value:string)=>new Intl.DateTimeFormat("bn-BD",{day:"2-digit",month:"short",year:"numeric",timeZone:"Asia/Dhaka"}).format(new Date(value+"T00:00:00+06:00"));
-const displayTime=(value:string)=>{const [hour,minute]=value.split(":").map(Number);const d=new Date();d.setHours(hour,minute,0,0);return new Intl.DateTimeFormat("bn-BD",{hour:"2-digit",minute:"2-digit",hour12:true,timeZone:"Asia/Dhaka"}).format(d);};
+const displayTime=(value:string)=>{const [hour,minute]=value.split(":").map(Number);const d=new Date(0);d.setUTCHours(hour,minute,0,0);return new Intl.DateTimeFormat("bn-BD",{hour:"2-digit",minute:"2-digit",hour12:true,timeZone:"UTC"}).format(d);};
 const nav: [string, LucideIcon][]=[["ড্যাশবোর্ড",Home],["লেনদেন",ArrowLeftRight],["দেনা-পাওনা",HandCoins],["বিল",ReceiptText],["লোন",Landmark],["ওয়ালেট",Wallet],["ক্যাটাগরি",LayoutGrid],["বাজেট",Activity],["রিপোর্ট",TrendingUp],["লক্ষ্য",Target],["সেটিংস",Settings]];
 const quickActions: [string,string,LucideIcon,string][]=[["আয় যোগ করুন","নতুন আয় রেকর্ড",ArrowDownLeft,"income"],["ব্যয় যোগ করুন","খরচের হিসাব রাখুন",ArrowUpRight,"expense"],["টাকা ট্রান্সফার","এক Wallet থেকে অন্যটিতে",ArrowLeftRight,"transfer"]];
 

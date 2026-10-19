@@ -1787,3 +1787,57 @@
 @media(max-width:600px){
  .transaction-heading{align-items:flex-start;flex-direction:column}.transaction-heading-actions{width:100%}.transaction-heading-actions .btn{flex:1}.transaction-toolbar{gap:7px}.transaction-date{flex:1}.transaction-filter-row{gap:6px}.transaction-chip{padding:0 9px}.transaction-select{max-width:100%}.transaction-select select{max-width:125px}.transaction-table-wrap{overflow-x:auto}.transaction-table{min-width:900px}.transaction-pagination-controls{gap:4px}.transaction-pagination-controls label{width:100%;margin:0 0 4px}
 }
+
+
+/* Exact reference layout: title + search/month/filter/new transaction on row one */
+.transaction-heading{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  padding:16px 18px;
+}
+.transaction-heading>h3{flex:0 0 auto;font-size:18px;white-space:nowrap}
+.transaction-heading-controls{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  flex:1;
+  min-width:0;
+}
+.transaction-heading-controls .transaction-search{flex:1;max-width:390px;min-width:180px;height:38px}
+.transaction-heading-controls .transaction-month{flex:0 0 auto;min-width:155px;height:38px}
+.transaction-heading-controls .transaction-month select{max-width:155px}
+.transaction-heading-controls .transaction-filter-button{flex:0 0 40px;height:38px}
+.transaction-heading-controls>.btn{flex:0 0 auto;height:38px;white-space:nowrap}
+.transaction-filter-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:0 18px 11px;
+}
+.transaction-filter-types{display:flex;align-items:center;gap:7px;flex:0 0 auto}
+.transaction-filter-row>.transaction-select{min-height:34px}
+.transaction-filter-row .transaction-sort{margin-left:auto;flex:0 0 auto}
+.transaction-filter-row .transaction-sort .transaction-select{min-height:36px}
+.transaction-filter-row .transaction-clear{flex:0 0 auto}
+.transaction-table-wrap{padding:0 12px}
+.transaction-table th{padding:10px 9px;font-size:11px}
+.transaction-table td{padding:8px 9px}
+.transaction-table .transaction-date-cell{font-size:10px}
+.transaction-pagination{padding:13px 18px}
+@media(max-width:1100px){
+ .transaction-heading{align-items:flex-start;flex-wrap:wrap}
+ .transaction-heading-controls{flex-basis:100%;width:100%}
+ .transaction-heading-controls .transaction-search{max-width:none}
+ .transaction-filter-row{flex-wrap:wrap}
+ .transaction-filter-row .transaction-sort{margin-left:auto}
+}
+@media(max-width:650px){
+ .transaction-heading-controls{flex-wrap:wrap;justify-content:flex-start}
+ .transaction-heading-controls .transaction-search{flex-basis:100%;max-width:none}
+ .transaction-heading-controls .transaction-month{flex:1}
+ .transaction-filter-types{width:100%}
+ .transaction-filter-row .transaction-sort{margin-left:0}
+}

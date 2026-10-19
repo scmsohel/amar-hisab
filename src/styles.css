@@ -1995,3 +1995,35 @@
  width:23px;height:23px;flex:0 0 23px;display:block;object-fit:contain;background:transparent
 }
 .dashboard-transactions .transaction-wallet-logo-nagad{width:23px;height:23px;transform:none}
+
+
+/* Restore the original gentle lift on dashboard summary cards */
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+ .dashboard-main .balance,
+ .dashboard-main .wallet-box,
+ .dashboard-main .stats .stat,
+ .dashboard-main .charts>.chart-panel,
+ .dashboard-main .charts>.best-expenses,
+ .dashboard-main .charts>.category{
+  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+ }
+ .dashboard-main .balance:hover,
+ .dashboard-main .wallet-box:hover,
+ .dashboard-main .stats .stat:hover,
+ .dashboard-main .charts>.chart-panel:hover,
+ .dashboard-main .charts>.best-expenses:hover,
+ .dashboard-main .charts>.category:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 26px #1d34481a;
+  border-color:#b8e5d2;
+ }
+ .dark .dashboard-main .balance:hover,
+ .dark .dashboard-main .wallet-box:hover,
+ .dark .dashboard-main .stats .stat:hover,
+ .dark .dashboard-main .charts>.chart-panel:hover,
+ .dark .dashboard-main .charts>.best-expenses:hover,
+ .dark .dashboard-main .charts>.category:hover{
+  box-shadow:0 12px 28px #0003;
+  border-color:#36594d;
+ }
+}

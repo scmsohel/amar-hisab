@@ -1059,3 +1059,9 @@
   white-space:nowrap;
  }
 }
+
+
+/* Keep the due badges slightly inset from the right edge */
+@media(min-width:1251px){
+ .dashboard-top>.hero-debts .debt-person .due{margin-right:6px}
+}

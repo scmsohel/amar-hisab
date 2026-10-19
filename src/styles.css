@@ -1497,3 +1497,22 @@
     white-space:nowrap;
   }
 }
+
+
+/* Show both percentage and amount in expense breakdown rows */
+@media(min-width:1251px){
+  .charts>.category .cat-row .cat-values{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:10px;
+    white-space:nowrap;
+  }
+  .charts>.category .cat-row .cat-values span,
+  .charts>.category .cat-row .cat-values strong{
+    font-size:13px!important;
+    font-weight:600;
+    color:var(--text);
+  }
+  .charts>.category .cat-row .cat-values span{min-width:44px;text-align:right}
+}

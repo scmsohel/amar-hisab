@@ -2094,3 +2094,10 @@
  .dashboard-main .wallet-panel .wallet-box .wallet-info b{font-size:12px}
  .dashboard-main .wallet-panel .wallet-box .wallet-info strong{font-size:15px}
 }
+
+/* Editable transaction date and time controls */
+.transaction-datetime-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.transaction-datetime-fields>label{min-width:0}
+.transaction-datetime-fields input[type="date"],
+.transaction-datetime-fields input[type="time"]{width:100%;min-width:0}
+@media(max-width:480px){.transaction-datetime-fields{gap:8px}}

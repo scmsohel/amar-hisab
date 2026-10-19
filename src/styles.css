@@ -2190,7 +2190,7 @@
 }
 
 
-/* Restore hover lift after dashboard entrance animations */
+/* Restore stable hover lift without restarting entrance animations */
 @media(hover:hover) and (prefers-reduced-motion:no-preference){
  .dashboard-top>.dashboard-main .hero-grid>.balance,
  .dashboard-top>.dashboard-main .hero-grid>.wallet-panel,
@@ -2198,7 +2198,7 @@
  .dashboard-top>.dashboard-main .charts>.chart-panel,
  .dashboard-top>.dashboard-main .charts>.best-expenses,
  .dashboard-top>.dashboard-main .charts>.category{
-  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+  transition:translate .22s ease,box-shadow .22s ease,border-color .22s ease;
  }
  .dashboard-top>.dashboard-main .hero-grid>.balance:hover,
  .dashboard-top>.dashboard-main .hero-grid>.wallet-panel:hover,
@@ -2206,10 +2206,9 @@
  .dashboard-top>.dashboard-main .charts>.chart-panel:hover,
  .dashboard-top>.dashboard-main .charts>.best-expenses:hover,
  .dashboard-top>.dashboard-main .charts>.category:hover{
-  transform:translateY(-3px);
+  translate:0 -3px;
   box-shadow:0 12px 26px #1d34481a;
   border-color:#b8e5d2;
-  animation:none;
  }
  .dark .dashboard-top>.dashboard-main .hero-grid>.balance:hover,
  .dark .dashboard-top>.dashboard-main .hero-grid>.wallet-panel:hover,

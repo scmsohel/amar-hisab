@@ -1106,3 +1106,28 @@
  .dashboard-main .wallet-panel .wallet-box{row-gap:5px}
  .dashboard-main .wallet-panel .wallet-box>span{width:27px;height:27px;flex-basis:27px}
 }
+
+
+/* Small additional readability bump on desktop; preserve dashboard card geometry */
+@media(min-width:701px){
+ .welcome p{font-size:13px}
+ .welcome p span{font-size:12px}
+ .balance-content .label{font-size:14px}
+ .balance-content .eye svg{width:18px;height:18px}
+ .balance-content .change{font-size:13px;padding:6px 10px}
+ .balance-content .change span{font-size:12px}
+ .wallet-panel>.panel-title p{font-size:12px}
+ .wallet-panel .wallet-box b{font-size:13px}
+ .wallet-panel .wallet-box strong{font-size:16px}
+ .wallet-panel .wallet-box small{font-size:11px}
+ .stats .stat-copy p{font-size:13px}
+ .stats .stat-copy strong{font-size:25px}
+ .stats .stat-caption{font-size:11px;padding:5px 8px}
+ .dashboard-top>.hero-debts .debt-total small{font-size:13px}
+ .dashboard-top>.hero-debts .debt-total b{font-size:18px}
+ .dashboard-top>.hero-debts .debt-total em{font-size:12px}
+ .dashboard-top>.hero-debts .debt-person b{font-size:15px}
+ .dashboard-top>.hero-debts .debt-person div small{font-size:13px}
+ .dashboard-top>.hero-debts .debt-date{font-size:13px}
+ .dashboard-top>.hero-debts .debt-person .due{font-size:13px;padding:8px 11px}
+}

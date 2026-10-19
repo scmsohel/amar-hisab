@@ -1371,7 +1371,7 @@
   .charts>.category .cat-row b{font-size:8px;white-space:nowrap}
   .charts>.category .cat-row span{min-width:0;white-space:nowrap}
   .charts>.category{position:relative}
-  .charts>.category>.link{position:absolute;top:12px;right:42px;grid-column:auto;grid-row:auto;font-size:9px;margin:0;white-space:nowrap}
+  .charts>.category>.link{position:absolute;top:12px;right:12px;grid-column:auto;grid-row:auto;font-size:9px;margin:0;white-space:nowrap}
 
 }
 @media(max-width:1250px){

@@ -1459,3 +1459,20 @@
     white-space:nowrap;
   }
 }
+
+
+/* Enlarge the expense breakdown donut and category labels */
+@media(min-width:1251px){
+  .charts>.category .donut{
+    width:132px!important;
+    height:132px!important;
+  }
+  .charts>.category .donut-hole{
+    width:88px!important;
+    height:88px!important;
+  }
+  .charts>.category .donut-hole small{font-size:11px!important}
+  .charts>.category .donut-hole b{font-size:16px!important}
+  .charts>.category .cat-row{font-size:13px!important}
+  .charts>.category .cat-row b{font-size:13px!important}
+}

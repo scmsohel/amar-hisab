@@ -1990,17 +1990,7 @@
 }
 
 
-/* Normalize wallet logo sizing: prevent oversized bKash artwork and keep Nagad visible */
-@media(min-width:1251px){
- .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{
-  width:40px;height:40px;max-width:none;object-fit:contain;transform:translate(-2px,-2px)
- }
-}
-@media(max-width:1250px){
- .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{
-  width:40px;height:40px;max-width:none;object-fit:contain;transform:translate(-2px,-2px)
- }
-}
+/* Preserve the carefully tuned bKash wallet-card logo sizing; size only transaction-table logos */
 .dashboard-transactions .transaction-wallet-logo{
  width:23px;height:23px;flex:0 0 23px;display:block;object-fit:contain;background:transparent
 }

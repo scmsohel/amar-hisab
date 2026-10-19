@@ -2165,51 +2165,26 @@
 }
 
 
-/* bKash logo size only: preserve wallet card dimensions */
+/* Single source of truth for bKash wallet logo sizing */
 .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand{
- width:42px;height:42px;flex:0 0 42px;overflow:visible
+ width:42px;height:42px;flex:0 0 42px;min-width:42px;
+ overflow:visible;position:relative;display:flex;align-items:center;justify-content:center;
+ background:transparent!important;background-color:transparent!important
 }
 .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{
  display:block;width:60px;height:60px;max-width:none;max-height:none;
- object-fit:contain;transform:translate(-9px,-9px)
+ object-fit:contain;transform:none;position:relative;left:0;top:0
 }
 @media(min-width:701px) and (max-width:1250px){
  .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{
-  width:60px;height:60px;transform:translate(-9px,-9px)
+  width:60px;height:60px;max-width:none;max-height:none;transform:none
  }
 }
 @media(max-width:700px){
- .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{
-  width:46px;height:46px;transform:translate(-2px,-2px)
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand{
+  width:34px;height:34px;flex-basis:34px;min-width:34px
  }
-}
-
-
-/* Dashboard transactions: give description more room and shift category right */
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table{
- table-layout:fixed
-}
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table th:nth-child(1),
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table td:nth-child(1){width:4%}
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table th:nth-child(2),
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table td:nth-child(2){width:22%}
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table th:nth-child(3),
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table td:nth-child(3){width:19%}
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table th:nth-child(4),
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table td:nth-child(4){width:13%}
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table th:nth-child(5),
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table td:nth-child(5){width:11%}
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table th:nth-child(6),
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table td:nth-child(6){width:7%}
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table th:nth-child(7),
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table td:nth-child(7){width:11%}
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table th:nth-child(8),
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table td:nth-child(8){width:9%}
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table th:nth-child(9),
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table td:nth-child(9){width:4%}
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-description{
- overflow:hidden;text-overflow:ellipsis
-}
-.dashboard-transactions .dashboard-transaction-table-wrap .transaction-description b{
- display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+ .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{
+  width:46px;height:46px;max-width:none;max-height:none;transform:none
+ }
 }

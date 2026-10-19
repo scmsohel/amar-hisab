@@ -1631,3 +1631,74 @@
 
 /* Show three time-range choices at once; scroll for the remaining options */
 .chart-range-menu{max-height:102px;overflow-y:auto;overscroll-behavior:contain}
+
+
+/* Dashboard entrance animations: run on page load/refresh, not on routine state updates */
+@media(prefers-reduced-motion:no-preference){
+  @keyframes dashboard-enter{
+    from{opacity:0;transform:translateY(12px)}
+    to{opacity:1;transform:translateY(0)}
+  }
+  @keyframes dashboard-bar-grow{
+    from{transform:scaleX(0)}
+    to{transform:scaleX(1)}
+  }
+  @keyframes dashboard-donut-enter{
+    from{opacity:.35;transform:rotate(-35deg) scale(.94)}
+    to{opacity:1;transform:rotate(0) scale(1)}
+  }
+  .content>.welcome{
+    animation:dashboard-enter .42s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .dashboard-top>.dashboard-main .hero-grid>.balance,
+  .dashboard-top>.dashboard-main .hero-grid>.wallet-panel,
+  .dashboard-top>.hero-debts{
+    animation:dashboard-enter .48s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .dashboard-top>.dashboard-main .hero-grid>.wallet-panel{animation-delay:.06s}
+  .dashboard-top>.hero-debts{animation-delay:.12s}
+  .dashboard-top>.dashboard-main .stats>.stat{
+    animation:dashboard-enter .42s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .dashboard-top>.dashboard-main .stats>.stat:nth-child(1){animation-delay:.10s}
+  .dashboard-top>.dashboard-main .stats>.stat:nth-child(2){animation-delay:.16s}
+  .dashboard-top>.dashboard-main .stats>.stat:nth-child(3){animation-delay:.22s}
+  .dashboard-top>.dashboard-main .stats>.stat:nth-child(4){animation-delay:.28s}
+  .charts>.chart-panel,
+  .charts>.best-expenses,
+  .charts>.category{
+    animation:dashboard-enter .48s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .charts>.chart-panel{animation-delay:.16s}
+  .charts>.best-expenses{animation-delay:.23s}
+  .charts>.category{animation-delay:.30s}
+  .charts>.best-expenses .best-expense-track>i{
+    transform-origin:left center;
+    animation:dashboard-bar-grow .8s cubic-bezier(.2,.7,.2,1) .35s both;
+  }
+  .charts>.category .donut{
+    animation:dashboard-donut-enter .75s cubic-bezier(.2,.7,.2,1) .24s both;
+  }
+  .charts>.chart-panel .recharts-area-curve{
+    animation:dashboard-chart-line .9s ease-out .28s both;
+  }
+  @keyframes dashboard-chart-line{
+    from{stroke-dasharray:1000;stroke-dashoffset:1000}
+    to{stroke-dasharray:1000;stroke-dashoffset:0}
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .content>.welcome,
+  .dashboard-top>.dashboard-main .hero-grid>.balance,
+  .dashboard-top>.dashboard-main .hero-grid>.wallet-panel,
+  .dashboard-top>.hero-debts,
+  .dashboard-top>.dashboard-main .stats>.stat,
+  .charts>.chart-panel,
+  .charts>.best-expenses,
+  .charts>.category,
+  .charts>.best-expenses .best-expense-track>i,
+  .charts>.category .donut,
+  .charts>.chart-panel .recharts-area-curve{
+    animation:none!important;
+  }
+}

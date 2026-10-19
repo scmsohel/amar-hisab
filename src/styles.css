@@ -1260,3 +1260,13 @@
   background:transparent!important;
   background-color:transparent!important;
 }
+
+
+/* Keep the decorative mini bars clear of the summary captions */
+@media(min-width:701px){
+  .stats .stat{position:relative}
+  .stats .stat-copy{padding-right:30px!important}
+  .stats .stat-caption{display:inline-block;max-width:calc(100% - 12px)!important}
+  .stats .stat-mini-bars{right:7px!important;bottom:8px!important;z-index:0}
+  .stats .stat-copy{position:relative;z-index:1}
+}

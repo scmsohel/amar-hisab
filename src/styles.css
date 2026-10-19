@@ -1155,3 +1155,10 @@
  .dashboard-top>.hero-debts .debt-date{font-weight:500}
  .dashboard-top>.hero-debts .debt-person .due{font-weight:700}
 }
+
+
+/* Make welcome subtitle and date the same font size */
+@media(min-width:701px){
+ .welcome p{font-size:13px}
+ .welcome p span{font-size:13px}
+}

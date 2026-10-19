@@ -1899,6 +1899,13 @@
 .dashboard-transactions .transaction-table th{font-size:13px;padding:12px 10px}
 .dashboard-transactions .transaction-table td{font-size:13px;padding:11px 10px}
 .dashboard-transactions .transaction-table .transaction-date-cell{font-size:12px}
+/* Improve contrast for the transaction running-balance column only */
+.dashboard-transactions .transaction-table td.transaction-balance{
+ color:#344b5d;font-weight:600
+}
+.dark .dashboard-transactions .transaction-table td.transaction-balance{
+ color:#d0dce4
+}
 .dashboard-transactions .transaction-description b{font-size:14px}
 .dashboard-transactions .transaction-category,
 .dashboard-transactions .transaction-kind,

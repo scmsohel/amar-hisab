@@ -1344,13 +1344,33 @@
   .best-expense-track i{display:block;height:100%;border-radius:20px;min-width:4px}
   .best-expense-row small{font-size:9px;color:var(--muted);text-align:right}
   .best-expense-row b{font:600 10px Inter,sans-serif;white-space:nowrap;color:var(--text)}
-  .charts>.category .donut{width:105px;height:105px;margin:5px auto 8px}
+  .charts>.category{
+    display:grid;
+    grid-template-columns:minmax(92px,38%) minmax(0,1fr);
+    grid-template-rows:auto repeat(5,minmax(18px,auto)) auto;
+    column-gap:10px;
+    align-content:start;
+  }
+  .charts>.category>.panel-title{grid-column:1/-1;grid-row:1}
+  .charts>.category .donut{
+    grid-column:1;
+    grid-row:2/7;
+    align-self:center;
+    justify-self:center;
+    width:105px;height:105px;max-width:100%;margin:0;
+  }
   .charts>.category .donut-hole{width:72px;height:72px}
   .charts>.category .donut-hole b{font-size:11px;margin:2px 0}
   .charts>.category .donut-hole small{font-size:7px}
-  .charts>.category .cat-row{margin:5px 0;font-size:8px}
-  .charts>.category .cat-row b{font-size:8px}
-  .charts>.category .link{font-size:9px;margin-top:5px}
+  .charts>.category .cat-row{
+    grid-column:2;
+    margin:0;
+    font-size:8px;
+    min-width:0;
+  }
+  .charts>.category .cat-row b{font-size:8px;white-space:nowrap}
+  .charts>.category .cat-row span{min-width:0;white-space:nowrap}
+  .charts>.category>.link{grid-column:1/-1;grid-row:7;font-size:9px;margin-top:5px}
 
 }
 @media(max-width:1250px){

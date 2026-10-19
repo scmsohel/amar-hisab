@@ -1931,3 +1931,19 @@
  .dashboard-transactions .transaction-description b{font-size:13px}
  .dashboard-transactions .transaction-amount{font-size:13px!important}
 }
+
+
+/* Wallet brand icons in the dashboard recent-transactions table */
+.dashboard-transactions .transaction-wallet-brand{
+ display:inline-flex;align-items:center;gap:7px;white-space:nowrap;vertical-align:middle
+}
+.dashboard-transactions .transaction-wallet-icon{
+ width:17px;height:17px;flex:0 0 17px;stroke-width:2.3
+}
+.dashboard-transactions .wallet-brand-cash .transaction-wallet-icon{color:#10a875}
+.dashboard-transactions .wallet-brand-bank .transaction-wallet-icon{color:#1685f5}
+.dashboard-transactions .transaction-wallet-logo{
+ display:block;width:19px;height:19px;flex:0 0 19px;object-fit:contain
+}
+.dashboard-transactions .wallet-brand-bkash .transaction-wallet-logo,
+.dashboard-transactions .wallet-brand-nagad .transaction-wallet-logo{border-radius:3px}

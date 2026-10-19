@@ -1423,3 +1423,22 @@
   .best-expense-row small{font-size:10px;color:var(--muted);text-align:right}
   .best-expense-row b{font:600 10px Inter,sans-serif;white-space:nowrap}
 }
+
+
+/* Final overrides: requested analytics text sizes (desktop compact row) */
+@media(min-width:1251px){
+  .charts>.chart-panel .panel-title h3,
+  .charts>.best-expenses .panel-title h3,
+  .charts>.category .panel-title h3{
+    font-size:18px!important;
+    line-height:1.35;
+  }
+  .charts>.best-expenses .panel-title p{
+    font-size:13px!important;
+    line-height:1.45;
+  }
+  .charts>.category .donut-hole small{font-size:10px!important}
+  .charts>.category .donut-hole b{font-size:14px!important}
+  .charts>.category .cat-row{font-size:12px!important}
+  .charts>.category .cat-row b{font-size:12px!important}
+}

@@ -1442,3 +1442,20 @@
   .charts>.category .cat-row{font-size:12px!important}
   .charts>.category .cat-row b{font-size:12px!important}
 }
+
+
+/* Center debt due dates between person details and remaining-days badges */
+@media(min-width:1251px){
+  .dashboard-top>.hero-debts .debt-person{
+    grid-template-columns:38px minmax(100px,1fr) minmax(120px,1fr) auto!important;
+    column-gap:10px;
+  }
+  .dashboard-top>.hero-debts .debt-date{
+    width:100%;
+    min-width:0;
+    justify-self:stretch;
+    text-align:center!important;
+    padding:0 4px;
+    white-space:nowrap;
+  }
+}

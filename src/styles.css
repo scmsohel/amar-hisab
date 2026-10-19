@@ -1178,10 +1178,11 @@
   column-gap:12px;
  }
  .dashboard-top>.hero-debts .debt-date{
-  padding:0 8px;
-  white-space:normal;
-  line-height:1.4;
-  overflow-wrap:anywhere;
+  padding:0 2px;
+  font-size:10px;
+  white-space:nowrap;
+  line-height:1.2;
+  overflow-wrap:normal;
  }
  .dashboard-top>.hero-debts .debt-person .due{margin-left:4px;margin-right:8px}
 }

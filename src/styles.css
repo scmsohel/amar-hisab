@@ -2190,24 +2190,25 @@
 }
 
 
-/* Restore stable hover lift without restarting entrance animations */
+/* Smooth hover lift for dashboard cards */
 @media(hover:hover) and (prefers-reduced-motion:no-preference){
  .dashboard-top>.dashboard-main .hero-grid>.balance,
  .dashboard-top>.dashboard-main .hero-grid>.wallet-panel,
  .dashboard-top>.dashboard-main .stats>.stat,
  .dashboard-top>.hero-debts,
- .dashboard-top>.charts>.chart-panel,
- .dashboard-top>.charts>.best-expenses,
- .dashboard-top>.charts>.category{
-  transition:translate .22s ease,box-shadow .22s ease,border-color .22s ease;
+ .charts>.chart-panel,
+ .charts>.best-expenses,
+ .charts>.category{
+  transition:translate .28s cubic-bezier(.2,.75,.25,1),box-shadow .28s ease,border-color .28s ease;
+  will-change:translate;
  }
  .dashboard-top>.dashboard-main .hero-grid>.balance:hover,
  .dashboard-top>.dashboard-main .hero-grid>.wallet-panel:hover,
  .dashboard-top>.dashboard-main .stats>.stat:hover,
  .dashboard-top>.hero-debts:hover,
- .dashboard-top>.charts>.chart-panel:hover,
- .dashboard-top>.charts>.best-expenses:hover,
- .dashboard-top>.charts>.category:hover{
+ .charts>.chart-panel:hover,
+ .charts>.best-expenses:hover,
+ .charts>.category:hover{
   translate:0 -3px;
   box-shadow:0 12px 26px #1d34481a;
   border-color:#b8e5d2;
@@ -2216,9 +2217,9 @@
  .dark .dashboard-top>.dashboard-main .hero-grid>.wallet-panel:hover,
  .dark .dashboard-top>.dashboard-main .stats>.stat:hover,
  .dark .dashboard-top>.hero-debts:hover,
- .dark .dashboard-top>.charts>.chart-panel:hover,
- .dark .dashboard-top>.charts>.best-expenses:hover,
- .dark .dashboard-top>.charts>.category:hover{
+ .dark .charts>.chart-panel:hover,
+ .dark .charts>.best-expenses:hover,
+ .dark .charts>.category:hover{
   box-shadow:0 12px 28px #0003;
   border-color:#36594d;
  }

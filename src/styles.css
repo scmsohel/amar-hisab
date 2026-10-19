@@ -1592,3 +1592,38 @@
 .dark .charts>.category:hover{
   border-color:#36594d;
 }
+
+
+/* Compact scrollable time-range menu for the income/expense chart */
+.chart-range-wrap{position:relative;flex-shrink:0}
+.chart-range-menu{
+  position:absolute;
+  top:calc(100% + 6px);
+  right:0;
+  z-index:30;
+  width:112px;
+  max-height:176px;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding:5px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:var(--surface);
+  box-shadow:0 10px 28px #1d34481f;
+  scrollbar-width:thin;
+}
+.chart-range-menu button{
+  display:block;
+  width:100%;
+  min-height:30px;
+  padding:6px 9px;
+  border:0;
+  border-radius:6px;
+  background:transparent;
+  color:var(--text);
+  text-align:left;
+  font-size:12px;
+  white-space:nowrap;
+}
+.chart-range-menu button:hover,
+.chart-range-menu button.active{background:var(--surface2);color:#079b6b}

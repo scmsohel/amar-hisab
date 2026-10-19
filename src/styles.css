@@ -498,7 +498,7 @@
   display:block;width:30px;height:30px;max-width:100%;object-fit:contain;transform:none
  }
  .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand img{
-  display:block;width:30px;height:30px;max-width:100%;object-fit:contain;transform:none
+  display:block;width:24px;height:24px;max-width:100%;object-fit:contain;transform:none
  }
 }
 @media(max-width:1250px){
@@ -510,7 +510,7 @@
   display:block;width:30px;height:30px;max-width:100%;object-fit:contain;transform:none
  }
  .wallet-panel .wallet-box .wallet-brand-icon.nagad-brand img{
-  display:block;width:30px;height:30px;max-width:100%;object-fit:contain;transform:none
+  display:block;width:24px;height:24px;max-width:100%;object-fit:contain;transform:none
  }
 }
 

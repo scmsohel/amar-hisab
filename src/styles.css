@@ -2183,3 +2183,33 @@
   width:46px;height:46px;transform:translate(-2px,-2px)
  }
 }
+
+
+/* Dashboard transactions: give description more room and shift category right */
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table{
+ table-layout:fixed
+}
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table th:nth-child(1),
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table td:nth-child(1){width:4%}
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table th:nth-child(2),
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table td:nth-child(2){width:22%}
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table th:nth-child(3),
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table td:nth-child(3){width:19%}
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table th:nth-child(4),
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table td:nth-child(4){width:13%}
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table th:nth-child(5),
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table td:nth-child(5){width:11%}
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table th:nth-child(6),
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table td:nth-child(6){width:7%}
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table th:nth-child(7),
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table td:nth-child(7){width:11%}
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table th:nth-child(8),
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table td:nth-child(8){width:9%}
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table th:nth-child(9),
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-table td:nth-child(9){width:4%}
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-description{
+ overflow:hidden;text-overflow:ellipsis
+}
+.dashboard-transactions .dashboard-transaction-table-wrap .transaction-description b{
+ display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}

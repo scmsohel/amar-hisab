@@ -1559,3 +1559,14 @@
     transform:translateY(-2px);
   }
 }
+
+
+/* Match expense breakdown percentages to the softer percentage style in best-expense rows */
+@media(min-width:1251px){
+  .charts>.category .cat-row .cat-values span{
+    font-size:11px!important;
+    font-weight:400!important;
+    color:var(--muted)!important;
+    text-shadow:none!important;
+  }
+}

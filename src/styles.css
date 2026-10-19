@@ -1131,3 +1131,27 @@
  .dashboard-top>.hero-debts .debt-date{font-size:13px}
  .dashboard-top>.hero-debts .debt-person .due{font-size:13px;padding:8px 11px}
 }
+
+
+/* Typography clarity pass: strengthen small Bangla labels without changing card sizing */
+@media(min-width:701px){
+ .welcome p,
+ .welcome p span{font-weight:500}
+ .balance-content .label{font-weight:600}
+ .balance-content .change,
+ .balance-content .change span{font-weight:600}
+ .wallet-panel>.panel-title p{font-weight:500}
+ .wallet-panel .wallet-box b{font-weight:700}
+ .wallet-panel .wallet-box strong{font-weight:700}
+ .wallet-panel .wallet-box small{font-weight:500}
+ .stats .stat-copy p{font-weight:600}
+ .stats .stat-copy strong{font-weight:800}
+ .stats .stat-caption{font-weight:600}
+ .dashboard-top>.hero-debts .debt-total small{font-weight:600}
+ .dashboard-top>.hero-debts .debt-total b{font-weight:800}
+ .dashboard-top>.hero-debts .debt-total em{font-weight:500}
+ .dashboard-top>.hero-debts .debt-person b{font-weight:800}
+ .dashboard-top>.hero-debts .debt-person div small,
+ .dashboard-top>.hero-debts .debt-date{font-weight:500}
+ .dashboard-top>.hero-debts .debt-person .due{font-weight:700}
+}

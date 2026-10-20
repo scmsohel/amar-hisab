@@ -1,7 +1,7 @@
 import {Fragment,useEffect,useMemo,useState} from "react";
 import type {LucideIcon} from "lucide-react";
 import {AnimatePresence,motion} from "framer-motion";
-import {Activity,ArrowDownLeft,ArrowLeftRight,ArrowUpRight,Banknote,Bell,CalendarDays,ChevronDown,ChevronRight,CircleHelp,Download,Eye,EyeOff,Filter,HandCoins,Home,Landmark,LayoutGrid,Menu,Moon,MoreHorizontal,Plus,Pencil,Search,Settings,Sparkles,Sun,Target,ChartNoAxesCombined,UserRound,House,TrendingDown,TrendingUp,Wallet,X,Zap,Check,ReceiptText} from "lucide-react";
+import {Activity,ArrowDownLeft,ArrowLeftRight,ArrowUpRight,Banknote,Bell,CalendarDays,ChevronDown,ChevronRight,CircleHelp,Download,Eye,EyeOff,Filter,HandCoins,Home,Landmark,LayoutGrid,Menu,Moon,MoreHorizontal,Plus,Pencil,Search,Settings,Sparkles,Sun,Target,ChartNoAxesCombined,UserRound,House,TrendingDown,TrendingUp,Wallet,X,Zap,Check,ReceiptText,Briefcase,ShoppingCart,FileText,Car,Heart,GraduationCap,Film,Gift,WalletCards,Plane,Smartphone,Lightbulb,Wifi,Utensils,Pill,Fuel,Shirt,PawPrint,Dumbbell,Music,Baby,Wrench,Coffee,Bus,Train,Bike,Stethoscope,Dog,Cat,BookOpen,Laptop,Monitor,Tv,Gamepad2,Camera,Headphones,Pizza,Salad,CookingPot,Droplets,Flame,Snowflake,WashingMachine,BedDouble,Sofa,Hammer,Paintbrush,Truck,Package,ShoppingBag,Store,BadgeDollarSign,Coins,PiggyBank,Receipt,Calculator,Building2,School,PartyPopper,Flower2,TreePine,Leaf,Cloud,Umbrella,Globe,MapPin,Luggage,Ticket,HeartPulse,Cross,Syringe,Glasses,Watch,Users,Bone,CreditCard,CircleDollarSign,ClipboardList,CircleUserRound,HousePlug,BusFront,TrainFront,PlaneTakeoff,HandHeart,UtensilsCrossed,BriefcaseBusiness,Ellipsis,BadgeCheck,Book,Sprout,Flower,Bed,ShowerHead,Bath,Microwave,Refrigerator,AirVent,Fan,Plug,BatteryCharging,CarFront,CarTaxiFront,Caravan,Ship,TramFront,ParkingCircle,MapPinned,Route,Compass,Mountain,TentTree,Hotel,PlaneLanding,Passport,BanknoteArrowDown,BanknoteArrowUp,ChartPie,ChartColumn,Percent,FileSpreadsheet,FilePlus,Notebook,University,Factory,HardHat,Scissors,PackageOpen,Boxes,Forklift,ShoppingBasket,Tag,TicketPercent,BadgePercent,Tablet,Keyboard,Mouse,Printer,Router,Bluetooth,Cable,Speaker,Video,Joystick,AudioLines,Mic,Radio,Podcast,Clapperboard,Theater,Popcorn,Sandwich,CupSoda,Wine,Beer,Apple,Carrot,Milk,Egg,Beef,Fish,ChefHat,Cake,IceCream,Candy,Cookie,Croissant,Soup,Wheat,CloudRain,Wind,Thermometer,Lamp,Brush,Broom,Trash2,Recycle,Footprints,Gem,Crown,Hospital,Ambulance,Bandage,PersonStanding,Bird,Rabbit,Turtle,Image,Palette,PenTool,Puzzle,Dice5,Trophy,Medal,Award,Goal,Flag,Clock,AlarmClock,Timer,Hourglass,Languages,Mail,Phone,MessageCircle,Send,AtSign,Link,KeyRound,ShieldCheck,LockKeyhole,Fingerprint,CloudUpload,Upload,FileArchive,Folder,FolderOpen,ListChecks,CheckCircle,Info,SlidersHorizontal,PlusCircle,CirclePlus,MinusCircle,CircleMinus,CircleEllipsis} from "lucide-react";
 import {Area,AreaChart,CartesianGrid,ResponsiveContainer,Tooltip,XAxis,YAxis} from "recharts";
 type Tx={id:number;title:string;category:string;date:string;time?:string;dateInput?:string;timeInput?:string;wallet:string;amount:number;kind:"আয়"|"ব্যয়"|"ট্রান্সফার";transferTo?:string};
 type DropdownOption={value:string;label:string};
@@ -118,6 +118,133 @@ function FeaturePage({active,tx,dark,setDark,setActive,setNotice}:{active:string
  return <section className="feature-page"><div className="feature-heading"><div><span className="eyebrow">PERSONAL FINANCE</span><h2>{config?.title||active}</h2><p>{config?.description||"আপনার আর্থিক তথ্য ব্যবস্থাপনা করুন।"}</p></div><button className="btn primary" onClick={()=>{reset();setShowForm(true)}}><Plus/> {config?.add||"নতুন রেকর্ড"}</button></div>{active==="বাজেট"&&<div className="feature-metrics"><article><small>এই মাসের ব্যয়</small><strong>{money(totalExpense)}</strong></article><article><small>রেকর্ড করা বাজেট</small><strong>{money(items.reduce((s,x)=>s+x.amount,0))}</strong></article><article><small>বাজেটের বাইরে</small><strong>{money(Math.max(totalExpense-items.reduce((s,x)=>s+x.amount,0),0))}</strong></article></div>}<section className="panel feature-panel"><div className="toolbar"><label className="table-search"><Search/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="রেকর্ড খুঁজুন..."/></label><span className="tag">{shown.length.toLocaleString("bn-BD")}টি রেকর্ড</span></div><FeatureRecords items={shown} edit={edit} remove={remove}/>{shown.length===0&&<div className="empty">এখনো কোনো রেকর্ড নেই। “{config?.add||"নতুন রেকর্ড"}” বাটনে চাপ দিয়ে যোগ করুন।</div>}</section><FeatureForm config={config||{key:active,title:active,description:"",add:"নতুন রেকর্ড",fields:["নাম","পরিমাণ","তারিখ","অবস্থা","নোট"]}} show={showForm} title={title} setTitle={setTitle} amount={amount} setAmount={setAmount} date={date} setDate={setDate} status={status} setStatus={setStatus} notes={notes} setNotes={setNotes} save={save} reset={reset} editing={editing}/></section>;
 }
 
+
+const categoryIconMap:Record<string,LucideIcon>={Briefcase:Briefcase,ShoppingCart:ShoppingCart,FileText:FileText,Car:Car,Heart:Heart,GraduationCap:GraduationCap,Film:Film,Gift:Gift,WalletCards:WalletCards,Plane:Plane,Smartphone:Smartphone,Lightbulb:Lightbulb,Wifi:Wifi,Utensils:Utensils,Pill:Pill,Fuel:Fuel,Shirt:Shirt,PawPrint:PawPrint,Dumbbell:Dumbbell,Music:Music,Baby:Baby,Wrench:Wrench,Coffee:Coffee,Bus:Bus,Train:Train,Bike:Bike,Stethoscope:Stethoscope,Dog:Dog,Cat:Cat,BookOpen:BookOpen,Laptop:Laptop,Monitor:Monitor,Tv:Tv,Gamepad2:Gamepad2,Camera:Camera,Headphones:Headphones,Pizza:Pizza,Salad:Salad,CookingPot:CookingPot,Droplets:Droplets,Flame:Flame,Snowflake:Snowflake,WashingMachine:WashingMachine,BedDouble:BedDouble,Sofa:Sofa,Hammer:Hammer,Paintbrush:Paintbrush,Truck:Truck,Package:Package,ShoppingBag:ShoppingBag,Store:Store,BadgeDollarSign:BadgeDollarSign,Coins:Coins,PiggyBank:PiggyBank,Receipt:Receipt,Calculator:Calculator,Building2:Building2,School:School,PartyPopper:PartyPopper,Flower2:Flower2,TreePine:TreePine,Leaf:Leaf,Cloud:Cloud,Umbrella:Umbrella,Globe:Globe,MapPin:MapPin,Luggage:Luggage,Ticket:Ticket,HeartPulse:HeartPulse,Cross:Cross,Syringe:Syringe,Glasses:Glasses,Watch:Watch,Users:Users,Bone:Bone,CreditCard:CreditCard,CircleDollarSign:CircleDollarSign,ClipboardList:ClipboardList,CircleUserRound:CircleUserRound,HousePlug:HousePlug,BusFront:BusFront,TrainFront:TrainFront,PlaneTakeoff:PlaneTakeoff,HandHeart:HandHeart,UtensilsCrossed:UtensilsCrossed,BriefcaseBusiness:BriefcaseBusiness,Ellipsis:Ellipsis,BadgeCheck:BadgeCheck,Book:Book,Sprout:Sprout,Flower:Flower,Bed:Bed,ShowerHead:ShowerHead,Bath:Bath,Microwave:Microwave,Refrigerator:Refrigerator,AirVent:AirVent,Fan:Fan,Plug:Plug,BatteryCharging:BatteryCharging,CarFront:CarFront,CarTaxiFront:CarTaxiFront,Caravan:Caravan,Ship:Ship,TramFront:TramFront,ParkingCircle:ParkingCircle,MapPinned:MapPinned,Route:Route,Compass:Compass,Mountain:Mountain,TentTree:TentTree,Hotel:Hotel,PlaneLanding:PlaneLanding,Passport:Passport,BanknoteArrowDown:BanknoteArrowDown,BanknoteArrowUp:BanknoteArrowUp,ChartPie:ChartPie,ChartColumn:ChartColumn,Percent:Percent,FileSpreadsheet:FileSpreadsheet,FilePlus:FilePlus,Notebook:Notebook,University:University,Factory:Factory,HardHat:HardHat,Scissors:Scissors,PackageOpen:PackageOpen,Boxes:Boxes,Forklift:Forklift,ShoppingBasket:ShoppingBasket,Tag:Tag,TicketPercent:TicketPercent,BadgePercent:BadgePercent,Tablet:Tablet,Keyboard:Keyboard,Mouse:Mouse,Printer:Printer,Router:Router,Bluetooth:Bluetooth,Cable:Cable,Speaker:Speaker,Video:Video,Joystick:Joystick,AudioLines:AudioLines,Mic:Mic,Radio:Radio,Podcast:Podcast,Clapperboard:Clapperboard,Theater:Theater,Popcorn:Popcorn,Sandwich:Sandwich,CupSoda:CupSoda,Wine:Wine,Beer:Beer,Apple:Apple,Carrot:Carrot,Milk:Milk,Egg:Egg,Beef:Beef,Fish:Fish,ChefHat:ChefHat,Cake:Cake,IceCream:IceCream,Candy:Candy,Cookie:Cookie,Croissant:Croissant,Soup:Soup,Wheat:Wheat,CloudRain:CloudRain,Wind:Wind,Thermometer:Thermometer,Lamp:Lamp,Brush:Brush,Broom:Broom,Trash2:Trash2,Recycle:Recycle,Footprints:Footprints,Gem:Gem,Crown:Crown,Hospital:Hospital,Ambulance:Ambulance,Bandage:Bandage,PersonStanding:PersonStanding,Bird:Bird,Rabbit:Rabbit,Turtle:Turtle,Image:Image,Palette:Palette,PenTool:PenTool,Puzzle:Puzzle,Dice5:Dice5,Trophy:Trophy,Medal:Medal,Award:Award,Goal:Goal,Flag:Flag,Clock:Clock,AlarmClock:AlarmClock,Timer:Timer,Hourglass:Hourglass,Languages:Languages,Mail:Mail,Phone:Phone,MessageCircle:MessageCircle,Send:Send,AtSign:AtSign,Link:Link,KeyRound:KeyRound,ShieldCheck:ShieldCheck,LockKeyhole:LockKeyhole,Fingerprint:Fingerprint,CloudUpload:CloudUpload,Upload:Upload,FileArchive:FileArchive,Folder:Folder,FolderOpen:FolderOpen,ListChecks:ListChecks,CheckCircle:CheckCircle,Info:Info,SlidersHorizontal:SlidersHorizontal,PlusCircle:PlusCircle,CirclePlus:CirclePlus,MinusCircle:MinusCircle,CircleMinus:CircleMinus,CircleEllipsis:CircleEllipsis};
+const categoryIconChoices:{id:string;label:string;group:string;Icon:LucideIcon}[]=[
+ {id:"Briefcase",label:"অফিস/চাকরি",group:"অর্থ",Icon:Briefcase},
+ {id:"Banknote",label:"টাকা",group:"অর্থ",Icon:Banknote},
+ {id:"CircleDollarSign",label:"আয়",group:"অর্থ",Icon:CircleDollarSign},
+ {id:"Coins",label:"কয়েন",group:"অর্থ",Icon:Coins},
+ {id:"PiggyBank",label:"সঞ্চয়",group:"অর্থ",Icon:PiggyBank},
+ {id:"CreditCard",label:"কার্ড",group:"অর্থ",Icon:CreditCard},
+ {id:"Wallet",label:"ওয়ালেট",group:"অর্থ",Icon:Wallet},
+ {id:"WalletCards",label:"কার্ড ওয়ালেট",group:"অর্থ",Icon:WalletCards},
+ {id:"HandCoins",label:"লেনদেন",group:"অর্থ",Icon:HandCoins},
+ {id:"BadgeDollarSign",label:"টাকা চিহ্ন",group:"অর্থ",Icon:BadgeDollarSign},
+ {id:"ReceiptText",label:"রসিদ",group:"অর্থ",Icon:ReceiptText},
+ {id:"ChartNoAxesCombined",label:"বিনিয়োগ",group:"অর্থ",Icon:ChartNoAxesCombined},
+ {id:"TrendingUp",label:"বৃদ্ধি",group:"অর্থ",Icon:TrendingUp},
+ {id:"TrendingDown",label:"কমতি",group:"অর্থ",Icon:TrendingDown},
+ {id:"Calculator",label:"হিসাব",group:"অর্থ",Icon:Calculator},
+ {id:"Percent",label:"শতাংশ",group:"অর্থ",Icon:Percent},
+ {id:"Store",label:"দোকান",group:"কেনাকাটা",Icon:Store},
+ {id:"ShoppingCart",label:"বাজার",group:"কেনাকাটা",Icon:ShoppingCart},
+ {id:"ShoppingBag",label:"ব্যাগ",group:"কেনাকাটা",Icon:ShoppingBag},
+ {id:"ShoppingBasket",label:"ঝুড়ি",group:"কেনাকাটা",Icon:ShoppingBasket},
+ {id:"Tag",label:"মূল্য",group:"কেনাকাটা",Icon:Tag},
+ {id:"Gift",label:"উপহার",group:"কেনাকাটা",Icon:Gift},
+ {id:"Package",label:"পার্সেল",group:"কেনাকাটা",Icon:Package},
+ {id:"PackageOpen",label:"খোলা প্যাকেট",group:"কেনাকাটা",Icon:PackageOpen},
+ {id:"House",label:"বাড়ি",group:"বাসা",Icon:House},
+ {id:"BedDouble",label:"শোবার ঘর",group:"বাসা",Icon:BedDouble},
+ {id:"Sofa",label:"আসবাব",group:"বাসা",Icon:Sofa},
+ {id:"Lamp",label:"ল্যাম্প",group:"বাসা",Icon:Lamp},
+ {id:"Lightbulb",label:"বিদ্যুৎ",group:"বাসা",Icon:Lightbulb},
+ {id:"Plug",label:"প্লাগ",group:"বাসা",Icon:Plug},
+ {id:"HousePlug",label:"বাড়ির বিদ্যুৎ",group:"বাসা",Icon:HousePlug},
+ {id:"Droplets",label:"পানি",group:"বাসা",Icon:Droplets},
+ {id:"Flame",label:"গ্যাস",group:"বাসা",Icon:Flame},
+ {id:"Wifi",label:"ইন্টারনেট",group:"বাসা",Icon:Wifi},
+ {id:"Smartphone",label:"মোবাইল",group:"প্রযুক্তি",Icon:Smartphone},
+ {id:"Laptop",label:"ল্যাপটপ",group:"প্রযুক্তি",Icon:Laptop},
+ {id:"Monitor",label:"কম্পিউটার",group:"প্রযুক্তি",Icon:Monitor},
+ {id:"Tv",label:"টিভি",group:"প্রযুক্তি",Icon:Tv},
+ {id:"Router",label:"রাউটার",group:"প্রযুক্তি",Icon:Router},
+ {id:"Printer",label:"প্রিন্টার",group:"প্রযুক্তি",Icon:Printer},
+ {id:"Camera",label:"ক্যামেরা",group:"প্রযুক্তি",Icon:Camera},
+ {id:"Headphones",label:"হেডফোন",group:"প্রযুক্তি",Icon:Headphones},
+ {id:"Gamepad2",label:"গেম",group:"প্রযুক্তি",Icon:Gamepad2},
+ {id:"Car",label:"গাড়ি",group:"যাতায়াত",Icon:Car},
+ {id:"CarFront",label:"গাড়ির সামনে",group:"যাতায়াত",Icon:CarFront},
+ {id:"Bus",label:"বাস",group:"যাতায়াত",Icon:Bus},
+ {id:"BusFront",label:"বাসের সামনে",group:"যাতায়াত",Icon:BusFront},
+ {id:"Train",label:"ট্রেন",group:"যাতায়াত",Icon:Train},
+ {id:"Bike",label:"সাইকেল",group:"যাতায়াত",Icon:Bike},
+ {id:"Plane",label:"বিমান",group:"যাতায়াত",Icon:Plane},
+ {id:"PlaneTakeoff",label:"বিমান ছাড়ে",group:"যাতায়াত",Icon:PlaneTakeoff},
+ {id:"Ship",label:"জাহাজ",group:"যাতায়াত",Icon:Ship},
+ {id:"Fuel",label:"জ্বালানি",group:"যাতায়াত",Icon:Fuel},
+ {id:"MapPin",label:"লোকেশন",group:"যাতায়াত",Icon:MapPin},
+ {id:"Route",label:"রুট",group:"যাতায়াত",Icon:Route},
+ {id:"Utensils",label:"খাবার",group:"খাবার",Icon:Utensils},
+ {id:"UtensilsCrossed",label:"খাবার পরিবেশন",group:"খাবার",Icon:UtensilsCrossed},
+ {id:"CookingPot",label:"রান্না",group:"খাবার",Icon:CookingPot},
+ {id:"Coffee",label:"কফি",group:"খাবার",Icon:Coffee},
+ {id:"Pizza",label:"পিজ্জা",group:"খাবার",Icon:Pizza},
+ {id:"Salad",label:"সালাদ",group:"খাবার",Icon:Salad},
+ {id:"Sandwich",label:"স্যান্ডউইচ",group:"খাবার",Icon:Sandwich},
+ {id:"Cake",label:"কেক",group:"খাবার",Icon:Cake},
+ {id:"IceCream",label:"আইসক্রিম",group:"খাবার",Icon:IceCream},
+ {id:"Apple",label:"ফল",group:"খাবার",Icon:Apple},
+ {id:"Carrot",label:"সবজি",group:"খাবার",Icon:Carrot},
+ {id:"Pill",label:"ওষুধ",group:"স্বাস্থ্য",Icon:Pill},
+ {id:"Stethoscope",label:"ডাক্তার",group:"স্বাস্থ্য",Icon:Stethoscope},
+ {id:"HeartPulse",label:"স্বাস্থ্য",group:"স্বাস্থ্য",Icon:HeartPulse},
+ {id:"Cross",label:"চিকিৎসা",group:"স্বাস্থ্য",Icon:Cross},
+ {id:"Syringe",label:"ইনজেকশন",group:"স্বাস্থ্য",Icon:Syringe},
+ {id:"Hospital",label:"হাসপাতাল",group:"স্বাস্থ্য",Icon:Hospital},
+ {id:"Bandage",label:"ব্যান্ডেজ",group:"স্বাস্থ্য",Icon:Bandage},
+ {id:"Dumbbell",label:"ব্যায়াম",group:"স্বাস্থ্য",Icon:Dumbbell},
+ {id:"GraduationCap",label:"শিক্ষা",group:"শিক্ষা",Icon:GraduationCap},
+ {id:"BookOpen",label:"বই",group:"শিক্ষা",Icon:BookOpen},
+ {id:"Book",label:"বইপত্র",group:"শিক্ষা",Icon:Book},
+ {id:"School",label:"স্কুল",group:"শিক্ষা",Icon:School},
+ {id:"Notebook",label:"নোটবুক",group:"শিক্ষা",Icon:Notebook},
+ {id:"FileText",label:"ডকুমেন্ট",group:"শিক্ষা",Icon:FileText},
+ {id:"Music",label:"গান",group:"বিনোদন",Icon:Music},
+ {id:"Film",label:"সিনেমা",group:"বিনোদন",Icon:Film},
+ {id:"Clapperboard",label:"ভিডিও",group:"বিনোদন",Icon:Clapperboard},
+ {id:"Theater",label:"থিয়েটার",group:"বিনোদন",Icon:Theater},
+ {id:"Popcorn",label:"পপকর্ন",group:"বিনোদন",Icon:Popcorn},
+ {id:"PartyPopper",label:"অনুষ্ঠান",group:"বিনোদন",Icon:PartyPopper},
+ {id:"Ticket",label:"টিকিট",group:"বিনোদন",Icon:Ticket},
+ {id:"Trophy",label:"পুরস্কার",group:"বিনোদন",Icon:Trophy},
+ {id:"Turtle",label:"প্রাণী",group:"পোষা প্রাণী",Icon:Turtle},
+ {id:"Dog",label:"কুকুর",group:"পোষা প্রাণী",Icon:Dog},
+ {id:"Cat",label:"বিড়াল",group:"পোষা প্রাণী",Icon:Cat},
+ {id:"PawPrint",label:"পোষা প্রাণী",group:"পোষা প্রাণী",Icon:PawPrint},
+ {id:"Bone",label:"পোষা প্রাণীর খাবার",group:"পোষা প্রাণী",Icon:Bone},
+ {id:"Shirt",label:"পোশাক",group:"ব্যক্তিগত",Icon:Shirt},
+ {id:"Footprints",label:"জুতা",group:"ব্যক্তিগত",Icon:Footprints},
+ {id:"Watch",label:"ঘড়ি",group:"ব্যক্তিগত",Icon:Watch},
+ {id:"Glasses",label:"চশমা",group:"ব্যক্তিগত",Icon:Glasses},
+ {id:"Gem",label:"গয়না",group:"ব্যক্তিগত",Icon:Gem},
+ {id:"Users",label:"পরিবার",group:"ব্যক্তিগত",Icon:Users},
+ {id:"Baby",label:"শিশু",group:"ব্যক্তিগত",Icon:Baby},
+ {id:"Heart",label:"ভালোবাসা",group:"ব্যক্তিগত",Icon:Heart},
+ {id:"Flower2",label:"ফুল",group:"প্রকৃতি",Icon:Flower2},
+ {id:"Sprout",label:"চারা",group:"প্রকৃতি",Icon:Sprout},
+ {id:"TreePine",label:"গাছ",group:"প্রকৃতি",Icon:TreePine},
+ {id:"Leaf",label:"পাতা",group:"প্রকৃতি",Icon:Leaf},
+ {id:"Sun",label:"সূর্য",group:"প্রকৃতি",Icon:Sun},
+ {id:"CloudRain",label:"বৃষ্টি",group:"প্রকৃতি",Icon:CloudRain},
+ {id:"Snowflake",label:"ঠান্ডা",group:"প্রকৃতি",Icon:Snowflake},
+ {id:"Umbrella",label:"ছাতা",group:"প্রকৃতি",Icon:Umbrella},
+ {id:"Wrench",label:"মেরামত",group:"অন্যান্য",Icon:Wrench},
+ {id:"Hammer",label:"হাতুড়ি",group:"অন্যান্য",Icon:Hammer},
+ {id:"Paintbrush",label:"রং করা",group:"অন্যান্য",Icon:Paintbrush},
+ {id:"Scissors",label:"কাঁচি",group:"অন্যান্য",Icon:Scissors},
+ {id:"Trash2",label:"ময়লা",group:"অন্যান্য",Icon:Trash2},
+ {id:"Recycle",label:"রিসাইকেল",group:"অন্যান্য",Icon:Recycle},
+ {id:"CalendarDays",label:"তারিখ",group:"অন্যান্য",Icon:CalendarDays},
+ {id:"Clock",label:"সময়",group:"অন্যান্য",Icon:Clock},
+ {id:"Bell",label:"নোটিফিকেশন",group:"অন্যান্য",Icon:Bell},
+ {id:"ShieldCheck",label:"নিরাপত্তা",group:"অন্যান্য",Icon:ShieldCheck},
+ {id:"KeyRound",label:"চাবি",group:"অন্যান্য",Icon:KeyRound},
+ {id:"Ellipsis",label:"অন্যান্য",group:"অন্যান্য",Icon:Ellipsis},
+];
+function renderManagedIcon(value:string,size=20){const Icon=categoryIconMap[value];return Icon?<Icon size={size} strokeWidth={2.2}/>:value;}
+
 type ManagedCategory={id:number;name:string;type:"আয়"|"ব্যয়";icon:string;color:string;description:string};
 const defaultManagedCategories:ManagedCategory[]=[
  {id:1,name:"বেতন",type:"আয়",icon:"💼",color:"#08a66b",description:""},
@@ -147,7 +274,9 @@ function CategoryManager({tx,setNotice}:{tx:Tx[];setNotice:(v:string)=>void}){
  const [filter,setFilter]=useState<"সব"|"আয়"|"ব্যয়">("সব");
  const [search,setSearch]=useState("");
  const [sort,setSort]=useState("সম্প্রতি যোগ করা");
- const iconChoices=["💼","🛒","⌂","▤","🚘","♡","🎓","▦","🎁","📊","▣","✈","•••"];
+ const [iconSearch,setIconSearch]=useState("");
+ const [iconGroup,setIconGroup]=useState("সব");
+ const visibleIcons=useMemo(()=>categoryIconChoices.filter(item=>(iconGroup==="সব"||item.group===iconGroup)&&(item.label.toLowerCase().includes(iconSearch.toLowerCase())||item.id.toLowerCase().includes(iconSearch.toLowerCase()))),[iconGroup,iconSearch]);
  const colors=["#08a66b","#ff5b60","#4385f5","#8b5cf6","#fb923c","#fbbf24","#94a3b8","#22c5c5"];
  const counts=useMemo(()=>tx.reduce((a,t)=>({...a,[t.category]:(a[t.category]||0)+1}),{} as Record<string,number>),[tx]);
  const visible=useMemo(()=>categories.filter(c=>(filter==="সব"||c.type===filter)&&c.name.toLowerCase().includes(search.toLowerCase())).sort((a,b)=>sort==="নাম অনুযায়ী"?a.name.localeCompare(b.name,"bn"):0),[categories,filter,search,sort]);
@@ -160,9 +289,9 @@ function CategoryManager({tx,setNotice}:{tx:Tx[];setNotice:(v:string)=>void}){
  return <section className="category-manager-page">
   <div className="category-manager-hero"><div><h2>ক্যাটাগরি ম্যানেজার</h2><p>আপনার আয় ও ব্যয়ের ক্যাটাগরি তৈরি, সম্পাদনা এবং পরিচালনা করুন।</p></div><div className="category-manager-summary"><div className="category-summary-income"><span>↗</span><div><small>মোট আয় ক্যাটাগরি</small><strong>{categories.filter(c=>c.type==="আয়").length.toLocaleString("bn-BD")}</strong></div></div><div className="category-summary-expense"><span>↘</span><div><small>মোট ব্যয় ক্যাটাগরি</small><strong>{categories.filter(c=>c.type==="ব্যয়").length.toLocaleString("bn-BD")}</strong></div></div></div></div>
   <div className="category-manager-toolbar"><div className="category-manager-filters">{(["সব","আয়","ব্যয়"] as const).map(v=><button key={v} className={filter===v?"active "+(v==="ব্যয়"?"expense":"income"):""} onClick={()=>setFilter(v)}>{v==="সব"?"সব ক্যাটাগরি":v} ({v==="সব"?categories.length:categories.filter(c=>c.type===v).length})</button>)}</div><label className="category-manager-search"><Search size={17}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="ক্যাটাগরি খুঁজুন..."/></label><select className="category-manager-sort" value={sort} onChange={e=>setSort(e.target.value)}><option>সম্প্রতি যোগ করা</option><option>নাম অনুযায়ী</option></select></div>
-  <div className="category-manager-grid"><section className="category-manager-list-card income-card"><div className="category-manager-card-heading"><span className="category-type-icon">↗</span><div><h3>আয় ক্যাটাগরি</h3><p>আয়ের উৎসের ক্যাটাগরিগুলো এখানে দেখানো হয়েছে।</p></div></div><div className="category-manager-table-head"><span>নাম</span><span>লেনদেন সংখ্যা</span><span>অ্যাকশন</span></div>{list("আয়").map(c=><div className="managed-category-row" key={c.id}><span className="managed-category-icon" style={{color:c.color,background:c.color+"18"}}>{c.icon}</span><span className="managed-category-name">{c.name}</span><span className="managed-category-count">{(counts[c.name]||0).toLocaleString("bn-BD")}</span><span className="managed-category-actions"><button className="category-edit-btn" onClick={()=>edit(c)} aria-label="সম্পাদনা"><Pencil size={16}/></button><button className="category-delete-btn" onClick={()=>remove(c)} aria-label="মুছুন"><X size={16}/></button></span></div>)}{list("আয়").length===0&&<p className="category-empty">কোনো আয় ক্যাটাগরি পাওয়া যায়নি।</p>}</section>
+  <div className="category-manager-grid"><section className="category-manager-list-card income-card"><div className="category-manager-card-heading"><span className="category-type-icon">↗</span><div><h3>আয় ক্যাটাগরি</h3><p>আয়ের উৎসের ক্যাটাগরিগুলো এখানে দেখানো হয়েছে।</p></div></div><div className="category-manager-table-head"><span>নাম</span><span>লেনদেন সংখ্যা</span><span>অ্যাকশন</span></div>{list("আয়").map(c=><div className="managed-category-row" key={c.id}><span className="managed-category-icon" style={{color:c.color,background:c.color+"18"}}>{renderManagedIcon(c.icon,20)}</span><span className="managed-category-name">{c.name}</span><span className="managed-category-count">{(counts[c.name]||0).toLocaleString("bn-BD")}</span><span className="managed-category-actions"><button className="category-edit-btn" onClick={()=>edit(c)} aria-label="সম্পাদনা"><Pencil size={16}/></button><button className="category-delete-btn" onClick={()=>remove(c)} aria-label="মুছুন"><X size={16}/></button></span></div>)}{list("আয়").length===0&&<p className="category-empty">কোনো আয় ক্যাটাগরি পাওয়া যায়নি।</p>}</section>
   <section className="category-manager-list-card expense-card"><div className="category-manager-card-heading"><span className="category-type-icon">↘</span><div><h3>ব্যয় ক্যাটাগরি</h3><p>ব্যয়ের খাতের ক্যাটাগরিগুলো এখানে দেখানো হয়েছে।</p></div></div><div className="category-manager-table-head"><span>নাম</span><span>লেনদেন সংখ্যা</span><span>অ্যাকশন</span></div>{list("ব্যয়").map(c=><div className="managed-category-row" key={c.id}><span className="managed-category-icon" style={{color:c.color,background:c.color+"18"}}>{c.icon}</span><span className="managed-category-name">{c.name}</span><span className="managed-category-count">{(counts[c.name]||0).toLocaleString("bn-BD")}</span><span className="managed-category-actions"><button className="category-edit-btn" onClick={()=>edit(c)} aria-label="সম্পাদনা"><Pencil size={16}/></button><button className="category-delete-btn" onClick={()=>remove(c)} aria-label="মুছুন"><X size={16}/></button></span></div>)}{list("ব্যয়").length===0&&<p className="category-empty">কোনো ব্যয় ক্যাটাগরি পাওয়া যায়নি।</p>}</section>
-  <aside className="category-manager-editor"><div className="category-editor-heading"><h3>{editing===null?"নতুন ক্যাটাগরি যোগ করুন":"ক্যাটাগরি সম্পাদনা"}</h3>{editing!==null&&<button className="category-editor-close" onClick={reset} aria-label="ফর্ম রিসেট"><X size={18}/></button>}</div><form onSubmit={save}><label>ক্যাটাগরির ধরন <b>*</b></label><div className="category-type-switch"><button type="button" className={type==="আয়"?"selected income":"income"} onClick={()=>chooseType("আয়")}>↗ &nbsp; আয়</button><button type="button" className={type==="ব্যয়"?"selected expense":"expense"} onClick={()=>chooseType("ব্যয়")}>↘ &nbsp; ব্যয়</button></div><label>ক্যাটাগরির নাম <b>*</b><input required value={name} onChange={e=>setName(e.target.value)} placeholder="যেমন: বেতন, বাজার, ভাড়া"/></label><label>আইকন</label><div className="category-icon-choices">{iconChoices.map(v=><button type="button" key={v} className={icon===v?"chosen":""} onClick={()=>setIcon(v)}>{v}</button>)}</div><label>রং</label><div className="category-color-choices">{colors.map(v=><button type="button" key={v} aria-label={"রং "+v} className={color===v?"chosen":""} style={{background:v}} onClick={()=>setColor(v)}/>)}</div><label>বিবরণ (ঐচ্ছিক)<textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="এই ক্যাটাগরি সম্পর্কে সংক্ষিপ্ত বিবরণ লিখুন..."/></label><div className="category-editor-actions"><button type="button" className="btn secondary" onClick={reset}>বাতিল</button><button type="submit" className="btn primary"><Check size={16}/>{editing===null?"ক্যাটাগরি সংরক্ষণ":"পরিবর্তন সংরক্ষণ"}</button></div></form></aside></div>
+  <aside className="category-manager-editor"><div className="category-editor-heading"><h3>{editing===null?"নতুন ক্যাটাগরি যোগ করুন":"ক্যাটাগরি সম্পাদনা"}</h3>{editing!==null&&<button className="category-editor-close" onClick={reset} aria-label="ফর্ম রিসেট"><X size={18}/></button>}</div><form onSubmit={save}><label>ক্যাটাগরির ধরন <b>*</b></label><div className="category-type-switch"><button type="button" className={type==="আয়"?"selected income":"income"} onClick={()=>chooseType("আয়")}>↗ &nbsp; আয়</button><button type="button" className={type==="ব্যয়"?"selected expense":"expense"} onClick={()=>chooseType("ব্যয়")}>↘ &nbsp; ব্যয়</button></div><label>ক্যাটাগরির নাম <b>*</b><input required value={name} onChange={e=>setName(e.target.value)} placeholder="যেমন: বেতন, বাজার, ভাড়া"/></label><label>আইকন</label><label className="category-icon-search"><Search size={15}/><input value={iconSearch} onChange={e=>setIconSearch(e.target.value)} placeholder="আইকন খুঁজুন..."/></label><div className="category-icon-groups">{["সব","অর্থ","কেনাকাটা","বাসা","প্রযুক্তি","যাতায়াত","খাবার","স্বাস্থ্য","শিক্ষা","বিনোদন","পোষা প্রাণী","ব্যক্তিগত","প্রকৃতি","অন্যান্য"].map(group=><button type="button" key={group} className={iconGroup===group?"active":""} onClick={()=>setIconGroup(group)}>{group}</button>)}</div><div className="category-icon-choices">{visibleIcons.map(item=><button type="button" key={item.id} title={item.label} aria-label={item.label} className={icon===item.id?"chosen":""} onClick={()=>setIcon(item.id)}><item.Icon size={19} strokeWidth={2}/></button>)}</div><p className="category-icon-selected">নির্বাচিত: {categoryIconChoices.find(item=>item.id===icon)?.label??"পুরোনো আইকন"}</p><label>রং</label><div className="category-color-choices">{colors.map(v=><button type="button" key={v} aria-label={"রং "+v} className={color===v?"chosen":""} style={{background:v}} onClick={()=>setColor(v)}/>)}</div><label>বিবরণ (ঐচ্ছিক)<textarea value={description} onChange={e=>setDescription(e.target.value)} placeholder="এই ক্যাটাগরি সম্পর্কে সংক্ষিপ্ত বিবরণ লিখুন..."/></label><div className="category-editor-actions"><button type="button" className="btn secondary" onClick={reset}>বাতিল</button><button type="submit" className="btn primary"><Check size={16}/>{editing===null?"ক্যাটাগরি সংরক্ষণ":"পরিবর্তন সংরক্ষণ"}</button></div></form></aside></div>
  </section>;
 }
 

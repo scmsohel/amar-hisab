@@ -2685,3 +2685,18 @@
  .dashboard-transactions~.side-widgets .income-source-row small{font-size:11px}
  .dashboard-transactions~.side-widgets .income-source-row b{font-size:12px}
 }
+
+
+/* Final approved analytics layout: legend beside title, slightly tighter lower cards */
+@media(min-width:1251px){
+  .charts>.chart-panel>.panel-title{align-items:center}
+  .chart-header-actions{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex:0 0 auto}
+  .charts>.chart-panel .legend{display:flex;align-items:center;gap:10px;margin:0;white-space:nowrap}
+  .charts>.chart-panel .chart-range-wrap{flex:0 0 auto}
+  .charts>.best-expenses .best-expense-row{margin-block:11px}
+  .charts>.category{grid-template-rows:auto repeat(5,minmax(20px,auto)) auto}
+}
+@media(max-width:1250px){
+  .chart-header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  .charts>.chart-panel .legend{margin:0;white-space:nowrap}
+}

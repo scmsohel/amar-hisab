@@ -2387,3 +2387,30 @@
  .dashboard-transactions .styled-dropdown.transaction-month{min-width:0}
  .dashboard-transactions .dashboard-transaction-filter-row>.styled-dropdown{min-width:0}
 }
+
+
+/* Full-width daily group header and clearly red expense labels */
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-group>td{
+ width:100%;padding:0;background:#edf5ff;border-bottom:0
+}
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-header{
+ display:flex;align-items:center;justify-content:space-between;gap:16px;
+ width:100%;min-width:0;padding:11px 14px;box-sizing:border-box
+}
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-title{flex:1;min-width:0}
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals{
+ display:flex;justify-content:flex-end;align-items:center;gap:22px;flex:0 0 auto
+}
+.dashboard-transactions .dashboard-grouped-transactions .transaction-category.category-expense,
+.dashboard-transactions .dashboard-grouped-transactions .transaction-kind.kind-ব্যয়{
+ color:#ef4444!important;background:#fff0f0!important;border-color:#ffd8d8!important
+}
+.dark .dashboard-transactions .dashboard-grouped-transactions .transaction-day-group>td{background:#1c3045}
+.dark .dashboard-transactions .dashboard-grouped-transactions .transaction-category.category-expense,
+.dark .dashboard-transactions .dashboard-grouped-transactions .transaction-kind.kind-ব্যয়{
+ color:#ff8585!important;background:#3b252a!important;border-color:#60333b!important
+}
+@media(max-width:760px){
+ .dashboard-transactions .dashboard-grouped-transactions .transaction-day-header{gap:7px;padding:9px 7px}
+ .dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals{gap:7px}
+}

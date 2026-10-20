@@ -2863,3 +2863,60 @@
   background:#dcfce7!important;
   color:#15803d!important;
 }
+
+
+/* Upcoming bills: fix Bengali date rendering, improve readability, and add full-card hover */
+.side-widgets>.bills{
+  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+}
+.side-widgets>.bills:hover{
+  transform:translateY(-3px);
+  border-color:#b9e6d3;
+  box-shadow:0 12px 28px #1d344814;
+}
+.side-widgets>.bills .bill-row{
+  border-radius:9px;
+  padding-inline:7px;
+  margin-inline:-7px;
+  transition:background-color .18s ease,transform .18s ease;
+}
+.side-widgets>.bills .bill-row:hover{
+  background:var(--surface2);
+  transform:translateX(2px);
+}
+.side-widgets>.bills .bill-row b{
+  font-family:'Noto Sans Bengali','Hind Siliguri',sans-serif!important;
+  font-size:14px;
+  line-height:1.45;
+  font-weight:700;
+}
+.side-widgets>.bills .bill-row small{
+  font-family:'Noto Sans Bengali','Hind Siliguri',sans-serif!important;
+  font-size:11px;
+  line-height:1.5;
+  font-weight:500;
+}
+.side-widgets>.bills .bill-row strong{
+  font-size:14px;
+  font-weight:800;
+}
+.side-widgets>.bills .bill-due{
+  font-family:'Noto Sans Bengali','Hind Siliguri',sans-serif!important;
+  font-size:10px;
+  font-weight:700;
+  line-height:1.4;
+}
+.side-widgets>.bills>.panel-title h3{
+  font-family:'Noto Sans Bengali','Hind Siliguri',sans-serif!important;
+  font-size:18px;
+}
+.side-widgets>.bills>.panel-title .link{font-size:12px}
+@media(max-width:700px){
+  .side-widgets>.bills .bill-row b{font-size:12px}
+  .side-widgets>.bills .bill-row small{font-size:10px}
+  .side-widgets>.bills .bill-row strong{font-size:12px}
+  .side-widgets>.bills>.panel-title h3{font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){
+  .side-widgets>.bills,.side-widgets>.bills .bill-row{transition:none}
+}

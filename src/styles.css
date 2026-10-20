@@ -3074,3 +3074,32 @@
 .category-manager-editor .category-icon-choices button{opacity:1;color:var(--text)}
 .category-manager-editor .category-color-choices button{opacity:1}
 .category-manager-editor .category-editor-actions .btn{opacity:1}
+
+
+/* Improve Bengali numerals and readability in category manager */
+.managed-category-count{
+  font-family:'Noto Sans Bengali','Hind Siliguri',sans-serif;
+  font-size:14px;
+  line-height:1.6;
+  font-weight:600;
+  font-variant-numeric:normal;
+}
+.category-manager-table-head span:nth-child(2){font-size:12px}
+.category-manager-editor .category-editor-heading h3{font-size:19px;line-height:1.5}
+.category-manager-editor form>label{font-size:14px;line-height:1.6;gap:8px}
+.category-manager-editor form>label input,
+.category-manager-editor textarea{font-size:14px;line-height:1.6}
+.category-manager-editor form>label input::placeholder,
+.category-manager-editor textarea::placeholder{font-size:13px;line-height:1.6}
+.category-manager-editor .category-type-switch button{font-size:14px;min-height:42px}
+.category-manager-editor .category-icon-choices button{font-size:19px}
+.category-manager-editor .category-color-choices button{width:25px;height:25px}
+.category-manager-editor .category-editor-actions .btn{font-size:14px;min-height:42px;padding:9px 13px}
+@media(max-width:760px){
+  .managed-category-count{font-size:13px}
+  .category-manager-editor .category-editor-heading h3{font-size:18px}
+  .category-manager-editor form>label{font-size:13px}
+  .category-manager-editor form>label input,
+  .category-manager-editor textarea{font-size:13px}
+  .category-manager-editor .category-editor-actions .btn{font-size:13px}
+}

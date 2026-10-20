@@ -2700,3 +2700,17 @@
   .chart-header-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
   .charts>.chart-panel .legend{margin:0;white-space:nowrap}
 }
+
+
+/* Restore readable plotting space after moving the legend into the chart header */
+@media(min-width:1251px){
+  .charts>.chart-panel .chart{
+    height:135px;
+    min-height:135px;
+    margin-top:6px;
+    flex:0 0 135px;
+  }
+  .charts>.chart-panel .chart .recharts-responsive-container{
+    min-height:135px;
+  }
+}

@@ -3365,3 +3365,9 @@
 .debt-person-card-actions .btn{flex:1;justify-content:center}
 @media(max-width:1100px){.debt-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.debt-toolbar{flex-wrap:wrap}.debt-search{flex-basis:100%}.debt-toolbar>.app-select{flex:1;min-width:120px}}
 @media(max-width:650px){.debt-redesign>.feature-heading{align-items:flex-start;gap:10px}.debt-redesign>.feature-heading h2{font-size:21px}.debt-metrics{grid-template-columns:1fr 1fr;gap:9px}.debt-metric{min-height:100px;padding:12px;gap:9px}.debt-metric-icon{flex-basis:40px;width:40px;height:40px}.debt-metric strong{font-size:17px}.debt-metric small{font-size:11px}.debt-metric p{font-size:10px}.debt-workspace{padding:12px 10px 0}.debt-toolbar>.app-select{min-width:calc(50% - 8px)}.debt-card-grid{grid-template-columns:1fr}.debt-table-footer{flex-wrap:wrap;padding:12px 0}.debt-table-footer>div{flex-wrap:wrap}}
+
+/* Noto Sans Bengali font only for the dashboard's recent-transactions section */
+.dashboard-transactions,
+.dashboard-transactions :is(h1,h2,h3,h4,p,span,strong,b,small,label,button,input,select,option,th,td,div){
+  font-family:'Noto Sans Bengali','Hind Siliguri',sans-serif;
+}

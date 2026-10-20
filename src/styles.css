@@ -2554,7 +2554,7 @@
 }
 
 
-/* Refined hover, donut entrance animation, and readable income-source text */
+/* Refined hover, stable income donut fade-in, and readable income-source text */
 @media(hover:hover) and (prefers-reduced-motion:no-preference){
  .dashboard-transactions~.side-widgets>.budget-compact,
  .dashboard-transactions~.side-widgets>.income-sources{
@@ -2568,23 +2568,7 @@
   border-color:#d6e8e0;
  }
  .dashboard-transactions~.side-widgets .income-source-donut{
-  position:relative;
-  isolation:isolate;
-  --income-reveal:0deg;
-  animation:incomeDonutFill 1.35s cubic-bezier(.22,.7,.25,1) both;
- }
- .dashboard-transactions~.side-widgets .income-source-donut::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  z-index:0;
-  border-radius:50%;
-  pointer-events:none;
-  background:conic-gradient(transparent 0deg var(--income-reveal),var(--surface) var(--income-reveal) 360deg);
- }
- .dashboard-transactions~.side-widgets .income-source-hole{
-  position:relative;
-  z-index:1;
+  animation:incomeDonutFade .9s ease-out both;
  }
  .dashboard-transactions~.side-widgets .income-source-row{
   animation:incomeSourceRowEnter .42s ease both;
@@ -2593,14 +2577,9 @@
  .dashboard-transactions~.side-widgets .income-source-row:nth-child(3){animation-delay:.12s}
  .dashboard-transactions~.side-widgets .income-source-row:nth-child(4){animation-delay:.18s}
 }
-@property --income-reveal{
- syntax:"<angle>";
- inherits:false;
- initial-value:0deg;
-}
-@keyframes incomeDonutFill{
- from{--income-reveal:0deg}
- to{--income-reveal:360deg}
+@keyframes incomeDonutFade{
+ from{opacity:.15}
+ to{opacity:1}
 }
 @keyframes incomeSourceRowEnter{
  from{opacity:0;transform:translateX(7px)}

@@ -2468,3 +2468,31 @@
  line-height:1.55;
  font-weight:600;
 }
+
+
+/* Correct Bengali numeral font selectors for grouped dates and chart labels */
+/* Use the already-loaded Noto Serif Bengali font for clearer Bengali date digits */
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-title b,
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-title small,
+.transaction-table .transaction-date-cell,
+.transaction-table .transaction-date-text,
+.charts>.chart-panel .chart .recharts-cartesian-axis-tick-value,
+.charts>.chart-panel .chart .recharts-tooltip-wrapper,
+.charts>.chart-panel .chart .recharts-default-tooltip,
+.charts>.chart-panel .chart .recharts-tooltip-label,
+.charts>.chart-panel .chart .recharts-tooltip-item,
+.charts>.chart-panel .chart .recharts-tooltip-item-name,
+.charts>.chart-panel .chart .recharts-tooltip-item-value{
+ font-family:'Noto Serif Bengali','Hind Siliguri',serif!important;
+ font-variant-numeric:normal!important;
+ font-feature-settings:normal!important;
+ letter-spacing:0!important;
+}
+.charts>.chart-panel .chart .recharts-cartesian-axis-tick-value{
+ font-size:11px!important;
+}
+.charts>.chart-panel .chart .recharts-tooltip-label{
+ font-size:14px!important;
+ line-height:1.6!important;
+ font-weight:600!important;
+}

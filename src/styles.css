@@ -2242,3 +2242,27 @@
   border-color:#36594d!important;
  }
 }
+
+
+/* Match debt summary tiles to the wallet-card outline and subtle lift */
+.dashboard-top>.hero-debts .debt-summary .debt-total{
+ border:1px solid var(--border);
+ box-shadow:0 2px 5px #1d34480a;
+ border-radius:14px;
+}
+.dashboard-top>.hero-debts .debt-summary .debt-total.receivable{
+ border-color:#d3f1e3;
+ box-shadow:0 2px 5px #08a66a0b;
+}
+.dashboard-top>.hero-debts .debt-summary .debt-total.payable{
+ border-color:#f8dfe2;
+ box-shadow:0 2px 5px #ef44440b;
+}
+.dark .dashboard-top>.hero-debts .debt-summary .debt-total.receivable{
+ border-color:#245744;
+ box-shadow:0 2px 5px #0002;
+}
+.dark .dashboard-top>.hero-debts .debt-summary .debt-total.payable{
+ border-color:#63333b;
+ box-shadow:0 2px 5px #0002;
+}

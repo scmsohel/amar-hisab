@@ -2716,7 +2716,7 @@
 }
 
 
-/* Approved refinement: restore expense subtitles below their headings */
+/* Approved refinement: restore subtitles with clearer size and spacing */
 @media(min-width:1251px){
   .charts>.best-expenses>.panel-title>div,
   .charts>.category>.panel-title>div{
@@ -2728,15 +2728,17 @@
   .charts>.category .panel-title p{
     display:block;
     width:fit-content;
-    margin-top:2px;
+    margin-top:5px;
     padding:0;
     border-radius:0;
     background:transparent;
     text-align:left;
     white-space:normal;
-    font-size:10px!important;
-    line-height:1.35;
+    font-size:12px!important;
+    line-height:1.4;
   }
+  .charts>.best-expenses .panel-title{margin-bottom:10px}
+  .charts>.category .panel-title{margin-bottom:10px}
   .charts>.best-expenses .best-expense-row{margin-block:10px;gap:7px}
   .charts>.best-expenses .best-expense-name{font-size:12px}
   .charts>.best-expenses .best-expense-row small{font-size:11px}

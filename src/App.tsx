@@ -72,7 +72,7 @@ return <div className={dark?"app dark":"app"}><AnimatePresence>{mobile&&<motion.
 <div className="transaction-heading dashboard-transaction-heading"><h3>সাম্প্রতিক লেনদেন</h3><div className="transaction-heading-controls">
 <label className="transaction-search"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="বিবরণ, ক্যাটাগরি, ওয়ালেট খুঁজুন..."/>{query&&<button type="button" onClick={()=>setQuery("")} aria-label="সার্চ মুছুন"><X size={14}/></button>}</label>
 <StyledDropdown className="transaction-month" icon={<CalendarDays size={15}/>} value={txMonthFilter} ariaLabel="মাস নির্বাচন" onChange={setTxMonthFilter} options={[{value:"সব মাস",label:"সব মাস"},...transactionMonths.map(([value,label])=>({value,label}))]}/>
-<button className={"transaction-filter-button"+(txCategoryFilter!=="সব ক্যাটাগরি"||txWalletFilter!=="সব ওয়ালেট"||txDateFilter!=="সব তারিখ"||txMoreFilter!=="সব"?" selected":"")} onClick={()=>{setFilter("সব");setQuery("");setTxCategoryFilter("সব ক্যাটাগরি");setTxWalletFilter("সব ওয়ালেট");setTxDateFilter("সব তারিখ");setTxMonthFilter("সব মাস");setTxMoreFilter("সব");setTxSort("নতুন আগে");}} aria-label="সব ফিল্টার রিসেট"><Filter size={16}/></button>
+
 <button className="btn primary small" onClick={()=>{setEditingId(null);setTitle("");setAmount("");setModal("আয়")}}><Plus size={15}/> নতুন লেনদেন</button>
 </div></div>
 <div className="transaction-filter-row dashboard-transaction-filter-row">

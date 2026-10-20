@@ -2850,3 +2850,16 @@
  .side-widgets>.bills .bill-due{grid-column:3;grid-row:2;justify-self:end;font-size:8px;padding:5px 6px}
  .side-widgets>.bills .bill-row>div{grid-column:2;grid-row:1/3;align-self:center}
 }
+
+
+/* Upcoming bills: alternate red and green due-date badges for visibility */
+.side-widgets>.bills .bill-due-0,
+.side-widgets>.bills .bill-due-2{
+  background:#ffe7eb!important;
+  color:#e11d48!important;
+}
+.side-widgets>.bills .bill-due-1,
+.side-widgets>.bills .bill-due-3{
+  background:#dcfce7!important;
+  color:#15803d!important;
+}

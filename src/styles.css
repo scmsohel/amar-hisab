@@ -2668,3 +2668,20 @@
  .dashboard-transactions~.side-widgets .income-sources>.panel-title>div{gap:6px}
  .dashboard-transactions~.side-widgets .income-sources>.panel-title p{font-size:9px}
 }
+
+
+/* Slightly enlarge typography only inside the income-sources card */
+.dashboard-transactions~.side-widgets .income-sources .panel-title h3{font-size:18px}
+.dashboard-transactions~.side-widgets .income-sources .panel-title p{font-size:12px}
+.dashboard-transactions~.side-widgets .income-source-hole b{font-size:16px}
+.dashboard-transactions~.side-widgets .income-source-hole small{font-size:11px}
+.dashboard-transactions~.side-widgets .income-source-row{font-size:13px}
+.dashboard-transactions~.side-widgets .income-source-row small{font-size:12px}
+.dashboard-transactions~.side-widgets .income-source-row b{font-size:13px}
+@media(max-width:700px){
+ .dashboard-transactions~.side-widgets .income-sources .panel-title h3{font-size:16px}
+ .dashboard-transactions~.side-widgets .income-sources .panel-title p{font-size:10px}
+ .dashboard-transactions~.side-widgets .income-source-row{font-size:12px}
+ .dashboard-transactions~.side-widgets .income-source-row small{font-size:11px}
+ .dashboard-transactions~.side-widgets .income-source-row b{font-size:12px}
+}

@@ -3262,7 +3262,7 @@
 /* Transactions page now uses the natural page scroll instead of pagination */
 .transaction-scroll-summary{display:flex;align-items:center;justify-content:flex-end;padding:12px 18px;border-top:1px solid var(--border);color:var(--muted);font-size:14px;background:var(--surface)}
 .dashboard-transactions{position:relative}
-.dashboard-transactions .dashboard-transaction-scroll-summary{position:absolute;right:14px;bottom:10px;z-index:8;display:flex;max-width:calc(100% - 28px);padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--surface);box-shadow:0 8px 24px #122b3b1a;color:var(--text);font-size:14px;font-weight:600;line-height:1.5;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(6px);transition:opacity .2s ease,transform .2s ease,visibility .2s ease}
+.dashboard-transactions .dashboard-transaction-scroll-summary{position:absolute;right:14px;bottom:10px;z-index:8;display:flex;max-width:calc(100% - 28px);padding:11px 15px;border:1px solid color-mix(in srgb,var(--primary) 22%,var(--border));border-radius:10px;background:var(--surface);box-shadow:0 8px 24px #122b3b1a;color:var(--text);font-family:inherit;font-size:16px;font-weight:600;line-height:1.6;letter-spacing:.01em;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(6px);transition:opacity .2s ease,transform .2s ease,visibility .2s ease}
 .dashboard-transactions:hover .dashboard-transaction-scroll-summary,.dashboard-transactions:focus-within .dashboard-transaction-scroll-summary{opacity:1;visibility:visible;transform:translateY(0)}
 @media(prefers-reduced-motion:reduce){.dashboard-transactions .dashboard-transaction-scroll-summary{transition:none}}
 .transaction-page .transaction-table-scroll{overflow-x:auto;max-width:100%}

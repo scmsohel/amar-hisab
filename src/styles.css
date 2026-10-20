@@ -2746,7 +2746,7 @@
   .charts>.category .cat-row{font-size:12px}
   .charts>.category .cat-row b{font-size:12px}
   .charts>.best-expenses,
-  .charts>.category{align-self:start;height:fit-content;min-height:0}
+  .charts>.category{align-self:stretch;height:auto;min-height:0}
 }
 @media(min-width:1251px) and (max-width:1450px){
   .charts>.best-expenses>.panel-title>div,

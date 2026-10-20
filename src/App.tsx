@@ -120,7 +120,6 @@ const featureConfig:Record<string,{key:string;title:string;description:string;ad
 };
 function FeaturePage({active,tx,dark,setDark,setActive,setNotice,sharedDebts,setSharedDebts}:{active:string;tx:Tx[];dark:boolean;setDark:(v:boolean)=>void;setActive:(v:string)=>void;setNotice:(v:string)=>void;sharedDebts:FeatureItem[];setSharedDebts:(v:FeatureItem[]|((old:FeatureItem[])=>FeatureItem[]))=>void}){
  const config=featureConfig[active];
- const [items,setItems]=useState<FeatureItem[]>(()=>{try{const raw=localStorage.getItem("amar-hisab-"+(config?.key||"")+"-items");if(raw)return JSON.parse(raw) as FeatureItem[];}catch{}return [];});
  const [localItems,setLocalItems]=useState<FeatureItem[]>(()=>{try{const raw=localStorage.getItem("amar-hisab-"+(config?.key||"")+"-items");if(raw)return JSON.parse(raw) as FeatureItem[];}catch{}return [];});
  const items=active==="দেনা-পাওনা"?sharedDebts:localItems;
  const setItems=active==="দেনা-পাওনা"?setSharedDebts:setLocalItems;

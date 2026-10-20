@@ -2568,8 +2568,23 @@
   border-color:#d6e8e0;
  }
  .dashboard-transactions~.side-widgets .income-source-donut{
-  animation:incomeDonutEnter .85s cubic-bezier(.2,.75,.25,1) both;
-  transform-origin:center;
+  position:relative;
+  isolation:isolate;
+  --income-reveal:0deg;
+  animation:incomeDonutFill 1.35s cubic-bezier(.22,.7,.25,1) both;
+ }
+ .dashboard-transactions~.side-widgets .income-source-donut::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  border-radius:50%;
+  pointer-events:none;
+  background:conic-gradient(transparent 0deg var(--income-reveal),var(--surface) var(--income-reveal) 360deg);
+ }
+ .dashboard-transactions~.side-widgets .income-source-hole{
+  position:relative;
+  z-index:1;
  }
  .dashboard-transactions~.side-widgets .income-source-row{
   animation:incomeSourceRowEnter .42s ease both;
@@ -2578,9 +2593,14 @@
  .dashboard-transactions~.side-widgets .income-source-row:nth-child(3){animation-delay:.12s}
  .dashboard-transactions~.side-widgets .income-source-row:nth-child(4){animation-delay:.18s}
 }
-@keyframes incomeDonutEnter{
- from{opacity:.45;transform:rotate(-35deg) scale(.82)}
- to{opacity:1;transform:rotate(0) scale(1)}
+@property --income-reveal{
+ syntax:"<angle>";
+ inherits:false;
+ initial-value:0deg;
+}
+@keyframes incomeDonutFill{
+ from{--income-reveal:0deg}
+ to{--income-reveal:360deg}
 }
 @keyframes incomeSourceRowEnter{
  from{opacity:0;transform:translateX(7px)}

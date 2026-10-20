@@ -3253,3 +3253,8 @@
 .transaction-pagination-controls .app-select{min-height:32px;border-radius:7px}
 .transaction-pagination-controls .app-select-trigger{padding:0 7px}
 @media(max-width:600px){.app-select-menu{max-width:min(280px,calc(100vw - 32px))}.category-manager-sort.app-select{min-width:125px}}
+
+
+/* Transactions page now uses the natural page scroll instead of pagination */
+.transaction-scroll-summary{display:flex;align-items:center;justify-content:flex-end;padding:12px 18px;border-top:1px solid var(--border);color:var(--muted);font-size:11px;background:var(--surface)}
+.transaction-page .transaction-table-scroll{overflow-x:auto;max-width:100%}

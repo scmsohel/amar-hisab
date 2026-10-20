@@ -2302,3 +2302,33 @@
  .dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals{gap:7px;font-size:9px}
  .dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals b{font-size:10px;margin-left:1px}
 }
+
+
+/* Align recent transactions and monthly budget with the three analytics cards above */
+@media(min-width:1251px){
+ .bottom{
+  grid-template-columns:minmax(0,2.45fr) minmax(280px,1fr);
+  gap:12px;
+  align-items:stretch;
+ }
+ .bottom>.dashboard-transactions,
+ .bottom>.side-widgets{min-width:0;width:100%}
+ .bottom>.side-widgets{display:flex;flex-direction:column;gap:12px}
+ .bottom>.side-widgets>.budget,
+ .bottom>.side-widgets>.bills{width:100%;min-width:0}
+}
+/* Expense amounts and daily expense totals use a consistent red accent */
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals span:last-child,
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals span:last-child b{
+ color:#ef4444;
+}
+.dashboard-transactions .dashboard-grouped-transactions .transaction-kind.kind-ব্যয়{
+ color:#ef4444;
+ background:#fff0f0;
+ border-color:#ffd8d8;
+}
+.dark .dashboard-transactions .dashboard-grouped-transactions .transaction-kind.kind-ব্যয়{
+ color:#ff8585;
+ background:#3b252a;
+ border-color:#60333b;
+}

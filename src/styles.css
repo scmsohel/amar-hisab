@@ -3234,3 +3234,22 @@
 .clock-date small{font-size:14px;color:var(--muted)}
 @media(max-width:900px){.dashboard-clock{gap:8px;margin-right:12px}.clock-time{gap:8px}.clock-time span{font-size:24px}.clock-divider{height:34px}.clock-date{gap:6px}.clock-date b{font-size:13px}.clock-date small{font-size:12px}}
 @media(max-width:700px){.dashboard-clock{width:100%;justify-content:flex-start;margin-top:2px;margin-right:0;gap:8px}.clock-time span{font-size:22px;letter-spacing:-.4px}.clock-time svg{width:24px;height:24px}.clock-divider{height:30px}.clock-date svg{width:21px;height:21px}.clock-date b{font-size:12px}.clock-date small{font-size:11px}}
+
+
+/* Unified custom dropdowns used across forms, filters and category manager */
+.app-select{position:relative;display:inline-flex;vertical-align:middle;align-items:center;min-width:0;min-height:36px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text);font:12px 'Hind Siliguri',sans-serif;z-index:10}
+.app-select.is-open{z-index:120}
+.app-select-trigger{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-width:0;min-height:inherit;padding:0 11px;border:0;border-radius:inherit;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.app-select-trigger>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.app-select-trigger>svg{flex-shrink:0;color:var(--muted);transition:transform .18s ease}
+.app-select.is-open .app-select-trigger>svg{transform:rotate(180deg)}
+.app-select:focus-within{border-color:var(--primary);box-shadow:0 0 0 2px color-mix(in srgb,var(--primary) 10%,transparent)}
+.app-select-menu{position:absolute;left:0;top:calc(100% + 5px);width:max(100%,180px);max-height:230px;overflow-y:auto;overscroll-behavior:contain;padding:5px;background:var(--surface);border:1px solid var(--border);border-radius:11px;box-shadow:0 12px 30px #172b4d24;z-index:200;scrollbar-width:thin;scrollbar-color:var(--muted) transparent}
+.app-select-menu>button{display:flex;align-items:center;width:100%;min-height:35px;padding:7px 10px;border:0;border-radius:7px;background:transparent;color:var(--text);text-align:left;font:inherit;white-space:nowrap;cursor:pointer;transition:background .14s ease,color .14s ease}
+.app-select-menu>button:hover,.app-select-menu>button.active{background:var(--surface2);color:var(--primary)}
+.app-select-menu>button.active{font-weight:650}
+.modal .app-select,.feature-form .app-select{display:flex;width:100%;min-height:41px;background:var(--surface2)}
+.category-manager-sort.app-select{display:flex;min-width:145px;min-height:40px}
+.transaction-pagination-controls .app-select{min-height:32px;border-radius:7px}
+.transaction-pagination-controls .app-select-trigger{padding:0 7px}
+@media(max-width:600px){.app-select-menu{max-width:min(280px,calc(100vw - 32px))}.category-manager-sort.app-select{min-width:125px}}

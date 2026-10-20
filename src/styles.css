@@ -2332,3 +2332,58 @@
  background:#3b252a;
  border-color:#60333b;
 }
+
+
+/* Shared custom menu styling for all transaction filter dropdowns */
+.dashboard-transactions .styled-dropdown{
+ position:relative;display:inline-flex;align-items:center;min-width:0;min-height:36px;
+ border:1px solid var(--border);border-radius:9px;background:var(--surface);
+ color:var(--muted);white-space:nowrap;z-index:10
+}
+.dashboard-transactions .styled-dropdown.is-open{z-index:80}
+.dashboard-transactions .styled-dropdown-trigger{
+ display:flex;align-items:center;justify-content:space-between;gap:9px;
+ width:100%;min-width:0;min-height:inherit;padding:0 10px;border:0;border-radius:inherit;
+ background:transparent;color:var(--text);font:inherit;font-size:12px;white-space:nowrap;cursor:pointer
+}
+.dashboard-transactions .styled-dropdown-trigger>span{
+ min-width:0;overflow:hidden;text-overflow:ellipsis
+}
+.dashboard-transactions .styled-dropdown-trigger>svg{flex:none;color:var(--muted)}
+.dashboard-transactions .styled-dropdown:focus-visible,
+.dashboard-transactions .styled-dropdown-trigger:focus-visible{
+ outline:2px solid color-mix(in srgb,var(--primary) 35%,transparent);outline-offset:1px
+}
+.dashboard-transactions .styled-dropdown.is-open .styled-dropdown-trigger{
+ border-color:var(--primary);box-shadow:0 0 0 2px color-mix(in srgb,var(--primary) 10%,transparent)
+}
+.dashboard-transactions .styled-dropdown-menu{
+ position:absolute;left:0;top:calc(100% + 5px);width:max(100%,180px);
+ max-height:210px;overflow-y:auto;overscroll-behavior:contain;padding:5px;
+ background:var(--surface);border:1px solid var(--border);border-radius:10px;
+ box-shadow:0 12px 30px #172b4d24;z-index:100;
+ scrollbar-width:thin;scrollbar-color:var(--muted) transparent
+}
+.dashboard-transactions .styled-dropdown-menu::-webkit-scrollbar{width:6px}
+.dashboard-transactions .styled-dropdown-menu::-webkit-scrollbar-thumb{background:var(--muted);border-radius:8px}
+.dashboard-transactions .styled-dropdown-menu>button{
+ display:flex;align-items:center;width:100%;min-height:35px;padding:7px 10px;
+ border:0;border-radius:6px;background:transparent;color:var(--text);
+ text-align:left;font:inherit;font-size:12px;white-space:nowrap;cursor:pointer
+}
+.dashboard-transactions .styled-dropdown-menu>button:hover,
+.dashboard-transactions .styled-dropdown-menu>button.active{
+ background:var(--surface2);color:var(--primary)
+}
+.dashboard-transactions .styled-dropdown-menu>button.active{font-weight:650}
+.dashboard-transactions .styled-dropdown.transaction-month{min-width:145px;min-height:38px;flex:0 0 auto}
+.dashboard-transactions .styled-dropdown.transaction-month .styled-dropdown-trigger{gap:7px}
+.dashboard-transactions .dashboard-transaction-filter-row>.styled-dropdown{min-height:34px;min-width:90px}
+.dashboard-transactions .dashboard-transaction-filter-row>.transaction-category-dropdown{min-width:132px}
+.dashboard-transactions .dashboard-transaction-filter-row>.styled-dropdown .styled-dropdown-trigger{font-size:12px}
+.dashboard-transactions .dashboard-transaction-filter-row .transaction-sort .styled-dropdown{min-height:36px;min-width:115px}
+@media(max-width:700px){
+ .dashboard-transactions .styled-dropdown-menu{max-height:190px}
+ .dashboard-transactions .styled-dropdown.transaction-month{min-width:0}
+ .dashboard-transactions .dashboard-transaction-filter-row>.styled-dropdown{min-width:0}
+}

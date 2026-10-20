@@ -2431,3 +2431,22 @@
  color:#ff8585!important;background:#3b252a!important;border-color:#60333b!important
 }
 .dark .dashboard-transactions .dashboard-grouped-transactions .transaction-amount.amount-out{color:#ff8585!important}
+
+
+/* Fix Bengali rendering for the daily transaction count label */
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-title small{
+ font-family:'Noto Sans Bengali','Hind Siliguri',sans-serif!important;
+ font-size:11px;
+ font-weight:400;
+ line-height:1.5;
+ letter-spacing:0;
+ word-spacing:0;
+ font-variant-numeric:normal;
+ text-rendering:optimizeLegibility;
+}
+@media(max-width:760px){
+ .dashboard-transactions .dashboard-grouped-transactions .transaction-day-title small{
+  font-size:10px;
+  line-height:1.45;
+ }
+}

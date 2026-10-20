@@ -2739,7 +2739,7 @@
     line-height:1.35;
     flex:0 0 auto;
   }
-  .charts>.best-expenses .best-expense-row{margin-block:9px;gap:7px}
+  .charts>.best-expenses .best-expense-row{margin-block:10px;gap:7px}
   .charts>.best-expenses .best-expense-name{font-size:12px}
   .charts>.best-expenses .best-expense-row small{font-size:11px}
   .charts>.best-expenses .best-expense-row b{font-size:12px}

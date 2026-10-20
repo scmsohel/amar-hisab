@@ -2552,3 +2552,63 @@
  .dashboard-transactions~.side-widgets .income-source-content{grid-template-columns:105px minmax(0,1fr);gap:12px}
  .dashboard-transactions~.side-widgets .income-source-list{gap:8px}
 }
+
+
+/* Refined hover, donut entrance animation, and readable income-source text */
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+ .dashboard-transactions~.side-widgets>.budget-compact,
+ .dashboard-transactions~.side-widgets>.income-sources{
+  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease;
+  will-change:transform;
+ }
+ .dashboard-transactions~.side-widgets>.budget-compact:hover,
+ .dashboard-transactions~.side-widgets>.income-sources:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 22px #1d344810;
+  border-color:#d6e8e0;
+ }
+ .dashboard-transactions~.side-widgets .income-source-donut{
+  animation:incomeDonutEnter .85s cubic-bezier(.2,.75,.25,1) both;
+  transform-origin:center;
+ }
+ .dashboard-transactions~.side-widgets .income-source-row{
+  animation:incomeSourceRowEnter .42s ease both;
+ }
+ .dashboard-transactions~.side-widgets .income-source-row:nth-child(2){animation-delay:.06s}
+ .dashboard-transactions~.side-widgets .income-source-row:nth-child(3){animation-delay:.12s}
+ .dashboard-transactions~.side-widgets .income-source-row:nth-child(4){animation-delay:.18s}
+}
+@keyframes incomeDonutEnter{
+ from{opacity:.45;transform:rotate(-35deg) scale(.82)}
+ to{opacity:1;transform:rotate(0) scale(1)}
+}
+@keyframes incomeSourceRowEnter{
+ from{opacity:0;transform:translateX(7px)}
+ to{opacity:1;transform:translateX(0)}
+}
+/* Increase small labels while keeping the compact layout */
+.dashboard-transactions~.side-widgets .budget-compact .panel-title h3{font-size:15px}
+.dashboard-transactions~.side-widgets .budget-compact .panel-title p{font-size:11px}
+.dashboard-transactions~.side-widgets .budget-compact .budget-num b{font-size:20px}
+.dashboard-transactions~.side-widgets .budget-compact .budget-num span{font-size:12px}
+.dashboard-transactions~.side-widgets .budget-compact .budget-num strong{font-size:18px}
+.dashboard-transactions~.side-widgets .budget-compact .budget-foot{font-size:10px}
+.dashboard-transactions~.side-widgets .income-sources .panel-title h3{font-size:16px}
+.dashboard-transactions~.side-widgets .income-sources .panel-title p{font-size:11px}
+.dashboard-transactions~.side-widgets .income-source-hole b{font-size:14px}
+.dashboard-transactions~.side-widgets .income-source-hole small{font-size:10px}
+.dashboard-transactions~.side-widgets .income-source-list{gap:10px}
+.dashboard-transactions~.side-widgets .income-source-row{font-size:12px;gap:9px}
+.dashboard-transactions~.side-widgets .income-source-row small{font-size:11px}
+.dashboard-transactions~.side-widgets .income-source-row b{font-size:12px}
+@media(max-width:700px){
+ .dashboard-transactions~.side-widgets .budget-compact .panel-title h3{font-size:14px}
+ .dashboard-transactions~.side-widgets .income-sources .panel-title h3{font-size:15px}
+ .dashboard-transactions~.side-widgets .income-source-row{font-size:11px;gap:6px}
+ .dashboard-transactions~.side-widgets .income-source-row small{font-size:10px}
+ .dashboard-transactions~.side-widgets .income-source-row b{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){
+ .dashboard-transactions~.side-widgets .income-source-donut,
+ .dashboard-transactions~.side-widgets .income-source-row{animation:none!important}
+}

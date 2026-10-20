@@ -2977,3 +2977,72 @@
   .modal .warning{font-size:11px!important}
   .modal .modal-actions .btn{font-size:13px}
 }
+
+
+/* Category manager page: separate income/expense lists and a shared editor */
+.category-manager-page{display:flex;flex-direction:column;gap:16px;min-width:0}
+.category-manager-hero{display:flex;align-items:center;justify-content:space-between;gap:22px;padding:22px 24px;background:var(--surface);border:1px solid var(--border);border-radius:15px;box-shadow:0 4px 18px #18354b06}
+.category-manager-hero h2{font-size:25px;line-height:1.35;margin:0 0 5px;font-weight:800}
+.category-manager-hero p{font-size:13px;color:var(--muted);margin:0;line-height:1.6}
+.category-manager-summary{display:flex;gap:12px;flex-shrink:0}
+.category-manager-summary>div{display:flex;align-items:center;gap:12px;min-width:172px;padding:12px 15px;border-radius:13px}
+.category-manager-summary span{width:43px;height:43px;display:grid;place-items:center;border-radius:50%;font-size:26px;font-weight:700}
+.category-manager-summary small{display:block;font-size:11px;white-space:nowrap}
+.category-manager-summary strong{display:block;font-size:22px;line-height:1.3;margin-top:2px}
+.category-summary-income{background:#eaf9f2;color:#07875d}.category-summary-income span{background:#d4f5e5}
+.category-summary-expense{background:#fff0f0;color:#e53935}.category-summary-expense span{background:#ffdddd}
+.category-manager-toolbar{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:13px;min-width:0}
+.category-manager-filters{display:flex;gap:8px;align-items:center;margin-right:auto}
+.category-manager-filters button{height:39px;padding:0 15px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--muted);font:600 13px 'Hind Siliguri',sans-serif;white-space:nowrap}
+.category-manager-filters button.active{border-color:#08a66b;background:#eaf9f2;color:#07875d}
+.category-manager-filters button.active.expense{border-color:#ffb9b9;background:#fff0f0;color:#e53935}
+.category-manager-search{display:flex;align-items:center;gap:9px;height:40px;width:min(300px,25vw);padding:0 12px;border:1px solid var(--border);border-radius:9px;color:var(--muted)}
+.category-manager-search input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:var(--text);font:13px 'Hind Siliguri',sans-serif}
+.category-manager-search input::placeholder{color:var(--muted)}
+.category-manager-sort{height:40px;min-width:145px;border:1px solid var(--border);border-radius:9px;background:var(--surface);color:var(--text);padding:0 10px;font:12px 'Hind Siliguri',sans-serif}
+.category-manager-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(290px,.78fr);gap:12px;align-items:stretch}
+.category-manager-list-card,.category-manager-editor{min-width:0;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:0 4px 18px #18354b05}
+.category-manager-card-heading{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.category-type-icon{width:42px;height:42px;flex-shrink:0;display:grid;place-items:center;border-radius:13px;font-size:25px;font-weight:800}
+.income-card .category-type-icon{background:#e8f8f1;color:#079b6b}.expense-card .category-type-icon{background:#ffeded;color:#ef3333}
+.category-manager-card-heading h3{font-size:17px;line-height:1.4;margin:0;font-weight:800}
+.category-manager-card-heading p{font-size:11px;line-height:1.6;color:var(--muted);margin:3px 0 0}
+.category-manager-table-head{display:grid;grid-template-columns:minmax(0,1fr) 86px 74px;gap:7px;align-items:center;padding:10px 8px;background:var(--surface2);color:var(--muted);font-size:11px;font-weight:700}
+.category-manager-table-head span:nth-child(2){text-align:center}.category-manager-table-head span:nth-child(3){text-align:center}
+.managed-category-row{display:grid;grid-template-columns:39px minmax(0,1fr) 50px 74px;gap:8px;align-items:center;min-height:53px;padding:7px 5px;border-bottom:1px solid var(--border);transition:background .18s}
+.managed-category-row:last-child{border-bottom:0}
+.managed-category-row:hover{background:var(--surface2);border-radius:8px}
+.managed-category-icon{width:37px;height:37px;display:grid;place-items:center;border-radius:12px;font-size:19px;font-weight:700}
+.managed-category-name{font-size:13px;font-weight:600;overflow-wrap:anywhere}
+.managed-category-count{text-align:center;font-size:12px;color:var(--text)}
+.managed-category-actions{display:flex;align-items:center;justify-content:flex-end;gap:5px}
+.managed-category-actions button{width:32px;height:34px;border:0;border-radius:9px;display:grid;place-items:center;cursor:pointer;transition:background .18s,transform .18s}
+.managed-category-actions button:hover{transform:translateY(-1px)}
+.category-edit-btn{background:var(--surface2);color:var(--muted)}.category-edit-btn:hover{color:#07875d;background:#eaf9f2}
+.category-delete-btn{background:#fff0f0;color:#ef3333}.category-delete-btn:hover{background:#ffdede}
+.category-empty{padding:20px;text-align:center;color:var(--muted);font-size:12px}
+.category-manager-editor{padding:17px 16px;box-shadow:0 6px 22px #18354b0b}
+.category-editor-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:16px}
+.category-editor-heading h3{font-size:17px;line-height:1.4;margin:0;font-weight:800}
+.category-editor-close{border:0;background:transparent;color:var(--muted);display:grid;place-items:center;width:30px;height:30px;border-radius:8px}
+.category-manager-editor form{display:flex;flex-direction:column;gap:10px}
+.category-manager-editor form>label{font-size:12px;line-height:1.5;font-weight:700;color:var(--text);display:flex;flex-direction:column;gap:7px}
+.category-manager-editor form>label b{color:#ef4444;display:inline}
+.category-manager-editor form>label input,.category-manager-editor textarea{width:100%;min-width:0;height:41px;border:1px solid var(--border);border-radius:9px;background:var(--surface2);color:var(--text);padding:0 11px;font:12px 'Hind Siliguri',sans-serif;outline-color:#08a66b}
+.category-manager-editor form>label input::placeholder,.category-manager-editor textarea::placeholder{color:var(--muted)}
+.category-type-switch{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:3px}
+.category-type-switch button{height:39px;border:1px solid var(--border);border-radius:9px;background:var(--surface2);font:600 13px 'Hind Siliguri',sans-serif;color:var(--muted)}
+.category-type-switch button.selected.income{background:#eaf9f2;border-color:#7ad9b4;color:#07875d}
+.category-type-switch button.selected.expense{background:#fff0f0;border-color:#ffb9b9;color:#e53935}
+.category-icon-choices{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
+.category-icon-choices button{height:38px;border:1px solid var(--border);border-radius:50%;background:var(--surface2);font-size:17px;color:var(--text)}
+.category-icon-choices button.chosen{border-color:#08a66b;background:#eaf9f2;box-shadow:0 0 0 1px #08a66b}
+.category-color-choices{display:flex;align-items:center;justify-content:space-between;gap:7px;flex-wrap:wrap;padding:1px 2px 4px}
+.category-color-choices button{width:24px;height:24px;border-radius:50%;border:2px solid var(--surface);box-shadow:0 0 0 1px transparent;position:relative}
+.category-color-choices button.chosen{box-shadow:0 0 0 2px #08a66b}
+.category-color-choices button.chosen:after{content:"";position:absolute;inset:7px;border-radius:50%;background:white}
+.category-manager-editor textarea{height:62px;resize:vertical;padding:9px 11px;line-height:1.5}
+.category-editor-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+.category-editor-actions .btn{min-height:39px;font-size:12px;padding:8px 12px}
+@media(max-width:1300px){.category-manager-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.category-manager-editor{grid-column:1/-1}.category-manager-editor form{display:grid;grid-template-columns:1fr 1fr;gap:11px 14px}.category-manager-editor form>label:nth-of-type(2),.category-manager-editor form>label:nth-of-type(3),.category-manager-editor form>label:nth-of-type(4){grid-column:1/-1}.category-editor-actions{grid-column:1/-1}}
+@media(max-width:760px){.category-manager-hero{align-items:flex-start;flex-direction:column;padding:17px}.category-manager-hero h2{font-size:21px}.category-manager-summary{width:100%;gap:8px}.category-manager-summary>div{min-width:0;flex:1;padding:10px}.category-manager-summary span{width:34px;height:34px;font-size:21px}.category-manager-summary small{font-size:10px;white-space:normal}.category-manager-summary strong{font-size:19px}.category-manager-toolbar{flex-wrap:wrap}.category-manager-filters{width:100%;margin:0}.category-manager-filters button{flex:1;padding:0 8px}.category-manager-search{width:100%;flex:1}.category-manager-sort{flex:1}.category-manager-grid{grid-template-columns:minmax(0,1fr)}.category-manager-editor{grid-column:auto}.category-manager-editor form{display:flex}.managed-category-row{grid-template-columns:35px minmax(0,1fr) 40px 70px;gap:5px}.category-manager-list-card{padding:12px}.category-manager-card-heading h3{font-size:15px}.category-manager-card-heading p{font-size:10px}.category-manager-table-head{grid-template-columns:minmax(0,1fr) 65px 68px;font-size:10px}.managed-category-name{font-size:12px}.managed-category-actions button{width:30px;height:31px}}

@@ -2945,3 +2945,35 @@
 .transaction-kind-tabs button.expense.active{background:#fff0ef;border-color:#f6b8b5;color:#d94e4e}
 .dark .transaction-kind-tabs button.income.active{background:#173d30;border-color:#2b7657;color:#7de2b5}
 .dark .transaction-kind-tabs button.expense.active{background:#442624;border-color:#82403d;color:#ffaaa4}
+
+
+/* Improve readability of the add-transaction modal without changing its layout */
+.modal{
+  max-height:calc(100dvh - 28px);
+  overflow-y:auto;
+  scrollbar-gutter:stable;
+}
+.modal h2{font-size:20px;line-height:1.45}
+.modal-head{margin-bottom:22px}
+.modal-head p,.modal>p{font-size:13px;line-height:1.65}
+.modal label{font-size:14px;line-height:1.5;gap:8px;margin:16px 0;font-weight:650}
+.modal input,.modal select{
+  height:46px;
+  font-size:14px;
+  line-height:1.5;
+  padding-inline:12px;
+}
+.modal input::placeholder{font-size:13px;opacity:1}
+.modal .transaction-datetime-fields input{font-size:13px}
+.modal .transaction-kind-tabs button{font-size:14px;min-height:44px}
+.modal .warning{font-size:12px!important;line-height:1.7;padding:11px 12px}
+.modal .modal-actions .btn{font-size:14px;min-height:42px;padding:10px 14px}
+@media(max-width:480px){
+  .modal-shade{padding:10px}
+  .modal{padding:18px;max-height:calc(100dvh - 20px)}
+  .modal h2{font-size:19px}
+  .modal label{font-size:13px;margin:13px 0}
+  .modal input,.modal select{height:44px;font-size:13px}
+  .modal .warning{font-size:11px!important}
+  .modal .modal-actions .btn{font-size:13px}
+}

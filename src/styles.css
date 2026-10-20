@@ -2649,3 +2649,22 @@
 @media(prefers-reduced-motion:reduce){
  .dashboard-transactions~.side-widgets .income-source-slice{animation:none!important;stroke-dasharray:var(--income-slice-length)!important}
 }
+
+
+/* Place only the income-sources subtitle on the right side of its heading */
+.dashboard-transactions~.side-widgets .income-sources>.panel-title>div{
+ display:flex;
+ align-items:center;
+ justify-content:space-between;
+ gap:10px;
+ width:100%;
+ min-width:0;
+}
+.dashboard-transactions~.side-widgets .income-sources>.panel-title p{
+ margin:0;
+ text-align:right;
+}
+@media(max-width:420px){
+ .dashboard-transactions~.side-widgets .income-sources>.panel-title>div{gap:6px}
+ .dashboard-transactions~.side-widgets .income-sources>.panel-title p{font-size:9px}
+}

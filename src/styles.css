@@ -2714,3 +2714,43 @@
     min-height:135px;
   }
 }
+
+
+/* Approved refinement: align subtitles to the top-right and improve legibility */
+@media(min-width:1251px){
+  .charts>.best-expenses>.panel-title>div,
+  .charts>.category>.panel-title>div{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+    width:100%;
+    min-width:0;
+  }
+  .charts>.best-expenses .panel-title p,
+  .charts>.category .panel-title p{
+    margin:0;
+    padding:4px 7px;
+    border-radius:6px;
+    background:var(--surface2);
+    text-align:right;
+    white-space:nowrap;
+    font-size:12px!important;
+    line-height:1.35;
+    flex:0 0 auto;
+  }
+  .charts>.best-expenses .best-expense-row{margin-block:9px;gap:7px}
+  .charts>.best-expenses .best-expense-name{font-size:12px}
+  .charts>.best-expenses .best-expense-row small{font-size:11px}
+  .charts>.best-expenses .best-expense-row b{font-size:12px}
+  .charts>.category .cat-row{font-size:12px}
+  .charts>.category .cat-row b{font-size:12px}
+  .charts>.best-expenses,
+  .charts>.category{align-self:start;height:fit-content;min-height:0}
+}
+@media(min-width:1251px) and (max-width:1450px){
+  .charts>.best-expenses>.panel-title>div,
+  .charts>.category>.panel-title>div{gap:6px}
+  .charts>.best-expenses .panel-title p,
+  .charts>.category .panel-title p{font-size:10px!important;padding:3px 5px}
+}

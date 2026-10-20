@@ -3046,3 +3046,31 @@
 .category-editor-actions .btn{min-height:39px;font-size:12px;padding:8px 12px}
 @media(max-width:1300px){.category-manager-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.category-manager-editor{grid-column:1/-1}.category-manager-editor form{display:grid;grid-template-columns:1fr 1fr;gap:11px 14px}.category-manager-editor form>label:nth-of-type(2),.category-manager-editor form>label:nth-of-type(3),.category-manager-editor form>label:nth-of-type(4){grid-column:1/-1}.category-editor-actions{grid-column:1/-1}}
 @media(max-width:760px){.category-manager-hero{align-items:flex-start;flex-direction:column;padding:17px}.category-manager-hero h2{font-size:21px}.category-manager-summary{width:100%;gap:8px}.category-manager-summary>div{min-width:0;flex:1;padding:10px}.category-manager-summary span{width:34px;height:34px;font-size:21px}.category-manager-summary small{font-size:10px;white-space:normal}.category-manager-summary strong{font-size:19px}.category-manager-toolbar{flex-wrap:wrap}.category-manager-filters{width:100%;margin:0}.category-manager-filters button{flex:1;padding:0 8px}.category-manager-search{width:100%;flex:1}.category-manager-sort{flex:1}.category-manager-grid{grid-template-columns:minmax(0,1fr)}.category-manager-editor{grid-column:auto}.category-manager-editor form{display:flex}.managed-category-row{grid-template-columns:35px minmax(0,1fr) 40px 70px;gap:5px}.category-manager-list-card{padding:12px}.category-manager-card-heading h3{font-size:15px}.category-manager-card-heading p{font-size:10px}.category-manager-table-head{grid-template-columns:minmax(0,1fr) 65px 68px;font-size:10px}.managed-category-name{font-size:12px}.managed-category-actions button{width:30px;height:31px}}
+
+
+/* Keep the category editor crisp and readable against the other manager cards */
+.category-manager-editor{
+  background:var(--surface)!important;
+  opacity:1!important;
+  color:var(--text)!important;
+  border-color:var(--border);
+  box-shadow:0 6px 22px #18354b0d;
+}
+.category-manager-editor *{opacity:1}
+.category-manager-editor .category-editor-heading h3,
+.category-manager-editor form>label{color:var(--text)!important}
+.category-manager-editor form>label b{color:#e53935!important}
+.category-manager-editor form>label input,
+.category-manager-editor textarea{
+  background:var(--surface2)!important;
+  color:var(--text)!important;
+  border-color:var(--border)!important;
+}
+.category-manager-editor form>label input::placeholder,
+.category-manager-editor textarea::placeholder{color:var(--muted)!important;opacity:1}
+.category-manager-editor .category-type-switch button{opacity:1;color:var(--text)}
+.category-manager-editor .category-type-switch button.selected.income{color:#07875d;background:#eaf9f2;border-color:#7ad9b4}
+.category-manager-editor .category-type-switch button.selected.expense{color:#e53935;background:#fff0f0;border-color:#ffb9b9}
+.category-manager-editor .category-icon-choices button{opacity:1;color:var(--text)}
+.category-manager-editor .category-color-choices button{opacity:1}
+.category-manager-editor .category-editor-actions .btn{opacity:1}

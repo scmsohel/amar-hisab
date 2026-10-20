@@ -2450,3 +2450,21 @@
   line-height:1.45;
  }
 }
+
+
+/* Improve Bengali date numerals in the income/expense chart and tooltip */
+.dashboard-transactions .charts>.chart-panel .chart .recharts-cartesian-axis-tick-value,
+.dashboard-transactions .charts>.chart-panel .chart .recharts-tooltip-wrapper,
+.dashboard-transactions .charts>.chart-panel .chart .recharts-default-tooltip,
+.dashboard-transactions .charts>.chart-panel .chart .recharts-tooltip-label,
+.dashboard-transactions .charts>.chart-panel .chart .recharts-tooltip-item,
+.dashboard-transactions .charts>.chart-panel .chart .recharts-tooltip-item-name,
+.dashboard-transactions .charts>.chart-panel .chart .recharts-tooltip-item-value{
+ font-family:'Noto Sans Bengali','Hind Siliguri',sans-serif!important;
+ font-variant-numeric:normal;
+ letter-spacing:0;
+}
+.dashboard-transactions .charts>.chart-panel .chart .recharts-tooltip-label{
+ line-height:1.55;
+ font-weight:600;
+}

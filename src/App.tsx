@@ -1,4 +1,4 @@
-import {Fragment,useEffect,useMemo,useState} from "react";
+import {Fragment,useEffect,useMemo,useRef,useState} from "react";
 import type {LucideIcon} from "lucide-react";
 import {AnimatePresence,motion} from "framer-motion";
 import {Activity,ArrowDownLeft,ArrowLeftRight,ArrowUpRight,Banknote,Bell,CalendarDays,ChevronDown,ChevronRight,CircleHelp,Download,Eye,EyeOff,Filter,HandCoins,Home,Landmark,LayoutGrid,Menu,Moon,MoreHorizontal,Plus,Pencil,Search,Settings,Sparkles,Sun,Target,ChartNoAxesCombined,UserRound,House,TrendingDown,TrendingUp,Wallet,X,Zap,Check,ReceiptText,Briefcase,CircleDollarSign,Coins,PiggyBank,CreditCard,WalletCards,BadgeDollarSign,Calculator,Percent,Store,ShoppingCart,ShoppingBag,ShoppingBasket,Tag,Gift,Package,PackageOpen,BedDouble,Sofa,Lamp,Lightbulb,Plug,HousePlug,Droplets,Flame,Wifi,Smartphone,Laptop,Monitor,Tv,Router,Printer,Camera,Headphones,Gamepad2,Car,CarFront,Bus,BusFront,Train,Bike,Plane,PlaneTakeoff,Ship,Fuel,MapPin,Route,Utensils,UtensilsCrossed,CookingPot,Coffee,Pizza,Salad,Sandwich,Cake,IceCream,Apple,Carrot,Pill,Stethoscope,HeartPulse,Cross,Syringe,Hospital,Bandage,Dumbbell,GraduationCap,BookOpen,Book,School,Notebook,FileText,Music,Film,Clapperboard,Theater,Popcorn,PartyPopper,Ticket,Trophy,Turtle,Dog,Cat,PawPrint,Bone,Shirt,Footprints,Watch,Glasses,Gem,Users,Baby,Heart,Flower2,Sprout,TreePine,Leaf,CloudRain,Snowflake,Umbrella,Wrench,Hammer,Paintbrush,Scissors,Trash2,Recycle,Clock,ShieldCheck,KeyRound,Ellipsis} from "lucide-react";
@@ -6,7 +6,7 @@ import {Area,AreaChart,CartesianGrid,ResponsiveContainer,Tooltip,XAxis,YAxis} fr
 type AppSelectOption={value:string;label:string};
 function AppSelect({value,options,onChange,className="",ariaLabel="বিকল্প নির্বাচন"}:{value:string|number;options:AppSelectOption[];onChange:(value:string)=>void;className?:string;ariaLabel?:string}){
  const [open,setOpen]=useState(false);
- const root=React.useRef<HTMLDivElement>(null);
+ const root=useRef<HTMLDivElement>(null);
  const selected=options.find(option=>String(option.value)===String(value));
  return <div ref={root} className={"app-select "+className+(open?" is-open":"")} tabIndex={-1} onBlur={e=>{if(!e.currentTarget.contains(e.relatedTarget as Node|null))setOpen(false);}}>
   <button type="button" className="app-select-trigger" aria-label={ariaLabel} aria-expanded={open} onClick={()=>setOpen(v=>!v)}><span>{selected?.label??String(value)}</span><ChevronDown size={15}/></button>

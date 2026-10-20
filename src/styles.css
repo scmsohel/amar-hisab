@@ -3103,3 +3103,34 @@
   .category-manager-editor textarea{font-size:13px}
   .category-manager-editor .category-editor-actions .btn{font-size:13px}
 }
+
+
+/* Slightly narrower editor and truly circular icon picker controls */
+.category-manager-editor{
+  width:100%;
+  max-width:480px;
+  justify-self:center;
+}
+.category-icon-choices{
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  align-items:center;
+  justify-items:center;
+  gap:7px;
+}
+.category-icon-choices button{
+  width:40px;
+  height:40px;
+  min-width:40px;
+  aspect-ratio:1/1;
+  padding:0;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  justify-self:center;
+  line-height:1;
+}
+@media(max-width:760px){
+  .category-manager-editor{max-width:480px}
+  .category-icon-choices{gap:6px}
+  .category-icon-choices button{width:38px;height:38px;min-width:38px}
+}

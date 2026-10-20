@@ -2414,3 +2414,20 @@
  .dashboard-transactions .dashboard-grouped-transactions .transaction-day-header{gap:7px;padding:9px 7px}
  .dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals{gap:7px}
 }
+
+
+/* Make expense category, type and amount consistently red in dashboard transactions */
+.dashboard-transactions .dashboard-grouped-transactions .transaction-category.category-expense,
+.dashboard-transactions .dashboard-grouped-transactions .transaction-kind.kind-expense,
+.dashboard-transactions .dashboard-grouped-transactions .transaction-amount.amount-out{
+ color:#ef4444!important;
+}
+.dashboard-transactions .dashboard-grouped-transactions .transaction-category.category-expense,
+.dashboard-transactions .dashboard-grouped-transactions .transaction-kind.kind-expense{
+ background:#fff0f0!important;border-color:#ffd8d8!important
+}
+.dark .dashboard-transactions .dashboard-grouped-transactions .transaction-category.category-expense,
+.dark .dashboard-transactions .dashboard-grouped-transactions .transaction-kind.kind-expense{
+ color:#ff8585!important;background:#3b252a!important;border-color:#60333b!important
+}
+.dark .dashboard-transactions .dashboard-grouped-transactions .transaction-amount.amount-out{color:#ff8585!important}

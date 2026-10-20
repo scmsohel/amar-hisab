@@ -2266,3 +2266,39 @@
  border-color:#63333b;
  box-shadow:0 2px 5px #0002;
 }
+
+
+/* Group dashboard transactions by date with compact time-only rows */
+.dashboard-transactions .dashboard-grouped-transactions thead th:first-child{padding-left:16px}
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-group:hover{background:transparent}
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-group td{
+ padding:11px 14px;
+ background:#edf5ff;
+ border-bottom:0;
+}
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-group:first-child td{border-radius:10px 10px 0 0}
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-title{
+ display:flex;align-items:center;gap:10px;color:var(--text);white-space:nowrap
+}
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-title svg{color:#365b8a;flex:none}
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-title b{font-size:14px;font-weight:750}
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-title small{font-size:11px;color:var(--muted);font-weight:500}
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals{
+ display:flex;justify-content:flex-end;align-items:center;gap:22px;white-space:nowrap;color:var(--muted);font-size:12px
+}
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals b{font-size:13px;color:#08a66a;margin-left:4px}
+.dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals span:last-child b{color:#ef4444}
+.dashboard-transactions .dashboard-grouped-transactions .transaction-date-cell{white-space:nowrap;font-family:inherit;font-size:12px;color:#617995;font-weight:500}
+.dashboard-transactions .dashboard-grouped-transactions tbody tr:not(.transaction-day-group):hover{background:var(--surface2)}
+.dark .dashboard-transactions .dashboard-grouped-transactions .transaction-day-group td{background:#1c3045}
+.dark .dashboard-transactions .dashboard-grouped-transactions .transaction-day-title svg{color:#9bbbe4}
+.dark .dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals{color:#b6c5d5}
+@media(max-width:760px){
+ .dashboard-transactions .dashboard-grouped-transactions .transaction-day-group td{padding:9px 7px}
+ .dashboard-transactions .dashboard-grouped-transactions .transaction-day-title{gap:5px}
+ .dashboard-transactions .dashboard-grouped-transactions .transaction-day-title svg{display:none}
+ .dashboard-transactions .dashboard-grouped-transactions .transaction-day-title b{font-size:11px}
+ .dashboard-transactions .dashboard-grouped-transactions .transaction-day-title small{font-size:9px}
+ .dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals{gap:7px;font-size:9px}
+ .dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals b{font-size:10px;margin-left:1px}
+}

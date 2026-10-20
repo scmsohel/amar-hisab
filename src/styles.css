@@ -2620,3 +2620,32 @@
  .dashboard-transactions~.side-widgets .income-source-slice,
  .dashboard-transactions~.side-widgets .income-source-row{animation:none!important}
 }
+
+
+/* Keep income total centered over the animated donut ring */
+.dashboard-transactions~.side-widgets .income-source-donut{
+ position:relative;
+ display:block;
+ flex:none;
+ aspect-ratio:1;
+}
+.dashboard-transactions~.side-widgets .income-source-svg{
+ position:absolute;
+ inset:0;
+ display:block;
+ width:100%;
+ height:100%;
+ overflow:visible;
+}
+.dashboard-transactions~.side-widgets .income-source-hole{
+ position:absolute;
+ left:50%;
+ top:50%;
+ transform:translate(-50%,-50%);
+ width:64%;
+ height:64%;
+ z-index:1;
+}
+@media(prefers-reduced-motion:reduce){
+ .dashboard-transactions~.side-widgets .income-source-slice{animation:none!important;stroke-dasharray:var(--income-slice-length)!important}
+}

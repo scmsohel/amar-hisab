@@ -2935,3 +2935,13 @@
 .side-widgets>.bills .bill-row b{font-size:14px;line-height:1.5;font-weight:700}
 .side-widgets>.bills .bill-row small{font-size:11px;line-height:1.6;font-weight:500}
 .side-widgets>.bills .bill-due{font-size:10px;line-height:1.5;font-weight:700}
+
+
+/* Income/expense selector in the new transaction modal */
+.transaction-kind-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 16px}
+.transaction-kind-tabs button{height:42px;display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--border);border-radius:9px;background:var(--surface2);color:var(--muted);font:600 13px 'Hind Siliguri',sans-serif;transition:background .18s,border-color .18s,color .18s,transform .18s}
+.transaction-kind-tabs button:hover{transform:translateY(-1px)}
+.transaction-kind-tabs button.income.active{background:#e4f8ed;border-color:#9be3c2;color:#07875d}
+.transaction-kind-tabs button.expense.active{background:#fff0ef;border-color:#f6b8b5;color:#d94e4e}
+.dark .transaction-kind-tabs button.income.active{background:#173d30;border-color:#2b7657;color:#7de2b5}
+.dark .transaction-kind-tabs button.expense.active{background:#442624;border-color:#82403d;color:#ffaaa4}

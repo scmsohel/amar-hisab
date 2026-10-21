@@ -3595,3 +3595,67 @@ input,button,select,textarea{
  .debt-table tbody td{font-size:13px!important}
  .debt-table tbody td:nth-child(6) .debt-installment-count{font-size:13px!important}
 }
+
+
+/* Payment history card and stronger transaction emphasis */
+.debt-history-card{
+  margin:8px 0 18px;
+  padding:14px;
+  border:1px solid color-mix(in srgb,var(--primary) 18%,var(--border));
+  border-radius:14px;
+  background:color-mix(in srgb,var(--primary) 3%,var(--surface));
+  box-shadow:0 3px 12px rgba(15,35,55,.045);
+}
+.debt-history-card .debt-detail-section-head{margin-bottom:12px}
+.debt-history-card .debt-detail-section-head h3{font-size:16px}
+.debt-history-card .debt-detail-section-head>span{
+  padding:4px 9px;
+  border-radius:999px;
+  background:color-mix(in srgb,var(--primary) 10%,var(--surface));
+  color:var(--primary);
+  font-size:12px;
+  font-weight:700;
+}
+.debt-history-card .debt-payment-list{margin:0;gap:9px}
+.debt-history-card .debt-payment-row{
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:11px;
+  background:var(--surface);
+  box-shadow:0 1px 3px rgba(15,35,55,.035);
+  transition:border-color .18s ease,background .18s ease,transform .18s ease;
+}
+.debt-history-card .debt-payment-row:hover{
+  border-color:color-mix(in srgb,var(--primary) 35%,var(--border));
+  background:color-mix(in srgb,var(--primary) 3%,var(--surface));
+}
+.debt-history-card .debt-payment-icon{
+  flex-basis:40px;width:40px;height:40px;
+  border-radius:12px;
+  background:color-mix(in srgb,var(--primary) 12%,var(--surface));
+}
+.debt-history-card .debt-payment-copy b{font-size:14px;line-height:1.5}
+.debt-history-card .debt-payment-copy small{font-size:12px;line-height:1.5}
+.debt-history-card .debt-payment-row>strong{
+  padding:7px 10px;
+  border:1px solid color-mix(in srgb,var(--primary) 20%,var(--border));
+  border-radius:9px;
+  background:color-mix(in srgb,var(--primary) 9%,var(--surface));
+  color:var(--primary);
+  font-size:14px;
+}
+.debt-history-card .debt-payment-row .icon{
+  border-radius:8px;
+}
+.debt-history-card .debt-payment-row .icon:hover{
+  background:var(--surface2);
+  color:var(--primary);
+}
+@media(max-width:600px){
+ .debt-history-card{padding:10px;border-radius:12px}
+ .debt-history-card .debt-payment-row{padding:9px;gap:7px}
+ .debt-history-card .debt-payment-icon{flex-basis:34px;width:34px;height:34px}
+ .debt-history-card .debt-payment-row>strong{padding:6px 7px;font-size:12px}
+ .debt-history-card .debt-payment-copy b{font-size:13px}
+ .debt-history-card .debt-payment-copy small{font-size:11px}
+}

@@ -4808,3 +4808,11 @@ input,button,select,textarea{
 }
 .dark .toast button{color:#a9bac4}
 .dark .toast button:hover{background:#2a3d48;color:#f3f8fb}
+
+
+/* Debt page heading actions */
+.debt-heading-actions{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap;}
+.debt-heading-actions>.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 17px;border-radius:11px;white-space:nowrap;}
+.debt-heading-actions>.credit-account-btn{color:#fff;background:linear-gradient(135deg,#3b82f6 0%,#6366f1 100%);border:1px solid #60a5fa;box-shadow:0 6px 16px #3b82f630;}
+.debt-heading-actions>.credit-account-btn:hover{background:linear-gradient(135deg,#2563eb 0%,#4f46e5 100%);box-shadow:0 9px 22px #3b82f640;transform:translateY(-1px);}
+@media(max-width:600px){.debt-heading-actions{gap:8px}.debt-heading-actions>.btn{padding:0 11px;font-size:12px;}}

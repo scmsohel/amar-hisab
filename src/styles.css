@@ -3896,3 +3896,118 @@ input,button,select,textarea{
  .transaction-page .transaction-pagination{padding:12px;align-items:flex-start;flex-direction:row;flex-wrap:wrap}
  .transaction-page .transaction-pagination-controls{flex-wrap:wrap}
 }
+
+
+/* Restore the custom dropdown UI on the dedicated transactions page.
+   The dashboard already has its own scoped dropdown styling; these rules keep
+   the standalone transaction filters consistent instead of browser-default buttons. */
+.transaction-page .styled-dropdown{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  flex:0 0 auto;
+  min-width:112px;
+  min-height:38px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:var(--surface2);
+  color:var(--text);
+  font:13px 'Hind Siliguri',sans-serif;
+  vertical-align:middle;
+  z-index:10;
+}
+.transaction-page .styled-dropdown.is-open{z-index:160}
+.transaction-page .styled-dropdown-trigger{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:9px;
+  width:100%;
+  min-width:0;
+  min-height:inherit;
+  padding:0 10px;
+  border:0;
+  border-radius:inherit;
+  outline:0;
+  background:transparent;
+  color:inherit;
+  font:inherit;
+  line-height:1.35;
+  text-align:left;
+  white-space:nowrap;
+  cursor:pointer;
+}
+.transaction-page .styled-dropdown-trigger>span{
+  display:block;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.transaction-page .styled-dropdown-trigger>svg{flex:0 0 auto;color:var(--muted);transition:transform .16s ease}
+.transaction-page .styled-dropdown.is-open .styled-dropdown-trigger>svg{transform:rotate(180deg)}
+.transaction-page .styled-dropdown:focus-visible,
+.transaction-page .styled-dropdown-trigger:focus-visible{
+  outline:2px solid color-mix(in srgb,var(--primary) 55%,transparent);
+  outline-offset:2px;
+}
+.transaction-page .styled-dropdown.is-open .styled-dropdown-trigger{
+  background:color-mix(in srgb,var(--primary) 5%,var(--surface));
+}
+.transaction-page .styled-dropdown-menu{
+  position:absolute;
+  top:calc(100% + 5px);
+  left:0;
+  min-width:max(100%,150px);
+  max-width:min(280px,calc(100vw - 32px));
+  max-height:240px;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding:5px;
+  border:1px solid var(--border);
+  border-radius:11px;
+  background:var(--surface);
+  box-shadow:0 12px 30px rgba(20,35,55,.16);
+  z-index:200;
+  scrollbar-width:thin;
+}
+.transaction-page .styled-dropdown-menu>button{
+  display:flex;
+  align-items:center;
+  width:100%;
+  min-height:35px;
+  padding:7px 10px;
+  border:0;
+  border-radius:7px;
+  background:transparent;
+  color:var(--text);
+  font:13px 'Hind Siliguri',sans-serif;
+  text-align:left;
+  white-space:nowrap;
+  cursor:pointer;
+  transition:background .14s ease,color .14s ease;
+}
+.transaction-page .styled-dropdown-menu>button:hover,
+.transaction-page .styled-dropdown-menu>button.active{
+  background:color-mix(in srgb,var(--primary) 9%,var(--surface));
+  color:var(--primary);
+}
+.transaction-page .styled-dropdown-menu>button.active{font-weight:700}
+.transaction-page .transaction-heading-controls .styled-dropdown.transaction-month{
+  min-width:155px;
+  min-height:42px;
+  height:42px;
+  flex:0 0 auto;
+}
+.transaction-page .transaction-heading-controls .styled-dropdown.transaction-month .styled-dropdown-trigger{gap:7px}
+.transaction-page .transaction-filter-row>.styled-dropdown{min-width:110px;min-height:38px}
+.transaction-page .transaction-filter-row>.styled-dropdown.transaction-date-filter{min-width:115px}
+.transaction-page .transaction-filter-row .transaction-sort .styled-dropdown{min-width:130px}
+.dark .transaction-page .styled-dropdown{background:var(--surface2);border-color:var(--border)}
+.dark .transaction-page .styled-dropdown-menu{box-shadow:0 12px 32px rgba(0,0,0,.38)}
+@media(max-width:650px){
+ .transaction-page .transaction-heading-controls .styled-dropdown.transaction-month{flex:1;min-width:0}
+ .transaction-page .transaction-filter-row>.styled-dropdown{min-width:0;max-width:100%}
+ .transaction-page .transaction-filter-row .transaction-sort .styled-dropdown{min-width:120px}
+ .transaction-page .styled-dropdown-menu{max-width:calc(100vw - 28px)}
+}

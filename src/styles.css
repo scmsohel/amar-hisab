@@ -4180,7 +4180,7 @@ input,button,select,textarea{
 .wallet-total-leading strong{font-size:31px;line-height:1.2;font-weight:850;color:#087d5a}
 .wallet-total-leading p{margin:2px 0 0;font-size:13px;color:var(--muted)}
 .wallet-total-stats{display:grid;grid-template-columns:repeat(3,minmax(130px,1fr));gap:10px;flex:1.25;min-width:0}
-.wallet-total-stat{display:flex;align-items:center;gap:11px;min-width:0;padding:13px;border:1px solid var(--border);border-radius:13px;background:color-mix(in srgb,var(--surface) 86%,transparent)}
+.wallet-total-stat{display:flex;align-items:center;gap:11px;min-width:0;padding:13px;border:1px solid var(--border);border-radius:13px;background:color-mix(in srgb,var(--surface) 86%,transparent);transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease,background .2s ease;cursor:default}.wallet-total-stat:hover{transform:translateY(-3px);border-color:color-mix(in srgb,#10b981 42%,var(--border));box-shadow:0 8px 20px #163c2a12;background:color-mix(in srgb,var(--surface) 96%,#10b981 4%)}.wallet-total-stat>span{transition:transform .2s ease}.wallet-total-stat:hover>span{transform:scale(1.07)}.dark .wallet-total-stat:hover{box-shadow:0 8px 20px #0003}
 .wallet-total-stat>span{display:grid;place-items:center;flex:0 0 44px;width:44px;height:44px;border-radius:50%}
 .wallet-total-stat>div{display:flex;flex-direction:column;gap:4px;min-width:0}
 .wallet-total-stat small{font-size:12px;color:var(--muted);white-space:nowrap}

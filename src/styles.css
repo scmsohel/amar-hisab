@@ -4011,3 +4011,112 @@ input,button,select,textarea{
  .transaction-page .transaction-filter-row .transaction-sort .styled-dropdown{min-width:120px}
  .transaction-page .styled-dropdown-menu{max-width:calc(100vw - 28px)}
 }
+
+
+/* Dedicated all-transactions page intentionally mirrors the dashboard's
+   recent-transactions visual language while keeping pagination and bulk actions. */
+.transaction-page.dashboard-transactions{padding:0;overflow:visible;border-radius:16px}
+.transaction-page.dashboard-transactions .transaction-heading{
+ display:flex;align-items:center;justify-content:space-between;gap:18px;
+ padding:16px 20px 14px;border-bottom:1px solid var(--border)
+}
+.transaction-page.dashboard-transactions .transaction-heading>h3{
+ flex:0 0 auto;margin:0;font-size:21px;font-weight:750;white-space:nowrap
+}
+.transaction-page.dashboard-transactions .transaction-heading-controls{
+ display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:1;min-width:0
+}
+.transaction-page.dashboard-transactions .transaction-heading-controls .transaction-search{
+ flex:1;max-width:390px;min-width:150px;height:42px;background:var(--surface2);border-radius:11px
+}
+.transaction-page.dashboard-transactions .transaction-heading-controls .transaction-search,
+.transaction-page.dashboard-transactions .transaction-heading-controls .transaction-search input,
+.transaction-page.dashboard-transactions .transaction-heading-controls .transaction-month,
+.transaction-page.dashboard-transactions .transaction-heading-controls>.btn{font-size:14px}
+.transaction-page.dashboard-transactions .transaction-heading-controls .transaction-month{
+ flex:0 0 auto;min-width:145px;min-height:42px;height:42px
+}
+.transaction-page.dashboard-transactions .transaction-heading-controls .transaction-filter-button{flex:0 0 40px;height:42px}
+.transaction-page.dashboard-transactions .transaction-heading-controls>.btn{
+ height:42px;flex:0 0 auto;white-space:nowrap;background:#087df1;border-color:#087df1;
+ box-shadow:0 4px 10px #087df11f;border-radius:11px
+}
+.transaction-page.dashboard-transactions .transaction-filter-row{
+ display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:10px 20px 11px;
+ border-bottom:1px solid var(--border)
+}
+.transaction-page.dashboard-transactions .transaction-filter-types{display:flex;align-items:center;gap:7px;flex:0 0 auto}
+.transaction-page.dashboard-transactions .transaction-filter-row .transaction-chip{
+ height:38px;min-width:42px;padding:0 14px;border-radius:10px;font-size:14px;background:var(--surface)
+}
+.transaction-page.dashboard-transactions .transaction-filter-row .transaction-chip.active{
+ background:#087df1;border-color:#087df1;color:#fff;box-shadow:0 3px 8px #087df126
+}
+.transaction-page.dashboard-transactions .transaction-filter-row>.transaction-select{min-height:38px}
+.transaction-page.dashboard-transactions .transaction-filter-row .transaction-select select{font-size:13px}
+.transaction-page.dashboard-transactions .transaction-filter-row .transaction-sort{margin-left:auto;flex:0 0 auto}
+.transaction-page.dashboard-transactions .transaction-filter-row .transaction-sort .transaction-select{min-height:38px}
+.transaction-page.dashboard-transactions .transaction-filter-row>.styled-dropdown{min-height:38px}
+.transaction-page.dashboard-transactions .transaction-filter-row>.transaction-select{background:var(--surface);border-radius:10px}
+.transaction-page.dashboard-transactions .transaction-table-wrap.dashboard-transaction-table-wrap{
+ padding:0 12px;border-top:0;border-bottom:0
+}
+.transaction-page.dashboard-transactions .transaction-table.dashboard-grouped-transactions{min-width:1040px}
+.transaction-page.dashboard-transactions .transaction-table th{
+ padding:12px 10px;font-size:13px;background:var(--surface2);font-weight:650
+}
+.transaction-page.dashboard-transactions .transaction-table td{padding:11px 10px;font-size:13px}
+.transaction-page.dashboard-transactions .transaction-table .transaction-date-cell{font-size:12px}
+.transaction-page.dashboard-transactions .transaction-description b{font-size:13px}
+.transaction-page.dashboard-transactions .transaction-amount{font-size:13px!important}
+.transaction-page.dashboard-transactions .transaction-table .select-cell{width:34px;padding-left:7px;padding-right:7px}
+.transaction-page.dashboard-transactions .dashboard-grouped-transactions .transaction-day-group>td{
+ width:100%;padding:0;background:#edf5ff;border-bottom:0
+}
+.transaction-page.dashboard-transactions .dashboard-grouped-transactions .transaction-day-header{
+ display:flex;align-items:center;justify-content:space-between;gap:16px;
+ width:100%;min-width:0;padding:11px 14px;box-sizing:border-box
+}
+.transaction-page.dashboard-transactions .dashboard-grouped-transactions .transaction-day-title{
+ display:flex;align-items:center;gap:9px;flex:1;min-width:0;color:#42566b
+}
+.transaction-page.dashboard-transactions .dashboard-grouped-transactions .transaction-day-title>svg{flex:none;color:#3c6d9d}
+.transaction-page.dashboard-transactions .dashboard-grouped-transactions .transaction-day-title b{font-size:13px;font-weight:700}
+.transaction-page.dashboard-transactions .dashboard-grouped-transactions .transaction-day-title small{font-size:11px;color:#74869a}
+.transaction-page.dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals{
+ display:flex;justify-content:flex-end;align-items:center;gap:20px;flex:0 0 auto;font-size:11px;color:#74869a
+}
+.transaction-page.dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals span:first-child b{color:#079b6b}
+.transaction-page.dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals span:last-child b{color:#ef4444}
+.transaction-page.dashboard-transactions .dashboard-grouped-transactions .transaction-kind.kind-ব্যয়{color:#ef4444;background:#fff0f0;border-color:#ffd8d8}
+.transaction-page.dashboard-transactions .transaction-pagination{
+ padding:12px 20px;border-top:1px solid var(--border);font-size:13px
+}
+.transaction-page.dashboard-transactions .transaction-pagination-controls select{height:36px;border-radius:9px;font:inherit}
+.transaction-page.dashboard-transactions .transaction-pagination-controls>button{width:36px;height:36px;border-radius:9px;font-size:18px}
+.transaction-page.dashboard-transactions .transaction-pagination-controls>button:disabled{opacity:.4}
+.dark .transaction-page.dashboard-transactions .dashboard-grouped-transactions .transaction-day-group>td{background:#1e3047}
+.dark .transaction-page.dashboard-transactions .dashboard-grouped-transactions .transaction-day-title{color:#dce8f5}
+.dark .transaction-page.dashboard-transactions .dashboard-grouped-transactions .transaction-day-title small,
+.dark .transaction-page.dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals{color:#a7b7ca}
+.dark .transaction-page.dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals span:last-child b{color:#ff8585}
+@media(max-width:1250px){
+ .transaction-page.dashboard-transactions .transaction-heading{align-items:flex-start;flex-wrap:wrap}
+ .transaction-page.dashboard-transactions .transaction-heading-controls{flex-basis:100%;width:100%}
+ .transaction-page.dashboard-transactions .transaction-heading-controls .transaction-search{max-width:none}
+ .transaction-page.dashboard-transactions .transaction-filter-row{flex-wrap:wrap}
+ .transaction-page.dashboard-transactions .transaction-filter-row .transaction-sort{margin-left:auto}
+}
+@media(max-width:700px){
+ .transaction-page.dashboard-transactions .transaction-heading{padding:13px}
+ .transaction-page.dashboard-transactions .transaction-heading-controls{flex-wrap:wrap;justify-content:flex-start}
+ .transaction-page.dashboard-transactions .transaction-heading-controls .transaction-search{flex-basis:100%;max-width:none}
+ .transaction-page.dashboard-transactions .transaction-heading-controls .transaction-month{flex:1;min-width:0}
+ .transaction-page.dashboard-transactions .transaction-filter-row{padding:9px 12px;gap:6px}
+ .transaction-page.dashboard-transactions .transaction-filter-row .transaction-filter-types{width:100%}
+ .transaction-page.dashboard-transactions .transaction-filter-row .transaction-sort{margin-left:0}
+ .transaction-page.dashboard-transactions .dashboard-grouped-transactions .transaction-day-header{align-items:flex-start;flex-direction:column;gap:7px;padding:10px}
+ .transaction-page.dashboard-transactions .dashboard-grouped-transactions .transaction-day-totals{width:100%;justify-content:flex-start;gap:15px}
+ .transaction-page.dashboard-transactions .transaction-table-wrap{padding:0 8px}
+ .transaction-page.dashboard-transactions .transaction-pagination{padding:11px 13px;flex-wrap:wrap}
+}

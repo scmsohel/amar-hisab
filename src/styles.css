@@ -4369,3 +4369,36 @@ input,button,select,textarea{
 .wallet-card-actions button.wallet-card-expense{background:color-mix(in srgb,#ef4444 10%,var(--surface));color:#df3948}
 .wallet-card-actions button.wallet-card-transfer{background:color-mix(in srgb,#3b82f6 11%,var(--surface));color:#236acb}
 .wallet-card-actions button:not(.wallet-card-income):not(.wallet-card-expense):not(.wallet-card-transfer){background:color-mix(in srgb,#3b82f6 8%,var(--surface));color:#236acb}
+
+
+/* Wallet-to-wallet transfer form redesign */
+.modal:has(.transfer-route){width:min(560px,100%);padding:24px}
+.modal:has(.transfer-route) .modal-head p{margin-top:5px}
+.transaction-kind-tabs.transfer-tabs{margin-bottom:18px}
+.transfer-route{display:grid;grid-template-columns:minmax(0,1fr) 42px minmax(0,1fr);align-items:center;gap:10px;margin-bottom:18px}
+.transfer-wallet-field{display:grid;gap:8px;min-width:0;padding:14px;border:1px solid var(--border);border-radius:14px;background:var(--surface2)}
+.transfer-wallet-field>span{font-size:12px;color:var(--muted);font-weight:650}
+.transfer-wallet-field .app-select{min-width:0;width:100%}
+.transfer-wallet-field .app-select-trigger{min-height:42px;padding:0 9px}
+.transfer-wallet-field>strong{font-size:19px;line-height:1.2;font-weight:850;color:var(--text);white-space:nowrap}
+.transfer-wallet-field>small{font-size:11px;color:var(--muted)}
+.transfer-route-icon{display:grid;place-items:center;width:42px;height:42px;border:1px solid color-mix(in srgb,#10b981 30%,var(--border));border-radius:50%;background:color-mix(in srgb,#10b981 10%,var(--surface));color:#079b6b}
+.transfer-amount-field{display:grid;gap:8px;margin-bottom:14px;font-size:13px;font-weight:700}
+.transfer-amount-field input{width:100%;height:58px;padding:0 15px;border:1px solid color-mix(in srgb,#10b981 35%,var(--border));border-radius:12px;background:var(--surface);color:var(--text);font:inherit;font-size:25px;font-weight:800;outline:none}
+.transfer-amount-field input:focus{border-color:#10b981;box-shadow:0 0 0 3px color-mix(in srgb,#10b981 13%,transparent)}
+.transfer-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.transfer-summary>div{display:grid;gap:6px;padding:12px;border:1px solid var(--border);border-radius:11px;background:color-mix(in srgb,#10b981 5%,var(--surface))}
+.transfer-summary span{font-size:11px;color:var(--muted)}
+.transfer-summary strong{font-size:16px;color:#07845f;white-space:nowrap}
+.modal:has(.transfer-route) .transaction-datetime-fields{margin-bottom:14px}
+.modal:has(.transfer-route) form>label:not(.transfer-amount-field){display:grid;gap:8px;margin-bottom:14px}
+@media(max-width:520px){
+ .modal:has(.transfer-route){padding:17px}
+ .transfer-route{grid-template-columns:minmax(0,1fr);gap:8px}
+ .transfer-route-icon{width:36px;height:36px;margin:0 auto;transform:rotate(90deg)}
+ .transfer-wallet-field{padding:11px}
+ .transfer-wallet-field>strong{font-size:17px}
+ .transfer-summary{gap:7px}
+ .transfer-summary>div{padding:10px}
+ .transfer-summary strong{font-size:14px}
+}

@@ -4740,3 +4740,18 @@ input,button,select,textarea{
 .dashboard-main .wallet-panel .wallets>.wallet-box:hover{
   z-index:2;
 }
+
+
+/* Bill Manager: compact in-app due-date reminder */
+.bill-reminder-banner{
+ display:flex;align-items:flex-start;gap:12px;
+ padding:13px 16px;margin:0 0 2px;
+ border:1px solid #b9e8d2;border-radius:13px;
+ background:linear-gradient(110deg,#ecfbf3,#f4faff);
+ color:#087f5b;
+}
+.bill-reminder-banner>svg{flex:0 0 auto;margin-top:2px}
+.bill-reminder-banner>div{display:flex;flex-direction:column;gap:4px;min-width:0}
+.bill-reminder-banner b{font-size:13px;font-weight:800}
+.bill-reminder-banner span{font-size:12px;line-height:1.65;overflow-wrap:anywhere}
+.dark .bill-reminder-banner{background:linear-gradient(110deg,#193c2e,#1b2f3b);border-color:#315d49;color:#a1edc6}

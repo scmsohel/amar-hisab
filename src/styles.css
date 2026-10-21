@@ -4606,3 +4606,23 @@ input,button,select,textarea{
 .bill-debt-workspace .bill-matched-table .debt-person{min-width:0;gap:12px}
 .bill-debt-workspace .bill-matched-table .debt-detail-link{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bill-debt-workspace .bill-matched-table td:nth-child(9) .row-actions{gap:8px}
+
+
+/* Keep the bKash mark visible but proportional to the other wallet logos */
+.dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{
+  width:34px;
+  height:34px;
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  transform:none;
+}
+@media(max-width:700px){
+  .dashboard-main .wallet-panel .wallet-box .wallet-brand-icon.bkash-brand img{
+    width:34px;
+    height:34px;
+    max-width:100%;
+    max-height:100%;
+    transform:none;
+  }
+}

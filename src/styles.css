@@ -4324,3 +4324,20 @@ input,button,select,textarea{
 .budget-compact .budget-progress.budget-danger i{background:#ef4444;color:#ef4444;}
 .dark .budget-compact .budget-progress{background:#2c3945;}
 @media(prefers-reduced-motion:reduce){.budget-compact .budget-progress i{transition:none}}
+
+
+/* Native in-app modal for monthly budget settings */
+.budget-settings-modal{width:min(460px,100%);padding:26px;border:1px solid var(--border);border-radius:18px;background:var(--surface);box-shadow:0 24px 80px #102a3a30}
+.budget-settings-modal .modal-head{align-items:flex-start;gap:14px;margin-bottom:18px}
+.budget-settings-modal .modal-head h2{margin:0 0 5px;font-size:21px}
+.budget-settings-modal .modal-head p{margin:0;color:var(--muted);font-size:13px}
+.budget-settings-current{display:grid;gap:5px;padding:14px 16px;margin-bottom:18px;border:1px solid #b9eadb;border-radius:13px;background:linear-gradient(135deg,#eaf9f3,#f6fcfa)}
+.dark .budget-settings-current{background:linear-gradient(135deg,#173b33,#1b302d);border-color:#285d50}
+.budget-settings-current span,.budget-settings-current small{font-size:12px;color:var(--muted)}
+.budget-settings-current strong{font-size:23px;line-height:1.35;color:#079b6b}
+.budget-settings-modal form label{display:grid;gap:8px;margin:0 0 12px;font-size:14px;font-weight:650}
+.budget-settings-modal form input{width:100%;height:48px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);padding:0 13px;font-size:16px}
+.budget-settings-hint{margin:10px 0 20px;color:var(--muted);font-size:12px;line-height:1.7}
+.budget-settings-modal .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:0}
+.budget-settings-modal .modal-actions .btn{min-height:42px}
+@media(max-width:480px){.budget-settings-modal{padding:20px;border-radius:16px}.budget-settings-modal .modal-head h2{font-size:19px}.budget-settings-current strong{font-size:21px}}

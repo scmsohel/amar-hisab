@@ -4137,3 +4137,30 @@ input,button,select,textarea{
 @media(max-width:600px){
   .debt-detail-modal .debt-history-card .debt-payment-list{max-height:330px}
 }
+
+
+/* Subtle hover interaction for the four debt summary cards. */
+.debt-redesign .debt-metric{
+  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease,filter .22s ease;
+  transform:translateY(0);
+  will-change:transform;
+}
+.debt-redesign .debt-metric:hover{
+  transform:translateY(-4px);
+  box-shadow:0 10px 24px color-mix(in srgb,var(--text) 9%,transparent);
+  filter:saturate(1.04);
+}
+.debt-redesign .debt-metric-icon{
+  transition:transform .22s ease,box-shadow .22s ease;
+}
+.debt-redesign .debt-metric:hover .debt-metric-icon{
+  transform:scale(1.07);
+  box-shadow:0 4px 12px color-mix(in srgb,currentColor 12%,transparent);
+}
+@media(hover:none){
+  .debt-redesign .debt-metric:hover{transform:none;box-shadow:none;filter:none}
+  .debt-redesign .debt-metric:hover .debt-metric-icon{transform:none;box-shadow:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .debt-redesign .debt-metric,.debt-redesign .debt-metric-icon{transition:none}
+}

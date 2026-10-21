@@ -3695,3 +3695,30 @@ input,button,select,textarea{
   background:color-mix(in srgb,var(--surface) 80%,#08a66a)!important;
   border-color:color-mix(in srgb,#08a66a 24%,var(--border))!important;
 }
+
+
+/* Center and enlarge debt amount/current-total values */
+.debt-table thead th:nth-child(7),
+.debt-table tbody td:nth-child(7){
+  text-align:center!important;
+  vertical-align:middle!important;
+}
+.debt-table tbody td:nth-child(7) .debt-amount,
+.debt-table tbody td:nth-child(7) strong{
+  font-size:15px!important;
+  line-height:1.5!important;
+}
+.debt-table tbody td:nth-child(7) small,
+.debt-table tbody td:nth-child(7) .muted{
+  display:block;
+  font-size:13px!important;
+  line-height:1.5!important;
+  margin-top:2px;
+}
+.debt-table tbody td:nth-child(7)>*{margin-inline:auto}
+@media(max-width:650px){
+ .debt-table tbody td:nth-child(7) strong,
+ .debt-table tbody td:nth-child(7) .debt-amount{font-size:14px!important}
+ .debt-table tbody td:nth-child(7) small,
+ .debt-table tbody td:nth-child(7) .muted{font-size:12px!important}
+}

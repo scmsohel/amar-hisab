@@ -4525,3 +4525,25 @@ input,button,select,textarea{
 .dark .bill-status.due{background:#48252a;color:#ff9aa3}.dark .bill-status.paid{background:#1d4033;color:#8ce4bc}
 @media(max-width:900px){.bill-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.bill-search-row .table-search{max-width:none;flex:1}}
 @media(max-width:560px){.bills-page>.feature-heading h2{font-size:22px}.bill-metrics{gap:8px}.bill-metrics>article{padding:13px;min-height:90px}.bill-metrics>article strong{font-size:18px}.bills-page>.feature-panel{padding:11px}.bill-search-row{flex-wrap:wrap}.bill-count{margin-left:0}.bill-filter-row{gap:6px}.bill-filter{padding:8px 10px}.bill-sort{margin-left:0}}
+
+/* Final bill page alignment: match the debt-and-receivables page pattern */
+.bills-page{gap:18px}
+.bills-page>.feature-heading{display:flex;align-items:center;justify-content:space-between;padding:0 2px 2px;min-height:42px}
+.bills-page>.feature-heading>div{display:none!important}
+.bills-page>.feature-heading>.btn{margin-left:auto}
+.bills-page .bill-metrics{margin-top:0}
+.bills-page>.feature-panel{padding:18px 20px;min-height:300px;border-radius:15px;box-shadow:0 3px 15px #23384a08}
+.bills-page>.feature-panel:before{height:0}
+.bills-page .bill-toolbar{gap:12px;margin-bottom:14px}
+.bills-page .bill-search-row{min-height:42px}
+.bills-page .bill-search-row .table-search{height:40px}
+.bills-page .bill-filter-row{padding-bottom:12px;border-bottom:1px solid var(--border)}
+.bills-page .bill-filter{border-radius:9px;padding:9px 13px}
+.bills-page .bill-filter.active{background:#1685f8;border-color:#1685f8;box-shadow:0 4px 10px #1685f81a}
+.bills-page .bill-table-scroll{border:0;border-radius:0;overflow-x:auto}
+.bills-page .bill-table{min-width:760px}
+.bills-page .bill-table thead{background:var(--surface2)}
+.bills-page .bill-table th{padding:13px 14px}
+.bills-page .bill-table td{padding:14px}
+.bills-page .bill-table tbody tr:hover{background:color-mix(in srgb,#1685f8 4%,var(--surface))}
+@media(max-width:700px){.bills-page>.feature-panel{padding:12px}.bills-page .bill-filter-row{border-bottom:0}.bills-page .bill-sort{margin-left:0}}

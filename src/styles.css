@@ -4776,3 +4776,19 @@ input,button,select,textarea{
 .dark .wallet-box.wallet-bkash strong{color:#f9a8d4}
 .dark .wallet-box.wallet-nagad strong{color:#fdba74}
 .dark .wallet-box.wallet-cash b,.dark .wallet-box.wallet-bank b,.dark .wallet-box.wallet-bkash b,.dark .wallet-box.wallet-nagad b{color:#dce8f2}
+
+
+/* Fix Recharts tooltip contrast in dark mode (income/expense dashboard chart) */
+.dark .recharts-default-tooltip{
+ background:var(--surface)!important;
+ border:1px solid var(--border)!important;
+ border-radius:8px!important;
+ box-shadow:0 8px 24px #0005!important;
+}
+.dark .recharts-default-tooltip .recharts-tooltip-label,
+.dark .recharts-default-tooltip .recharts-tooltip-item,
+.dark .recharts-default-tooltip .recharts-tooltip-item-name,
+.dark .recharts-default-tooltip .recharts-tooltip-item-value{
+ color:var(--text)!important;
+}
+.dark .recharts-default-tooltip .recharts-tooltip-label{color:var(--muted)!important}

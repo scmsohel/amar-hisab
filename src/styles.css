@@ -4407,3 +4407,27 @@ input,button,select,textarea{
  .transfer-summary>div{padding:10px}
  .transfer-summary strong{font-size:14px}
 }
+
+/* Bill manager page refresh */
+.bills-page{gap:20px}
+.bills-page>.feature-heading{padding:4px 2px 8px}
+.bills-page>.feature-heading h2{font-size:25px;font-weight:800}
+.bills-page>.feature-heading p{font-size:13px;line-height:1.7;margin-top:5px}
+.bills-page>.feature-heading>.btn{height:42px;padding:0 18px;border-radius:11px;font-size:12px;box-shadow:0 7px 16px #079b6b20}
+.bills-page>.feature-panel{padding:20px;border-radius:16px;min-height:260px}
+.bills-page .toolbar{margin:0 0 15px;padding:12px 14px;border:1px solid var(--border);border-radius:11px;background:var(--surface2)}
+.bills-page .table-search{max-width:340px;height:38px;border-radius:9px}
+.bills-page .table-search input{font-size:12px}
+.bills-page .tag{font-size:11px;padding:6px 10px;border-radius:8px}
+.bills-page table th{font-size:11px;padding:14px 12px}
+.bills-page table td{font-size:12px;padding:15px 12px}
+.bills-page table td b{font-size:13px}
+.bills-page .empty{display:none}
+.bill-empty-state{min-height:250px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:28px 20px 34px;border:1px dashed #cfe6dc;border-radius:13px;background:linear-gradient(135deg,color-mix(in srgb,#e8f8f0 60%,var(--surface)),var(--surface));}
+.dark .bill-empty-state{border-color:#315848;background:linear-gradient(135deg,#17362c,var(--surface))}
+.bill-empty-icon{width:64px;height:64px;border-radius:20px;display:grid;place-items:center;background:#def7eb;color:#079b6b;margin-bottom:14px;box-shadow:0 8px 18px #079b6b12}
+.dark .bill-empty-icon{background:#214a3a;color:#7ce0b6}
+.bill-empty-state h3{margin:0;color:var(--text);font-size:19px;font-weight:800}
+.bill-empty-state p{max-width:490px;margin:8px 0 18px;color:var(--muted);font-size:13px;line-height:1.8}
+.bill-empty-state .btn{height:40px;font-size:12px}
+@media(max-width:600px){.bills-page>.feature-heading h2{font-size:22px}.bills-page>.feature-panel{padding:12px}.bills-page .toolbar{padding:9px;gap:7px}.bill-empty-state{padding:22px 12px}.bill-empty-state h3{font-size:17px}.bill-empty-state p{font-size:12px}}

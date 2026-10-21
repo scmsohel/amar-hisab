@@ -4314,3 +4314,13 @@ input,button,select,textarea{
  .wallet-manager-card,.wallet-card-actions button{transition:none}
  .wallet-manager-card:hover,.wallet-card-actions button:hover{transform:none}
 }
+
+
+/* Monthly budget progress reacts to spending percentage. */
+.budget-compact .budget-progress{overflow:hidden;border-radius:999px;background:color-mix(in srgb,var(--muted) 13%,var(--surface));}
+.budget-compact .budget-progress i{display:block;height:100%;border-radius:inherit;transition:width .45s ease,background-color .25s ease;box-shadow:0 0 10px color-mix(in srgb,currentColor 18%,transparent);}
+.budget-compact .budget-progress.budget-safe i{background:#10b981;color:#10b981;}
+.budget-compact .budget-progress.budget-warning i{background:#f59e0b;color:#f59e0b;}
+.budget-compact .budget-progress.budget-danger i{background:#ef4444;color:#ef4444;}
+.dark .budget-compact .budget-progress{background:#2c3945;}
+@media(prefers-reduced-motion:reduce){.budget-compact .budget-progress i{transition:none}}

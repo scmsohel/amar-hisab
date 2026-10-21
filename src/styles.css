@@ -3698,27 +3698,27 @@ input,button,select,textarea{
 
 
 /* Center and enlarge debt amount/current-total values */
-.debt-table thead th:nth-child(7),
-.debt-table tbody td:nth-child(7){
+.debt-table thead th:nth-child(6),
+.debt-table tbody td:nth-child(6){
   text-align:center!important;
   vertical-align:middle!important;
 }
-.debt-table tbody td:nth-child(7) .debt-amount,
-.debt-table tbody td:nth-child(7) strong{
+.debt-table tbody td:nth-child(6) .debt-amount,
+.debt-table tbody td:nth-child(6) strong{
   font-size:15px!important;
   line-height:1.5!important;
 }
-.debt-table tbody td:nth-child(7) small,
-.debt-table tbody td:nth-child(7) .muted{
+.debt-table tbody td:nth-child(6) small,
+.debt-table tbody td:nth-child(6) .muted{
   display:block;
   font-size:13px!important;
   line-height:1.5!important;
   margin-top:2px;
 }
-.debt-table tbody td:nth-child(7)>*{margin-inline:auto}
+.debt-table tbody td:nth-child(6)>*{margin-inline:auto}
 @media(max-width:650px){
- .debt-table tbody td:nth-child(7) strong,
- .debt-table tbody td:nth-child(7) .debt-amount{font-size:14px!important}
- .debt-table tbody td:nth-child(7) small,
- .debt-table tbody td:nth-child(7) .muted{font-size:12px!important}
+ .debt-table tbody td:nth-child(6) strong,
+ .debt-table tbody td:nth-child(6) .debt-amount{font-size:14px!important}
+ .debt-table tbody td:nth-child(6) small,
+ .debt-table tbody td:nth-child(6) .muted{font-size:12px!important}
 }

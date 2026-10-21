@@ -4765,3 +4765,14 @@ input,button,select,textarea{
 .bill-payment-summary b{font-size:19px;font-weight:800}
 .bill-paid-subline{display:block;margin-top:3px;white-space:nowrap}
 .bill-next-date{display:inline-flex;padding:5px 9px;border:1px solid rgba(16,185,129,.3);border-radius:9px;color:#10b981;background:rgba(16,185,129,.08);font-size:12px;font-weight:700;white-space:nowrap}
+
+
+/* Dashboard wallet strip: keep labels and balances readable in dark mode */
+.dark .wallet-box{background:color-mix(in srgb,var(--surface2) 88%,transparent);border-color:var(--border)}
+.dark .wallet-box b{color:#dce8f2}
+.dark .wallet-box strong{color:#f1f7fc;font-weight:750}
+.dark .wallet-box.wallet-cash strong{color:#6ee7b7}
+.dark .wallet-box.wallet-bank strong{color:#93c5fd}
+.dark .wallet-box.wallet-bkash strong{color:#f9a8d4}
+.dark .wallet-box.wallet-nagad strong{color:#fdba74}
+.dark .wallet-box.wallet-cash b,.dark .wallet-box.wallet-bank b,.dark .wallet-box.wallet-bkash b,.dark .wallet-box.wallet-nagad b{color:#dce8f2}

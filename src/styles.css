@@ -3513,3 +3513,22 @@ input,button,select,textarea{
  .feature-form-modal .feature-form input::placeholder,
  .feature-form-modal .feature-form textarea::placeholder{font-size:16px!important}
 }
+
+
+/* Theme-consistent installment badges and visible partial installment progress */
+.debt-rule-cell{min-width:108px;gap:5px}
+.debt-rule-cell .debt-rule-badge.installment{
+  color:var(--primary);
+  border:1px solid color-mix(in srgb,var(--primary) 24%,var(--border));
+  background:color-mix(in srgb,var(--primary) 11%,var(--surface));
+  box-shadow:none;
+}
+.debt-rule-cell .debt-rule-badge.one-time{
+  color:var(--muted);
+  border:1px solid var(--border);
+  background:var(--surface2);
+  box-shadow:none;
+}
+.debt-installment-progress{display:block;width:100%;height:5px;overflow:hidden;border-radius:99px;background:var(--surface2)}
+.debt-installment-progress i{display:block;height:100%;border-radius:inherit;background:var(--primary);transition:width .2s ease}
+.debt-rule-cell small{font-size:11px;line-height:1.4;white-space:normal}

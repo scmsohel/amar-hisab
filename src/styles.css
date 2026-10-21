@@ -4567,3 +4567,42 @@ input,button,select,textarea{
 .bill-debt-workspace .bill-matched-table .debt-kind.out{background:#fff0f1;color:#f04452;border-color:#f7c7cc}
 .bill-debt-workspace .bill-matched-table .debt-status:not(.is-settled){color:#079b6b;background:#e8f8f1;border-color:#b8e7d3}
 @media(max-width:760px){.bill-debt-layout>.feature-heading h2{font-size:22px}.bill-debt-workspace .debt-toolbar{flex-wrap:wrap}.bill-debt-workspace .debt-search{max-width:none;flex-basis:100%}}
+
+
+/* Bill table: balance column widths and prevent adjacent cells from touching */
+.bill-debt-workspace .bill-matched-table{
+  width:100%;
+  min-width:1480px;
+  table-layout:fixed;
+  border-collapse:separate;
+  border-spacing:0;
+}
+.bill-debt-workspace .bill-matched-table th,
+.bill-debt-workspace .bill-matched-table td{
+  box-sizing:border-box;
+  padding-left:16px;
+  padding-right:16px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.bill-debt-workspace .bill-matched-table th:nth-child(1),
+.bill-debt-workspace .bill-matched-table td:nth-child(1){width:220px}
+.bill-debt-workspace .bill-matched-table th:nth-child(2),
+.bill-debt-workspace .bill-matched-table td:nth-child(2){width:130px}
+.bill-debt-workspace .bill-matched-table th:nth-child(3),
+.bill-debt-workspace .bill-matched-table td:nth-child(3){width:160px}
+.bill-debt-workspace .bill-matched-table th:nth-child(4),
+.bill-debt-workspace .bill-matched-table td:nth-child(4){width:150px}
+.bill-debt-workspace .bill-matched-table th:nth-child(5),
+.bill-debt-workspace .bill-matched-table td:nth-child(5){width:150px}
+.bill-debt-workspace .bill-matched-table th:nth-child(6),
+.bill-debt-workspace .bill-matched-table td:nth-child(6){width:110px}
+.bill-debt-workspace .bill-matched-table th:nth-child(7),
+.bill-debt-workspace .bill-matched-table td:nth-child(7){width:180px}
+.bill-debt-workspace .bill-matched-table th:nth-child(8),
+.bill-debt-workspace .bill-matched-table td:nth-child(8){width:180px}
+.bill-debt-workspace .bill-matched-table th:nth-child(9),
+.bill-debt-workspace .bill-matched-table td:nth-child(9){width:130px}
+.bill-debt-workspace .bill-matched-table .debt-person{min-width:0;gap:12px}
+.bill-debt-workspace .bill-matched-table .debt-detail-link{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bill-debt-workspace .bill-matched-table td:nth-child(9) .row-actions{gap:8px}

@@ -4648,3 +4648,34 @@ input,button,select,textarea{
 .wallet-add-preview>div b{font-size:14px}
 .wallet-add-preview>div strong{font-size:17px}
 @media(max-width:600px){.wallet-icon-choices{grid-template-columns:repeat(4,minmax(0,1fr))}.wallet-add-modal{max-width:calc(100vw - 24px)}}
+
+
+/* Dashboard wallet strip: always one horizontal swipeable row */
+.dashboard-main .wallet-panel .wallets{
+ display:flex !important;
+ flex-flow:row nowrap !important;
+ grid-template-columns:none !important;
+ align-items:stretch;
+ gap:8px;
+ min-width:0;
+ width:100%;
+ overflow-x:auto;
+ overflow-y:hidden;
+ padding:1px 1px 7px;
+ scroll-snap-type:x proximity;
+ overscroll-behavior-x:contain;
+ -webkit-overflow-scrolling:touch;
+ scrollbar-width:thin;
+}
+.dashboard-main .wallet-panel .wallets>.wallet-box{
+ flex:0 0 clamp(175px,28%,220px) !important;
+ width:auto !important;
+ min-width:0;
+ max-width:none;
+ scroll-snap-align:start;
+}
+.dashboard-main .wallet-panel .wallets::-webkit-scrollbar{height:5px}
+.dashboard-main .wallet-panel .wallets::-webkit-scrollbar-thumb{background:var(--border);border-radius:999px}
+@media(max-width:700px){
+ .dashboard-main .wallet-panel .wallets>.wallet-box{flex-basis:clamp(165px,70%,220px) !important}
+}

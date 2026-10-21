@@ -3678,3 +3678,18 @@ input,button,select,textarea{
  .debt-table thead th:nth-child(3),.debt-table tbody td:nth-child(3){width:108px}
  .debt-table thead th:nth-child(6),.debt-table tbody td:nth-child(6){width:88px}
 }
+
+
+/* Soft tinted surface for the debt payment history section */
+.debt-history-card{
+  background:color-mix(in srgb,var(--primary) 5%,var(--surface))!important;
+  border-color:color-mix(in srgb,var(--primary) 16%,var(--border))!important;
+}
+.debt-history-card .debt-payment-row{
+  background:color-mix(in srgb,var(--surface2) 48%,var(--surface))!important;
+  border-color:color-mix(in srgb,var(--primary) 10%,var(--border))!important;
+}
+.debt-history-card .debt-payment-row:hover{
+  background:color-mix(in srgb,var(--primary) 7%,var(--surface))!important;
+  border-color:color-mix(in srgb,var(--primary) 24%,var(--border))!important;
+}

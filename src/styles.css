@@ -4431,3 +4431,42 @@ input,button,select,textarea{
 .bill-empty-state p{max-width:490px;margin:8px 0 18px;color:var(--muted);font-size:13px;line-height:1.8}
 .bill-empty-state .btn{height:40px;font-size:12px}
 @media(max-width:600px){.bills-page>.feature-heading h2{font-size:22px}.bills-page>.feature-panel{padding:12px}.bills-page .toolbar{padding:9px;gap:7px}.bill-empty-state{padding:22px 12px}.bill-empty-state h3{font-size:17px}.bill-empty-state p{font-size:12px}}
+
+/* Bill manager — enhanced visual polish */
+.bills-page{position:relative;gap:22px}
+.bills-page>.feature-heading{position:relative}
+.bills-page>.feature-heading:before{content:"";position:absolute;left:-12px;top:0;bottom:3px;width:4px;border-radius:8px;background:linear-gradient(180deg,#10b981,#60a5fa)}
+.bills-page>.feature-heading>div{padding-left:7px}
+.bills-page>.feature-heading h2{letter-spacing:-.55px}
+.bills-page>.feature-heading p{max-width:560px}
+.bills-page>.feature-heading>.btn{transition:transform .18s,box-shadow .18s}
+.bills-page>.feature-heading>.btn:hover{transform:translateY(-2px);box-shadow:0 10px 22px #079b6b30}
+.bills-page>.feature-panel{position:relative;overflow:hidden;background:var(--surface);box-shadow:0 12px 32px #243b4a0a}
+.bills-page>.feature-panel:before{content:"";position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,#10b981 0%,#54c7a0 45%,#60a5fa 100%)}
+.bills-page .toolbar{background:linear-gradient(110deg,var(--surface2),var(--surface));}
+.bills-page .table-search{transition:border-color .18s,box-shadow .18s}
+.bills-page .table-search:focus-within{border-color:#71cfae;box-shadow:0 0 0 3px #10b98116}
+.bills-page .tag{background:#e9f8f1;border-color:#d7f1e5;color:#07865d;font-weight:700}
+.dark .bills-page .tag{background:#1d4033;border-color:#2d5b47;color:#8ce4bc}
+.bills-page table thead{background:var(--surface2)}
+.bills-page table th{color:var(--muted);font-weight:700}
+.bills-page table tbody tr{transition:background .16s}
+.bills-page table tbody tr:hover{background:color-mix(in srgb,#10b981 5%,var(--surface))}
+.bills-page table td{border-bottom-color:color-mix(in srgb,var(--border) 75%,transparent)}
+.bills-page table tbody tr:last-child td{border-bottom:0}
+.bills-page table td .tag{display:inline-flex;align-items:center}
+.bill-empty-state{position:relative;isolation:isolate;overflow:hidden;min-height:290px;border:1px solid #d9eee5;background:radial-gradient(ellipse at 50% 0%,#e6f8ef 0%,transparent 58%),linear-gradient(135deg,#fbfefc,#f7fbff);box-shadow:inset 0 1px #fff}
+.bill-empty-state:before,.bill-empty-state:after{content:"";position:absolute;z-index:-1;border-radius:50%;pointer-events:none}
+.bill-empty-state:before{width:190px;height:190px;left:-75px;bottom:-110px;border:1px solid #ccefe0;box-shadow:0 0 0 18px #10b98108,0 0 0 38px #10b98105}
+.bill-empty-state:after{width:220px;height:220px;right:-100px;top:-130px;border:1px solid #d9e8fb;box-shadow:0 0 0 20px #3b82f608,0 0 0 42px #3b82f605}
+.dark .bill-empty-state{border-color:#2d5545;background:radial-gradient(ellipse at 50% 0%,#1c4032 0%,transparent 62%),linear-gradient(135deg,#172a24,var(--surface))}
+.dark .bill-empty-state:before{border-color:#315b49;box-shadow:0 0 0 18px #10b9810b,0 0 0 38px #10b98106}
+.dark .bill-empty-state:after{border-color:#304b67;box-shadow:0 0 0 20px #3b82f60b,0 0 0 42px #3b82f606}
+.bill-empty-icon{width:70px;height:70px;border-radius:22px;background:linear-gradient(145deg,#dcf8eb,#c8f0de);border:1px solid #c9efdd;box-shadow:0 12px 25px #079b6b18;animation:bill-icon-float 3.4s ease-in-out infinite}
+.dark .bill-empty-icon{background:linear-gradient(145deg,#214a3a,#1b3b30);border-color:#315b49}
+.bill-empty-state h3{font-size:20px;letter-spacing:-.25px}
+.bill-empty-state p{max-width:500px}
+.bill-empty-state .btn{padding-inline:18px;box-shadow:0 6px 14px #079b6b1c;transition:transform .18s,box-shadow .18s}
+.bill-empty-state .btn:hover{transform:translateY(-2px);box-shadow:0 10px 22px #079b6b2b}
+@keyframes bill-icon-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@media(prefers-reduced-motion:reduce){.bill-empty-icon{animation:none}.bills-page>.feature-heading>.btn,.bill-empty-state .btn{transition:none}}

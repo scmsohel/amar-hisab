@@ -4120,3 +4120,20 @@ input,button,select,textarea{
  .transaction-page.dashboard-transactions .transaction-table-wrap{padding:0 8px}
  .transaction-page.dashboard-transactions .transaction-pagination{padding:11px 13px;flex-wrap:wrap}
 }
+
+
+/* Keep debt detail modal compact: show five recent payments, scroll the rest. */
+.debt-detail-modal .debt-history-card .debt-payment-list{
+  max-height:390px;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  padding:2px 5px 2px 1px;
+  scrollbar-gutter:stable;
+}
+.debt-detail-modal .debt-history-card .debt-payment-row{flex-shrink:0}
+@media(max-height:760px){
+  .debt-detail-modal .debt-history-card .debt-payment-list{max-height:300px}
+}
+@media(max-width:600px){
+  .debt-detail-modal .debt-history-card .debt-payment-list{max-height:330px}
+}

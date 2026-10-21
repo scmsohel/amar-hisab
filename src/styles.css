@@ -4650,7 +4650,46 @@ input,button,select,textarea{
 @media(max-width:600px){.wallet-icon-choices{grid-template-columns:repeat(4,minmax(0,1fr))}.wallet-add-modal{max-width:calc(100vw - 24px)}}
 
 
+
+/* Prevent dashboard wallet cards from being clipped when hovered */
+.dashboard-main .wallet-panel{overflow:visible !important}
+.dashboard-main .wallet-panel .wallets{padding-top:6px;padding-bottom:3px}
+.dashboard-main .wallet-panel .wallets>.wallet-box{position:relative;z-index:0;transition:transform .18s ease,box-shadow .18s ease}
+.dashboard-main .wallet-panel .wallets>.wallet-box:hover{z-index:2;transform:translateY(-2px);box-shadow:0 5px 12px rgba(25,50,75,.08)}
+
 /* Dashboard wallet strip: one row, drag with mouse or swipe, no visible scrollbar */
+.dashboard-main .wallet-panel .wallets{
+ display:flex !important;
+ flex-flow:row nowrap !important;
+ grid-template-columns:none !important;
+ align-items:stretch;
+ gap:8px;
+ min-width:0;
+ width:100%;
+ overflow-x:auto;
+ overflow-y:hidden;
+ padding:1px 1px 2px;
+ scroll-snap-type:none;scroll-behavior:smooth;
+ overscroll-behavior-x:contain;
+ -webkit-overflow-scrolling:touch;
+ scrollbar-width:none;
+ cursor:grab;
+ user-select:none;
+ -webkit-user-select:none;
+}
+.dashboard-main .wallet-panel .wallets:active,.dashboard-main .wallet-panel .wallets.is-dragging{cursor:grabbing}.dashboard-main .wallet-panel .wallets.is-dragging{scroll-behavior:auto}
+.dashboard-main .wallet-panel .wallets::-webkit-scrollbar{display:none;width:0;height:0}
+.dashboard-main .wallet-panel .wallets>.wallet-box{
+ flex:0 0 calc((100% - 24px)/4) !important;
+ width:auto !important;
+ min-width:0;
+ max-width:none;
+ scroll-snap-align:start;
+}
+@media(max-width:700px){
+ .dashboard-main .wallet-panel .wallets>.wallet-box{flex-basis:calc((100% - 8px)/2) !important}
+}
+
 .dashboard-main .wallet-panel .wallets{
  display:flex !important;
  flex-flow:row nowrap !important;

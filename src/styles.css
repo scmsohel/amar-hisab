@@ -4673,12 +4673,12 @@ input,button,select,textarea{
 .dashboard-main .wallet-panel .wallets:active,.dashboard-main .wallet-panel .wallets.is-dragging{cursor:grabbing}.dashboard-main .wallet-panel .wallets.is-dragging{scroll-behavior:auto}
 .dashboard-main .wallet-panel .wallets::-webkit-scrollbar{display:none;width:0;height:0}
 .dashboard-main .wallet-panel .wallets>.wallet-box{
- flex:0 0 clamp(175px,28%,220px) !important;
+ flex:0 0 calc((100% - 24px)/4) !important;
  width:auto !important;
  min-width:0;
  max-width:none;
  scroll-snap-align:start;
 }
 @media(max-width:700px){
- .dashboard-main .wallet-panel .wallets>.wallet-box{flex-basis:clamp(165px,70%,220px) !important}
+ .dashboard-main .wallet-panel .wallets>.wallet-box{flex-basis:calc((100% - 8px)/2) !important}
 }

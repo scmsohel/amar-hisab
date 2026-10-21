@@ -1772,7 +1772,7 @@
 .transaction-category,.transaction-kind{display:inline-flex;align-items:center;justify-content:center;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:600}
 .category-income,.kind-income{background:#e2f8ed;color:#079b6b}
 .category-expense,.kind-expense{background:#fff0ef;color:#e07871}
-.category-transfer,.kind-transfer{background:#edf3fa;color:#70839a}
+.category-transfer,.kind-transfer{background:#e9e8ff;color:#5b4bc4;border:1px solid #d7d3ff}.category-transfer{background:#eaf2ff;color:#2864b8;border:1px solid #d5e5ff}.kind-transfer{background:#e9e8ff;color:#5b4bc4;border:1px solid #d7d3ff}.transaction-wallet .subline{display:flex;align-items:center;gap:4px;margin-top:4px;color:#2864b8;font-size:12px;font-weight:750;line-height:1.35}.transaction-wallet .subline:before{content:"→";font-size:13px;font-weight:800;color:#5b4bc4}.dark .category-transfer{background:#1d3150;color:#a8c9ff;border-color:#304c76}.dark .kind-transfer{background:#302852;color:#c7baff;border-color:#4a3d73}.dark .transaction-wallet .subline{color:#a8c9ff}
 .transaction-wallet{display:inline-flex;align-items:center;gap:7px;color:#63768a;font-size:11px}
 .wallet-dot{width:14px;height:14px;border-radius:4px;display:inline-block;background:#10a875;position:relative}
 .wallet-bank{background:#1686f5}.wallet-bkash{background:#ed3f83}.wallet-nagad{background:#ff8a24}

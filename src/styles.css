@@ -4792,3 +4792,19 @@ input,button,select,textarea{
  color:var(--text)!important;
 }
 .dark .recharts-default-tooltip .recharts-tooltip-label{color:var(--muted)!important}
+
+
+/* Dark mode: make toast/notification readable against the dashboard */
+.dark .toast{
+ background:rgba(23,38,48,.97);
+ border-color:#344b59;
+ color:var(--text);
+ box-shadow:0 16px 44px #0006;
+}
+.dark .toast-message{
+ background:#1c2e38;
+ border-color:#344b59;
+ color:#e8f0f4;
+}
+.dark .toast button{color:#a9bac4}
+.dark .toast button:hover{background:#2a3d48;color:#f3f8fb}

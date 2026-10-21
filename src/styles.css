@@ -3754,3 +3754,18 @@ input,button,select,textarea{
  .debt-installment-hint span{font-size:11px}
  .debt-installment-hint p{font-size:12px}
 }
+
+
+/* Clear date-format guidance in forms */
+.date-format-help{
+  display:block;
+  margin-top:5px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
+}
+.feature-form input[type="date"]{
+  min-width:0;
+  max-width:100%;
+  font-variant-numeric:tabular-nums;
+}

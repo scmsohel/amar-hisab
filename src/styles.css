@@ -4626,3 +4626,25 @@ input,button,select,textarea{
     transform:none;
   }
 }
+
+
+/* Wallet Manager: custom wallet creation, icon and color picker */
+.wallet-manager-card{border-top:3px solid var(--wallet-accent,#0d9f6e)}
+.wallet-manager-brand{color:var(--wallet-accent,#0d9f6e)}
+.wallet-add-modal{max-width:620px}
+.wallet-customize-label{font-size:13px;font-weight:700;color:var(--text);margin:18px 0 9px}
+.wallet-icon-choices{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}
+.wallet-icon-choice{min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:12px 4px;border:1px solid var(--border);border-radius:12px;background:var(--surface2);color:var(--text);transition:border-color .15s,background .15s,transform .15s}
+.wallet-icon-choice svg{width:22px;height:22px}
+.wallet-icon-choice small{font-size:11px}
+.wallet-icon-choice.selected{border-color:#10b981;background:#e7f8f0;color:#087f5b;box-shadow:0 0 0 2px #10b98120}
+.wallet-color-choices{display:flex;flex-wrap:wrap;gap:11px}
+.wallet-color-choice{width:30px;height:30px;border:3px solid var(--surface);border-radius:50%;box-shadow:0 0 0 1px var(--border);padding:0}
+.wallet-color-choice.selected{outline:2px solid var(--text);outline-offset:2px}
+.wallet-add-preview{display:flex;align-items:center;gap:12px;margin-top:20px;padding:14px;border:1px solid var(--border);border-radius:14px;background:var(--surface2);border-left:4px solid var(--wallet-accent,#0d9f6e)}
+.wallet-add-preview>span{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;background:color-mix(in srgb,var(--wallet-accent) 13%,transparent);color:var(--wallet-accent)}
+.wallet-add-preview>span svg{width:24px;height:24px}
+.wallet-add-preview>div{display:flex;flex-direction:column;gap:4px}
+.wallet-add-preview>div b{font-size:14px}
+.wallet-add-preview>div strong{font-size:17px}
+@media(max-width:600px){.wallet-icon-choices{grid-template-columns:repeat(4,minmax(0,1fr))}.wallet-add-modal{max-width:calc(100vw - 24px)}}

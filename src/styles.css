@@ -3769,3 +3769,130 @@ input,button,select,textarea{
   max-width:100%;
   font-variant-numeric:tabular-nums;
 }
+
+
+/* Approved modern finance design, scoped only to the dedicated Transactions page */
+.transaction-page{
+  overflow:hidden;
+  border:1px solid color-mix(in srgb,var(--primary) 9%,var(--border));
+  border-radius:16px;
+  background:var(--surface);
+  box-shadow:0 5px 22px rgba(23,43,77,.045);
+}
+.transaction-page .transaction-overview{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+  padding:18px 18px 2px;
+}
+.transaction-page .transaction-overview-card{
+  position:relative;
+  display:flex;
+  align-items:center;
+  gap:13px;
+  min-width:0;
+  min-height:104px;
+  padding:16px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  border-radius:14px;
+  background:var(--surface);
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+}
+.transaction-page .transaction-overview-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 7px 18px rgba(23,43,77,.07);
+}
+.transaction-page .transaction-overview-card>div{display:flex;flex-direction:column;gap:3px;min-width:0}
+.transaction-page .transaction-overview-card small{font-size:13px;color:var(--muted);font-weight:600}
+.transaction-page .transaction-overview-card strong{font-size:23px;line-height:1.35;font-weight:750;letter-spacing:-.25px;font-variant-numeric:tabular-nums}
+.transaction-page .transaction-overview-card em{font-style:normal;font-size:12px;color:var(--muted);line-height:1.4}
+.transaction-page .transaction-overview-icon{
+  flex:0 0 54px;width:54px;height:54px;display:grid;place-items:center;border-radius:50%;
+}
+.transaction-page .transaction-overview-decoration{position:absolute;right:14px;top:14px;opacity:.45}
+.transaction-page .transaction-overview-card.income{background:color-mix(in srgb,#10a875 5%,var(--surface));border-color:color-mix(in srgb,#10a875 24%,var(--border))}
+.transaction-page .transaction-overview-card.income .transaction-overview-icon{background:color-mix(in srgb,#10a875 14%,var(--surface));color:#0aab77}
+.transaction-page .transaction-overview-card.income strong,.transaction-page .transaction-overview-card.income .transaction-overview-decoration{color:#0aab77}
+.transaction-page .transaction-overview-card.expense{background:color-mix(in srgb,#f05c65 5%,var(--surface));border-color:color-mix(in srgb,#f05c65 23%,var(--border))}
+.transaction-page .transaction-overview-card.expense .transaction-overview-icon{background:color-mix(in srgb,#f05c65 13%,var(--surface));color:#ed5861}
+.transaction-page .transaction-overview-card.expense strong,.transaction-page .transaction-overview-card.expense .transaction-overview-decoration{color:#ed5861}
+.transaction-page .transaction-overview-card.net{background:color-mix(in srgb,#2587f5 5%,var(--surface));border-color:color-mix(in srgb,#2587f5 24%,var(--border))}
+.transaction-page .transaction-overview-card.net .transaction-overview-icon{background:color-mix(in srgb,#2587f5 14%,var(--surface));color:#2587f5}
+.transaction-page .transaction-overview-card.net strong,.transaction-page .transaction-overview-card.net .transaction-overview-decoration{color:#2587f5}
+.transaction-page .transaction-overview-card.today{background:color-mix(in srgb,#9560f5 5%,var(--surface));border-color:color-mix(in srgb,#9560f5 22%,var(--border))}
+.transaction-page .transaction-overview-card.today .transaction-overview-icon{background:color-mix(in srgb,#9560f5 14%,var(--surface));color:#9560f5}
+.transaction-page .transaction-overview-card.today strong,.transaction-page .transaction-overview-card.today .transaction-overview-decoration{color:#9560f5}
+.transaction-page .transaction-heading{padding:18px 20px 15px;gap:16px}
+.transaction-page .transaction-heading>h3{font-size:19px;font-weight:750;color:var(--text)}
+.transaction-page .transaction-heading-controls .transaction-search{max-width:none;height:42px;border-radius:11px;background:var(--surface2)}
+.transaction-page .transaction-heading-controls .transaction-search input{font-size:14px}
+.transaction-page .transaction-heading-controls .transaction-month{height:42px;border-radius:11px;background:var(--surface2)}
+.transaction-page .transaction-heading-controls .transaction-filter-button{height:42px;width:42px;border-radius:11px}
+.transaction-page .transaction-heading-controls>.btn{height:42px;border-radius:11px}
+.transaction-page .transaction-filter-row{padding:0 20px 14px;gap:9px;border-bottom:1px solid var(--border)}
+.transaction-page .transaction-filter-types{gap:7px}
+.transaction-page .transaction-chip{height:38px;padding:0 15px;border-radius:999px;font-size:13px;font-weight:600;background:var(--surface2)}
+.transaction-page .transaction-chip.active{background:#08a66b;border-color:#08a66b;color:#fff;box-shadow:0 3px 9px #08a66b20}
+.transaction-page .transaction-filter-row .app-select,
+.transaction-page .transaction-filter-row .styled-dropdown{min-height:38px;border-radius:10px;background:var(--surface2);font-size:13px}
+.transaction-page .transaction-filter-row .transaction-sort{margin-left:auto}
+.transaction-page .transaction-table-wrap{padding:0 16px;border:0}
+.transaction-page .transaction-table{min-width:1080px}
+.transaction-page .transaction-table thead th{padding:13px 11px;font-size:13px;font-weight:650;background:var(--surface2);color:var(--muted)}
+.transaction-page .transaction-table tbody td{padding:13px 11px;font-size:13px}
+.transaction-page .transaction-table .transaction-date-cell,
+.transaction-page .transaction-table .transaction-date-text{font-size:13px;line-height:1.55}
+.transaction-page .transaction-description b{font-size:14px}
+.transaction-page .transaction-kind,
+.transaction-page .transaction-category{padding:5px 9px;border-radius:8px;font-size:12px}
+.transaction-page .transaction-wallet{font-size:13px}
+.transaction-page .transaction-amount{font-size:15px!important;font-weight:750!important}
+.transaction-page .transaction-balance{font-size:13px!important;font-variant-numeric:tabular-nums}
+.transaction-page .transaction-table tbody tr{transition:background .14s ease}
+.transaction-page .transaction-table tbody tr:hover{background:color-mix(in srgb,var(--primary) 4%,var(--surface))}
+.transaction-page .transaction-table .action-cell{width:45px}
+.transaction-page .transaction-row-action>.icon{width:32px;height:32px;border-radius:9px}
+.transaction-page .transaction-pagination{padding:15px 20px;border-top:1px solid var(--border);background:var(--surface);font-size:13px}
+.transaction-page .transaction-pagination-controls select{min-width:62px;height:36px;border-radius:9px;font:inherit}
+.transaction-page .transaction-pagination-controls>button{width:36px;height:36px;border-radius:9px;font-size:18px}
+.transaction-page .transaction-pagination-controls>button.active{background:#08a875;border-color:#08a875}
+.transaction-page .transaction-page-indicator{min-width:52px;text-align:center;font-weight:650;color:var(--text)}
+.dark .transaction-page .transaction-overview-card strong{filter:saturate(1.05)}
+.dark .transaction-page .transaction-overview-card{box-shadow:none}
+.dark .transaction-page .transaction-chip.active{background:#087d57;border-color:#087d57}
+@media(max-width:1100px){
+ .transaction-page .transaction-overview{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding:14px 14px 0}
+ .transaction-page .transaction-overview-card{min-height:92px;padding:13px}
+ .transaction-page .transaction-overview-card strong{font-size:21px}
+ .transaction-page .transaction-heading{padding:15px}
+ .transaction-page .transaction-heading-controls{flex-basis:100%;width:100%}
+ .transaction-page .transaction-filter-row{padding:0 15px 12px}
+}
+@media(max-width:650px){
+ .transaction-page .transaction-overview{gap:8px;padding:10px 10px 0}
+ .transaction-page .transaction-overview-card{gap:9px;min-height:84px;padding:10px;border-radius:12px}
+ .transaction-page .transaction-overview-icon{flex-basis:38px;width:38px;height:38px}
+ .transaction-page .transaction-overview-icon svg{width:19px;height:19px}
+ .transaction-page .transaction-overview-card small{font-size:11px}
+ .transaction-page .transaction-overview-card strong{font-size:17px}
+ .transaction-page .transaction-overview-card em{font-size:10px}
+ .transaction-page .transaction-overview-decoration{right:7px;top:7px;width:15px;height:15px}
+ .transaction-page .transaction-heading{padding:14px 12px 12px;gap:12px}
+ .transaction-page .transaction-heading>h3{font-size:17px}
+ .transaction-page .transaction-heading-controls{gap:7px}
+ .transaction-page .transaction-heading-controls .transaction-search{flex-basis:100%;height:40px}
+ .transaction-page .transaction-heading-controls .transaction-month{flex:1;min-width:0;height:40px}
+ .transaction-page .transaction-heading-controls .transaction-filter-button{width:40px;height:40px}
+ .transaction-page .transaction-heading-controls>.btn{height:40px;padding-inline:10px}
+ .transaction-page .transaction-filter-row{padding:0 12px 12px;gap:7px}
+ .transaction-page .transaction-filter-types{width:100%;overflow-x:auto;padding:1px 0 3px}
+ .transaction-page .transaction-chip{height:35px;padding:0 13px;font-size:12px}
+ .transaction-page .transaction-filter-row .transaction-sort{margin-left:0}
+ .transaction-page .transaction-table-wrap{padding:0 8px}
+ .transaction-page .transaction-table{min-width:1040px}
+ .transaction-page .transaction-table th{font-size:12px;padding:11px 9px}
+ .transaction-page .transaction-table td{padding:11px 9px}
+ .transaction-page .transaction-pagination{padding:12px;align-items:flex-start;flex-direction:row;flex-wrap:wrap}
+ .transaction-page .transaction-pagination-controls{flex-wrap:wrap}
+}

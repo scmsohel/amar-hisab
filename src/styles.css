@@ -3680,16 +3680,18 @@ input,button,select,textarea{
 }
 
 
-/* Soft tinted surface for the debt payment history section */
+/* Tint the entire payment-history card; keep individual transactions neutral */
 .debt-history-card{
-  background:color-mix(in srgb,var(--primary) 5%,var(--surface))!important;
-  border-color:color-mix(in srgb,var(--primary) 16%,var(--border))!important;
+  background:color-mix(in srgb,#08a66a 9%,var(--surface))!important;
+  border:1px solid color-mix(in srgb,#08a66a 24%,var(--border))!important;
+  border-radius:14px;
+  box-shadow:0 3px 12px rgba(15,35,55,.045);
 }
 .debt-history-card .debt-payment-row{
-  background:color-mix(in srgb,var(--surface2) 48%,var(--surface))!important;
-  border-color:color-mix(in srgb,var(--primary) 10%,var(--border))!important;
+  background:color-mix(in srgb,var(--surface) 92%,transparent)!important;
+  border-color:color-mix(in srgb,var(--border) 88%,transparent)!important;
 }
 .debt-history-card .debt-payment-row:hover{
-  background:color-mix(in srgb,var(--primary) 7%,var(--surface))!important;
-  border-color:color-mix(in srgb,var(--primary) 24%,var(--border))!important;
+  background:color-mix(in srgb,var(--surface) 80%,#08a66a)!important;
+  border-color:color-mix(in srgb,#08a66a 24%,var(--border))!important;
 }

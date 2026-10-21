@@ -4362,8 +4362,9 @@ input,button,select,textarea{
 .wallet-edit-modal .modal-actions{display:flex;justify-content:flex-end;gap:10px}
 @media(max-width:600px){.wallet-heading-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}.wallet-manager-page .wallet-transfer-btn,.wallet-manager-page .wallet-add-btn{width:100%;justify-content:center;min-height:40px}.wallet-edit-modal{padding:18px}}
 
-/* Explicit wallet card action colors after restoring income/expense filters */
-.wallet-card-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
+/* Keep all three wallet actions on a single row. */
+.wallet-card-actions{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.wallet-card-actions button{gap:4px;padding:6px 4px;font-size:11px;white-space:nowrap}
 .wallet-card-actions button.wallet-card-income{background:color-mix(in srgb,#10b981 10%,var(--surface));color:#07845f}
 .wallet-card-actions button.wallet-card-expense{background:color-mix(in srgb,#ef4444 10%,var(--surface));color:#df3948}
 .wallet-card-actions button.wallet-card-transfer{background:color-mix(in srgb,#3b82f6 11%,var(--surface));color:#236acb}

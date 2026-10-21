@@ -4345,7 +4345,7 @@ input,button,select,textarea{
 
 /* Wallet manager actions and native wallet-name editor */
 .wallet-heading-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
-.wallet-manager-page .wallet-transfer-btn{min-height:44px;border-radius:11px;white-space:nowrap}
+.wallet-manager-page .wallet-transfer-btn{min-height:44px;border-radius:11px;white-space:nowrap;background:linear-gradient(135deg,#3b82f6,#2563eb);border:1px solid #2563eb;color:#fff;box-shadow:0 3px 10px #2563eb26}.wallet-manager-page .wallet-transfer-btn:hover{background:linear-gradient(135deg,#2563eb,#1d4ed8);border-color:#1d4ed8;color:#fff}
 .wallet-manager-card-top{position:relative}
 .wallet-card-menu{position:absolute;z-index:15;right:0;top:36px;min-width:172px;padding:6px;border:1px solid var(--border);border-radius:12px;background:var(--surface);box-shadow:0 12px 35px #142a3b20;display:grid;gap:3px}
 .wallet-card-menu button{display:flex;align-items:center;gap:9px;width:100%;padding:10px;border:0;border-radius:8px;background:transparent;color:var(--text);text-align:left;font-size:12px;font-weight:600}

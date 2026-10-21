@@ -4188,7 +4188,7 @@ input,button,select,textarea{
 .wallet-stat-income>span{background:#d9f7e9;color:#059669}.wallet-stat-income b{color:#07845f}
 .wallet-stat-expense>span{background:#ffe4e6;color:#e54857}.wallet-stat-expense b{color:#e54857}
 .wallet-stat-count>span{background:#dcecff;color:#287cf0}.wallet-stat-count b{color:#236acb}
-.wallet-manager-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.wallet-manager-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px;align-items:stretch}
 .wallet-manager-card{position:relative;min-width:0;padding:18px;border:1px solid var(--border);border-radius:16px;background:var(--surface);box-shadow:0 4px 14px rgba(25,50,75,.035);transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease}
 .wallet-manager-card:hover{transform:translateY(-4px);box-shadow:0 12px 26px rgba(25,50,75,.10)}
 .wallet-card-cash{background:linear-gradient(135deg,color-mix(in srgb,#10b981 8%,var(--surface)),var(--surface));border-color:color-mix(in srgb,#10b981 22%,var(--border))}

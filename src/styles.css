@@ -3482,3 +3482,34 @@ input,button,select,textarea{
 .debt-rule-badge{display:inline-flex;align-items:center;width:max-content;max-width:100%;padding:4px 7px;border:1px solid var(--border);border-radius:7px;font-size:11px;font-weight:600;line-height:1.4;white-space:nowrap}
 .debt-rule-badge.one-time{color:var(--muted);background:var(--surface2)}
 .debt-rule-badge.installment{color:var(--primary);border-color:color-mix(in srgb,var(--primary) 25%,var(--border));background:color-mix(in srgb,var(--primary) 9%,var(--surface))}
+
+
+/* Readable debt entry modal typography */
+.feature-form-modal .panel-title h3{font-size:23px!important;line-height:1.45}
+.feature-form-modal .panel-title p{font-size:14px!important;line-height:1.65}
+.feature-form-modal .feature-form>label{font-size:15px!important;line-height:1.65;gap:9px}
+.feature-form-modal .feature-form input,
+.feature-form-modal .feature-form select,
+.feature-form-modal .feature-form .app-select,
+.feature-form-modal .feature-form textarea,
+.feature-form-modal .feature-form input::placeholder,
+.feature-form-modal .feature-form textarea::placeholder{font-size:16px!important;line-height:1.5}
+.feature-form-modal .feature-form input,
+.feature-form-modal .feature-form select,
+.feature-form-modal .feature-form .app-select{min-height:48px}
+.feature-form-modal .feature-form .app-select button{font-size:16px!important;min-height:46px}
+.feature-form-modal .feature-form .modal-actions .btn,
+.feature-form-modal .feature-form .btn{font-size:15px!important;min-height:46px}
+.feature-form-modal .installment-summary small{font-size:13px}
+.feature-form-modal .installment-summary strong{font-size:21px}
+@media(max-width:640px){
+ .feature-form-modal .panel-title h3{font-size:21px!important}
+ .feature-form-modal .panel-title p{font-size:13px!important}
+ .feature-form-modal .feature-form>label{font-size:14px!important}
+ .feature-form-modal .feature-form input,
+ .feature-form-modal .feature-form select,
+ .feature-form-modal .feature-form .app-select,
+ .feature-form-modal .feature-form textarea,
+ .feature-form-modal .feature-form input::placeholder,
+ .feature-form-modal .feature-form textarea::placeholder{font-size:16px!important}
+}

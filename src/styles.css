@@ -4216,8 +4216,8 @@ input,button,select,textarea{
 .wallet-manager-lower{display:grid;grid-template-columns:minmax(0,2.05fr) minmax(280px,.95fr);gap:18px;align-items:stretch;min-width:0}
 .wallet-transactions-panel,.wallet-chart-panel{min-width:0;padding:0;overflow:hidden;border-radius:16px}
 .wallet-transactions-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 22px 16px;border-bottom:1px solid var(--border)}
-.wallet-transactions-heading h3,.wallet-chart-panel h3{margin:0;font-size:21px;font-weight:800;color:var(--text)}
-.wallet-transactions-heading p,.wallet-chart-panel>p{margin:5px 0 0;color:var(--muted);font-size:13px}
+.wallet-transactions-heading h3,.wallet-chart-panel h3{margin:0;font-size:23px;font-weight:800;color:var(--text)}
+.wallet-transactions-heading p,.wallet-chart-panel>p{margin:5px 0 0;color:var(--muted);font-size:15px;line-height:1.5}
 .wallet-transactions-controls{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0}
 .wallet-transactions-controls .app-select{min-width:140px;flex:0 0 auto}
 .wallet-transactions-controls .app-select-trigger{min-height:42px}
@@ -4251,14 +4251,14 @@ input,button,select,textarea{
 
 @property --wallet-reveal{syntax:"<percentage>";inherits:false;initial-value:0%}.wallet-donut:after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;z-index:0;background:conic-gradient(from 0deg,transparent 0 var(--wallet-reveal),var(--surface) var(--wallet-reveal) 100%);animation:wallet-donut-fill 2.4s cubic-bezier(.22,.75,.25,1) both}.wallet-donut:before{content:"";position:absolute;inset:18%;border-radius:50%;background:var(--surface);box-shadow:inset 0 0 0 1px var(--border);z-index:1}@keyframes wallet-donut-fill{from{--wallet-reveal:0%}to{--wallet-reveal:100%}}@media(prefers-reduced-motion:reduce){.wallet-donut,.wallet-donut:after{animation:none;--wallet-reveal:100%}}
 .wallet-donut>div{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:5px}
-.wallet-donut small{font-size:12px;color:var(--muted)}
-.wallet-donut strong{font-size:21px;font-weight:850;color:var(--text);text-align:center}
+.wallet-donut small{font-size:14px;color:var(--muted)}
+.wallet-donut strong{font-size:23px;font-weight:850;color:var(--text);text-align:center}
 .wallet-chart-legend{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 10px}
 .wallet-chart-legend>div{display:flex;flex-direction:column;gap:5px;min-width:0}
-.wallet-chart-legend>div>span{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px}
+.wallet-chart-legend>div>span{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:14px}
 .wallet-chart-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;flex:0 0 9px}
-.wallet-chart-legend b{font-size:13px;color:var(--text)}
-.wallet-chart-legend small{font-size:11px;color:var(--muted)}
+.wallet-chart-legend b{font-size:15px;color:var(--text)}
+.wallet-chart-legend small{font-size:13px;color:var(--muted)}
 .wallet-extra-records{padding:18px}
 .wallet-extra-records h3{margin:0 0 14px}
 .dark .wallet-total-banner{border-color:#245b50;background:linear-gradient(110deg,#14352f,#172b2b)}

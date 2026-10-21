@@ -3722,3 +3722,35 @@ input,button,select,textarea{
  .debt-table tbody td:nth-child(6) small,
  .debt-table tbody td:nth-child(6) .muted{font-size:12px!important}
 }
+
+
+/* Installment guidance while entering a debt payment */
+.debt-installment-hint{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin:2px 0 4px;
+  padding:12px 14px;
+  border:1px solid color-mix(in srgb,#08a66a 24%,var(--border));
+  border-radius:12px;
+  background:color-mix(in srgb,#08a66a 7%,var(--surface));
+}
+.debt-installment-hint>div{display:flex;flex-direction:column;gap:4px}
+.debt-installment-hint span{font-size:12px;color:var(--muted);font-weight:600}
+.debt-installment-hint strong{font-size:16px;color:var(--primary);line-height:1.4}
+.debt-installment-hint p{
+  grid-column:1/-1;
+  margin:2px 0 0;
+  padding-top:8px;
+  border-top:1px solid color-mix(in srgb,#08a66a 18%,var(--border));
+  font-size:13px;
+  font-weight:700;
+  line-height:1.5;
+  color:var(--text);
+}
+@media(max-width:520px){
+ .debt-installment-hint{padding:10px;gap:7px}
+ .debt-installment-hint strong{font-size:14px}
+ .debt-installment-hint span{font-size:11px}
+ .debt-installment-hint p{font-size:12px}
+}

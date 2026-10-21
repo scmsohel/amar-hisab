@@ -3378,3 +3378,40 @@
 }
 
 .feature-form-shade{z-index:55;overflow-y:auto}.feature-form-modal{width:min(100%,680px);max-height:calc(100vh - 36px);overflow-y:auto}.feature-form-modal .feature-form-panel{width:100%;margin:0;padding:22px;box-shadow:0 24px 80px #071c142b}.feature-form-modal .feature-form{margin-top:18px}.feature-form-modal .feature-form .wide{grid-column:1/-1}@media(max-width:640px){.feature-form-modal{width:100%;max-height:calc(100vh - 24px)}.feature-form-modal .feature-form-panel{padding:16px}}
+
+
+/* Debt form modal: center the overlay in the viewport without affecting page flow. */
+.feature-form-shade{
+  position:fixed;
+  inset:0;
+  z-index:55;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  overflow-y:auto;
+  background:rgba(12,22,32,.48);
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+}
+.feature-form-modal{
+  width:min(100%,640px);
+  max-height:calc(100dvh - 36px);
+  margin:auto;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  border-radius:16px;
+}
+.feature-form-modal .feature-form-panel{
+  width:100%;
+  margin:0;
+  padding:22px;
+  box-shadow:0 24px 80px rgba(7,28,20,.20);
+}
+.feature-form-modal .feature-form{margin-top:18px}
+.feature-form-modal .feature-form .wide{grid-column:1/-1}
+@media(max-width:640px){
+  .feature-form-shade{padding:12px}
+  .feature-form-modal{width:100%;max-height:calc(100dvh - 24px);border-radius:13px}
+  .feature-form-modal .feature-form-panel{padding:16px}
+}

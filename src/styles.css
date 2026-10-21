@@ -3659,3 +3659,22 @@ input,button,select,textarea{
  .debt-history-card .debt-payment-copy b{font-size:13px}
  .debt-history-card .debt-payment-copy small{font-size:11px}
 }
+
+
+/* Debt table column alignment: compact left-aligned dates, centered installment, updated date */
+.debt-table{table-layout:fixed;min-width:1120px}
+.debt-table thead th:nth-child(3),
+.debt-table tbody td:nth-child(3){width:108px;text-align:left;padding-left:12px;padding-right:8px}
+.debt-table thead th:nth-child(6),
+.debt-table tbody td:nth-child(6){width:88px;text-align:center;vertical-align:middle}
+.debt-table thead th:nth-child(11),
+.debt-table tbody td:nth-child(11){width:112px;text-align:left}
+.debt-table thead th:nth-child(12),
+.debt-table tbody td:nth-child(12){width:104px;text-align:left}
+.debt-table thead th:nth-child(3){padding-left:12px}
+.debt-table tbody td:nth-child(6) .debt-installment-count{margin-inline:auto}
+@media(max-width:650px){
+ .debt-table{min-width:1120px}
+ .debt-table thead th:nth-child(3),.debt-table tbody td:nth-child(3){width:108px}
+ .debt-table thead th:nth-child(6),.debt-table tbody td:nth-child(6){width:88px}
+}

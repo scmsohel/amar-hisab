@@ -2011,7 +2011,7 @@
 .dashboard-transactions .transaction-wallet-logo{
  width:23px;height:23px;flex:0 0 23px;display:block;object-fit:contain;background:transparent
 }
-.dashboard-transactions .transaction-wallet-logo-nagad{width:29px;height:29px;flex:0 0 29px;transform:none}.dashboard-transactions .wallet-brand-nagad>span{font-size:14px;font-weight:750;color:#344b5d}.dark .dashboard-transactions .wallet-brand-nagad>span{color:#d0dce4}.dashboard-transactions .transaction-wallet-brand .transaction-wallet-icon{width:23px;height:23px;flex:0 0 23px}.transaction-table .wallet-brand-nagad .transaction-wallet-logo-nagad{width:29px;height:29px;flex-basis:29px}.wallet-manager-table .wallet-tx-wallet.wallet-tx-nagad{font-size:14px;font-weight:700;color:#344b5d}.dark .wallet-manager-table .wallet-tx-wallet.wallet-tx-nagad{color:#d0dce4}
+.dashboard-transactions .wallet-brand-bank>span,.dashboard-transactions .wallet-brand-nagad>span{font-size:12px;font-weight:600}.wallet-manager-table .wallet-tx-wallet.wallet-tx-bank,.wallet-manager-table .wallet-tx-wallet.wallet-tx-nagad{font-size:14px;font-weight:700}
 
 
 /* Restore the original gentle lift on dashboard summary cards */

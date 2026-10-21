@@ -4377,7 +4377,7 @@ input,button,select,textarea{
 .transaction-kind-tabs.transfer-tabs{margin-bottom:18px}
 .transfer-route{display:grid;grid-template-columns:minmax(0,1fr) 42px minmax(0,1fr);align-items:center;gap:10px;margin-bottom:18px}
 .transfer-wallet-field{display:grid;gap:8px;min-width:0;padding:14px;border:1px solid var(--border);border-radius:14px;background:var(--surface2)}
-.transfer-wallet-field>span{font-size:12px;color:var(--muted);font-weight:650}
+.transfer-wallet-field>span{font-size:15px;color:var(--text);font-weight:700;line-height:1.45}.transfer-wallet-field .app-select-trigger{font-size:15px;font-weight:650}.transfer-wallet-field>small{font-size:13px;color:var(--muted);line-height:1.4}
 .transfer-wallet-field .app-select{min-width:0;width:100%}
 .transfer-wallet-field .app-select-trigger{min-height:42px;padding:0 9px}
 .transfer-wallet-field>strong{font-size:19px;line-height:1.2;font-weight:850;color:var(--text);white-space:nowrap}

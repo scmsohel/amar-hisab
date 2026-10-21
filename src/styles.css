@@ -3532,3 +3532,32 @@ input,button,select,textarea{
 .debt-installment-progress{display:block;width:100%;height:5px;overflow:hidden;border-radius:99px;background:var(--surface2)}
 .debt-installment-progress i{display:block;height:100%;border-radius:inherit;background:var(--primary);transition:width .2s ease}
 .debt-rule-cell small{font-size:11px;line-height:1.4;white-space:normal}
+
+/* Debt rule labels and installment count column */
+.debt-rule-badge.one-time{
+  color:#087f5b;
+  border-color:color-mix(in srgb,#08a66a 25%,var(--border));
+  background:color-mix(in srgb,#08a66a 10%,var(--surface));
+}
+.debt-rule-badge.installment{
+  color:#1769c2;
+  border-color:color-mix(in srgb,#1682f5 26%,var(--border));
+  background:color-mix(in srgb,#1682f5 10%,var(--surface));
+}
+.debt-installment-count{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:58px;
+  padding:5px 9px;
+  border:1px solid color-mix(in srgb,var(--primary) 22%,var(--border));
+  border-radius:8px;
+  background:color-mix(in srgb,var(--primary) 8%,var(--surface));
+  color:var(--text);
+  font-size:12px;
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+@media(max-width:640px){
+  .debt-installment-count{font-size:12px;padding:5px 8px}
+}

@@ -3376,3 +3376,5 @@
 .dashboard-transactions :is(h1,h2,h3,h4,p,span,strong,b,small,label,button,input,select,option,th,td,div){
   font-family:'Noto Sans Bengali','Hind Siliguri',sans-serif;
 }
+
+.feature-form-shade{z-index:55;overflow-y:auto}.feature-form-modal{width:min(100%,680px);max-height:calc(100vh - 36px);overflow-y:auto}.feature-form-modal .feature-form-panel{width:100%;margin:0;padding:22px;box-shadow:0 24px 80px #071c142b}.feature-form-modal .feature-form{margin-top:18px}.feature-form-modal .feature-form .wide{grid-column:1/-1}@media(max-width:640px){.feature-form-modal{width:100%;max-height:calc(100vh - 24px)}.feature-form-modal .feature-form-panel{padding:16px}}

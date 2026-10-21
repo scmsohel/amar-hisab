@@ -3456,3 +3456,21 @@ html,body,#root,.app,.app *{
 input,button,select,textarea{
   font-family:'Noto Sans Bengali',Inter,sans-serif!important;
 }
+
+
+/* Recurring installment form summary */
+.installment-summary{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  gap:3px;
+  min-height:68px;
+  padding:10px 12px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:var(--surface2);
+}
+.installment-summary small{color:var(--muted);font-size:11px;line-height:1.45}
+.installment-summary strong{color:var(--primary);font-size:18px;line-height:1.3}
+@media(max-width:640px){.installment-summary{min-height:58px}}

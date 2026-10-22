@@ -5105,3 +5105,20 @@ input,button,select,textarea{
 
 
 .reminder-group-title{padding:9px 3px 4px;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.02em}
+
+
+/* Keep reminder panel outside the sidebar's scroll/clipping area */
+.sidebar .bill-reminder-popover{
+  position:fixed!important;left:90px!important;right:auto!important;bottom:80px!important;
+  width:320px!important;max-width:calc(100vw - 110px)!important;
+  max-height:min(70vh,520px);overflow-y:auto;
+}
+.sidebar:not(.collapsed) .bill-reminder-popover{
+  left:256px!important;max-width:calc(100vw - 276px)!important;
+}
+@media(max-width:700px){
+  .sidebar .bill-reminder-popover{
+    position:fixed!important;left:76px!important;right:10px!important;bottom:80px!important;
+    width:auto!important;max-width:none!important;max-height:calc(100dvh - 110px);
+  }
+}

@@ -4924,3 +4924,55 @@ input,button,select,textarea{
   text-overflow:clip!important;
   white-space:nowrap;
 }
+
+
+/* Upcoming bills: align every amount in one fixed column, independent of badge text */
+.side-widgets>.bills .bill-row{
+  grid-template-columns:40px minmax(0,1fr) 48px 76px!important;
+  column-gap:8px!important;
+}
+.side-widgets>.bills .bill-row strong{
+  grid-column:3;
+  justify-self:end;
+  text-align:right;
+  white-space:nowrap;
+  min-width:48px;
+}
+.side-widgets>.bills .bill-row .bill-due{
+  grid-column:4;
+  justify-self:end;
+  max-width:76px!important;
+  min-width:0;
+  box-sizing:border-box;
+  padding-inline:5px;
+  font-size:9px;
+  text-align:center;
+  overflow:hidden!important;
+  text-overflow:clip!important;
+}
+@media(max-width:700px){
+  .side-widgets>.bills .bill-row{
+    grid-template-columns:34px minmax(0,1fr) 46px 72px!important;
+    column-gap:6px!important;
+  }
+  .side-widgets>.bills .bill-row strong{
+    grid-column:3;
+    grid-row:1/3;
+    align-self:center;
+    min-width:46px;
+    font-size:11px;
+  }
+  .side-widgets>.bills .bill-row .bill-due{
+    grid-column:4;
+    grid-row:1/3;
+    align-self:center;
+    max-width:72px!important;
+    font-size:8px;
+    padding-inline:4px;
+  }
+  .side-widgets>.bills .bill-row>div{
+    grid-column:2;
+    grid-row:1/3;
+    min-width:0;
+  }
+}

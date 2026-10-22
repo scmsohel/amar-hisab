@@ -5530,3 +5530,34 @@ input,button,select,textarea{
 .goal-workspace .goal-full-table th:nth-child(9),.goal-workspace .goal-full-table th:nth-child(10){min-width:120px}
 .goal-workspace .goal-full-table th:nth-child(11){min-width:100px}
 .goal-workspace .goal-full-table .debt-paid-caption{display:block;margin-top:4px;font-size:10px;color:var(--muted);white-space:nowrap}
+
+
+/* Match savings page vertical rhythm to the debt/receivables page */
+.goal-redesign>.goal-feature-heading{
+  margin-top:-8px;
+  margin-bottom:10px;
+  min-height:42px;
+}
+.goal-redesign>.goal-metrics{
+  margin-top:0;
+  margin-bottom:12px;
+  gap:14px;
+}
+.goal-redesign>.goal-metrics>.debt-metric{
+  min-height:101px;
+}
+.goal-redesign>.goal-workspace{
+  margin-top:0;
+}
+.goal-redesign>.goal-workspace>.goal-toolbar{
+  margin-bottom:10px;
+}
+.goal-redesign .goal-full-table th,
+.goal-redesign .goal-full-table td{
+  padding-top:9px;
+  padding-bottom:9px;
+}
+@media(max-width:760px){
+  .goal-redesign>.goal-feature-heading{margin-top:0;margin-bottom:10px}
+  .goal-redesign>.goal-metrics{gap:10px;margin-bottom:12px}
+}

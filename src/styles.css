@@ -5471,3 +5471,13 @@ input,button,select,textarea{
 .goal-calculation-preview small{font-size:13px;line-height:1.5}
 .goal-calculation-preview strong{font-size:16px;line-height:1.5}
 .goal-savings-form .modal-actions .btn{font-size:14px;min-height:42px}
+
+
+/* Reusable icon selector for transaction, debt, bill and savings forms */
+.record-icon-field{display:flex;flex-direction:column;gap:8px}
+.record-icon-picker{display:flex;align-items:center;gap:10px;min-width:0}
+.record-icon-preview,.record-list-icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 38px;width:38px;height:38px;border-radius:12px;background:var(--surface-soft,#e8f7f1);color:var(--primary,#0d9f6e)}
+.record-icon-picker select{flex:1;min-width:0;width:100%;min-height:42px;padding:8px 12px;border:1px solid var(--border,#dce5e8);border-radius:10px;background:var(--panel,#fff);color:var(--text,#182230);font:inherit}
+.record-name-with-icon{display:inline-flex;align-items:center;gap:10px;min-width:0}
+.record-name-with-icon b{overflow-wrap:anywhere}
+.record-list-icon{width:32px;height:32px;flex-basis:32px;border-radius:50%;background:var(--surface-soft,#e8f7f1)}

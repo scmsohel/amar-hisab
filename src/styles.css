@@ -5122,3 +5122,46 @@ input,button,select,textarea{
     width:auto!important;max-width:none!important;max-height:calc(100dvh - 110px);
   }
 }
+
+
+/* Larger reminder panel and readable items; scroll the list instead of a "view all" footer */
+.sidebar .bill-reminder-popover{
+  width:420px!important;
+  max-width:calc(100vw - 110px)!important;
+  max-height:min(78vh,680px)!important;
+  padding:18px!important;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden!important;
+  box-sizing:border-box;
+}
+.sidebar:not(.collapsed) .bill-reminder-popover{
+  width:420px!important;
+  max-width:calc(100vw - 276px)!important;
+}
+.bill-reminder-popover-head{padding:3px 2px 13px!important;flex:0 0 auto}
+.bill-reminder-popover-head b{font-size:17px!important}
+.bill-reminder-popover-head button{width:32px!important;height:32px!important}
+.bill-reminder-popover .reminder-group-title{font-size:13px!important;padding:12px 4px 6px!important;flex:0 0 auto}
+.bill-reminder-popover .bill-reminder-item{
+  padding:13px 5px!important;
+  gap:12px!important;
+  flex:0 0 auto;
+}
+.bill-reminder-popover .bill-reminder-item-copy{gap:5px!important}
+.bill-reminder-popover .bill-reminder-item-copy b{font-size:15px!important}
+.bill-reminder-popover .bill-reminder-item-copy small{font-size:13px!important}
+.bill-reminder-popover .bill-reminder-item-due{font-size:12px!important;padding:7px 10px!important}
+.bill-reminder-popover .bill-reminder-empty{font-size:14px!important;padding:8px 2px}
+.bill-reminder-popover .bill-reminder-view-all{display:none!important}
+.bill-reminder-popover .bill-reminder-item{min-width:0}
+.bill-reminder-popover .bill-reminder-item-copy{min-width:0}
+.bill-reminder-popover .bill-reminder-item-copy b{white-space:normal;overflow-wrap:anywhere}
+.sidebar .bill-reminder-popover .reminder-group-title:first-of-type{margin-top:2px}
+@media(max-width:700px){
+  .sidebar .bill-reminder-popover{
+    left:76px!important;right:10px!important;bottom:72px!important;top:12px!important;
+    width:auto!important;max-width:none!important;max-height:none!important;
+    padding:15px!important;
+  }
+}

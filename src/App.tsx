@@ -165,60 +165,41 @@ return <div className={dark?"app dark":"app"}><AnimatePresence>{mobile&&<motion.
 <aside className={"sidebar "+(collapsed?"collapsed ":"")+(mobile?"mobile-open":"")}><div className="brand"><button className="sidebar-logo" onClick={()=>setCollapsed(!collapsed)} aria-label={collapsed?"সাইডবার প্রসারিত করুন":"সাইডবার সঙ্কুচিত করুন"} title={collapsed?"সাইডবার প্রসারিত করুন":"সাইডবার সঙ্কুচিত করুন"}><span className="brand-icon"><Wallet size={22}/></span><span className="sidebar-brand-copy"><b>আমার হিসাব</b><small>Personal Finance</small></span></button><button className="icon close" onClick={()=>setMobile(false)}><X/></button></div><p className="overline">WORKSPACE</p><nav>{nav.map(([label,Icon])=><button key={label} className={active===label?"nav active":"nav"} onClick={()=>{setActive(label);setMobile(false)}}><Icon size={18}/>{!collapsed&&<span>{label}</span>}{!collapsed&&label==="বিল"&&globalBillReminders.length>0&&<i>{globalBillReminders.length.toLocaleString("bn-BD")}</i>}{!collapsed&&label==="দেনা-পাওনা"&&globalDebtReminders.length>0&&<i>{globalDebtReminders.length.toLocaleString("bn-BD")}</i>}</button>)}</nav><div className="side-bottom"><div className="sidebar-notification-wrap"><button className="sidebar-notification" onClick={()=>{refreshGlobalBillReminders();refreshGlobalDebtReminders();setBillReminderPanelOpen(open=>!open);}} aria-label="বিল রিমাইন্ডার দেখুন" title="বিল রিমাইন্ডার" aria-expanded={billReminderPanelOpen}><Bell size={19}/><span>বিল রিমাইন্ডার</span>{globalBillReminders.length+globalDebtReminders.length>0&&<i>{(globalBillReminders.length+globalDebtReminders.length).toLocaleString("bn-BD")}</i>}</button>{billReminderPanelOpen && (
   <div className="bill-reminder-layer">
     <div className="bill-reminder-backdrop" onClick={() => setBillReminderPanelOpen(false)} aria-hidden="true" />
-    <div className="bill-reminder-popover">
-      <div className="bill-reminder-popover-head">
+    <section className="bill-reminder-popover" role="dialog" aria-label="রিমাইন্ডার">
+      <header className="bill-reminder-popover-head">
         <b>রিমাইন্ডার</b>
         <button type="button" aria-label="বন্ধ করুন" onClick={() => setBillReminderPanelOpen(false)}><X size={14} /></button>
-      </div>
+      </header>
       <div className="bill-reminder-tabs">
-        <button type="button" className={reminderFilter === "all" ? "active" : ""} onClick={() => setReminderFilter("all")}>
-          সবগুলো <i>{(globalBillReminders.length + globalDebtReminders.length).toLocaleString("bn-BD")}</i>
-        </button>
-        <button type="button" className={reminderFilter === "today" ? "active" : ""} onClick={() => setReminderFilter("today")}>
-          আজকের <i>{(globalBillReminders.filter(b => Math.round((new Date(b.date + "T00:00:00").getTime() - new Date(dhakaDateTime().date + "T00:00:00").getTime()) / 86400000) === 0).length + globalDebtReminders.filter(d => Math.round((new Date(d.date + "T00:00:00").getTime() - new Date(dhakaDateTime().date + "T00:00:00").getTime()) / 86400000) === 0).length}</i>
-        </button>
-        <button type="button" className={reminderFilter === "upcoming" ? "active" : ""} onClick={() => setReminderFilter("upcoming")}>
-          আসন্ন <i>{(globalBillReminders.filter(b => Math.round((new Date(b.date + "T00:00:00").getTime() - new Date(dhakaDateTime().date + "T00:00:00").getTime()) / 86400000) > 0).length + globalDebtReminders.filter(d => Math.round((new Date(d.date + "T00:00:00").getTime() - new Date(dhakaDateTime().date + "T00:00:00").getTime()) / 86400000) > 0).length}</i>
-        </button>
+        <button type="button" className={reminderFilter === "all" ? "active" : ""} onClick={() => setReminderFilter("all")}>সবগুলো <i>{(globalBillReminders.length + globalDebtReminders.length).toLocaleString("bn-BD")}</i></button>
+        <button type="button" className={reminderFilter === "today" ? "active" : ""} onClick={() => setReminderFilter("today")}>আজকের <i>{[...globalBillReminders, ...globalDebtReminders].filter(item => daysUntil(item.date) === 0).length.toLocaleString("bn-BD")}</i></button>
+        <button type="button" className={reminderFilter === "upcoming" ? "active" : ""} onClick={() => setReminderFilter("upcoming")}>আসন্ন <i>{[...globalBillReminders, ...globalDebtReminders].filter(item => daysUntil(item.date) !== null && daysUntil(item.date)! > 0).length.toLocaleString("bn-BD")}</i></button>
       </div>
-      {reminderBills.length === 0 && reminderDebts.length === 0 ? (
-        <p className="bill-reminder-empty">এখন কোনো রিমাইন্ডার নেই।</p>
-      ) : (
-        <>
-          {reminderBills.length > 0 && (
-            <>
-              <div className="reminder-group-title">বিল</div>
-              {reminderBills.map(b => {
-                const days = Math.round((new Date(b.date + "T00:00:00").getTime() - new Date(dhakaDateTime().date + "T00:00:00").getTime()) / 86400000);
-                return (
-                  <button type="button" className="bill-reminder-item" key={"bill-" + b.id} onClick={() => { setActive("বিল"); setMobile(false); setBillReminderPanelOpen(false); }}>
-                    <span className="bill-reminder-item-copy"><b>{b.title}</b><small>{displayDate(b.date)}</small></span>
-                    <span className="bill-reminder-item-due">{days < 0 ? Math.abs(days).toLocaleString("bn-BD") + " দিন পেরিয়েছে" : days === 0 ? "আজ" : days.toLocaleString("bn-BD") + " দিন বাকি"}</span>
-                    <span className={"bill-reminder-progress" + (days <= 1 ? " urgent" : "")}><i style={{ width: (days < 0 ? 100 : Math.max(12, Math.min(100, (8 - days) * 12.5))) + "%" }} /></span>
-                  </button>
-                );
-              })}
-            </>
-          )}
-          {reminderDebts.length > 0 && (
-            <>
-              <div className="reminder-group-title">দেনা-পাওনা</div>
-              {reminderDebts.map(d => {
-                const days = Math.round((new Date(d.date + "T00:00:00").getTime() - new Date(dhakaDateTime().date + "T00:00:00").getTime()) / 86400000);
-                return (
-                  <button type="button" className="bill-reminder-item" key={"debt-" + d.id} onClick={() => { setActive("দেনা-পাওনা"); setMobile(false); setBillReminderPanelOpen(false); }}>
-                    <span className="bill-reminder-item-copy"><b>{d.title}</b><small>{(d.debtKind || d.status) === "দেনা" ? "দেনা" : "পাওনা"} · {displayDate(d.date)}</small></span>
-                    <span className="bill-reminder-item-due">{days < 0 ? Math.abs(days).toLocaleString("bn-BD") + " দিন পেরিয়েছে" : days === 0 ? "আজ" : days.toLocaleString("bn-BD") + " দিন বাকি"}</span>
-                    <span className={"bill-reminder-progress" + (days <= 1 ? " urgent" : "")}><i style={{ width: (days < 0 ? 100 : Math.max(12, Math.min(100, (8 - days) * 12.5))) + "%" }} /></span>
-                  </button>
-                );
-              })}
-            </>
-          )}
-        </>
-      )}
+      {reminderBills.length === 0 && reminderDebts.length === 0 && <p className="bill-reminder-empty">এখন কোনো রিমাইন্ডার নেই।</p>}
+      {reminderBills.length > 0 && <div className="reminder-group-title">বিল</div>}
+      {reminderBills.map(item => {
+        const days = daysUntil(item.date) ?? 0;
+        const dueText = days < 0 ? Math.abs(days).toLocaleString("bn-BD") + " দিন পেরিয়েছে" : days === 0 ? "আজ" : days.toLocaleString("bn-BD") + " দিন বাকি";
+        const progress = days < 0 ? 100 : Math.max(12, Math.min(100, (8 - days) * 12.5));
+        return <button type="button" className="bill-reminder-item" key={"bill-" + item.id} onClick={() => { setActive("বিল"); setMobile(false); setBillReminderPanelOpen(false); }}>
+          <span className="bill-reminder-item-copy"><b>{item.title}</b><small>{displayDate(item.date)}</small></span>
+          <span className="bill-reminder-item-due">{dueText}</span>
+          <span className={"bill-reminder-progress" + (days <= 1 ? " urgent" : "")}><i style={{ width: progress + "%" }} /></span>
+        </button>;
+      })}
+      {reminderDebts.length > 0 && <div className="reminder-group-title">দেনা-পাওনা</div>}
+      {reminderDebts.map(item => {
+        const days = daysUntil(item.date) ?? 0;
+        const dueText = days < 0 ? Math.abs(days).toLocaleString("bn-BD") + " দিন পেরিয়েছে" : days === 0 ? "আজ" : days.toLocaleString("bn-BD") + " দিন বাকি";
+        const progress = days < 0 ? 100 : Math.max(12, Math.min(100, (8 - days) * 12.5));
+        return <button type="button" className="bill-reminder-item" key={"debt-" + item.id} onClick={() => { setActive("দেনা-পাওনা"); setMobile(false); setBillReminderPanelOpen(false); }}>
+          <span className="bill-reminder-item-copy"><b>{item.title}</b><small>{(item.debtKind || item.status) === "দেনা" ? "দেনা" : "পাওনা"} · {displayDate(item.date)}</small></span>
+          <span className="bill-reminder-item-due">{dueText}</span>
+          <span className={"bill-reminder-progress" + (days <= 1 ? " urgent" : "")}><i style={{ width: progress + "%" }} /></span>
+        </button>;
+      })}
       <button type="button" className="bill-reminder-view-all" onClick={() => { setActive(reminderDebts.length > 0 && reminderBills.length === 0 ? "দেনা-পাওনা" : "বিল"); setMobile(false); setBillReminderPanelOpen(false); }}>সব দেখুন →</button>
-    </div>
+    </section>
   </div>
 )}<div className="sidebar-profile"><span className="avatar">S</span><span className="sidebar-profile-copy"><b>Sohel</b><small>Personal Finance</small></span></div><button className="theme theme-icon-only" onClick={()=>setDark(!dark)} aria-label={dark?"লাইট মোড চালু করুন":"ডার্ক মোড চালু করুন"} title={dark?"লাইট মোড":"ডার্ক মোড"}>{dark?<Sun size={20}/>:<Moon size={20}/>}</button></div></aside>
 <main className="main"><header className="topbar"><button className="icon mobile-menu" onClick={()=>setMobile(true)}><Menu/></button></header>

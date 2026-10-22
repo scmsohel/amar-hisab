@@ -69,6 +69,13 @@ async function init() {
       role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('admin','user')),
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+    CREATE TABLE IF NOT EXISTS user_finance_data (
+      user_id BIGINT NOT NULL REFERENCES app_users(id) ON DELETE CASCADE,
+      collection TEXT NOT NULL CHECK (collection IN ('transactions','debts','bills','goals','wallets','settings','categories')),
+      payload JSONB NOT NULL,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (user_id, collection)
+    );
     CREATE TABLE IF NOT EXISTS invitations (
       id BIGSERIAL PRIMARY KEY,
       code_hash TEXT NOT NULL UNIQUE,
@@ -140,6 +147,60 @@ app.post("/auth/register", asyncRoute(async (req, res) => {
     throw error;
   } finally { client.release(); }
 }));
+
+const financeCollections = new Set(["transactions", "debts", "bills", "goals", "wallets", "settings", "categories"]);
+async function requireUser(req, res) {
+  const session = readSession(req);
+  if (!session) {
+    res.status(401).json({ error: "লগইন প্রয়োজন।" });
+    return null;
+  }
+  const result = await pool.query("SELECT id,name,email,mobile,role FROM app_users WHERE id=$1", [session.id]);
+  if (!result.rowCount) {
+    res.status(401).json({ error: "অ্যাকাউন্ট পাওয়া যায়নি।" });
+    return null;
+  }
+  return result.rows[0];
+}
+app.get("/data/:collection", asyncRoute(async (req, res) => {
+  const collection = String(req.params.collection || "");
+  if (!financeCollections.has(collection)) return res.status(404).json({ error: "এই data collection পাওয়া যায়নি।" });
+  const user = await requireUser(req, res);
+  if (!user) return;
+  const result = await pool.query(
+    "SELECT payload, updated_at FROM user_finance_data WHERE user_id=$1 AND collection=$2",
+    [user.id, collection]
+  );
+  res.set("Cache-Control", "no-store");
+  res.json({ collection, data: result.rows[0]?.payload ?? null, updatedAt: result.rows[0]?.updated_at ?? null });
+}));
+app.put("/data/:collection", asyncRoute(async (req, res) => {
+  const collection = String(req.params.collection || "");
+  if (!financeCollections.has(collection)) return res.status(404).json({ error: "এই data collection পাওয়া যায়নি।" });
+  const user = await requireUser(req, res);
+  if (!user) return;
+  if (!Object.prototype.hasOwnProperty.call(req.body || {}, "data")) {
+    return res.status(400).json({ error: "সংরক্ষণের data দেওয়া হয়নি।" });
+  }
+  const payload = req.body.data;
+  if (payload !== null && !Array.isArray(payload) && (typeof payload !== "object" || payload === null)) {
+    return res.status(400).json({ error: "Data-এর format সঠিক নয়।" });
+  }
+  const encoded = JSON.stringify(payload);
+  if (!encoded || Buffer.byteLength(encoded, "utf8") > 2 * 1024 * 1024) {
+    return res.status(413).json({ error: "একবারে সর্বোচ্চ ২ MB data সংরক্ষণ করা যাবে।" });
+  }
+  const result = await pool.query(
+    `INSERT INTO user_finance_data(user_id, collection, payload, updated_at)
+     VALUES($1,$2,$3::jsonb,NOW())
+     ON CONFLICT(user_id, collection) DO UPDATE SET payload=EXCLUDED.payload, updated_at=NOW()
+     RETURNING updated_at`,
+    [user.id, collection, encoded]
+  );
+  res.set("Cache-Control", "no-store");
+  res.json({ ok: true, collection, updatedAt: result.rows[0].updated_at });
+}));
+
 app.post("/admin/invitations", asyncRoute(async (req, res) => {
   const session = readSession(req);
   const isAdmin = session?.role === "admin";

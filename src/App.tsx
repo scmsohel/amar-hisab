@@ -67,7 +67,7 @@ useEffect(()=>{
     thumb.style.transform="translateY("+((trackHeight-thumbHeight)*(scroll.scrollTop/maxScroll))+"px)";
    };
    const show=()=>{hovered=true;update()};
-   const hide=()=>{hovered=false;if(!dragging)update()};
+   const hide=()=>{if(track.matches(":hover"))return;hovered=false;if(!dragging)update()};
    const onScroll=()=>update();
    const onMove=(event:PointerEvent)=>{
     if(!dragging)return;
@@ -84,10 +84,10 @@ useEffect(()=>{
    };
    scroll.addEventListener("mouseenter",show);scroll.addEventListener("mouseleave",hide);card.addEventListener("mouseenter",show);card.addEventListener("mouseleave",hide);
    scroll.addEventListener("scroll",onScroll,{passive:true});window.addEventListener("resize",update);window.addEventListener("scroll",update,true);
-   track.addEventListener("pointerdown",onDown);thumb.addEventListener("pointerdown",onDown);
+   track.addEventListener("pointerenter",show);track.addEventListener("pointerleave",hide);track.addEventListener("pointerdown",onDown);thumb.addEventListener("pointerdown",onDown);
    window.addEventListener("pointermove",onMove);window.addEventListener("pointerup",onUp);
    const observer=new ResizeObserver(update);observer.observe(scroll);observer.observe(card);update();
-   cleanups.push(()=>{observer.disconnect();scroll.removeEventListener("mouseenter",show);scroll.removeEventListener("mouseleave",hide);card.removeEventListener("mouseenter",show);card.removeEventListener("mouseleave",hide);scroll.removeEventListener("scroll",onScroll);window.removeEventListener("resize",update);window.removeEventListener("scroll",update,true);track.removeEventListener("pointerdown",onDown);thumb.removeEventListener("pointerdown",onDown);window.removeEventListener("pointermove",onMove);window.removeEventListener("pointerup",onUp);track.remove();delete scroll.dataset.overlayScrollbarReady;});
+   cleanups.push(()=>{observer.disconnect();scroll.removeEventListener("mouseenter",show);scroll.removeEventListener("mouseleave",hide);card.removeEventListener("mouseenter",show);card.removeEventListener("mouseleave",hide);scroll.removeEventListener("scroll",onScroll);window.removeEventListener("resize",update);window.removeEventListener("scroll",update,true);track.removeEventListener("pointerenter",show);track.removeEventListener("pointerleave",hide);track.removeEventListener("pointerdown",onDown);thumb.removeEventListener("pointerdown",onDown);window.removeEventListener("pointermove",onMove);window.removeEventListener("pointerup",onUp);track.remove();delete scroll.dataset.overlayScrollbarReady;});
   });
  };
  setups();

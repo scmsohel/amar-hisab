@@ -5561,3 +5561,34 @@ input,button,select,textarea{
   .goal-redesign>.goal-feature-heading{margin-top:0;margin-bottom:10px}
   .goal-redesign>.goal-metrics{gap:10px;margin-bottom:12px}
 }
+
+
+/* Keep the reusable icon picker readable in dark theme */
+.dark .icon-picker-trigger{
+  background:var(--surface2);
+  border-color:var(--border);
+  color:var(--text);
+}
+.dark .icon-picker-trigger:hover,
+.dark .icon-picker.is-open .icon-picker-trigger{
+  background:#1a4335;
+  border-color:#2f8e6a;
+}
+.dark .icon-picker-grid{
+  background:#172630;
+  border-color:#344955;
+  box-shadow:0 14px 34px rgba(0,0,0,.48);
+}
+.dark .icon-picker-option{
+  color:#c5d3dc;
+  border-color:transparent;
+}
+.dark .icon-picker-option:hover{
+  background:#233d49;
+  color:#8be0bd;
+}
+.dark .icon-picker-option.selected{
+  background:#1a4335;
+  border-color:#2f8e6a;
+  color:#8be0bd;
+}

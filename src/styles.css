@@ -4818,37 +4818,59 @@ input,button,select,textarea{
 @media(max-width:600px){.debt-heading-actions{gap:8px}.debt-heading-actions>.btn{padding:0 11px;font-size:12px;}}
 
 
-/* Dashboard bill list: scrollbar overlays the card content edge */
-.bill-list-scroll{scrollbar-width:none;position:relative;width:100%;margin-right:0;padding-right:0!important;box-sizing:border-box;overflow-y:auto;overflow-x:hidden;scrollbar-gutter:auto;}
-.bill-list-scroll::-webkit-scrollbar{width:0;height:0;}
-.bills:hover .bill-list-scroll,.bill-list-scroll:hover{scrollbar-width:thin;scrollbar-color:rgba(120,140,155,.58) rgba(255,255,255,.38);}
-.bills:hover .bill-list-scroll::-webkit-scrollbar,.bill-list-scroll:hover::-webkit-scrollbar{width:7px;}
-.bills:hover .bill-list-scroll::-webkit-scrollbar-thumb,.bill-list-scroll:hover::-webkit-scrollbar-thumb{background:rgba(120,140,155,.58);border:2px solid rgba(255,255,255,.5);background-clip:padding-box;border-radius:10px;}
-.bills:hover .bill-list-scroll::-webkit-scrollbar-track,.bill-list-scroll:hover::-webkit-scrollbar-track{background:rgba(255,255,255,.38);border-radius:10px;}
-.bills:hover .bill-list-scroll::-webkit-scrollbar-corner,.bill-list-scroll:hover::-webkit-scrollbar-corner{background:transparent;}
+/* Dashboard card scrollbars: overlay the row content without expanding or narrowing the viewport */
+.bill-list-scroll,
+.debt-person-scroll{
+  position:relative;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  box-sizing:border-box;
+  overflow-x:hidden;
+  overflow-y:auto;
+  scrollbar-width:none;
+  scrollbar-gutter:auto;
+}
+.bill-list-scroll::-webkit-scrollbar,
+.debt-person-scroll::-webkit-scrollbar{width:0;height:0}
+@media(hover:hover){
+  .bills:hover .bill-list-scroll,
+  .hero-debts:hover .debt-person-scroll,
+  .bill-list-scroll:hover,
+  .debt-person-scroll:hover{
+    scrollbar-width:thin;
+    scrollbar-color:rgba(120,140,155,.62) rgba(255,255,255,.38);
+  }
+  .bills:hover .bill-list-scroll::-webkit-scrollbar,
+  .hero-debts:hover .debt-person-scroll::-webkit-scrollbar,
+  .bill-list-scroll:hover::-webkit-scrollbar,
+  .debt-person-scroll:hover::-webkit-scrollbar{width:7px}
+  .bills:hover .bill-list-scroll::-webkit-scrollbar-thumb,
+  .hero-debts:hover .debt-person-scroll::-webkit-scrollbar-thumb,
+  .bill-list-scroll:hover::-webkit-scrollbar-thumb,
+  .debt-person-scroll:hover::-webkit-scrollbar-thumb{
+    background:rgba(120,140,155,.62);
+    border:2px solid rgba(255,255,255,.58);
+    background-clip:padding-box;
+    border-radius:10px;
+  }
+  .bills:hover .bill-list-scroll::-webkit-scrollbar-track,
+  .hero-debts:hover .debt-person-scroll::-webkit-scrollbar-track,
+  .bill-list-scroll:hover::-webkit-scrollbar-track,
+  .debt-person-scroll:hover::-webkit-scrollbar-track{
+    background:rgba(255,255,255,.38);
+    border-radius:10px;
+  }
+}
 
-.debt-person-scroll{scrollbar-width:none;position:relative;min-width:0}.debt-person-scroll::-webkit-scrollbar{width:0;height:0}.hero-debts:hover .debt-person-scroll,.debt-person-scroll:hover{scrollbar-width:thin;scrollbar-color:rgba(120,140,155,.62) transparent}.hero-debts:hover .debt-person-scroll::-webkit-scrollbar,.debt-person-scroll:hover::-webkit-scrollbar{width:7px}.hero-debts:hover .debt-person-scroll::-webkit-scrollbar-thumb,.debt-person-scroll:hover::-webkit-scrollbar-thumb{background:rgba(120,140,155,.62);border:2px solid rgba(255,255,255,.58);background-clip:padding-box;border-radius:10px}.hero-debts .debt-person{min-width:0;max-width:100%;overflow:hidden}.hero-debts .debt-person .debt-date{flex:0 1 auto;min-width:0;max-width:72px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hero-debts .debt-person .due{flex:0 0 auto;max-width:82px;overflow:hidden;text-overflow:ellipsis}
-
-/* Clip the debt list viewport so the last row cannot protrude outside its panel */
-.hero-debts{min-width:0;overflow:hidden}
-.hero-debts .debt-person-scroll{max-height:150px;overflow-y:auto;overflow-x:hidden;clip-path:inset(0 round 0 0 8px 8px);padding-bottom:2px}
-.hero-debts .debt-person{width:100%;box-sizing:border-box;min-width:0}
-.hero-debts .debt-person>div{flex:1 1 0;min-width:0;overflow:hidden}
-.hero-debts .debt-person .debt-date{flex:0 1 58px;max-width:58px;min-width:0}
-.hero-debts .debt-person .due{flex:0 1 auto;min-width:0;max-width:76px}
-
-/* Keep the dashboard debt viewport inside the fixed-height card; scroll rows within it */
-.dashboard-top .hero-debts{display:flex;flex-direction:column;min-height:0;box-sizing:border-box;}
-.dashboard-top .hero-debts .debt-person-scroll{height:112px;max-height:112px;min-height:0;flex:0 0 112px;box-sizing:border-box;overflow-x:hidden;overflow-y:auto;clip-path:none;padding-right:3px;padding-bottom:0;}
-.dashboard-top .hero-debts .debt-person{flex:0 0 auto;}
-
-/* Keep bill rows within the card while the scrollbar overlays the right edge */
+/* Keep row content inside each card while leaving the scroll viewport full width */
 .side-widgets>.bills{min-width:0;overflow:hidden}
-.side-widgets>.bills .bill-list-scroll{width:100%;max-width:100%;min-width:0;}
-.side-widgets>.bills .bill-row{width:100%;max-width:100%;min-width:0;box-sizing:border-box;}
-.side-widgets>.bills .bill-row>div{min-width:0;}
-.side-widgets>.bills .bill-row .bill-due{flex-shrink:1;max-width:78px;overflow:hidden;text-overflow:ellipsis;}
-
-/* Overlay the hover scrollbar over bill rows instead of reserving layout space */
-.bill-list-scroll{width:calc(100% + 7px)!important;max-width:none!important;margin-right:-7px;padding-right:10px!important;box-sizing:border-box;scrollbar-gutter:auto;}
-.bills:hover .bill-list-scroll{scrollbar-gutter:auto;}
+.side-widgets>.bills .bill-row{width:100%;max-width:100%;min-width:0;box-sizing:border-box}
+.side-widgets>.bills .bill-row>div{min-width:0}
+.side-widgets>.bills .bill-row .bill-due{flex-shrink:1;max-width:78px;overflow:hidden;text-overflow:ellipsis}
+.hero-debts{min-width:0;overflow:hidden}
+.hero-debts .debt-person-scroll{min-height:0;clip-path:none;padding-right:0!important;padding-bottom:0}
+.hero-debts .debt-person{width:100%;max-width:100%;min-width:0;box-sizing:border-box;flex:0 0 auto}
+.hero-debts .debt-person>div{flex:1 1 0;min-width:0;overflow:hidden}
+.hero-debts .debt-person .debt-date{flex:0 1 58px;min-width:0;max-width:58px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hero-debts .debt-person .due{flex:0 1 auto;min-width:0;max-width:76px;overflow:hidden;text-overflow:ellipsis}

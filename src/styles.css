@@ -5437,3 +5437,23 @@ input,button,select,textarea{
  .feature-page.debt-redesign:not(.bill-debt-layout) .debt-table th,
  .feature-page.debt-redesign:not(.bill-debt-layout) .debt-table td{padding-left:6px;padding-right:6px}
 }
+
+
+/* Savings goal modal: installment inputs and live maturity calculation */
+.goal-heading-actions{display:flex;justify-content:flex-end;margin:0 0 16px}
+.goal-modal-shade{z-index:1200}
+.goal-savings-modal{width:min(760px,calc(100vw - 32px));max-width:760px;max-height:calc(100vh - 36px);overflow-y:auto}
+.goal-savings-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.goal-savings-form>label{display:flex;flex-direction:column;gap:7px;min-width:0;font-size:12px;color:var(--muted);font-weight:600}
+.goal-savings-form input,.goal-savings-form textarea{width:100%;min-width:0;box-sizing:border-box}
+.goal-savings-form textarea{resize:vertical;min-height:66px;border:1px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text);padding:10px 12px;font:inherit;font-weight:400}
+.goal-savings-form .goal-note-field,.goal-savings-form .goal-calculation-preview,.goal-savings-form .modal-actions{grid-column:1/-1}
+.goal-calculation-preview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:14px;border:1px solid color-mix(in srgb,var(--primary) 20%,var(--border));background:color-mix(in srgb,var(--primary) 5%,var(--surface));border-radius:12px}
+.goal-calculation-preview>div{display:flex;flex-direction:column;gap:6px;min-width:0}
+.goal-calculation-preview small{font-size:11px;color:var(--muted)}
+.goal-calculation-preview strong{font-size:14px;color:var(--text);overflow-wrap:anywhere}
+@media(max-width:600px){
+ .goal-savings-form{grid-template-columns:minmax(0,1fr)}
+ .goal-savings-form .goal-note-field,.goal-savings-form .goal-calculation-preview,.goal-savings-form .modal-actions{grid-column:1}
+ .goal-calculation-preview{grid-template-columns:repeat(2,minmax(0,1fr))}
+}

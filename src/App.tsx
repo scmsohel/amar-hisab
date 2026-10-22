@@ -31,7 +31,7 @@ const dhakaDateTime=()=>{const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"
 const isValidDateInput=(value:string)=>{if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;const [year,month,day]=value.split("-").map(Number);const date=new Date(Date.UTC(year,month-1,day));return date.getUTCFullYear()===year&&date.getUTCMonth()===month-1&&date.getUTCDate()===day;};
 const displayDate=(value:string)=>{if(!isValidDateInput(value))return "—";return new Intl.DateTimeFormat("bn-BD",{day:"2-digit",month:"short",year:"numeric",timeZone:"Asia/Dhaka"}).format(new Date(value+"T00:00:00+06:00"));};
 const displayTime=(value:string)=>{const [hour,minute]=value.split(":").map(Number);const d=new Date(0);d.setUTCHours(hour,minute,0,0);return new Intl.DateTimeFormat("bn-BD",{hour:"2-digit",minute:"2-digit",hour12:true,timeZone:"UTC"}).format(d);};
-const nav: [string, LucideIcon][]=[["ড্যাশবোর্ড",Home],["লেনদেন",ArrowLeftRight],["দেনা-পাওনা",HandCoins],["বিল",ReceiptText],["ওয়ালেট",Wallet],["ক্যাটাগরি",LayoutGrid],["সঞ্চয়",PiggyBank],["সেটিংস",Settings]];
+const nav: [string, LucideIcon][]=[["ড্যাশবোর্ড",Home],["লেনদেন",ArrowLeftRight],["দেনা-পাওনা",HandCoins],["বিল",ReceiptText],["ওয়ালেট",Wallet],["ক্যাটাগরি",LayoutGrid],["সঞ্চয়",Coins],["সেটিংস",Settings]];
 const quickActions: [string,string,LucideIcon,string][]=[["আয় যোগ করুন","নতুন আয় রেকর্ড",ArrowDownLeft,"income"],["ব্যয় যোগ করুন","খরচের হিসাব রাখুন",ArrowUpRight,"expense"],["টাকা ট্রান্সফার","এক Wallet থেকে অন্যটিতে",ArrowLeftRight,"transfer"]];
 
 export default function App(){

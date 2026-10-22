@@ -4874,3 +4874,41 @@ input,button,select,textarea{
 .hero-debts .debt-person>div{flex:1 1 0;min-width:0;overflow:hidden}
 .hero-debts .debt-person .debt-date{flex:0 1 58px;min-width:0;max-width:58px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hero-debts .debt-person .due{flex:0 1 auto;min-width:0;max-width:76px;overflow:hidden;text-overflow:ellipsis}
+
+
+/* True overlay scrollbar: independent of the list layout and clipped to its card */
+.bill-list-scroll,
+.debt-person-scroll{
+  scrollbar-width:none!important;
+  -ms-overflow-style:none;
+}
+.bill-list-scroll::-webkit-scrollbar,
+.debt-person-scroll::-webkit-scrollbar{display:none!important;width:0!important;height:0!important}
+.dashboard-overlay-scrollbar{
+  position:fixed;
+  z-index:120;
+  display:none;
+  width:7px;
+  border-radius:999px;
+  background:rgba(255,255,255,.38);
+  box-shadow:0 0 1px rgba(80,100,115,.16);
+  cursor:pointer;
+  touch-action:none;
+  user-select:none;
+}
+.dashboard-overlay-scrollbar-thumb{
+  position:absolute;
+  inset:0 1px auto;
+  width:5px;
+  min-height:22px;
+  border-radius:999px;
+  background:rgba(120,140,155,.72);
+  border:1px solid rgba(255,255,255,.58);
+  background-clip:padding-box;
+  cursor:grab;
+  touch-action:none;
+}
+.dashboard-scrollbar-dragging,
+.dashboard-scrollbar-dragging *{cursor:grabbing!important;user-select:none!important}
+.dark .dashboard-overlay-scrollbar{background:rgba(40,60,72,.42)}
+.dark .dashboard-overlay-scrollbar-thumb{background:rgba(150,174,187,.72);border-color:rgba(23,38,48,.65)}

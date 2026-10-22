@@ -5394,3 +5394,46 @@ input,button,select,textarea{
  .goal-workspace .goal-table{min-width:620px}
  .goal-workspace .goal-table th,.goal-workspace .goal-table td{padding-left:7px;padding-right:7px}
 }
+
+
+/* Compact the debt/receivables table: less cell padding and less excess width */
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table{
+  min-width:1120px;
+  table-layout:fixed;
+  width:100%;
+}
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table th,
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table td{
+  padding-left:8px;
+  padding-right:8px;
+  box-sizing:border-box;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table th:nth-child(1),
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table td:nth-child(1){width:12%}
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table th:nth-child(2),
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table td:nth-child(2){width:9%}
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table th:nth-child(3),
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table td:nth-child(3){width:8%}
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table th:nth-child(4),
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table td:nth-child(4){width:11%}
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table th:nth-child(5),
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table td:nth-child(5){width:6%}
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table th:nth-child(6),
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table td:nth-child(6){width:9%}
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table th:nth-child(7),
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table td:nth-child(7){width:9%}
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table th:nth-child(8),
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table td:nth-child(8){width:7%}
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table th:nth-child(9),
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table td:nth-child(9){width:10%}
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table th:nth-child(10),
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table td:nth-child(10){width:10%}
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table th:nth-child(11),
+.feature-page.debt-redesign:not(.bill-debt-layout) .debt-table td:nth-child(11){width:9%}
+@media(max-width:760px){
+ .feature-page.debt-redesign:not(.bill-debt-layout) .debt-table{min-width:1120px}
+ .feature-page.debt-redesign:not(.bill-debt-layout) .debt-table th,
+ .feature-page.debt-redesign:not(.bill-debt-layout) .debt-table td{padding-left:6px;padding-right:6px}
+}

@@ -5165,3 +5165,30 @@ input,button,select,textarea{
     padding:15px!important;
   }
 }
+
+
+/* Reminder panel: fixed compact height with an internal scrollbar; show about four reminders */
+.sidebar .bill-reminder-popover{
+  height:410px!important;
+  max-height:calc(100dvh - 24px)!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  display:block!important;
+  scrollbar-width:thin;
+  scrollbar-color:rgba(120,140,155,.55) transparent;
+  overscroll-behavior:contain;
+}
+.sidebar .bill-reminder-popover::-webkit-scrollbar{width:6px}
+.sidebar .bill-reminder-popover::-webkit-scrollbar-thumb{background:rgba(120,140,155,.55);border-radius:8px}
+.sidebar .bill-reminder-popover .bill-reminder-popover-head{
+  position:sticky;top:-18px;z-index:2;
+  background:var(--surface);
+  margin:-2px 0 0;
+}
+.sidebar .bill-reminder-popover .bill-reminder-view-all{display:none!important}
+@media(max-width:700px){
+  .sidebar .bill-reminder-popover{
+    top:12px!important;bottom:72px!important;height:auto!important;
+    max-height:none!important;overflow-y:auto!important;
+  }
+}

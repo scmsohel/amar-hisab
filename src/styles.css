@@ -663,7 +663,14 @@
 .sidebar-notification>span{flex:1}
 .sidebar-notification i{font:600 9px Inter,sans-serif;font-style:normal;background:#ffe8e7;color:#dc5d5d;border-radius:6px;padding:3px 5px}
 .sidebar-notification:hover{background:var(--surface2);color:var(--text)}
-.sidebar-profile{display:flex;align-items:center;gap:9px;padding:9px 5px 2px;border-top:1px solid var(--border);min-width:0}
+.sidebar-profile{display:flex;align-items:center;gap:9px;padding:9px 5px 2px;border:0;border-top:1px solid var(--border);border-radius:0;background:transparent;box-shadow:none;outline:none;min-width:0;width:100%;text-align:left;cursor:pointer;appearance:none;-webkit-appearance:none;transition:background .18s ease,color .18s ease}
+.sidebar-profile:hover{background:var(--surface2);border-color:var(--border);box-shadow:none}
+.sidebar-profile:focus{outline:none;box-shadow:none}
+.sidebar-profile:focus-visible{outline:2px solid var(--accent,#10a875);outline-offset:-2px;border-radius:9px}
+.sidebar.collapsed .side-bottom .sidebar-profile{width:42px;min-width:42px;height:42px;min-height:42px;padding:0;margin:8px auto 0;border:0;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:0 0 42px;box-sizing:border-box}
+.sidebar.collapsed .side-bottom .sidebar-profile:hover{background:var(--surface2)}
+.sidebar.collapsed .side-bottom .sidebar-profile .avatar{width:32px;height:32px;flex:0 0 32px;margin:0}
+
 .sidebar-profile .avatar{width:32px;height:32px;flex:0 0 32px;font-size:12px}
 .sidebar-profile-copy{min-width:0;display:block;overflow:hidden;white-space:nowrap}
 .sidebar-profile-copy b,.sidebar-profile-copy small{display:block;overflow:hidden;text-overflow:ellipsis}

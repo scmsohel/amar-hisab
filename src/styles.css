@@ -5380,3 +5380,17 @@ input,button,select,textarea{
  .goal-toolbar{flex-wrap:wrap}
  .goal-toolbar .debt-search{max-width:none;flex-basis:100%}
 }
+
+
+/* Tighten savings-goal table columns and reduce excess horizontal space */
+.goal-workspace .goal-table{min-width:620px}
+.goal-workspace .goal-table th,.goal-workspace .goal-table td{padding-left:8px;padding-right:8px}
+.goal-workspace .goal-table th:nth-child(1),.goal-workspace .goal-table td:nth-child(1){width:27%}
+.goal-workspace .goal-table th:nth-child(2),.goal-workspace .goal-table td:nth-child(2){width:16%}
+.goal-workspace .goal-table th:nth-child(3),.goal-workspace .goal-table td:nth-child(3){width:27%}
+.goal-workspace .goal-table th:nth-child(4),.goal-workspace .goal-table td:nth-child(4){width:16%}
+.goal-workspace .goal-table th:nth-child(5),.goal-workspace .goal-table td:nth-child(5){width:14%}
+@media(max-width:760px){
+ .goal-workspace .goal-table{min-width:620px}
+ .goal-workspace .goal-table th,.goal-workspace .goal-table td{padding-left:7px;padding-right:7px}
+}

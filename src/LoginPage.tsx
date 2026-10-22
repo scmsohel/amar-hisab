@@ -24,8 +24,8 @@ export default function LoginPage() {
       return;
     }
     const value = identity.trim();
-    const validEmail = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value);
-    const mobileDigits = value.replace(/\\D/g, "");
+    const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+    const mobileDigits = value.replace(/\D/g, "");
     if (value.includes("@") ? !validEmail : mobileDigits.length < 10 || mobileDigits.length > 15) {
       setError("সঠিক Email address অথবা ১০–১৫ সংখ্যার Mobile নম্বর দিন।");
       return;
@@ -100,7 +100,7 @@ export default function LoginPage() {
                   <p><strong>{identity}</strong>-এ OTP পাঠানোর ধাপটি preview হিসেবে দেখানো হচ্ছে। বাস্তবে OTP পাঠাতে backend ও email service যুক্ত করতে হবে।</p>
                   <form className="login-fields login-otp-form" onSubmit={submitOtp}>
                     <label className="signup-field">৬ সংখ্যার OTP
-                      <span className="signup-input"><LockKeyhole size={18}/><input inputMode="numeric" autoComplete="one-time-code" aria-label="৬ সংখ্যার OTP" value={otp} onChange={e=>setOtp(e.target.value.replace(/\\D/g,"").slice(0,6))} placeholder="123456" maxLength={6}/></span>
+                      <span className="signup-input"><LockKeyhole size={18}/><input inputMode="numeric" autoComplete="one-time-code" aria-label="৬ সংখ্যার OTP" value={otp} onChange={e=>setOtp(e.target.value.replace(/\D/g,"").slice(0,6))} placeholder="123456" maxLength={6}/></span>
                     </label>
                     {error && <motion.p className="signup-error" initial={{opacity:0,y:-4}} animate={{opacity:1,y:0}}>{error}</motion.p>}
                     <button className="signup-primary login-main-button" type="submit">OTP যাচাই করুন <ArrowRight size={17}/></button>

@@ -5192,3 +5192,40 @@ input,button,select,textarea{
     max-height:none!important;overflow-y:auto!important;
   }
 }
+
+
+/* Make the reminder count clearly visible on the collapsed sidebar bell */
+@media(min-width:701px){
+  .sidebar.collapsed .side-bottom .sidebar-notification-wrap{
+    width:42px;
+    min-width:42px;
+    align-self:center;
+    overflow:visible;
+  }
+  .sidebar.collapsed .side-bottom .sidebar-notification-wrap>.sidebar-notification{
+    width:42px!important;
+    min-width:42px!important;
+    height:42px;
+    position:relative;
+    overflow:visible!important;
+  }
+  .sidebar.collapsed .side-bottom .sidebar-notification-wrap>.sidebar-notification i{
+    display:flex!important;
+    align-items:center;
+    justify-content:center;
+    position:absolute!important;
+    top:-5px!important;
+    right:-5px!important;
+    transform:none!important;
+    min-width:18px;
+    height:18px;
+    padding:0 4px!important;
+    box-sizing:border-box;
+    border:2px solid var(--surface);
+    border-radius:999px!important;
+    background:#ef4444!important;
+    color:#fff!important;
+    font:700 10px/1 Inter,sans-serif!important;
+    z-index:20;
+  }
+}

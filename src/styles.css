@@ -5229,3 +5229,32 @@ input,button,select,textarea{
     z-index:20;
   }
 }
+
+
+/* Slightly smaller reminder badge, tucked closer to the bell and centered */
+@media(min-width:701px){
+  .sidebar.collapsed .side-bottom .sidebar-notification-wrap{
+    width:42px!important;
+    min-width:42px!important;
+    display:flex;
+    justify-content:center;
+    margin-inline:auto;
+  }
+  .sidebar.collapsed .side-bottom .sidebar-notification-wrap>.sidebar-notification{
+    width:42px!important;
+    min-width:42px!important;
+    margin:0 auto!important;
+    padding:0!important;
+    justify-content:center!important;
+  }
+  .sidebar.collapsed .side-bottom .sidebar-notification-wrap>.sidebar-notification i{
+    top:2px!important;
+    right:6px!important;
+    min-width:14px!important;
+    width:14px!important;
+    height:14px!important;
+    padding:0!important;
+    border-width:1px!important;
+    font-size:8px!important;
+  }
+}

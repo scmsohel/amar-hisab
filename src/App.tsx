@@ -35,6 +35,66 @@ const nav: [string, LucideIcon][]=[["ড্যাশবোর্ড",Home],["ল
 const quickActions: [string,string,LucideIcon,string][]=[["আয় যোগ করুন","নতুন আয় রেকর্ড",ArrowDownLeft,"income"],["ব্যয় যোগ করুন","খরচের হিসাব রাখুন",ArrowUpRight,"expense"],["টাকা ট্রান্সফার","এক Wallet থেকে অন্যটিতে",ArrowLeftRight,"transfer"]];
 
 export default function App(){
+useEffect(()=>{
+ const cleanups:(()=>void)[]=[];
+ const selectors=[".bill-list-scroll",".debt-person-scroll"];
+ const setups=()=>{
+  document.querySelectorAll<HTMLElement>(selectors.join(",")).forEach(scroll=>{
+   if(scroll.dataset.overlayScrollbarReady==="true")return;
+   scroll.dataset.overlayScrollbarReady="true";
+   const card=scroll.closest<HTMLElement>(".bills,.hero-debts")||scroll.parentElement;
+   if(!card)return;
+   const track=document.createElement("div");
+   const thumb=document.createElement("div");
+   track.className="dashboard-overlay-scrollbar";
+   thumb.className="dashboard-overlay-scrollbar-thumb";
+   track.appendChild(thumb);
+   document.body.appendChild(track);
+   let hovered=false,dragging=false,startY=0,startScroll=0;
+   const update=()=>{
+    const rect=scroll.getBoundingClientRect(),cardRect=card.getBoundingClientRect();
+    const trackHeight=Math.max(0,Math.min(rect.bottom,cardRect.bottom-4)-Math.max(rect.top,cardRect.top+4));
+    const trackTop=Math.max(rect.top,cardRect.top+4);
+    const maxScroll=scroll.scrollHeight-scroll.clientHeight;
+    const visible=maxScroll>1&&trackHeight>16;
+    track.style.display=visible&&(hovered||dragging)?"block":"none";
+    if(!visible)return;
+    track.style.top=trackTop+"px";
+    track.style.left=(Math.min(rect.right,cardRect.right)-10)+"px";
+    track.style.height=trackHeight+"px";
+    const thumbHeight=Math.max(22,trackHeight*scroll.clientHeight/scroll.scrollHeight);
+    thumb.style.height=Math.min(trackHeight,thumbHeight)+"px";
+    thumb.style.transform="translateY("+((trackHeight-thumbHeight)*(scroll.scrollTop/maxScroll))+"px)";
+   };
+   const show=()=>{hovered=true;update()};
+   const hide=()=>{hovered=false;if(!dragging)update()};
+   const onScroll=()=>update();
+   const onMove=(event:PointerEvent)=>{
+    if(!dragging)return;
+    const rect=track.getBoundingClientRect(),travel=Math.max(1,rect.height-thumb.getBoundingClientRect().height);
+    scroll.scrollTop=startScroll+((event.clientY-startY)/travel)*(scroll.scrollHeight-scroll.clientHeight);
+    update();
+   };
+   const onUp=()=>{dragging=false;document.body.classList.remove("dashboard-scrollbar-dragging");update()};
+   const onDown=(event:PointerEvent)=>{
+    event.preventDefault();event.stopPropagation();dragging=true;startY=event.clientY;startScroll=scroll.scrollTop;
+    document.body.classList.add("dashboard-scrollbar-dragging");
+    if(event.target!==thumb){const rect=track.getBoundingClientRect();const th=thumb.getBoundingClientRect().height;scroll.scrollTop=((event.clientY-rect.top-th/2)/Math.max(1,rect.height-th))*(scroll.scrollHeight-scroll.clientHeight);startY=event.clientY;startScroll=scroll.scrollTop;}
+    update();
+   };
+   scroll.addEventListener("mouseenter",show);scroll.addEventListener("mouseleave",hide);card.addEventListener("mouseenter",show);card.addEventListener("mouseleave",hide);
+   scroll.addEventListener("scroll",onScroll,{passive:true});window.addEventListener("resize",update);window.addEventListener("scroll",update,true);
+   track.addEventListener("pointerdown",onDown);thumb.addEventListener("pointerdown",onDown);
+   window.addEventListener("pointermove",onMove);window.addEventListener("pointerup",onUp);
+   const observer=new ResizeObserver(update);observer.observe(scroll);observer.observe(card);update();
+   cleanups.push(()=>{observer.disconnect();scroll.removeEventListener("mouseenter",show);scroll.removeEventListener("mouseleave",hide);card.removeEventListener("mouseenter",show);card.removeEventListener("mouseleave",hide);scroll.removeEventListener("scroll",onScroll);window.removeEventListener("resize",update);window.removeEventListener("scroll",update,true);track.removeEventListener("pointerdown",onDown);thumb.removeEventListener("pointerdown",onDown);window.removeEventListener("pointermove",onMove);window.removeEventListener("pointerup",onUp);track.remove();delete scroll.dataset.overlayScrollbarReady;});
+  });
+ };
+ setups();
+ const observer=new MutationObserver(setups);observer.observe(document.body,{childList:true,subtree:true});
+ return()=>{observer.disconnect();cleanups.forEach(cleanup=>cleanup());document.body.classList.remove("dashboard-scrollbar-dragging");};
+},[]);
+
 const [dashboardBills,setDashboardBills]=useState<FeatureItem[]>(()=>{try{return JSON.parse(localStorage.getItem("amar-hisab-bills-items")||"[]") as FeatureItem[];}catch{return [];}});useEffect(()=>{const syncBills=()=>{try{setDashboardBills(JSON.parse(localStorage.getItem("amar-hisab-bills-items")||"[]") as FeatureItem[]);}catch{setDashboardBills([]);}};window.addEventListener("amar-hisab-bills-updated",syncBills);window.addEventListener("storage",syncBills);return()=>{window.removeEventListener("amar-hisab-bills-updated",syncBills);window.removeEventListener("storage",syncBills);};},[]);
 const [clockNow,setClockNow]=useState(()=>new Date());const walletStripDrag=useRef<{startX:number;scrollLeft:number;dragging:boolean}>({startX:0,scrollLeft:0,dragging:false});const [availableWalletNames,setAvailableWalletNames]=useState<string[]>(()=>{try{return ["ক্যাশ","ব্যাংক","বিকাশ","নগদ",...(JSON.parse(localStorage.getItem("amar-hisab-custom-wallets")||"[]") as Array<{name:string}>).map(w=>w.name)];}catch{return ["ক্যাশ","ব্যাংক","বিকাশ","নগদ"];}});useEffect(()=>{const syncWallets=(event:Event)=>{try{setAvailableWalletNames((event as CustomEvent<string[]>).detail||["ক্যাশ","ব্যাংক","বিকাশ","নগদ"]);}catch{}};window.addEventListener("amar-hisab-wallets-updated",syncWallets);return()=>window.removeEventListener("amar-hisab-wallets-updated",syncWallets);},[]);
 const [sharedDebts,setSharedDebts]=useState<FeatureItem[]>(()=>{try{return (JSON.parse(localStorage.getItem("amar-hisab-debts-items")||"[]") as FeatureItem[]).map(item=>({...item,payments:item.payments?.map(payment=>({...payment,wallet:walletLabel(payment.wallet)}))}));}catch{return [];}});

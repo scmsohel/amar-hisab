@@ -226,6 +226,60 @@ app.put("/data/:collection", asyncRoute(async (req, res) => {
   res.json({ ok: true, collection, updatedAt: result.rows[0].updated_at });
 }));
 
+app.post("/data/restore", asyncRoute(async (req, res) => {
+  const user = await requireUser(req, res);
+  if (!user) return;
+  const data = req.body?.data;
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    return res.status(400).json({ error: "Backup data-এর format সঠিক নয়।" });
+  }
+  const supplied = Object.keys(data);
+  if (supplied.length !== financeCollections.size || supplied.some((key) => !financeCollections.has(key))) {
+    return res.status(400).json({ error: "Backup-এ প্রয়োজনীয় collection তালিকা সঠিক নয়।" });
+  }
+  const entries = [];
+  let totalBytes = 0;
+  for (const collection of financeCollections) {
+    if (!Object.prototype.hasOwnProperty.call(data, collection)) {
+      return res.status(400).json({ error: collection + " collection backup-এ নেই।" });
+    }
+    const payload = data[collection];
+    if (payload !== null && !Array.isArray(payload) && typeof payload !== "object") {
+      return res.status(400).json({ error: collection + " collection-এর format সঠিক নয়।" });
+    }
+    const encoded = JSON.stringify(payload);
+    const bytes = Buffer.byteLength(encoded, "utf8");
+    if (bytes > 2 * 1024 * 1024) {
+      return res.status(413).json({ error: collection + " collection ২ MB সীমা ছাড়িয়েছে।" });
+    }
+    totalBytes += bytes;
+    entries.push([collection, encoded]);
+  }
+  if (totalBytes > 8 * 1024 * 1024) {
+    return res.status(413).json({ error: "সম্পূর্ণ backup সর্বোচ্চ ৮ MB হতে পারবে।" });
+  }
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    for (const [collection, encoded] of entries) {
+      await client.query(
+        `INSERT INTO user_finance_data(user_id, collection, payload, updated_at)
+         VALUES($1,$2,$3::jsonb,NOW())
+         ON CONFLICT(user_id, collection) DO UPDATE SET payload=EXCLUDED.payload, updated_at=NOW()`,
+        [user.id, collection, encoded]
+      );
+    }
+    await client.query("COMMIT");
+    res.set("Cache-Control", "no-store");
+    res.json({ ok: true, restoredCollections: entries.length });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}));
+
 app.post("/admin/invitations", asyncRoute(async (req, res) => {
   const session = readSession(req);
   const isAdmin = session?.role === "admin";

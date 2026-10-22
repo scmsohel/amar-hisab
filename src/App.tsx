@@ -181,7 +181,7 @@ return <div className={dark?"app dark":"app"}><AnimatePresence>{mobile&&<motion.
         const days = daysUntil(item.date) ?? 0;
         const dueText = days < 0 ? Math.abs(days).toLocaleString("bn-BD") + " দিন পেরিয়েছে" : days === 0 ? "আজ" : days.toLocaleString("bn-BD") + " দিন বাকি";
         const progress = days < 0 ? 100 : Math.max(12, Math.min(100, (8 - days) * 12.5));
-        return <button type="button" className="bill-reminder-item" key={"bill-" + item.id} onClick={() => { setActive("বিল"); setMobile(false); setBillReminderPanelOpen(false); }}>
+        return <button type="button" className="bill-reminder-item bill-reminder-bill" key={"bill-" + item.id} onClick={() => { setActive("বিল"); setMobile(false); setBillReminderPanelOpen(false); }}>
           <span className="bill-reminder-item-copy"><b>{item.title}</b><small>{displayDate(item.date)}</small></span>
           <span className="bill-reminder-item-due">{dueText}</span>
           <span className={"bill-reminder-progress" + (days <= 1 ? " urgent" : "")}><i style={{ width: progress + "%" }} /></span>
@@ -192,7 +192,7 @@ return <div className={dark?"app dark":"app"}><AnimatePresence>{mobile&&<motion.
         const days = daysUntil(item.date) ?? 0;
         const dueText = days < 0 ? Math.abs(days).toLocaleString("bn-BD") + " দিন পেরিয়েছে" : days === 0 ? "আজ" : days.toLocaleString("bn-BD") + " দিন বাকি";
         const progress = days < 0 ? 100 : Math.max(12, Math.min(100, (8 - days) * 12.5));
-        return <button type="button" className="bill-reminder-item" key={"debt-" + item.id} onClick={() => { setActive("দেনা-পাওনা"); setMobile(false); setBillReminderPanelOpen(false); }}>
+        return <button type="button" className="bill-reminder-item bill-reminder-debt" key={"debt-" + item.id} onClick={() => { setActive("দেনা-পাওনা"); setMobile(false); setBillReminderPanelOpen(false); }}>
           <span className="bill-reminder-item-copy"><b>{item.title}</b><small>{(item.debtKind || item.status) === "দেনা" ? "দেনা" : "পাওনা"} · {displayDate(item.date)}</small></span>
           <span className="bill-reminder-item-due">{dueText}</span>
           <span className={"bill-reminder-progress" + (days <= 1 ? " urgent" : "")}><i style={{ width: progress + "%" }} /></span>

@@ -5854,7 +5854,7 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
  .dashboard-top>.side-widgets{grid-template-columns:minmax(0,1fr)}
 }
 
-/* Fix dashboard wallet grid overlap: keep all four default wallets inside their panel. */
+/* Keep the four default wallet cards in one horizontal row without overlap. */
 .dashboard-main .wallet-panel{
   height:auto!important;
   min-height:0!important;
@@ -5863,7 +5863,7 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
 }
 .dashboard-main .wallet-panel .wallets{
   display:grid!important;
-  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
   grid-auto-rows:minmax(58px,auto);
   gap:8px!important;
   height:auto!important;
@@ -5876,4 +5876,8 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
   width:100%!important;
   min-width:0!important;
   max-width:100%!important;
+}
+@media(max-width:700px){
+  .dashboard-main .wallet-panel .wallets{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important}
+  .dashboard-main .wallet-panel .wallets>.wallet-box{padding:8px 5px!important}
 }

@@ -5268,10 +5268,10 @@ input,button,select,textarea{
   }
 }
 .sidebar-notification-wrap:has(>.sidebar-notification i)>.sidebar-notification{
-  color:#0a9b6b!important;
+  color:#ef4444!important;
 }
 .sidebar-notification-wrap:has(>.sidebar-notification i)>.sidebar-notification svg{
-  color:#0a9b6b!important;
+  color:#ef4444!important;
   transform-origin:50% 12%;
   animation:reminder-bell-ring 6s ease-in-out infinite;
 }

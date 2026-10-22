@@ -115,6 +115,31 @@ app.get("/auth/me", asyncRoute(async (req, res) => {
   if (!result.rowCount) return res.status(401).json({ error: "অ্যাকাউন্ট পাওয়া যায়নি।" });
   res.json({ user: cleanUser(result.rows[0]) });
 }));
+app.put("/auth/profile", asyncRoute(async (req, res) => {
+  const session = readSession(req);
+  if (!session) return res.status(401).json({ error: "লগইন প্রয়োজন।" });
+  const name = String(req.body?.name || "").trim();
+  const mobile = String(req.body?.mobile || "").trim();
+  if (name.length < 2 || name.length > 100 || mobile.length > 30) {
+    return res.status(400).json({ error: "নাম কমপক্ষে ২ অক্ষরের হতে হবে এবং মোবাইল নম্বর সঠিক দিন।" });
+  }
+  const result = await pool.query("UPDATE app_users SET name=$1,mobile=$2 WHERE id=$3 RETURNING id,name,email,mobile,role", [name, mobile, session.id]);
+  if (!result.rowCount) return res.status(404).json({ error: "অ্যাকাউন্ট পাওয়া যায়নি।" });
+  res.json({ user: cleanUser(result.rows[0]) });
+}));
+app.post("/auth/password", asyncRoute(async (req, res) => {
+  const session = readSession(req);
+  if (!session) return res.status(401).json({ error: "লগইন প্রয়োজন।" });
+  const currentPassword = String(req.body?.currentPassword || "");
+  const newPassword = String(req.body?.newPassword || "");
+  if (newPassword.length < 12) return res.status(400).json({ error: "নতুন পাসওয়ার্ড কমপক্ষে ১২ অক্ষরের হতে হবে।" });
+  const found = await pool.query("SELECT password_hash FROM app_users WHERE id=$1", [session.id]);
+  if (!found.rowCount || !(await verifyPassword(currentPassword, found.rows[0].password_hash))) {
+    return res.status(400).json({ error: "বর্তমান পাসওয়ার্ড সঠিক নয়।" });
+  }
+  await pool.query("UPDATE app_users SET password_hash=$1 WHERE id=$2", [await hashPassword(newPassword), session.id]);
+  res.json({ ok: true });
+}));
 app.post("/auth/logout", (_req, res) => {
   res.clearCookie(cookieName, { httpOnly: true, secure: cookieSecure, sameSite: "lax", path: "/" });
   res.json({ ok: true });

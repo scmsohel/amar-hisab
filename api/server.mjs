@@ -22,7 +22,7 @@ if (adminPassword && adminPassword.length < 12) {
 }
 app.disable("x-powered-by");
 app.set("trust proxy", 1);
-app.use(express.json({ limit: "32kb" }));
+app.use(express.json({ limit: "10mb" }));
 
 const cookieName = "amar_hisab_session";
 const sign = (value) => createHmac("sha256", sessionSecret).update(value).digest("base64url");

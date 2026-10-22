@@ -109,6 +109,7 @@ export default function LoginPage() {
                 </>
               )}
             </motion.div>
+          ) : (
             <motion.div key={recovery?"recovery":"login"} className="signup-card login-card" initial={{opacity:0,x:16}} animate={{opacity:1,x:0}} exit={{opacity:0,x:-12}} transition={{duration:.22,ease:"easeOut"}}>
               <div className="signup-card-brand"><span className="signup-card-logo"><WalletCards size={24}/><Leaf size={12}/></span><strong>Amar <em>Hisab</em></strong></div>
               <h2>{recovery ? "Password reset করুন" : "আবার স্বাগতম!"}</h2>

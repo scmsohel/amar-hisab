@@ -36,8 +36,8 @@ const nav: [string, LucideIcon][]=[["ড্যাশবোর্ড",Home],["ল
 const quickActions: [string,string,LucideIcon,string][]=[["আয় যোগ করুন","নতুন আয় রেকর্ড",ArrowDownLeft,"income"],["ব্যয় যোগ করুন","খরচের হিসাব রাখুন",ArrowUpRight,"expense"],["টাকা ট্রান্সফার","এক Wallet থেকে অন্যটিতে",ArrowLeftRight,"transfer"]];
 
 export default function App(){
-const [currentUserRole,setCurrentUserRole]=useState("");const [profileUser,setProfileUser]=useState<{name?:string;email?:string;mobile?:string;role?:string}|null>(null);const [logoutLoading,setLogoutLoading]=useState(false);
-const backupFileInput=useRef<HTMLInputElement|null>(null);const [backupRestoreLoading,setBackupRestoreLoading]=useState(false);
+const [currentUserRole,setCurrentUserRole]=useState("");const [profileUser,setProfileUser]=useState<{name?:string;email?:string;mobile?:string;role?:string}|null>(null);const [logoutLoading,setLogoutLoading]=useState(false);const backupFileInput=useRef<HTMLInputElement|null>(null);const [backupRestoreLoading,setBackupRestoreLoading]=useState(false);
+
 const [inviteCode,setInviteCode]=useState("");
 const [inviteExpiry,setInviteExpiry]=useState("");
 const [inviteLoading,setInviteLoading]=useState(false);

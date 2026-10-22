@@ -5823,3 +5823,33 @@ input,button,select,textarea{
     box-shadow:none!important;flex:0 0 32px!important;
   }
 }
+
+/* Demo dashboard: prevent horizontal overflow and keep every panel inside the viewport. */
+html,body,#root,.app{max-width:100%;overflow-x:clip}
+.main,.content,.dashboard-top,.dashboard-main,.hero-grid,.wallet-panel,.stats,.charts,.bottom{min-width:0;max-width:100%}
+.dashboard-top{grid-template-columns:minmax(0,2fr) minmax(260px,1fr)!important}
+.dashboard-main{min-width:0!important}
+.dashboard-main .hero-grid{grid-template-columns:minmax(0,.92fr) minmax(0,1.32fr)!important;min-width:0}
+.dashboard-main .balance,.dashboard-main .wallet-panel{min-width:0;max-width:100%}
+.dashboard-main .wallet-panel .wallets{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;overflow-x:hidden!important;overflow-y:auto!important;min-width:0}
+.dashboard-main .wallet-panel .wallet-box{min-width:0!important;max-width:100%;overflow:hidden}
+.dashboard-main .wallet-panel .wallet-box div{min-width:0;overflow:hidden}
+.dashboard-main .wallet-panel .wallet-box strong{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.stats{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+.stats>*{min-width:0;max-width:100%;overflow:hidden}
+@media(max-width:1100px){
+ .dashboard-top{grid-template-columns:minmax(0,1fr)!important}
+ .dashboard-top>.side-widgets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));min-width:0}
+ .dashboard-main .hero-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .dashboard-main .wallet-panel .wallets{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .charts,.bottom{grid-template-columns:minmax(0,1fr)!important}
+}
+@media(max-width:700px){
+ .dashboard-top{grid-template-columns:minmax(0,1fr)!important}
+ .dashboard-main .hero-grid{grid-template-columns:minmax(0,1fr)!important}
+ .dashboard-main .balance,.dashboard-main .wallet-panel{height:auto;min-height:0}
+ .dashboard-main .wallet-panel .wallets{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .dashboard-top>.side-widgets{grid-template-columns:minmax(0,1fr)}
+}

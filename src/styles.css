@@ -5592,3 +5592,14 @@ input,button,select,textarea{
   border-color:#2f8e6a;
   color:#8be0bd;
 }
+
+
+/* Compact dashboard upcoming-savings rows */
+.upcoming-saving-row{padding:0 0 9px;margin:0 0 2px;border-bottom:1px solid var(--border);cursor:pointer}
+.upcoming-saving-row:last-child{border-bottom:0;margin-bottom:0}
+.upcoming-saving-row .bill-row{border-bottom:0;margin-bottom:0}
+.upcoming-saving-title{min-width:0;display:flex;flex-direction:column;gap:2px}
+.upcoming-saving-title b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.upcoming-saving-title small{font-size:11px;color:var(--muted)}
+.upcoming-saving-progress{height:4px;border-radius:99px;background:var(--border);overflow:hidden;margin:0 8px 0 49px}
+.upcoming-saving-progress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#10b981,#34d399);transition:width .35s ease}

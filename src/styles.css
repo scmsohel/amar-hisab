@@ -5319,3 +5319,40 @@ input,button,select,textarea{
 .sidebar:not(.collapsed) .sidebar-notification-wrap>.sidebar-notification span{
   font-size:13.5px;
 }
+
+
+/* Bills page: make amounts easier to read and keep table columns compact */
+.bill-debt-workspace .bill-matched-table{
+  min-width:1180px;
+}
+.bill-debt-workspace .bill-matched-table th,
+.bill-debt-workspace .bill-matched-table td{
+  padding-left:10px;
+  padding-right:10px;
+}
+.bill-debt-workspace .bill-matched-table th:nth-child(1),
+.bill-debt-workspace .bill-matched-table td:nth-child(1){width:170px}
+.bill-debt-workspace .bill-matched-table th:nth-child(2),
+.bill-debt-workspace .bill-matched-table td:nth-child(2){width:105px}
+.bill-debt-workspace .bill-matched-table th:nth-child(3),
+.bill-debt-workspace .bill-matched-table td:nth-child(3){width:110px}
+.bill-debt-workspace .bill-matched-table th:nth-child(4),
+.bill-debt-workspace .bill-matched-table td:nth-child(4){width:115px}
+.bill-debt-workspace .bill-matched-table th:nth-child(5),
+.bill-debt-workspace .bill-matched-table td:nth-child(5){width:120px}
+.bill-debt-workspace .bill-matched-table th:nth-child(6),
+.bill-debt-workspace .bill-matched-table td:nth-child(6){width:75px}
+.bill-debt-workspace .bill-matched-table th:nth-child(7),
+.bill-debt-workspace .bill-matched-table td:nth-child(7){width:145px}
+.bill-debt-workspace .bill-matched-table th:nth-child(8),
+.bill-debt-workspace .bill-matched-table td:nth-child(8){width:145px}
+.bill-debt-workspace .bill-matched-table th:nth-child(9),
+.bill-debt-workspace .bill-matched-table td:nth-child(9){width:95px}
+.bill-debt-workspace .bill-matched-table tbody td:nth-child(4) strong{
+  font-size:14px;
+  font-weight:700;
+}
+@media(max-width:760px){
+  .bill-debt-workspace .bill-matched-table{min-width:1120px}
+  .bill-debt-workspace .bill-matched-table tbody td:nth-child(4) strong{font-size:13px}
+}

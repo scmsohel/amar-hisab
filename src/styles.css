@@ -5508,3 +5508,11 @@ input,button,select,textarea{
 /* Dashboard bill avatars use the same selected icon as the Bill Manager. */
 .side-widgets>.bills .bill-row>.bill-home-avatar{display:flex;align-items:center;justify-content:center;flex-shrink:0;background:#f0eaff;color:#7c3aed;font-size:12px;font-weight:700;line-height:1}
 .side-widgets>.bills .bill-row>.bill-home-avatar svg{display:block;flex-shrink:0}
+
+
+/* Savings page heading and action share one compact row */
+.goal-redesign>.goal-feature-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin:0 0 14px;padding:0 2px 2px;min-height:42px}
+.goal-redesign>.goal-feature-heading h2{font-size:25px;font-weight:800;letter-spacing:-.4px;margin:0 0 4px}
+.goal-redesign>.goal-feature-heading p{font-size:12px;line-height:1.6;color:var(--muted);margin:0}
+.goal-redesign>.goal-feature-heading>.btn{flex:0 0 auto;height:42px;border-radius:10px}
+@media(max-width:760px){.goal-redesign>.goal-feature-heading{align-items:center;gap:10px}.goal-redesign>.goal-feature-heading h2{font-size:21px}.goal-redesign>.goal-feature-heading p{font-size:11px}.goal-redesign>.goal-feature-heading>.btn{height:38px;padding:0 10px;font-size:10px}}

@@ -4819,7 +4819,7 @@ input,button,select,textarea{
 
 
 /* Dashboard bill list: scrollbar overlays the card content edge */
-.bill-list-scroll{scrollbar-width:none;position:relative;width:100%;margin-right:0;padding-right:0!important;box-sizing:border-box;overflow-x:hidden;}
+.bill-list-scroll{scrollbar-width:none;position:relative;width:100%;margin-right:0;padding-right:0!important;box-sizing:border-box;overflow-y:auto;overflow-x:hidden;scrollbar-gutter:auto;}
 .bill-list-scroll::-webkit-scrollbar{width:0;height:0;}
 .bills:hover .bill-list-scroll,.bill-list-scroll:hover{scrollbar-width:thin;scrollbar-color:rgba(120,140,155,.58) rgba(255,255,255,.38);}
 .bills:hover .bill-list-scroll::-webkit-scrollbar,.bill-list-scroll:hover::-webkit-scrollbar{width:7px;}
@@ -4848,3 +4848,7 @@ input,button,select,textarea{
 .side-widgets>.bills .bill-row{width:100%;max-width:100%;min-width:0;box-sizing:border-box;}
 .side-widgets>.bills .bill-row>div{min-width:0;}
 .side-widgets>.bills .bill-row .bill-due{flex-shrink:1;max-width:78px;overflow:hidden;text-overflow:ellipsis;}
+
+/* Overlay the hover scrollbar over bill rows instead of reserving layout space */
+.bill-list-scroll{scrollbar-gutter:stable;}
+.bills:hover .bill-list-scroll{scrollbar-gutter:stable;}

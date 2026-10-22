@@ -5658,3 +5658,22 @@ input,button,select,textarea{
   .bill-reminder-popover .bill-reminder-item{padding:11px 10px!important;column-gap:7px}
   .bill-reminder-popover .bill-reminder-item-due{font-size:10px!important;padding:6px 7px!important}
 }
+
+
+/* Reminder menu filters and page blur overlay */
+.bill-reminder-backdrop{
+  position:fixed;inset:0;z-index:499;
+  background:rgba(15,25,38,.16);
+  -webkit-backdrop-filter:blur(5px) saturate(.82);
+  backdrop-filter:blur(5px) saturate(.82);
+  cursor:default;
+  animation:reminder-backdrop-in .18s ease-out both;
+}
+.sidebar .bill-reminder-popover{z-index:500!important}
+.bill-reminder-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:0 0 13px;padding:4px;border-radius:12px;background:var(--surface2)}
+.bill-reminder-tabs button{display:flex;align-items:center;justify-content:center;gap:5px;min-width:0;padding:8px 5px;border:1px solid transparent;border-radius:9px;background:transparent;color:var(--muted);font-size:11px;font-weight:700;white-space:nowrap;cursor:pointer;transition:background .18s ease,color .18s ease,box-shadow .18s ease}
+.bill-reminder-tabs button i{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;border-radius:6px;background:var(--border);font-style:normal;font-size:10px;color:var(--text)}
+.bill-reminder-tabs button.active{background:var(--surface);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 24%,var(--border));box-shadow:0 2px 7px rgba(15,35,65,.08)}
+.bill-reminder-tabs button.active i{background:var(--accent);color:#fff}
+@keyframes reminder-backdrop-in{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.bill-reminder-backdrop{animation:none}}

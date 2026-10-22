@@ -10,6 +10,8 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [recovery, setRecovery] = useState(false);
   const [sent, setSent] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [otpVerified, setOtpVerified] = useState(false);
   const [identity, setIdentity] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -18,13 +20,20 @@ export default function LoginPage() {
     event.preventDefault();
     setError("");
     if (!identity.trim() || !password) {
-      setError("Email/Mobile এবং Password লিখুন।");
+      setError("Email/Mobile এবং Password—দুটিই লিখুন।");
       return;
     }
-    setError("এটি Login UI preview—বাস্তব authentication এখনো সংযুক্ত করা হয়নি।");
+    const value = identity.trim();
+    const validEmail = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value);
+    const mobileDigits = value.replace(/\\D/g, "");
+    if (value.includes("@") ? !validEmail : mobileDigits.length < 10 || mobileDigits.length > 15) {
+      setError("সঠিক Email address অথবা ১০–১৫ সংখ্যার Mobile নম্বর দিন।");
+      return;
+    }
+    setError("Login যাচাই করার জন্য backend authentication এখনো যুক্ত হয়নি।");
   };
 
-  const submitRecovery = (event: React.FormEvent<HTMLFormElement>) => {
+  const submitRecovery = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identity.trim())) {
@@ -32,6 +41,18 @@ export default function LoginPage() {
       return;
     }
     setSent(true);
+    setOtp("");
+    setOtpVerified(false);
+  };
+
+  const submitOtp = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError("");
+    if (!/^\\d{6}$/.test(otp.trim())) {
+      setError("৬ সংখ্যার OTP লিখুন।");
+      return;
+    }
+    setOtpVerified(true);
   };
 
   return (
@@ -65,12 +86,29 @@ export default function LoginPage() {
         <AnimatePresence mode="wait">
           {sent ? (
             <motion.div key="sent" className="signup-card login-card login-message" initial={{opacity:0,y:14}} animate={{opacity:1,y:0}} exit={{opacity:0,y:-10}}>
-              <span className="login-message-icon"><Mail size={30}/></span>
-              <h2>Email recovery preview</h2>
-              <p>আপনার Email-এ OTP পাঠানোর ধাপটি UI preview-তে দেখানো হয়েছে। বাস্তবে OTP পাঠাতে backend ও email service যুক্ত করতে হবে।</p>
-              <button className="signup-primary login-main-button" onClick={()=>{setSent(false);setRecovery(false);setError("");setIdentity("");}}>Login-এ ফিরে যান <ArrowRight size={17}/></button>
+              {otpVerified ? (
+                <>
+                  <span className="login-message-icon"><LockKeyhole size={30}/></span>
+                  <h2>OTP যাচাইয়ের preview</h2>
+                  <p>OTP format ঠিক আছে। বাস্তবে OTP যাচাই ও নতুন Password সেট করতে backend authentication এবং email service লাগবে।</p>
+                  <button className="signup-primary login-main-button" onClick={()=>{setSent(false);setRecovery(false);setError("");setIdentity("");setPassword("");setOtp("");setOtpVerified(false);}}>Login-এ ফিরে যান <ArrowRight size={17}/></button>
+                </>
+              ) : (
+                <>
+                  <span className="login-message-icon"><Mail size={30}/></span>
+                  <h2>Email OTP যাচাই করুন</h2>
+                  <p><strong>{identity}</strong>-এ OTP পাঠানোর ধাপটি preview হিসেবে দেখানো হচ্ছে। বাস্তবে OTP পাঠাতে backend ও email service যুক্ত করতে হবে।</p>
+                  <form className="login-fields login-otp-form" onSubmit={submitOtp}>
+                    <label className="signup-field">৬ সংখ্যার OTP
+                      <span className="signup-input"><LockKeyhole size={18}/><input inputMode="numeric" autoComplete="one-time-code" aria-label="৬ সংখ্যার OTP" value={otp} onChange={e=>setOtp(e.target.value.replace(/\\D/g,"").slice(0,6))} placeholder="123456" maxLength={6}/></span>
+                    </label>
+                    {error && <motion.p className="signup-error" initial={{opacity:0,y:-4}} animate={{opacity:1,y:0}}>{error}</motion.p>}
+                    <button className="signup-primary login-main-button" type="submit">OTP যাচাই করুন <ArrowRight size={17}/></button>
+                  </form>
+                  <button className="login-back" onClick={()=>{setSent(false);setRecovery(true);setError("");}}>Email পরিবর্তন করুন</button>
+                </>
+              )}
             </motion.div>
-          ) : (
             <motion.div key={recovery?"recovery":"login"} className="signup-card login-card" initial={{opacity:0,x:16}} animate={{opacity:1,x:0}} exit={{opacity:0,x:-12}} transition={{duration:.22,ease:"easeOut"}}>
               <div className="signup-card-brand"><span className="signup-card-logo"><WalletCards size={24}/><Leaf size={12}/></span><strong>Amar <em>Hisab</em></strong></div>
               <h2>{recovery ? "Password reset করুন" : "আবার স্বাগতম!"}</h2>

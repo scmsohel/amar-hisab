@@ -4989,3 +4989,39 @@ input,button,select,textarea{
   .side-widgets>.bills .bill-row strong{font-size:12px!important}
   .side-widgets>.bills .bill-row .bill-due{font-size:9px!important;padding-inline:4px}
 }
+
+
+/* Dashboard debt list: keep date, due badge and every person row inside the card */
+.dashboard-top>.hero-debts{min-width:0;overflow:hidden}
+.dashboard-top>.hero-debts .debt-person-scroll{
+  width:100%;min-width:0;height:112px;max-height:112px;min-height:0;flex:0 0 112px;
+  overflow-x:hidden!important;overflow-y:auto!important;padding:0!important;clip-path:none;overscroll-behavior:contain;
+}
+.dashboard-top>.hero-debts .debt-person{
+  display:grid!important;grid-template-columns:32px minmax(0,1fr) minmax(48px,64px) minmax(58px,76px)!important;
+  align-items:center;gap:6px!important;width:100%;max-width:100%;min-width:0;min-height:54px;box-sizing:border-box;padding:6px 0!important;overflow:hidden;
+}
+.dashboard-top>.hero-debts .debt-person .person-icon{width:32px;height:32px;min-width:32px;flex:0 0 32px}
+.dashboard-top>.hero-debts .debt-person>div{grid-column:2;min-width:0;width:100%;overflow:hidden}
+.dashboard-top>.hero-debts .debt-person b,
+.dashboard-top>.hero-debts .debt-person div small{display:block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dashboard-top>.hero-debts .debt-date{
+  grid-column:3;width:100%;min-width:0;max-width:100%;padding:0!important;text-align:center!important;
+  white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;font-size:10px!important;line-height:1.35;
+}
+.dashboard-top>.hero-debts .debt-person .due{
+  grid-column:4;justify-self:stretch;width:100%;min-width:0;max-width:100%;margin:0!important;padding:6px 4px!important;
+  box-sizing:border-box;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:10px!important;line-height:1.3;
+}
+@media(max-width:1250px){
+  .dashboard-top>.hero-debts .debt-person{grid-template-columns:30px minmax(0,1fr) minmax(54px,72px)!important;gap:6px!important}
+  .dashboard-top>.hero-debts .debt-date{display:none!important}
+  .dashboard-top>.hero-debts .debt-person .due{grid-column:3;font-size:9px!important}
+}
+@media(max-width:700px){
+  .dashboard-top>.hero-debts .debt-person-scroll{height:108px;max-height:108px;flex-basis:108px}
+  .dashboard-top>.hero-debts .debt-person{min-height:52px;grid-template-columns:28px minmax(0,1fr) minmax(52px,68px)!important;gap:5px!important;padding:5px 0!important}
+  .dashboard-top>.hero-debts .debt-person .person-icon{width:28px;height:28px;min-width:28px}
+  .dashboard-top>.hero-debts .debt-person b{font-size:12px!important}
+  .dashboard-top>.hero-debts .debt-person div small{font-size:10px!important}
+}

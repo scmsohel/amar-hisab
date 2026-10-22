@@ -5793,3 +5793,33 @@ input,button,select,textarea{
  .sidebar .bill-reminder-item:before{width:30px!important;height:30px!important}
  .sidebar .bill-reminder-item-due{padding:5px 6px!important;font-size:9px!important}
 }
+
+
+/* Final collapsed-sidebar profile alignment fix */
+@media (min-width:701px){
+  .sidebar.collapsed nav .nav{width:42px!important;min-width:42px!important;height:36px!important;margin-inline:auto!important;justify-content:center!important;padding:0!important;box-sizing:border-box}
+  .sidebar.collapsed nav .nav svg{width:19px!important;height:19px!important;min-width:19px;display:block;flex:0 0 19px}
+  .sidebar.collapsed .side-bottom .sidebar-profile,
+  .sidebar.collapsed .side-bottom button.sidebar-profile{
+    appearance:none!important;-webkit-appearance:none!important;
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    width:42px!important;min-width:42px!important;max-width:42px!important;
+    height:42px!important;min-height:42px!important;max-height:42px!important;
+    padding:0!important;margin:8px auto 0!important;
+    border:0!important;outline:0!important;border-radius:10px!important;
+    background:transparent!important;box-shadow:none!important;
+    flex:0 0 42px!important;box-sizing:border-box!important;
+  }
+  .sidebar.collapsed .side-bottom .sidebar-profile:hover,
+  .sidebar.collapsed .side-bottom button.sidebar-profile:hover{background:var(--surface2)!important}
+  .sidebar.collapsed .side-bottom .sidebar-profile:focus,
+  .sidebar.collapsed .side-bottom button.sidebar-profile:focus{outline:none!important;box-shadow:none!important}
+  .sidebar.collapsed .side-bottom .sidebar-profile:focus-visible,
+  .sidebar.collapsed .side-bottom button.sidebar-profile:focus-visible{outline:2px solid #55cba4!important;outline-offset:1px!important}
+  .sidebar.collapsed .side-bottom .sidebar-profile .avatar{
+    display:grid!important;place-items:center!important;
+    width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;
+    padding:0!important;margin:0!important;border:0!important;border-radius:50%!important;
+    box-shadow:none!important;flex:0 0 32px!important;
+  }
+}

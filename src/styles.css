@@ -5102,3 +5102,6 @@ input,button,select,textarea{
 @media(max-width:700px){
  .bill-reminder-popover{position:fixed;left:76px;right:10px;bottom:80px;width:auto;max-width:none}
 }
+
+
+.reminder-group-title{padding:9px 3px 4px;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.02em}

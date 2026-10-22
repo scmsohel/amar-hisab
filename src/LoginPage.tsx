@@ -1,4 +1,5 @@
 import { useState } from "react";
+import type { FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Eye, EyeOff, Leaf, LockKeyhole, Mail, Moon, Smartphone, Sun, WalletCards } from "lucide-react";
 import "./signup.css";
@@ -13,7 +14,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const submitLogin = (event: React.FormEvent<HTMLFormElement>) => {
+  const submitLogin = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
     if (!identity.trim() || !password) {

@@ -5299,3 +5299,23 @@ input,button,select,textarea{
   color:var(--text-muted,var(--muted,#111827))!important;
   animation:none!important;
 }
+
+
+/* Improve readability of expanded sidebar labels and their live reminder badges */
+.sidebar:not(.collapsed) .nav{
+  font-size:14.5px;
+  gap:13px;
+}
+.sidebar:not(.collapsed) .nav span{
+  font-size:14.5px;
+  line-height:1.35;
+}
+.sidebar:not(.collapsed) .nav i{
+  font-size:11px;
+  min-width:18px;
+  text-align:center;
+  padding:3px 6px;
+}
+.sidebar:not(.collapsed) .sidebar-notification-wrap>.sidebar-notification span{
+  font-size:13.5px;
+}

@@ -4850,5 +4850,5 @@ input,button,select,textarea{
 .side-widgets>.bills .bill-row .bill-due{flex-shrink:1;max-width:78px;overflow:hidden;text-overflow:ellipsis;}
 
 /* Overlay the hover scrollbar over bill rows instead of reserving layout space */
-.bill-list-scroll{scrollbar-gutter:stable;}
-.bills:hover .bill-list-scroll{scrollbar-gutter:stable;}
+.bill-list-scroll{width:calc(100% + 7px)!important;max-width:none!important;margin-right:-7px;padding-right:10px!important;box-sizing:border-box;scrollbar-gutter:auto;}
+.bills:hover .bill-list-scroll{scrollbar-gutter:auto;}

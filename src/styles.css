@@ -5677,3 +5677,15 @@ input,button,select,textarea{
 .bill-reminder-tabs button.active i{background:var(--accent);color:#fff}
 @keyframes reminder-backdrop-in{from{opacity:0}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){.bill-reminder-backdrop{animation:none}}
+
+/* Keep the whole selected reminder filter segment highlighted. */
+.bill-reminder-tabs button.active{
+  background:var(--accent);
+  color:#fff;
+  border-color:var(--accent);
+  box-shadow:0 2px 8px color-mix(in srgb,var(--accent) 24%,transparent);
+}
+.bill-reminder-tabs button.active i{
+  background:rgba(255,255,255,.2);
+  color:#fff;
+}

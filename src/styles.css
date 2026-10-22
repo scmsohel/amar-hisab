@@ -4912,3 +4912,15 @@ input,button,select,textarea{
 .dashboard-scrollbar-dragging *{cursor:grabbing!important;user-select:none!important}
 .dark .dashboard-overlay-scrollbar{background:rgba(40,60,72,.42)}
 .dark .dashboard-overlay-scrollbar-thumb{background:rgba(150,174,187,.72);border-color:rgba(23,38,48,.65)}
+
+
+/* Upcoming bills: keep due-status labels fully readable beside the overlay scrollbar */
+.side-widgets>.bills .bill-row .bill-due{
+  width:max-content;
+  max-width:none!important;
+  min-width:max-content;
+  flex-shrink:0!important;
+  overflow:visible!important;
+  text-overflow:clip!important;
+  white-space:nowrap;
+}

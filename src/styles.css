@@ -5853,3 +5853,27 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
  .stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
  .dashboard-top>.side-widgets{grid-template-columns:minmax(0,1fr)}
 }
+
+/* Fix dashboard wallet grid overlap: keep all four default wallets inside their panel. */
+.dashboard-main .wallet-panel{
+  height:auto!important;
+  min-height:0!important;
+  align-self:start;
+  overflow:visible!important;
+}
+.dashboard-main .wallet-panel .wallets{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  grid-auto-rows:minmax(58px,auto);
+  gap:8px!important;
+  height:auto!important;
+  max-height:none!important;
+  overflow:visible!important;
+  padding:6px 1px 3px!important;
+}
+.dashboard-main .wallet-panel .wallets>.wallet-box{
+  flex:none!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+}

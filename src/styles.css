@@ -5258,3 +5258,36 @@ input,button,select,textarea{
     font-size:8px!important;
   }
 }
+
+
+/* Reminder active state: leave a little gap around the badge and gently animate the bell */
+@media(min-width:701px){
+  .sidebar.collapsed .side-bottom .sidebar-notification-wrap>.sidebar-notification i{
+    top:-2px!important;
+    right:1px!important;
+  }
+}
+.sidebar-notification-wrap:has(>.sidebar-notification i)>.sidebar-notification{
+  color:#0a9b6b!important;
+}
+.sidebar-notification-wrap:has(>.sidebar-notification i)>.sidebar-notification svg{
+  color:#0a9b6b!important;
+  transform-origin:50% 12%;
+  animation:reminder-bell-ring 6s ease-in-out infinite;
+}
+.sidebar-notification-wrap:has(>.sidebar-notification i)>.sidebar-notification i{
+  background:#ef4444!important;
+  color:#fff!important;
+}
+@keyframes reminder-bell-ring{
+  0%,88%,100%{transform:rotate(0deg)}
+  89%{transform:rotate(14deg)}
+  90%{transform:rotate(-14deg)}
+  91%{transform:rotate(11deg)}
+  92%{transform:rotate(-9deg)}
+  93%{transform:rotate(5deg)}
+  94%{transform:rotate(0deg)}
+}
+@media(prefers-reduced-motion:reduce){
+  .sidebar-notification-wrap:has(>.sidebar-notification i)>.sidebar-notification svg{animation:none}
+}

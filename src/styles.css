@@ -5614,3 +5614,47 @@ input,button,select,textarea{
 .upcoming-saving-row:nth-child(4n+3) .bill-home-avatar{background:#e0efff;color:#2563eb}
 .side-widgets>.bills .bill-list-scroll>.bill-row:nth-child(4n+4)>.bill-home-avatar,
 .upcoming-saving-row:nth-child(4n+4) .bill-home-avatar{background:#fff0dc;color:#d97706}
+
+
+/* Reminder Style 3 — compact modern list with subtle deadline progress */
+.sidebar .bill-reminder-popover{
+  width: min(390px, calc(100vw - 88px)) !important;
+  padding: 18px !important;
+  border: 1px solid color-mix(in srgb, var(--border) 78%, #6a8cff 22%) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 24px 70px rgba(16, 35, 65, .18), 0 3px 12px rgba(16, 35, 65, .06) !important;
+  backdrop-filter: blur(18px);
+}
+.bill-reminder-popover .bill-reminder-popover-head{
+  padding: 2px 0 13px !important;
+  margin: 0 0 12px !important;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface) !important;
+}
+.bill-reminder-popover .bill-reminder-popover-head b{font-size:17px;letter-spacing:-.3px}
+.bill-reminder-popover .bill-reminder-popover-head button{
+  width:32px;height:32px;border-radius:10px;background:var(--surface-2);transition:transform .18s ease,background .18s ease;
+}
+.bill-reminder-popover .bill-reminder-popover-head button:hover{transform:rotate(90deg);background:var(--border)}
+.bill-reminder-popover .reminder-group-title{font-size:11px!important;font-weight:750;letter-spacing:.04em;color:var(--muted);margin:8px 2px 9px!important}
+.bill-reminder-popover .bill-reminder-item{
+  display:grid!important;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto 4px;align-items:center;column-gap:10px;row-gap:9px;
+  width:100%;padding:12px 12px 11px!important;margin:0 0 9px!important;border:1px solid var(--border)!important;border-radius:14px!important;
+  background:var(--surface)!important;text-align:left;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease!important;
+}
+.bill-reminder-popover .bill-reminder-item:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 42%,var(--border))!important;box-shadow:0 8px 20px rgba(20,60,100,.07)}
+.bill-reminder-popover .bill-reminder-item-copy{display:flex;flex-direction:column;gap:5px;grid-column:1;grid-row:1;min-width:0}
+.bill-reminder-popover .bill-reminder-item-copy b{font-size:13px;line-height:1.35;font-weight:750;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bill-reminder-popover .bill-reminder-item-copy small{font-size:11px;line-height:1.4;color:var(--muted)}
+.bill-reminder-popover .bill-reminder-item-due{grid-column:2;grid-row:1;align-self:center;font-size:11px!important;font-weight:750;padding:7px 9px!important;border-radius:9px!important;white-space:nowrap;background:#fff0d5!important;color:#a86300!important}
+.bill-reminder-popover .bill-reminder-progress{grid-column:1/3;grid-row:2;display:block;height:4px;width:100%;border-radius:99px;background:var(--border);overflow:hidden}
+.bill-reminder-popover .bill-reminder-progress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#60a5fa,#3b82f6);transition:width .35s ease}
+.bill-reminder-popover .bill-reminder-progress.urgent i{background:linear-gradient(90deg,#fb7185,#ef4444)}
+.dark .bill-reminder-popover .bill-reminder-item{background:color-mix(in srgb,var(--surface) 90%,#203d57)!important;border-color:color-mix(in srgb,var(--border) 82%,#5478a1)!important}
+.dark .bill-reminder-popover .bill-reminder-item-due{background:#3e321e!important;color:#ffd17b!important}
+.dark .bill-reminder-popover .bill-reminder-progress{background:#2a3b4c}
+@media(max-width:700px){
+  .sidebar .bill-reminder-popover{width:auto!important;padding:14px!important;border-radius:18px!important}
+  .bill-reminder-popover .bill-reminder-item{padding:11px 10px!important;column-gap:7px}
+  .bill-reminder-popover .bill-reminder-item-due{font-size:10px!important;padding:6px 7px!important}
+}

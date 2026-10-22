@@ -5356,3 +5356,27 @@ input,button,select,textarea{
   .bill-debt-workspace .bill-matched-table{min-width:1120px}
   .bill-debt-workspace .bill-matched-table tbody td:nth-child(4) strong{font-size:13px}
 }
+
+
+/* Savings goals page: reuse the debt/receivables layout with goal-specific data */
+.goal-redesign .goal-metrics{margin-bottom:16px}
+.goal-workspace{min-width:0}
+.goal-toolbar>.tag{flex:0 0 auto}
+.goal-workspace .goal-table{min-width:760px;width:100%;table-layout:fixed}
+.goal-workspace .goal-table th,.goal-workspace .goal-table td{padding:0 14px;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis}
+.goal-workspace .goal-table th:nth-child(1),.goal-workspace .goal-table td:nth-child(1){width:28%}
+.goal-workspace .goal-table th:nth-child(2),.goal-workspace .goal-table td:nth-child(2){width:17%}
+.goal-workspace .goal-table th:nth-child(3),.goal-workspace .goal-table td:nth-child(3){width:28%}
+.goal-workspace .goal-table th:nth-child(4),.goal-workspace .goal-table td:nth-child(4){width:15%}
+.goal-workspace .goal-table th:nth-child(5),.goal-workspace .goal-table td:nth-child(5){width:12%}
+.goal-workspace .goal-avatar{background:color-mix(in srgb,#0d9f6e 13%,var(--surface));color:#079b6b}
+.goal-workspace .goal-table tbody td:nth-child(4) strong{font-size:14px;font-weight:750;white-space:nowrap}
+.goal-status-note{display:flex;align-items:center;gap:8px;min-width:0}
+.goal-status-note small{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:11px}
+@media(max-width:760px){
+ .goal-redesign .feature-heading{align-items:flex-start;gap:12px}
+ .goal-workspace .goal-table{min-width:700px}
+ .goal-workspace .goal-table th,.goal-workspace .goal-table td{padding-inline:10px}
+ .goal-toolbar{flex-wrap:wrap}
+ .goal-toolbar .debt-search{max-width:none;flex-basis:100%}
+}

@@ -16,21 +16,22 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const submitLogin = (event: FormEvent<HTMLFormElement>) => {
+  const submitLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
-    if (!identity.trim() || !password) {
-      setError("Email/Mobile এবং Password—দুটিই লিখুন।");
-      return;
-    }
+    if (!identity.trim() || !password) return setError("Email/Mobile এবং Password—দুটিই লিখুন।");
     const value = identity.trim();
     const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
     const mobileDigits = value.replace(/\D/g, "");
-    if (value.includes("@") ? !validEmail : mobileDigits.length < 10 || mobileDigits.length > 15) {
-      setError("সঠিক Email address অথবা ১০–১৫ সংখ্যার Mobile নম্বর দিন।");
-      return;
+    if (value.includes("@") ? !validEmail : mobileDigits.length < 10 || mobileDigits.length > 15) return setError("সঠিক Email address অথবা ১০–১৫ সংখ্যার Mobile নম্বর দিন।");
+    try {
+      const response = await fetch("/api/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin", body: JSON.stringify({ identity: value, password }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Login করা যায়নি।");
+      window.location.assign("/");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "সার্ভারের সঙ্গে যোগাযোগ করা যায়নি।");
     }
-    setError("Login যাচাই করার জন্য backend authentication এখনো যুক্ত হয়নি।");
   };
 
   const submitRecovery = (event: FormEvent<HTMLFormElement>) => {

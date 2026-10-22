@@ -4976,3 +4976,16 @@ input,button,select,textarea{
     min-width:0;
   }
 }
+
+
+/* Upcoming bills: slightly larger, clearer title, date, amount and status text */
+.side-widgets>.bills .bill-row b{font-size:15px!important;line-height:1.4!important}
+.side-widgets>.bills .bill-row small{font-size:11px!important;line-height:1.4!important}
+.side-widgets>.bills .bill-row strong{font-size:14px!important}
+.side-widgets>.bills .bill-row .bill-due{font-size:10px!important;padding-block:6px}
+@media(max-width:700px){
+  .side-widgets>.bills .bill-row b{font-size:13px!important}
+  .side-widgets>.bills .bill-row small{font-size:10px!important}
+  .side-widgets>.bills .bill-row strong{font-size:12px!important}
+  .side-widgets>.bills .bill-row .bill-due{font-size:9px!important;padding-inline:4px}
+}

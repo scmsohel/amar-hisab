@@ -4836,3 +4836,8 @@ input,button,select,textarea{
 .hero-debts .debt-person>div{flex:1 1 0;min-width:0;overflow:hidden}
 .hero-debts .debt-person .debt-date{flex:0 1 58px;max-width:58px;min-width:0}
 .hero-debts .debt-person .due{flex:0 1 auto;min-width:0;max-width:76px}
+
+/* Keep the dashboard debt viewport inside the fixed-height card; scroll rows within it */
+.dashboard-top .hero-debts{display:flex;flex-direction:column;min-height:0;box-sizing:border-box;}
+.dashboard-top .hero-debts .debt-person-scroll{height:112px;max-height:112px;min-height:0;flex:0 0 112px;box-sizing:border-box;overflow-x:hidden;overflow-y:auto;clip-path:none;padding-right:3px;padding-bottom:0;}
+.dashboard-top .hero-debts .debt-person{flex:0 0 auto;}

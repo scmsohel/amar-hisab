@@ -5603,3 +5603,14 @@ input,button,select,textarea{
 .upcoming-saving-title small{font-size:11px;color:var(--muted)}
 .upcoming-saving-progress{height:4px;border-radius:99px;background:var(--border);overflow:hidden;margin:0 8px 0 49px}
 .upcoming-saving-progress i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#10b981,#34d399);transition:width .35s ease}
+
+
+/* Give each dashboard bill/savings icon its own soft accent color */
+.side-widgets>.bills .bill-list-scroll>.bill-row:nth-child(4n+1)>.bill-home-avatar,
+.upcoming-saving-row:nth-child(4n+1) .bill-home-avatar{background:#f0eaff;color:#7c3aed}
+.side-widgets>.bills .bill-list-scroll>.bill-row:nth-child(4n+2)>.bill-home-avatar,
+.upcoming-saving-row:nth-child(4n+2) .bill-home-avatar{background:#dff7ec;color:#059669}
+.side-widgets>.bills .bill-list-scroll>.bill-row:nth-child(4n+3)>.bill-home-avatar,
+.upcoming-saving-row:nth-child(4n+3) .bill-home-avatar{background:#e0efff;color:#2563eb}
+.side-widgets>.bills .bill-list-scroll>.bill-row:nth-child(4n+4)>.bill-home-avatar,
+.upcoming-saving-row:nth-child(4n+4) .bill-home-avatar{background:#fff0dc;color:#d97706}

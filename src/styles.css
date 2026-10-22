@@ -5495,3 +5495,11 @@ input,button,select,textarea{
 .icon-picker-option.selected{border-color:var(--primary,#0d9f6e);background:var(--surface-soft,#dff6ec);color:var(--primary,#0d9f6e)}
 .debt-avatar{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
 @media(max-width:520px){.icon-picker-grid{grid-template-columns:repeat(5,minmax(0,1fr));max-height:190px}}
+
+
+/* Keep paired controls aligned at the top even when the date field has helper text. */
+.feature-form-modal .feature-form{align-items:start}
+.feature-form-modal .feature-form>label{align-self:start;margin:0;min-width:0}
+.feature-form-modal .feature-form>label input,
+.feature-form-modal .feature-form>label select,
+.feature-form-modal .feature-form>label .app-select{align-self:start}

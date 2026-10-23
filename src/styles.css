@@ -6180,3 +6180,71 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     background-position:center center!important;
   }
 }
+
+
+/* Final dashboard layout fix: compact debt panel + one fixed-width draggable wallet row */
+@media(min-width:1101px){
+  .dashboard-top{
+    align-items:start!important;
+    grid-template-columns:minmax(0,2fr) minmax(260px,1fr)!important;
+  }
+  .dashboard-top>.hero-debts,
+  .dashboard-top>.side-widgets.hero-debts{
+    align-self:start!important;
+    height:fit-content!important;
+    min-height:0!important;
+    grid-row:auto!important;
+  }
+  .dashboard-main .hero-grid{
+    align-items:start!important;
+    grid-template-columns:minmax(0,.92fr) minmax(0,1.32fr)!important;
+  }
+  .dashboard-main .wallet-panel{
+    align-self:start!important;
+    height:fit-content!important;
+    min-height:0!important;
+  }
+  .dashboard-main .wallet-panel .wallets{
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    justify-content:flex-start!important;
+    align-items:stretch!important;
+    gap:8px!important;
+    height:auto!important;
+    max-height:none!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    cursor:grab!important;
+    touch-action:pan-x;
+    overscroll-behavior-x:contain;
+    scroll-snap-type:x mandatory;
+    padding:6px 1px 8px!important;
+  }
+  .dashboard-main .wallet-panel .wallets>.wallet-box{
+    flex:0 0 150px!important;
+    width:150px!important;
+    min-width:150px!important;
+    max-width:150px!important;
+    scroll-snap-align:start;
+  }
+  .dashboard-main .wallet-panel .wallets.is-dragging{
+    cursor:grabbing!important;
+    scroll-snap-type:none!important;
+  }
+}
+@media(max-width:1100px){
+  .dashboard-main .wallet-panel .wallets{
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    cursor:grab!important;
+    gap:8px!important;
+  }
+  .dashboard-main .wallet-panel .wallets>.wallet-box{
+    flex:0 0 150px!important;
+    width:150px!important;
+    min-width:150px!important;
+    max-width:150px!important;
+  }
+}

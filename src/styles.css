@@ -6403,3 +6403,35 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
   min-width:150px!important;
   max-width:150px!important;
 }
+
+
+/* Wallet strip sizing: fit exactly four cards across the available panel width. */
+.dashboard-main .wallet-panel .wallets{
+  gap:8px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+}
+.dashboard-main .wallet-panel .wallets>.wallet-box{
+  flex:0 0 calc((100% - 24px)/4)!important;
+  width:calc((100% - 24px)/4)!important;
+  min-width:0!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+}
+.dashboard-main .wallet-panel .wallets>.wallet-box .wallet-info{
+  min-width:0!important;
+  max-width:100%!important;
+}
+.dashboard-main .wallet-panel .wallets>.wallet-box .wallet-info b,
+.dashboard-main .wallet-panel .wallets>.wallet-box .wallet-info strong{
+  max-width:100%!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+@media(max-width:700px){
+  .dashboard-main .wallet-panel .wallets>.wallet-box{
+    flex:0 0 150px!important;
+    width:150px!important;
+    min-width:150px!important;
+  }
+}

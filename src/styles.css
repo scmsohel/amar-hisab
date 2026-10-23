@@ -6534,6 +6534,10 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
   .dashboard-side-column > .category > .cat-row .cat-values > span {
     font-size: 11px !important;
   }
+  .dashboard-side-column > .category > .cat-row .cat-values > span {
+    color: var(--muted) !important;
+    font-weight: 400 !important;
+  }
   .dashboard-side-column > .category > .cat-row > b,
   .dashboard-side-column > .category > .cat-row .cat-values > strong {
     font-size: 12px !important;

@@ -6559,3 +6559,32 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     gap: 6px !important;
   }
 }
+
+
+/* Dark mode readability: profile banner and sidebar account details */
+.dark .profile-redesign-page .profile-landscape-header,
+[data-theme="dark"] .profile-redesign-page .profile-landscape-header{
+  color:#f3fbff;
+}
+.dark .profile-redesign-page .profile-landscape-header h3,
+[data-theme="dark"] .profile-redesign-page .profile-landscape-header h3{
+  color:#f3fbff!important;
+}
+.dark .profile-redesign-page .profile-landscape-header p,
+[data-theme="dark"] .profile-redesign-page .profile-landscape-header p{
+  color:#244c5c!important;
+  text-shadow:0 1px 1px rgba(255,255,255,.35);
+}
+.dark .profile-redesign-page .profile-landscape-header .profile-landscape-quote,
+[data-theme="dark"] .profile-redesign-page .profile-landscape-header .profile-landscape-quote{
+  color:#123e53!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.45);
+}
+.dark .sidebar-profile-copy b,
+[data-theme="dark"] .sidebar-profile-copy b{
+  color:#f1f7fb!important;
+}
+.dark .sidebar-profile-copy small,
+[data-theme="dark"] .sidebar-profile-copy small{
+  color:#b5c8d6!important;
+}

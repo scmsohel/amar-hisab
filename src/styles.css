@@ -5881,3 +5881,87 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
   .dashboard-main .wallet-panel .wallets{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:5px!important}
   .dashboard-main .wallet-panel .wallets>.wallet-box{padding:8px 5px!important}
 }
+
+
+/* Profile page — soft landscape banner and compact section navigation */
+.profile-redesign-page .profile-landscape-header{
+  min-height:142px;
+  isolation:isolate;
+  border:1px solid #c9eee2;
+  background:
+    radial-gradient(ellipse at 72% 32%,rgba(255,239,166,.95) 0 5%,transparent 5.2%),
+    radial-gradient(ellipse at 88% 8%,rgba(255,255,255,.58),transparent 24%),
+    linear-gradient(180deg,#d8f4fc 0%,#e0f9f1 57%,#c4f0d6 100%);
+}
+.profile-redesign-page .profile-landscape-header:before,
+.profile-redesign-page .profile-landscape-header:after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  left:-3%;
+  right:-3%;
+  bottom:-28px;
+  height:88px;
+  pointer-events:none;
+  border-radius:50% 50% 0 0 / 70% 70% 0 0;
+}
+.profile-redesign-page .profile-landscape-header:before{
+  background:linear-gradient(160deg,#b4e8c5,#8edcae);
+  transform:rotate(-3deg) translateY(3px);
+}
+.profile-redesign-page .profile-landscape-header:after{
+  left:34%;
+  right:-8%;
+  bottom:-39px;
+  height:102px;
+  background:linear-gradient(160deg,rgba(114,211,158,.9),rgba(70,184,137,.82));
+  transform:rotate(3deg);
+}
+.profile-redesign-page .profile-landscape-header > *{position:relative;z-index:1}
+.profile-redesign-page .profile-section-tabs{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  overflow-x:auto;
+  padding:0 0 14px;
+  margin-bottom:2px;
+  scrollbar-width:none;
+}
+.profile-redesign-page .profile-section-tabs::-webkit-scrollbar{display:none}
+.profile-redesign-page .profile-section-tab{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  flex:0 0 auto;
+  padding:9px 14px;
+  border:1px solid var(--border,#e2eaf1);
+  border-radius:999px;
+  background:var(--surface,#fff);
+  color:var(--muted,#647b91);
+  font-size:12px;
+  font-weight:650;
+  white-space:nowrap;
+}
+.profile-redesign-page .profile-section-tab.active{
+  color:#fff;
+  border-color:#0b9f70;
+  background:linear-gradient(135deg,#12b981,#07845e);
+  box-shadow:0 3px 10px rgba(8,132,94,.14);
+}
+.profile-redesign-page .panel{
+  box-shadow:0 5px 18px rgba(24,55,84,.035);
+}
+.profile-redesign-page .admin-invitations-panel{
+  border-color:var(--border,#e2eaf1);
+}
+.dark .profile-redesign-page .profile-landscape-header,
+[data-theme="dark"] .profile-redesign-page .profile-landscape-header{
+  border-color:#285d59;
+  background:radial-gradient(ellipse at 72% 32%,rgba(231,201,111,.8) 0 5%,transparent 5.2%),linear-gradient(180deg,#173d55 0%,#174c4a 60%,#1e6048 100%);
+}
+@media(max-width:640px){
+  .profile-redesign-page .profile-landscape-header{padding:20px 16px!important;min-height:120px}
+  .profile-redesign-page .profile-section-tabs{gap:6px}
+  .profile-redesign-page .profile-section-tab{padding:8px 11px;font-size:11px}
+}

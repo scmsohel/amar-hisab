@@ -1,0 +1,14 @@
+.login-page .signup-story-copy{max-width:470px}
+.login-card{max-width:500px}
+.login-fields{display:grid;gap:19px;margin-top:30px}
+.login-forgot{display:flex;justify-content:flex-end;margin-top:-9px}
+.login-forgot button,.login-back{border:0;background:transparent;color:var(--signup-blue);font-size:11px;font-weight:700;padding:4px 0}
+.login-forgot button:hover,.login-back:hover{text-decoration:underline}
+.login-main-button{width:100%;margin-top:5px;cursor:pointer}
+.login-back{display:block;margin:16px auto 0}
+.login-message{text-align:center;padding-block:52px}
+.login-message-icon{width:66px;height:66px;border-radius:22px;background:#e6f3ff;color:#1674f8;display:grid;place-items:center;margin:0 auto 20px}
+.login-message p{font-size:12px;line-height:1.9;color:var(--signup-muted);margin:12px auto 26px;max-width:350px}
+.signup-dark .login-message-icon{background:#203b55;color:#82baff}
+@media(max-width:950px){.login-page .signup-story-copy{padding-top:30px}.login-page .signup-story h1{font-size:36px}}
+@media(max-width:520px){.login-card{padding:25px 20px}.login-fields{margin-top:25px;gap:17px}.login-message{padding:38px 22px}}

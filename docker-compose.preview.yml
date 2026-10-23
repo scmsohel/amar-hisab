@@ -1,0 +1,72 @@
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: amar-hisab-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?Create .env from .env.example first}
+      POSTGRES_USER: ${POSTGRES_USER:?Create .env from .env.example first}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - amar_hisab_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks: [amar-hisab-internal]
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: amar-hisab-api
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      SESSION_SECRET: ${SESSION_SECRET:?Set SESSION_SECRET in .env}
+      ADMIN_SETUP_KEY: ${ADMIN_SETUP_KEY:?Set ADMIN_SETUP_KEY in .env}
+      ADMIN_NAME: ${ADMIN_NAME:-Amar Hisab Admin}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:?Set ADMIN_EMAIL in .env}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Set ADMIN_PASSWORD in .env}
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [amar-hisab-internal]
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  amar-hisab-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: amar-hisab-web-preview
+    restart: unless-stopped
+    ports:
+      - "${AMAR_HISAB_PORT:-8088}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1/health || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks: [amar-hisab-internal]
+
+networks:
+  amar-hisab-internal:
+    name: amar-hisab-internal
+    driver: bridge
+
+volumes:
+  amar_hisab_pgdata:
+    name: amar-hisab-pgdata

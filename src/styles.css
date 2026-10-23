@@ -6135,3 +6135,30 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     background-position:center center!important;
   }
 }
+
+
+/* Dashboard top row: keep debt widget compact and wallet cards in one draggable row */
+@media(min-width:1251px){
+  .hero-grid{align-items:start!important}
+  .hero-debts{
+    align-self:start!important;
+    height:fit-content!important;
+    min-height:0!important;
+    grid-row:auto!important;
+  }
+  .wallet-panel{align-self:start!important;min-height:0!important}
+  .wallet-panel .wallets{
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    gap:8px!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    cursor:grab;
+  }
+  .wallet-panel .wallets>.wallet-box{
+    flex:0 0 150px!important;
+    width:150px!important;
+    min-width:150px!important;
+    max-width:150px!important;
+  }
+}

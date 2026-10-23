@@ -39,7 +39,318 @@ class AmarHisabApp extends StatelessWidget {
             ),
           ),
         ),
-        home: const AuthScreen(),
+        home: const SplashScreen(),
+      );
+}
+
+
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen>
+    with TickerProviderStateMixin {
+  late final AnimationController _floatController;
+  late final AnimationController _loadingController;
+
+  @override
+  void initState() {
+    super.initState();
+    _floatController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2200),
+    )..repeat(reverse: true);
+    _loadingController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1100),
+    )..repeat();
+
+    Future<void>.delayed(const Duration(milliseconds: 2600), () {
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder<void>(
+          pageBuilder: (_, __, ___) => const AuthScreen(),
+          transitionDuration: const Duration(milliseconds: 450),
+          transitionsBuilder: (_, animation, __, child) => FadeTransition(
+            opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+            child: child,
+          ),
+        ),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _floatController.dispose();
+    _loadingController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final background = isDark ? const Color(0xFF071A13) : const Color(0xFFF9FFFB);
+    final titleColor = isDark ? const Color(0xFFE8FFF1) : const Color(0xFF073D2A);
+    final subtitleColor = isDark ? const Color(0xFFB4D2C3) : const Color(0xFF617C70);
+    const green = Color(0xFF079653);
+    const mint = Color(0xFFB9F2D0);
+
+    return Scaffold(
+      backgroundColor: background,
+      body: Stack(
+        children: [
+          Positioned(
+            top: -105,
+            left: -95,
+            child: _SplashGlow(size: 300, color: mint.withValues(alpha: .42)),
+          ),
+          Positioned(
+            bottom: -130,
+            right: -95,
+            child: _SplashGlow(
+              size: 340,
+              color: green.withValues(alpha: isDark ? .12 : .10),
+            ),
+          ),
+          SafeArea(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 28),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedBuilder(
+                      animation: _floatController,
+                      builder: (context, child) => Transform.translate(
+                        offset: Offset(
+                          0,
+                          -7 * Curves.easeInOut.transform(_floatController.value),
+                        ),
+                        child: child,
+                      ),
+                      child: Container(
+                        width: 222,
+                        height: 222,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: mint.withValues(alpha: isDark ? .10 : .28),
+                        ),
+                        child: Center(
+                          child: Container(
+                            width: 158,
+                            height: 142,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [Color(0xFF13B96B), Color(0xFF047746)],
+                              ),
+                              borderRadius: BorderRadius.circular(30),
+                              border: Border.all(
+                                color: Colors.white.withValues(alpha: .55),
+                                width: 2,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: green.withValues(alpha: .24),
+                                  blurRadius: 28,
+                                  offset: const Offset(0, 16),
+                                ),
+                              ],
+                            ),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                Positioned(
+                                  top: 22,
+                                  left: 20,
+                                  child: Container(
+                                    width: 62,
+                                    height: 7,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: .75),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 36,
+                                  left: 20,
+                                  child: Container(
+                                    width: 42,
+                                    height: 7,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: .48),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.eco_rounded,
+                                  size: 75,
+                                  color: const Color(0xFFA9F5C5),
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.black.withValues(alpha: .12),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                Positioned(
+                                  right: -2,
+                                  bottom: 24,
+                                  child: Container(
+                                    width: 60,
+                                    height: 47,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF075C3B),
+                                      borderRadius: const BorderRadius.horizontal(
+                                        left: Radius.circular(15),
+                                        right: Radius.circular(9),
+                                      ),
+                                      border: Border.all(
+                                        color: Colors.white.withValues(alpha: .25),
+                                      ),
+                                    ),
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.circle,
+                                        color: Color(0xFFFFD54F),
+                                        size: 24,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 0,
+                                  right: 12,
+                                  child: Container(
+                                    width: 55,
+                                    height: 55,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      gradient: const LinearGradient(
+                                        colors: [Color(0xFFFFE66D), Color(0xFFFFB800)],
+                                      ),
+                                      border: Border.all(
+                                        color: Colors.white.withValues(alpha: .8),
+                                        width: 2,
+                                      ),
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: Color(0x335A4A00),
+                                          blurRadius: 10,
+                                          offset: Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: const Center(
+                                      child: Text(
+                                        '৳',
+                                        style: TextStyle(
+                                          color: Color(0xFF8A5700),
+                                          fontSize: 30,
+                                          fontWeight: FontWeight.w900,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 35),
+                    RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        style: TextStyle(
+                          fontSize: 39,
+                          height: 1.2,
+                          fontWeight: FontWeight.w900,
+                          color: titleColor,
+                          letterSpacing: -.8,
+                        ),
+                        children: const [
+                          TextSpan(text: 'আমার '),
+                          TextSpan(
+                            text: 'হিসাব',
+                            style: TextStyle(color: green),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      'আপনার আয়-ব্যয়ের সহজ সঙ্গী',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: subtitleColor,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 76),
+                    AnimatedBuilder(
+                      animation: _loadingController,
+                      builder: (context, child) => Transform.rotate(
+                        angle: _loadingController.value * 6.283185307,
+                        child: child,
+                      ),
+                      child: SizedBox(
+                        width: 44,
+                        height: 44,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 4,
+                          strokeCap: StrokeCap.round,
+                          valueColor: const AlwaysStoppedAnimation<Color>(green),
+                          backgroundColor: green.withValues(alpha: .12),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Text(
+                      'তথ্য প্রস্তুত করা হচ্ছে...',
+                      style: TextStyle(
+                        color: subtitleColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SplashGlow extends StatelessWidget {
+  const _SplashGlow({required this.size, required this.color});
+
+  final double size;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(
+            colors: [color, color.withValues(alpha: 0)],
+          ),
+        ),
       );
 }
 

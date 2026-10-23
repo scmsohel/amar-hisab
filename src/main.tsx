@@ -13,7 +13,7 @@ function AuthGate() {
       .then(response => setStatus(response.ok ? "authenticated" : "unauthenticated"))
       .catch(() => setStatus("unauthenticated"));
   }, []);
-  if (status === "checking") return <main className="ah-loading-screen" role="status" aria-live="polite" aria-label="Amar Hisab লোড হচ্ছে">
+  if (status === "checking") return <main className={"ah-loading-screen"+(()=>{try{return window.localStorage.getItem("amar-hisab-dark")==="true"?" ah-loading-dark":"";}catch{return "";}})()} role="status" aria-live="polite" aria-label="Amar Hisab লোড হচ্ছে">
     <div className="ah-loading-scene" aria-hidden="true">
       <div className="ah-scene-cloud ah-scene-cloud-one"/><div className="ah-scene-cloud ah-scene-cloud-two"/>
       <div className="ah-finance-card ah-finance-card-chart"><ChartNoAxesCombined size={25}/><span/><span/><span/></div>

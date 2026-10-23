@@ -5965,3 +5965,43 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
   .profile-redesign-page .profile-section-tabs{gap:6px}
   .profile-redesign-page .profile-section-tab{padding:8px 11px;font-size:11px}
 }
+
+
+/* Replace the abstract hill gradients with a real illustrated SVG landscape. */
+.profile-redesign-page .profile-landscape-header{
+  background-image:url("/profile-landscape.svg") !important;
+  background-size:cover !important;
+  background-position:center 58% !important;
+  border-color:#c6eee5;
+}
+.profile-redesign-page .profile-landscape-header:before,
+.profile-redesign-page .profile-landscape-header:after{content:none!important;display:none!important}
+.profile-redesign-page .profile-landscape-header .profile-landscape-quote{
+  margin-left:auto;
+  flex:0 1 310px;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  align-items:flex-start;
+  color:#15536a;
+  font-size:clamp(14px,1.15vw,20px);
+  line-height:1.45;
+  font-weight:800;
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
+  padding:10px 12px;
+}
+.profile-redesign-page .profile-landscape-header .profile-landscape-quote span{
+  width:42px;
+  height:3px;
+  margin-top:8px;
+  border-radius:99px;
+  background:#13a989;
+}
+@media(max-width:700px){
+  .profile-redesign-page .profile-landscape-header .profile-landscape-quote{
+    flex-basis:100%;
+    margin-left:0;
+    padding:0 0 4px 2px;
+    font-size:14px;
+  }
+}

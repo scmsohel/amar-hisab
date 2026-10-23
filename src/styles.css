@@ -1681,12 +1681,26 @@
   .dashboard-top>.dashboard-main .stats>.stat:nth-child(4){animation-delay:.28s}
   .charts>.chart-panel,
   .charts>.best-expenses,
-  .charts>.category{
-    animation:dashboard-enter .48s cubic-bezier(.2,.7,.2,1) both;
+  .charts>.category,
+  .dashboard-transactions,
+  .dashboard-transactions~.side-widgets>.budget-compact,
+  .dashboard-transactions~.side-widgets>.income-sources,
+  .dashboard-transactions~.side-widgets>.bills,
+  .dashboard-transactions~.side-widgets>.savings,
+  .dashboard-transactions~.side-widgets>.goals,
+  .dashboard-transactions~.side-widgets>.debts{
+    animation:dashboard-enter .42s cubic-bezier(.2,.7,.2,1) both;
   }
   .charts>.chart-panel{animation-delay:.16s}
   .charts>.best-expenses{animation-delay:.23s}
   .charts>.category{animation-delay:.30s}
+  .dashboard-transactions{animation-delay:.34s}
+  .dashboard-transactions~.side-widgets>.budget-compact{animation-delay:.38s}
+  .dashboard-transactions~.side-widgets>.income-sources{animation-delay:.42s}
+  .dashboard-transactions~.side-widgets>.bills{animation-delay:.46s}
+  .dashboard-transactions~.side-widgets>.savings{animation-delay:.50s}
+  .dashboard-transactions~.side-widgets>.goals{animation-delay:.54s}
+  .dashboard-transactions~.side-widgets>.debts{animation-delay:.58s}
   .charts>.best-expenses .best-expense-track>i{
     transform-origin:left center;
     animation:dashboard-bar-grow .8s cubic-bezier(.2,.7,.2,1) .35s both;
@@ -1732,6 +1746,13 @@
   .charts>.chart-panel,
   .charts>.best-expenses,
   .charts>.category,
+  .dashboard-transactions,
+  .dashboard-transactions~.side-widgets>.budget-compact,
+  .dashboard-transactions~.side-widgets>.income-sources,
+  .dashboard-transactions~.side-widgets>.bills,
+  .dashboard-transactions~.side-widgets>.savings,
+  .dashboard-transactions~.side-widgets>.goals,
+  .dashboard-transactions~.side-widgets>.debts,
   .charts>.best-expenses .best-expense-track>i,
   .charts>.category .donut,
   .charts>.category .donut::before,

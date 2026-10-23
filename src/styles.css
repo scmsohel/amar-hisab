@@ -6609,3 +6609,17 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
 [data-theme="dark"] .sidebar-profile-copy small{
   color:#b5c8d6!important;
 }
+
+
+/* Dashboard: stretch recent transactions card to balance the right column */
+@media(min-width:1251px){
+  .bottom{
+    align-items:stretch!important;
+  }
+  .bottom>.dashboard-transactions{
+    align-self:stretch!important;
+    height:100%;
+    min-height:100%;
+    box-sizing:border-box;
+  }
+}

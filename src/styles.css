@@ -6672,7 +6672,7 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
 .app-dialog-card input:focus{border-color:var(--primary,#0d9f6e);box-shadow:0 0 0 3px rgba(16,185,129,.14)}
 .app-dialog-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:23px}
 .app-dialog-actions .btn{min-width:94px;justify-content:center}
-.app.dark .app-dialog-card{--text:#edf6fc;--muted:#9db1c1;--surface:#172832;--surface-subtle:#10212a;--border:#2a414e;--primary:#10b981;--primary-soft:rgba(16,185,129,.14)}
+.app-dialog-card.app-dialog-dark{--text:#edf6fc;--muted:#9db1c1;--surface:#172832;--surface-subtle:#10212a;--border:#2a414e;--primary:#10b981;--primary-soft:rgba(16,185,129,.14)}
 @keyframes app-dialog-shade-in{from{opacity:0}to{opacity:1}}
 @keyframes app-dialog-card-in{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:520px){.app-dialog-shade{padding:14px}.app-dialog-card{padding:20px;border-radius:16px}.app-dialog-actions .btn{flex:1;min-width:0}}

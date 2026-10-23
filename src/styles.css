@@ -6677,3 +6677,57 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
 @keyframes app-dialog-card-in{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:520px){.app-dialog-shade{padding:14px}.app-dialog-card{padding:20px;border-radius:16px}.app-dialog-actions .btn{flex:1;min-width:0}}
 @media(prefers-reduced-motion:reduce){.app-dialog-shade,.app-dialog-card{animation:none!important}}
+
+
+/* Amar Hisab finance-illustration authentication loading screen */
+.ah-loading-screen{
+  --ah-load-bg:#f3f8f7;--ah-load-ink:#183d35;--ah-load-muted:#78918a;
+  --ah-load-green:#0e9f6e;--ah-load-mint:#d9f4e9;
+  position:fixed;inset:0;z-index:9999;min-height:100vh;min-height:100dvh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;padding:28px 18px 40px;background:var(--ah-load-bg);
+  color:var(--ah-load-ink);font-family:'Noto Sans Bengali','Hind Siliguri',Inter,sans-serif;
+}
+.ah-loading-scene{width:min(440px,94vw);height:300px;position:relative;isolation:isolate;flex:none}
+.ah-scene-cloud{position:absolute;height:28px;border-radius:999px;background:#fff;opacity:.68;filter:blur(.2px);animation:ah-cloud-drift 7s ease-in-out infinite}
+.ah-scene-cloud-one{width:106px;left:6%;top:35px}.ah-scene-cloud-two{width:76px;right:5%;top:66px;animation-delay:-3s}
+.ah-loading-orbit{position:absolute;left:50%;top:43%;border-radius:50%;border:1px solid rgba(14,159,110,.18);transform:translate(-50%,-50%)}
+.ah-loading-orbit-outer{width:194px;height:194px;border-style:dashed;animation:ah-orbit-spin 24s linear infinite}
+.ah-loading-orbit-inner{width:150px;height:150px;border-color:rgba(14,159,110,.13);animation:ah-orbit-spin 18s linear infinite reverse}
+.ah-loading-wallet{position:absolute;z-index:4;left:50%;top:42%;width:104px;height:88px;transform:translate(-50%,-50%);border-radius:25px;
+  display:grid;place-items:center;color:white;background:linear-gradient(145deg,#20c68e 0%,#0b9868 72%,#087b58 100%);
+  box-shadow:0 17px 30px rgba(11,153,104,.22),inset 0 1px 0 rgba(255,255,255,.5);
+  animation:ah-wallet-float 3s ease-in-out infinite}
+.ah-loading-wallet:before{content:"";position:absolute;inset:7px;border:1px solid rgba(255,255,255,.32);border-radius:19px}
+.ah-loading-wallet-shine{position:absolute;inset:0;border-radius:inherit;background:linear-gradient(125deg,rgba(255,255,255,.22),transparent 52%);pointer-events:none}
+.ah-wallet-clasp{position:absolute;right:-1px;top:31px;width:29px;height:26px;border-radius:8px 0 0 8px;background:#e3fff2;border:2px solid #0b9868;box-shadow:0 3px 7px #075b3c20}
+.ah-wallet-clasp:after{content:"";position:absolute;left:9px;top:8px;width:5px;height:5px;border-radius:50%;background:#0e9f6e}
+.ah-finance-card{position:absolute;z-index:3;display:flex;align-items:center;justify-content:center;color:#0e9f6e;background:rgba(255,255,255,.94);
+  border:1px solid rgba(14,159,110,.13);border-radius:17px;box-shadow:0 12px 27px rgba(33,87,69,.08);animation:ah-finance-float 4s ease-in-out infinite}
+.ah-finance-card-chart{left:7%;top:70px;width:84px;height:76px;transform:rotate(-8deg);gap:3px}
+.ah-finance-card-chart span{align-self:flex-end;width:5px;border-radius:5px 5px 2px 2px;background:#9ee4c7;height:15px;margin-bottom:15px}
+.ah-finance-card-chart span:nth-of-type(2){height:24px;background:#5bd1a0}.ah-finance-card-chart span:nth-of-type(3){height:34px;background:#19b982}
+.ah-finance-card-calendar{right:8%;top:89px;width:75px;height:75px;display:grid;grid-template-columns:repeat(2,7px);grid-template-rows:repeat(2,7px);gap:5px;align-content:center;padding-top:19px;animation-delay:-1.6s}
+.ah-finance-card-calendar svg{position:absolute;top:10px;left:25px}
+.ah-finance-card-calendar i{width:7px;height:7px;border-radius:2px;background:#9fe3c6}
+.ah-finance-card-pie{right:16%;bottom:47px;width:57px;height:57px;border-radius:16px;animation-delay:-2.5s}
+.ah-finance-card-pie span{position:absolute;width:10px;height:10px;right:9px;top:9px;border-radius:50%;background:#c5b5ff;border:2px solid white}
+.ah-scene-hill{position:absolute;z-index:-1;bottom:23px;width:120%;height:112px;left:-10%;border-radius:50% 50% 0 0}
+.ah-scene-hill-back{background:#d8f0e3;transform:rotate(-5deg) translateY(12px)}
+.ah-scene-hill-front{background:#b9e8d0;transform:rotate(5deg) translateY(37px);opacity:.95}
+.ah-scene-ground{position:absolute;z-index:-1;left:0;right:0;bottom:0;height:54px;border-radius:50% 50% 0 0;background:linear-gradient(180deg,#a4e2c4,#d7f3e5);opacity:.8}
+.ah-loading-copy{position:relative;z-index:5;display:flex;align-items:center;flex-direction:column;margin-top:-1px;text-align:center}
+.ah-loading-wordmark{display:flex;align-items:center;gap:10px;font-family:Inter,'Noto Sans Bengali',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.65px}
+.ah-wordmark-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:#0e9f6e;color:white;box-shadow:0 5px 12px #0e9f6e22}
+.ah-loading-copy p{margin:13px 0 15px;color:var(--ah-load-muted);font-size:14px;font-weight:500}
+.ah-loading-dots{display:flex;align-items:center;justify-content:center;gap:7px;height:12px}
+.ah-loading-dots i{display:block;width:7px;height:7px;border-radius:50%;background:#0e9f6e;animation:ah-dot-bounce 1.05s ease-in-out infinite}
+.ah-loading-dots i:nth-child(2){animation-delay:.14s;background:#49c99a}.ah-loading-dots i:nth-child(3){animation-delay:.28s;background:#9bdcc1}
+@keyframes ah-wallet-float{0%,100%{translate:0 0;rotate:-1deg}50%{translate:0 -9px;rotate:1deg}}
+@keyframes ah-finance-float{0%,100%{translate:0 0}50%{translate:0 -8px}}
+@keyframes ah-dot-bounce{0%,60%,100%{transform:translateY(0);opacity:.48}30%{transform:translateY(-5px);opacity:1}}
+@keyframes ah-orbit-spin{to{rotate:360deg}}
+@keyframes ah-cloud-drift{0%,100%{translate:0 0}50%{translate:12px 3px}}
+@media(max-width:480px){.ah-loading-scene{height:260px;transform:scale(.88);transform-origin:center bottom;margin-bottom:-25px}.ah-loading-copy p{font-size:13px}.ah-loading-wordmark{font-size:22px}}
+@media(prefers-color-scheme:dark){body:not(:has(.app:not(.dark))) .ah-loading-screen{--ah-load-bg:#101b24;--ah-load-ink:#e8f5ef;--ah-load-muted:#9aafa7;--ah-load-mint:#1c3930}.ah-loading-screen:has(~ .app.dark){--ah-load-bg:#101b24;--ah-load-ink:#e8f5ef;--ah-load-muted:#9aafa7}}
+@media(prefers-reduced-motion:reduce){.ah-loading-screen *{animation:none!important;scroll-behavior:auto!important}}

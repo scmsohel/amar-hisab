@@ -6435,3 +6435,76 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     min-width:150px!important;
   }
 }
+
+
+/* Approved dashboard refinement: compact expense breakdown with donut left and labels right. */
+@media (min-width: 1251px) {
+  .dashboard-side-column > .category {
+    display: grid !important;
+    grid-template-columns: minmax(110px, 40%) minmax(0, 1fr) !important;
+    grid-template-rows: auto repeat(5, minmax(18px, auto)) !important;
+    column-gap: 12px !important;
+    row-gap: 6px !important;
+    align-content: start !important;
+    align-items: center !important;
+  }
+
+  .dashboard-side-column > .category > .panel-title {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    width: 100% !important;
+    margin-bottom: 4px !important;
+  }
+
+  .dashboard-side-column > .category > .donut {
+    grid-column: 1 !important;
+    grid-row: 2 / 7 !important;
+    align-self: center !important;
+    justify-self: center !important;
+    width: min(132px, 100%) !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+    margin: 0 !important;
+  }
+
+  .dashboard-side-column > .category > .donut > .donut-hole {
+    width: 66% !important;
+    height: 66% !important;
+  }
+
+  .dashboard-side-column > .category > .cat-row {
+    grid-column: 2 !important;
+    align-self: center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+  }
+
+  .dashboard-side-column > .category > .cat-row > span {
+    display: flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+  }
+
+  .dashboard-side-column > .category > .cat-row .cat-values {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 8px !important;
+    min-width: 0 !important;
+    white-space: nowrap !important;
+  }
+
+  .dashboard-side-column > .category > .empty {
+    grid-column: 2 !important;
+    grid-row: 2 / 7 !important;
+    align-self: center !important;
+    text-align: center !important;
+  }
+}

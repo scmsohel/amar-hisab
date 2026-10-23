@@ -6308,3 +6308,57 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
   .dashboard-side-column{grid-template-columns:minmax(0,1fr)!important}
   .dashboard-main .wallet-panel .wallets>.wallet-box{flex-basis:150px!important;width:150px!important;min-width:150px!important}
 }
+
+
+/* Approved dashboard layout correction: align the right rail and remove the empty vertical gap */
+@media (min-width: 1251px) {
+  .dashboard-top {
+    grid-template-columns: minmax(0, 2.45fr) minmax(280px, 1fr) !important;
+    align-items: start !important;
+    gap: 12px !important;
+  }
+
+  .dashboard-main {
+    display: flex !important;
+    flex-direction: column !important;
+    align-content: flex-start !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    height: fit-content !important;
+    min-height: 0 !important;
+  }
+
+  .dashboard-main > .hero-grid,
+  .dashboard-main > .stats,
+  .dashboard-main > .charts {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  .dashboard-main > .charts {
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr) !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+
+  .dashboard-side-column {
+    width: 100% !important;
+    min-width: 0 !important;
+    align-self: start !important;
+    gap: 12px !important;
+  }
+
+  .dashboard-side-column > .debts,
+  .dashboard-side-column > .category {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .bottom {
+    grid-template-columns: minmax(0, 2.45fr) minmax(280px, 1fr) !important;
+    align-items: start !important;
+  }
+}

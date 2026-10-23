@@ -57,7 +57,6 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
   bool _showConfirm = false;
   bool _loading = false;
   String? _message;
-  bool _messageIsError = true;
   final _formKey = GlobalKey<FormState>();
   final _identity = TextEditingController();
   final _name = TextEditingController();
@@ -101,7 +100,6 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     if (!mounted) return;
     setState(() {
       _loading = false;
-      _messageIsError = true;
       _message = 'ডিজাইন প্রস্তুত। আসল Login/Signup চালু করতে আপনার Amar Hisab API-এর ঠিকানা সংযুক্ত করতে হবে।';
     });
   }
@@ -112,8 +110,8 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
     return Scaffold(
       body: Stack(
         children: [
-          Positioned(top: -100, right: -90, child: _Glow(size: 250, color: const Color(0xFFBBD2FF).withOpacity(.48))),
-          Positioned(bottom: -120, left: -100, child: _Glow(size: 280, color: const Color(0xFFC7F3E2).withOpacity(.52))),
+          Positioned(top: -100, right: -90, child: _Glow(size: 250, color: const Color(0xFFBBD2FF).withValues(alpha: .48))),
+          Positioned(bottom: -120, left: -100, child: _Glow(size: 280, color: const Color(0xFFC7F3E2).withValues(alpha: .52))),
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -142,11 +140,11 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                           key: ValueKey(_mode),
                           padding: const EdgeInsets.all(22),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(.96),
+                            color: Colors.white.withValues(alpha: .96),
                             borderRadius: BorderRadius.circular(28),
                             border: Border.all(color: Colors.white, width: 1.5),
                             boxShadow: [
-                              BoxShadow(color: const Color(0xFF203B72).withOpacity(.08), blurRadius: 34, offset: const Offset(0, 16)),
+                              BoxShadow(color: const Color(0xFF203B72).withValues(alpha: .08), blurRadius: 34, offset: const Offset(0, 16)),
                             ],
                           ),
                           child: Form(
@@ -342,7 +340,7 @@ class _BrandHeader extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: const LinearGradient(colors: [_blue, Color(0xFF6D8FFF)], begin: Alignment.topLeft, end: Alignment.bottomRight),
               borderRadius: BorderRadius.circular(17),
-              boxShadow: [BoxShadow(color: _blue.withOpacity(.22), blurRadius: 16, offset: const Offset(0, 7))],
+              boxShadow: [BoxShadow(color: _blue.withValues(alpha: .22), blurRadius: 16, offset: const Offset(0, 7))],
             ),
             child: const Icon(Icons.account_balance_wallet_rounded, color: Colors.white, size: 27),
           ),
@@ -368,8 +366,8 @@ class _FinanceIllustration extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            Positioned(right: -24, top: -42, child: _Glow(size: 150, color: Colors.white.withOpacity(.65))),
-            Positioned(left: -22, bottom: -52, child: _Glow(size: 130, color: const Color(0xFFBDD3FF).withOpacity(.5))),
+            Positioned(right: -24, top: -42, child: _Glow(size: 150, color: Colors.white.withValues(alpha: .65))),
+            Positioned(left: -22, bottom: -52, child: _Glow(size: 130, color: const Color(0xFFBDD3FF).withValues(alpha: .5))),
             Positioned(left: 20, top: 25, child: _FloatingIcon(icon: Icons.savings_rounded, color: const Color(0xFF2F67D8), size: 42)),
             Positioned(right: 24, top: 20, child: _FloatingIcon(icon: Icons.trending_up_rounded, color: const Color(0xFF179B75), size: 37)),
             Positioned(
@@ -385,10 +383,10 @@ class _FinanceIllustration extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(.94),
+                    color: Colors.white.withValues(alpha: .94),
                     borderRadius: BorderRadius.circular(21),
                     border: Border.all(color: Colors.white, width: 1.5),
-                    boxShadow: [BoxShadow(color: _navy.withOpacity(.10), blurRadius: 20, offset: const Offset(0, 9))],
+                    boxShadow: [BoxShadow(color: _navy.withValues(alpha: .10), blurRadius: 20, offset: const Offset(0, 9))],
                   ),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Row(children: [
@@ -431,7 +429,7 @@ class _FloatingIcon extends StatelessWidget {
         child: Container(
           width: size + 17,
           height: size + 17,
-          decoration: BoxDecoration(color: Colors.white.withOpacity(.88), borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: color.withOpacity(.10), blurRadius: 14, offset: const Offset(0, 5))]),
+          decoration: BoxDecoration(color: Colors.white.withValues(alpha: .88), borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: color.withValues(alpha: .10), blurRadius: 14, offset: const Offset(0, 5))]),
           child: Icon(icon, color: color, size: size),
         ),
       );
@@ -445,7 +443,7 @@ class _Glow extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         width: size,
         height: size,
-        decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [color, color.withOpacity(0)])),
+        decoration: BoxDecoration(shape: BoxShape.circle, gradient: RadialGradient(colors: [color, color.withValues(alpha: 0)])),
       );
 }
 

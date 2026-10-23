@@ -6080,3 +6080,43 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
   .bill-payment-modal .bill-payment-summary{gap:10px;padding:11px}
   .bill-payment-modal .bill-payment-summary strong{font-size:14px}
 }
+
+
+/* Dashboard wallet strip: fixed-width cards, horizontal overflow and mouse drag */
+.wallet-panel .wallets{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  justify-content:flex-start;
+  align-items:stretch;
+  min-width:0;
+  width:100%;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  cursor:grab;
+  user-select:none;
+  -webkit-user-select:none;
+  scroll-snap-type:x mandatory;
+  overscroll-behavior-x:contain;
+  scrollbar-width:thin;
+  scrollbar-color:#b8dccc transparent;
+  padding:1px 1px 9px!important;
+}
+.wallet-panel .wallets.is-dragging{cursor:grabbing;scroll-snap-type:none;scroll-behavior:auto}
+.wallet-panel .wallets>.wallet-box{
+  flex:0 0 160px!important;
+  width:160px;
+  min-width:160px!important;
+  max-width:160px;
+  flex-wrap:nowrap!important;
+  align-items:center;
+  gap:8px;
+  scroll-snap-align:start;
+}
+.wallet-panel .wallets>.wallet-box>div{flex:1 1 auto!important;min-width:0}
+.wallet-panel .wallets>.wallet-box strong{flex-basis:auto!important;padding-left:0!important;font-size:12px}
+.wallet-panel .wallets::-webkit-scrollbar{height:5px}
+.wallet-panel .wallets::-webkit-scrollbar-thumb{background:#b8dccc;border-radius:999px}
+@media(max-width:700px){
+  .wallet-panel .wallets{gap:8px!important;padding:1px 1px 9px!important}
+  .wallet-panel .wallets>.wallet-box{flex-basis:155px!important;width:155px;min-width:155px!important;max-width:155px;padding:10px 9px!important}
+}

@@ -1691,12 +1691,14 @@
     transform-origin:left center;
     animation:dashboard-bar-grow .8s cubic-bezier(.2,.7,.2,1) .35s both;
   }
-  .charts>.category .donut{
+  .charts>.category .donut,
+  .dashboard-side-column>.category .donut{
     position:relative;
     isolation:isolate;
   }
   /* Reveal the existing, data-driven color segments in place; never rotate or replace the chart */
-  .charts>.category .donut::before{
+  .charts>.category .donut::before,
+  .dashboard-side-column>.category .donut::before{
     content:"";
     position:absolute;
     inset:0;
@@ -1708,7 +1710,8 @@
     mask:conic-gradient(transparent 0deg var(--donut-reveal),#000 var(--donut-reveal) 360deg);
     animation:dashboard-donut-fill 1.35s cubic-bezier(.2,.7,.2,1) .2s both;
   }
-  .charts>.category .donut-hole{
+  .charts>.category .donut-hole,
+  .dashboard-side-column>.category .donut-hole{
     position:relative;
     z-index:2;
   }
@@ -1732,6 +1735,8 @@
   .charts>.best-expenses .best-expense-track>i,
   .charts>.category .donut,
   .charts>.category .donut::before,
+  .dashboard-side-column>.category .donut,
+  .dashboard-side-column>.category .donut::before,
   .charts>.chart-panel .recharts-area-curve{
     animation:none!important;
   }

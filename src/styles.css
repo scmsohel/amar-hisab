@@ -6120,3 +6120,18 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
   .wallet-panel .wallets{gap:8px!important;padding:1px 1px 9px!important}
   .wallet-panel .wallets>.wallet-box{flex-basis:155px!important;width:155px;min-width:155px!important;max-width:155px;padding:10px 9px!important}
 }
+
+
+/* Show the complete profile landscape artwork instead of cropping it */
+.profile-redesign-page .profile-landscape-header{
+  min-height:340px!important;
+  background-size:100% 100%!important;
+  background-position:center center!important;
+}
+@media(max-width:700px){
+  .profile-redesign-page .profile-landscape-header{
+    min-height:390px!important;
+    background-size:100% 100%!important;
+    background-position:center center!important;
+  }
+}

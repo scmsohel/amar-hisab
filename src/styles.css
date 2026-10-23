@@ -6248,3 +6248,63 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     max-width:150px!important;
   }
 }
+
+
+/* Dashboard: debt and expense breakdown share the right-hand column */
+.dashboard-top{
+  display:grid!important;
+  grid-template-columns:minmax(0,2fr) minmax(300px,.95fr)!important;
+  align-items:start!important;
+  gap:12px!important;
+}
+.dashboard-main{min-width:0!important}
+.dashboard-side-column{
+  display:flex!important;
+  flex-direction:column!important;
+  align-self:start!important;
+  min-width:0!important;
+  gap:12px!important;
+}
+.dashboard-side-column>.hero-debts{
+  height:fit-content!important;
+  min-height:0!important;
+  align-self:stretch!important;
+}
+.dashboard-side-column>.category{
+  min-width:0!important;
+  height:fit-content!important;
+  min-height:0!important;
+  align-self:stretch!important;
+}
+.dashboard-main .wallet-panel{min-width:0!important;overflow:hidden!important}
+.dashboard-main .wallet-panel .wallets{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  gap:8px!important;
+  cursor:grab!important;
+  scrollbar-width:thin;
+  overscroll-behavior-x:contain;
+}
+.dashboard-main .wallet-panel .wallets>.wallet-box{
+  flex:0 0 150px!important;
+  width:150px!important;
+  min-width:150px!important;
+  max-width:150px!important;
+}
+.dashboard-main .wallet-panel .wallets.is-dragging{
+  cursor:grabbing!important;
+  scroll-snap-type:none!important;
+}
+@media(max-width:1100px){
+  .dashboard-top{grid-template-columns:minmax(0,1fr)!important}
+  .dashboard-side-column{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+}
+@media(max-width:700px){
+  .dashboard-side-column{grid-template-columns:minmax(0,1fr)!important}
+  .dashboard-main .wallet-panel .wallets>.wallet-box{flex-basis:150px!important;width:150px!important;min-width:150px!important}
+}

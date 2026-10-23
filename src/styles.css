@@ -6310,6 +6310,83 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
 }
 
 
+
+
+/* Approved: compact the right-rail expense breakdown; donut left, labels and values right */
+@media (min-width: 1101px) {
+  .dashboard-side-column > .category {
+    display: grid !important;
+    grid-template-columns: minmax(112px, 34%) minmax(0, 1fr) !important;
+    grid-template-rows: auto repeat(5, minmax(20px, auto)) !important;
+    column-gap: 14px !important;
+    row-gap: 7px !important;
+    align-content: start !important;
+    align-items: center !important;
+    padding: 14px !important;
+    height: fit-content !important;
+    min-height: 0 !important;
+  }
+  .dashboard-side-column > .category > .panel-title {
+    grid-column: 1 / -1 !important;
+    grid-row: 1 !important;
+    margin: 0 0 2px !important;
+  }
+  .dashboard-side-column > .category > .donut {
+    grid-column: 1 !important;
+    grid-row: 2 / span 5 !important;
+    align-self: center !important;
+    justify-self: center !important;
+    width: 126px !important;
+    height: 126px !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+  }
+  .dashboard-side-column > .category > .donut .donut-hole {
+    width: 86px !important;
+    height: 86px !important;
+  }
+  .dashboard-side-column > .category > .donut .donut-hole b {
+    font-size: 15px !important;
+    margin: 2px 0 !important;
+  }
+  .dashboard-side-column > .category > .donut .donut-hole small {
+    font-size: 10px !important;
+  }
+  .dashboard-side-column > .category > .cat-row {
+    grid-column: 2 !important;
+    margin: 0 !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    font-size: 12px !important;
+    gap: 8px !important;
+  }
+  .dashboard-side-column > .category > .cat-row > span {
+    min-width: 0 !important;
+    white-space: nowrap !important;
+  }
+  .dashboard-side-column > .category > .cat-row .cat-values {
+    display: flex !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    gap: 10px !important;
+    white-space: nowrap !important;
+  }
+  .dashboard-side-column > .category > .cat-row .cat-values span {
+    color: var(--muted) !important;
+    font-size: 11px !important;
+    min-width: 42px !important;
+    text-align: right !important;
+  }
+  .dashboard-side-column > .category > .cat-row .cat-values strong {
+    font-size: 12px !important;
+  }
+  .dashboard-side-column > .category > .empty {
+    grid-column: 2 !important;
+    padding: 12px 4px !important;
+    text-align: left !important;
+  }
+}
+
 /* Approved dashboard layout correction: align the right rail and remove the empty vertical gap */
 @media (min-width: 1251px) {
   .dashboard-top {

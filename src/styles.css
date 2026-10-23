@@ -3340,9 +3340,10 @@
     flex-direction:column;
   }
   .bottom>.dashboard-transactions .dashboard-transaction-table-wrap .table-scroll{
-    flex:1 1 auto;
+    flex:0 1 auto;
     min-height:0;
-    max-height:none;
+    max-height:520px;
+    overflow:auto;
   }
   .bottom>.dashboard-transactions .dashboard-transaction-scroll-summary{
     flex:0 0 auto;

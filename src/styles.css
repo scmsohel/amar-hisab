@@ -6362,3 +6362,44 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     align-items: start !important;
   }
 }
+
+
+/* Wallet strip final fix: four compact cards visible, extra wallets drag-scroll with no scrollbar or reserved track. */
+.dashboard-main .wallet-panel{
+  min-width:0!important;
+  max-width:100%!important;
+  overflow:hidden!important;
+}
+.dashboard-main .wallet-panel .wallets{
+  display:flex!important;
+  flex-flow:row nowrap!important;
+  justify-content:flex-start!important;
+  align-items:stretch!important;
+  width:100%!important;
+  min-width:0!important;
+  max-width:100%!important;
+  gap:8px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  padding:1px 1px 2px!important;
+  scrollbar-width:none!important;
+  -ms-overflow-style:none!important;
+  overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+  cursor:grab;
+}
+.dashboard-main .wallet-panel .wallets::-webkit-scrollbar{
+  display:none!important;
+  width:0!important;
+  height:0!important;
+}
+.dashboard-main .wallet-panel .wallets.is-dragging{
+  cursor:grabbing!important;
+  scroll-behavior:auto!important;
+}
+.dashboard-main .wallet-panel .wallets>.wallet-box{
+  flex:0 0 150px!important;
+  width:150px!important;
+  min-width:150px!important;
+  max-width:150px!important;
+}

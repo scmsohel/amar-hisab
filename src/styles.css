@@ -3342,7 +3342,7 @@
   .bottom>.dashboard-transactions .dashboard-transaction-table-wrap .table-scroll{
     flex:1 1 auto;
     min-height:360px;
-    max-height:calc(100vh - 250px);
+    max-height:calc(100vh - 200px);
     overflow:auto;
   }
   .bottom>.dashboard-transactions .dashboard-transaction-scroll-summary{

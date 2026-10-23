@@ -3316,13 +3316,37 @@
 .transaction-page .transaction-table-scroll{overflow-x:auto;max-width:100%}
 
 
-/* Keep dashboard recent-transactions panel compact; scroll rows inside the fixed table area */
+/* Dashboard recent transactions: let the table scroll area fill the stretched card */
+.dashboard-transactions .dashboard-transaction-table-wrap{
+  min-height:0;
+}
 .dashboard-transactions .dashboard-transaction-table-wrap .table-scroll{
   max-height:520px;
   overflow:auto;
   overscroll-behavior:contain;
   scrollbar-width:thin;
   scrollbar-color:transparent transparent;
+}
+@media(min-width:1251px){
+  .bottom>.dashboard-transactions{
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+  }
+  .bottom>.dashboard-transactions .dashboard-transaction-table-wrap{
+    display:flex;
+    flex:1 1 auto;
+    min-height:0;
+    flex-direction:column;
+  }
+  .bottom>.dashboard-transactions .dashboard-transaction-table-wrap .table-scroll{
+    flex:1 1 auto;
+    min-height:0;
+    max-height:none;
+  }
+  .bottom>.dashboard-transactions .dashboard-transaction-scroll-summary{
+    flex:0 0 auto;
+  }
 }
 .dashboard-transactions .dashboard-transaction-table-wrap .table-scroll::-webkit-scrollbar{width:7px;height:7px}
 .dashboard-transactions .dashboard-transaction-table-wrap .table-scroll::-webkit-scrollbar-thumb{background:transparent;border-radius:8px}

@@ -6649,3 +6649,31 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     box-sizing:border-box;
   }
 }
+
+
+/* Unified in-app dialogs replacing browser confirm/prompt popups */
+.app-dialog-shade{
+  position:fixed;inset:0;z-index:100000;display:grid;place-items:center;
+  padding:20px;background:rgba(4,14,24,.62);backdrop-filter:blur(5px);
+  animation:app-dialog-shade-in .16s ease-out both;
+}
+.app-dialog-card{
+  width:min(100%,440px);box-sizing:border-box;padding:25px;border-radius:20px;
+  color:var(--text,#183044);background:var(--surface,#fff);
+  border:1px solid var(--border,#dce6ee);box-shadow:0 24px 80px rgba(0,0,0,.28);
+  animation:app-dialog-card-in .2s cubic-bezier(.2,.7,.2,1) both;
+}
+.app-dialog-mark{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;
+  color:var(--primary,#0d9f6e);background:var(--primary-soft,rgba(16,185,129,.12));margin-bottom:14px}
+.app-dialog-card h2{margin:0 0 9px;font-size:19px;font-weight:800;color:var(--text,#183044)}
+.app-dialog-card p{margin:0;color:var(--muted,#718096);font-size:14px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere}
+.app-dialog-card form{margin-top:18px}
+.app-dialog-card input{width:100%;box-sizing:border-box;padding:12px 13px;border-radius:11px;border:1px solid var(--border,#dce6ee);background:var(--surface-subtle,#f7fafc);color:var(--text,#183044);font:inherit;outline:none}
+.app-dialog-card input:focus{border-color:var(--primary,#0d9f6e);box-shadow:0 0 0 3px rgba(16,185,129,.14)}
+.app-dialog-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:23px}
+.app-dialog-actions .btn{min-width:94px;justify-content:center}
+.app.dark .app-dialog-card{--text:#edf6fc;--muted:#9db1c1;--surface:#172832;--surface-subtle:#10212a;--border:#2a414e;--primary:#10b981;--primary-soft:rgba(16,185,129,.14)}
+@keyframes app-dialog-shade-in{from{opacity:0}to{opacity:1}}
+@keyframes app-dialog-card-in{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(max-width:520px){.app-dialog-shade{padding:14px}.app-dialog-card{padding:20px;border-radius:16px}.app-dialog-actions .btn{flex:1;min-width:0}}
+@media(prefers-reduced-motion:reduce){.app-dialog-shade,.app-dialog-card{animation:none!important}}

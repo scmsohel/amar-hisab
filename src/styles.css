@@ -6508,3 +6508,25 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     text-align: center !important;
   }
 }
+
+
+/* Approved refinement: larger expense donut and more readable category labels.
+   Keep the category card's existing outer dimensions unchanged. */
+@media (min-width: 1251px) {
+  .dashboard-side-column > .category {
+    grid-template-columns: minmax(150px, 42%) minmax(0, 1fr) !important;
+    overflow: hidden !important;
+  }
+  .dashboard-side-column > .category > .donut {
+    width: min(150px, 100%) !important;
+    transform: translate(-5px, 7px) !important;
+  }
+  .dashboard-side-column > .category > .cat-row,
+  .dashboard-side-column > .category > .cat-row > span,
+  .dashboard-side-column > .category > .cat-row .cat-values {
+    font-size: 11px !important;
+  }
+  .dashboard-side-column > .category > .cat-row .cat-values {
+    gap: 6px !important;
+  }
+}

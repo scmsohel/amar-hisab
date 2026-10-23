@@ -6613,7 +6613,8 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
 }
 .dark .profile-redesign-page .profile-landscape-header h3,
 [data-theme="dark"] .profile-redesign-page .profile-landscape-header h3{
-  color:#f3fbff!important;
+  color:#123047!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.28);
 }
 .dark .profile-redesign-page .profile-landscape-header p,
 [data-theme="dark"] .profile-redesign-page .profile-landscape-header p{

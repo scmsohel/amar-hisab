@@ -6527,9 +6527,17 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     transform: translate(-5px, 7px) !important;
   }
   .dashboard-side-column > .category > .cat-row,
-  .dashboard-side-column > .category > .cat-row > span,
-  .dashboard-side-column > .category > .cat-row .cat-values {
+  .dashboard-side-column > .category > .cat-row > span {
+    font-size: 12px !important;
+  }
+  .dashboard-side-column > .category > .cat-row > small,
+  .dashboard-side-column > .category > .cat-row .cat-values > span {
     font-size: 11px !important;
+  }
+  .dashboard-side-column > .category > .cat-row > b,
+  .dashboard-side-column > .category > .cat-row .cat-values > strong {
+    font-size: 12px !important;
+    font-weight: 700 !important;
   }
   .dashboard-side-column > .category > .cat-row .cat-values {
     gap: 6px !important;

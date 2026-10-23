@@ -6041,3 +6041,42 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
   .profile-redesign-page .profile-landscape-header{min-height:220px!important;padding:20px 16px!important}
   .profile-redesign-page .profile-inline-edit{width:26px;height:26px}
 }
+
+
+/* Bill payment modal: suggested amount is placeholder, summary and centered save */
+.bill-payment-modal .debt-payment-form input[type="number"]::placeholder{
+  color:var(--muted,#8796a6);
+  opacity:1;
+}
+.bill-payment-modal .bill-payment-summary{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-top:2px;
+  padding:13px 15px;
+  border:1px solid #a9e2d2;
+  border-radius:13px;
+  background:#edf9f5;
+}
+.bill-payment-modal .bill-payment-summary>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.bill-payment-modal .bill-payment-summary small{
+  color:#8193a2;
+  font-size:12px;
+  font-weight:600;
+}
+.bill-payment-modal .bill-payment-summary strong{
+  color:#203746;
+  font-size:16px;
+  font-weight:750;
+}
+.bill-payment-modal .bill-payment-actions{
+  display:flex;
+  justify-content:center!important;
+  align-items:center;
+  gap:10px;
+  margin-top:14px;
+}
+@media(max-width:520px){
+  .bill-payment-modal .bill-payment-summary{gap:10px;padding:11px}
+  .bill-payment-modal .bill-payment-summary strong{font-size:14px}
+}

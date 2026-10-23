@@ -6681,14 +6681,17 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
 
 /* Amar Hisab finance-illustration authentication loading screen */
 .ah-loading-screen{
-  --ah-load-bg:#f3f8f7;--ah-load-ink:#183d35;--ah-load-muted:#78918a;
+  --ah-load-bg:#fbfdfc;--ah-load-ink:#172b3d;--ah-load-muted:#718096;
   --ah-load-green:#0e9f6e;--ah-load-mint:#d9f4e9;
   position:fixed;inset:0;z-index:9999;min-height:100vh;min-height:100dvh;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   overflow:hidden;padding:28px 18px 40px;background:var(--ah-load-bg);
   color:var(--ah-load-ink);font-family:'Noto Sans Bengali','Hind Siliguri',Inter,sans-serif;
 }
-.ah-loading-scene{width:min(440px,94vw);height:270px;position:relative;isolation:isolate;flex:none;overflow:hidden}
+.ah-loading-screen:before,.ah-loading-screen:after{content:"";position:absolute;z-index:0;left:-12%;width:124%;height:170px;bottom:-78px;border-radius:50% 50% 0 0;pointer-events:none}
+.ah-loading-screen:before{background:rgba(184,242,222,.30);transform:rotate(-5deg) translateY(-22px)}
+.ah-loading-screen:after{background:rgba(151,232,205,.23);transform:rotate(4deg) translateY(-2px)}
+.ah-loading-scene{width:min(440px,94vw);height:285px;position:relative;isolation:isolate;flex:none;overflow:visible;z-index:1}
 .ah-scene-cloud{position:absolute;height:28px;border-radius:999px;background:#fff;opacity:.68;filter:blur(.2px);animation:ah-cloud-drift 7s ease-in-out infinite}
 .ah-scene-cloud-one{width:106px;left:6%;top:35px}.ah-scene-cloud-two{width:76px;right:5%;top:66px;animation-delay:-3s}
 .ah-loading-orbit{position:absolute;left:50%;top:43%;border-radius:50%;border:1px solid rgba(14,159,110,.18);transform:translate(-50%,-50%)}
@@ -6712,10 +6715,10 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
 .ah-finance-card-calendar i{width:7px;height:7px;border-radius:2px;background:#9fe3c6}
 .ah-finance-card-pie{right:16%;bottom:47px;width:57px;height:57px;border-radius:16px;animation-delay:-2.5s}
 .ah-finance-card-pie span{position:absolute;width:10px;height:10px;right:9px;top:9px;border-radius:50%;background:#c5b5ff;border:2px solid white}
-.ah-scene-hill{position:absolute;z-index:0;pointer-events:none;bottom:22px;width:120%;height:72px;left:-10%;border-radius:50% 50% 0 0}
-.ah-scene-hill-back{background:#d8f0e3;transform:rotate(-5deg) translateY(5px)}
-.ah-scene-hill-front{background:#b9e8d0;transform:rotate(5deg) translateY(22px);opacity:.95}
-.ah-scene-ground{position:absolute;z-index:0;left:0;right:0;bottom:0;height:35px;border-radius:50% 50% 0 0;background:linear-gradient(180deg,#a4e2c4,#d7f3e5);opacity:.8}
+.ah-scene-hill{display:none}
+.ah-scene-hill-back{display:none}
+.ah-scene-hill-front{display:none}
+.ah-scene-ground{display:none}
 .ah-loading-copy{position:relative;z-index:5;display:flex;align-items:center;flex-direction:column;margin-top:12px;text-align:center}
 .ah-loading-wordmark{display:flex;align-items:center;gap:10px;font-family:Inter,'Noto Sans Bengali',sans-serif;font-size:24px;font-weight:800;letter-spacing:-.65px}
 .ah-wordmark-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:#0e9f6e;color:white;box-shadow:0 5px 12px #0e9f6e22}
@@ -6729,5 +6732,5 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
 @keyframes ah-orbit-spin{to{rotate:360deg}}
 @keyframes ah-cloud-drift{0%,100%{translate:0 0}50%{translate:12px 3px}}
 @media(max-width:480px){.ah-loading-scene{height:245px;transform:scale(.88);transform-origin:center bottom;margin-bottom:-8px}.ah-loading-copy p{font-size:13px}.ah-loading-wordmark{font-size:22px}}
-.ah-loading-screen.ah-loading-dark{--ah-load-bg:#101b24;--ah-load-ink:#e8f5ef;--ah-load-muted:#9aafa7;--ah-load-mint:#1c3930}.ah-loading-screen.ah-loading-dark .ah-scene-hill-back{background:#1d3c32}.ah-loading-screen.ah-loading-dark .ah-scene-hill-front{background:#255543}.ah-loading-screen.ah-loading-dark .ah-scene-ground{background:linear-gradient(180deg,#214b3c,#183a30)}.ah-loading-screen.ah-loading-dark .ah-finance-card{background:rgba(23,38,48,.96);border-color:#2a5143}.ah-loading-screen.ah-loading-dark .ah-scene-cloud{background:#263a43}.ah-loading-screen.ah-loading-dark .ah-loading-orbit{border-color:rgba(70,210,157,.19)}
+.ah-loading-screen.ah-loading-dark{--ah-load-bg:#101b24;--ah-load-ink:#e8f5ef;--ah-load-muted:#9aafa7;--ah-load-mint:#1c3930}.ah-loading-screen.ah-loading-dark:before{background:rgba(30,88,68,.28)}.ah-loading-screen.ah-loading-dark:after{background:rgba(22,67,52,.32)}.ah-loading-screen.ah-loading-dark .ah-scene-hill-back{background:#1d3c32}.ah-loading-screen.ah-loading-dark .ah-scene-hill-front{background:#255543}.ah-loading-screen.ah-loading-dark .ah-scene-ground{background:linear-gradient(180deg,#214b3c,#183a30)}.ah-loading-screen.ah-loading-dark .ah-finance-card{background:rgba(23,38,48,.96);border-color:#2a5143}.ah-loading-screen.ah-loading-dark .ah-scene-cloud{background:#263a43}.ah-loading-screen.ah-loading-dark .ah-loading-orbit{border-color:rgba(70,210,157,.19)}
 @media(prefers-reduced-motion:reduce){.ah-loading-screen *{animation:none!important;scroll-behavior:auto!important}}

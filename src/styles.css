@@ -6005,3 +6005,39 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     font-size:14px;
   }
 }
+
+
+/* Profile refinements: taller landscape, working section links, inline edits */
+.profile-redesign-page .profile-landscape-header{
+  min-height:190px!important;
+  background-position:center 55%!important;
+}
+.profile-redesign-page .profile-section-tab{
+  appearance:none;
+  cursor:pointer;
+  font:inherit;
+  font-size:12px;
+  line-height:1.2;
+  transition:background .18s ease,border-color .18s ease,color .18s ease,transform .18s ease;
+}
+.profile-redesign-page .profile-section-tab:hover{border-color:#10a779;color:#07845e;transform:translateY(-1px)}
+.profile-redesign-page .profile-section-tab:focus-visible,
+.profile-redesign-page .profile-inline-edit:focus-visible{outline:2px solid #10a779;outline-offset:2px}
+.profile-redesign-page .profile-anchor-section{scroll-margin-top:18px}
+.profile-redesign-page .profile-inline-edit{
+  width:28px;
+  height:28px;
+  padding:0;
+  display:inline-grid;
+  place-items:center;
+  border:1px solid var(--border,#e2eaf1);
+  border-radius:8px;
+  color:var(--muted,#647b91);
+  background:var(--surface,#fff);
+  cursor:pointer;
+}
+.profile-redesign-page .profile-inline-edit:hover{color:#07845e;border-color:#10a779;background:rgba(16,185,129,.06)}
+@media(max-width:640px){
+  .profile-redesign-page .profile-landscape-header{min-height:220px!important;padding:20px 16px!important}
+  .profile-redesign-page .profile-inline-edit{width:26px;height:26px}
+}

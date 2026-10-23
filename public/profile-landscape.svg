@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 220" preserveAspectRatio="xMidYMid slice">
+<defs>
+ <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#c8effb"/><stop offset=".62" stop-color="#e2fbf1"/><stop offset="1" stop-color="#c9f0d8"/></linearGradient>
+ <linearGradient id="hill1" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b9efc6"/><stop offset="1" stop-color="#8fdcb0"/></linearGradient>
+ <linearGradient id="hill2" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#a7e7a9"/><stop offset="1" stop-color="#5ccda6"/></linearGradient>
+ <linearGradient id="front" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#65d7a4"/><stop offset="1" stop-color="#24bca4"/></linearGradient>
+ <g id="tree"><path d="M0 0v42" stroke="#368f71" stroke-width="4" stroke-linecap="round"/><path d="M0-52C-24-51-35-28-20-11C-38 1-25 18-7 13C9 24 29 12 24-4C40-21 23-42 8-40C8-52 4-57 0-52Z" fill="#23bfa0"/><path d="M-16-25q-5 16 4 23M11-37q-5 14 1 23" fill="none" stroke="#63d9b4" stroke-width="4" stroke-linecap="round"/></g>
+</defs>
+<rect width="1600" height="220" fill="url(#sky)"/>
+<g fill="#fff" opacity=".42"><ellipse cx="590" cy="45" rx="110" ry="25"/><ellipse cx="650" cy="36" rx="43" ry="26"/><ellipse cx="1050" cy="34" rx="88" ry="18"/></g>
+<circle cx="1110" cy="73" r="39" fill="#fff0a8" opacity=".96"/>
+<g fill="#17a99e" opacity=".9"><path d="M1220 46q-17-14-30-3q18 0 24 10q-4-13 6-7Z"/><path d="M1260 31q-14-12-25-2q15 0 20 9q-3-10 5-7Z"/><path d="M1287 47q-12-10-22-1q13 0 17 8q-2-9 5-7Z"/></g>
+<path d="M0 157Q170 121 310 151T590 140T850 157T1130 134T1390 149T1600 130V220H0Z" fill="#d0f0d1"/>
+<path d="M0 176Q185 158 335 176T650 151T945 169T1250 149T1600 165V220H0Z" fill="url(#hill1)"/>
+<path d="M0 201Q175 178 335 191T640 184T940 195T1260 178T1600 193V220H0Z" fill="url(#hill2)"/>
+<path d="M0 215Q180 192 375 210T720 201T1060 212T1350 195T1600 204V220H0Z" fill="url(#front)"/>
+<g opacity=".98"><use href="#tree" x="710" y="184" transform="translate(710 184) scale(1.1) translate(-710 -184)"/><use href="#tree" x="790" y="185" transform="translate(790 185) scale(1.35) translate(-790 -185)"/><use href="#tree" x="900" y="192" transform="translate(900 192) scale(.9) translate(-900 -192)"/><use href="#tree" x="1530" y="190" transform="translate(1530 190) scale(1.1) translate(-1530 -190)"/></g>
+<g fill="#46c69a" opacity=".85"><circle cx="18" cy="192" r="34"/><circle cx="52" cy="208" r="26"/><circle cx="1570" cy="205" r="35"/><circle cx="1590" cy="189" r="27"/></g>
+</svg>

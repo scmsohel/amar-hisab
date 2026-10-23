@@ -202,7 +202,7 @@ class _AuthScreenState extends State<AuthScreen> with TickerProviderStateMixin {
                                     validator: (v) {
                                       final value = (v ?? '').trim();
                                       if (value.isEmpty) return 'Email অথবা মোবাইল নম্বর দিন।';
-                                      if (value.contains('@') && !RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+).hasMatch(value)) return 'সঠিক Email address দিন।';
+                                      if (value.contains('@') && (!value.contains('.') || value.startsWith('@') || value.endsWith('@'))) return 'সঠিক Email address দিন।';
                                       if (!value.contains('@') && value.replaceAll(RegExp(r'\D'), '').length < 10) return 'সঠিক মোবাইল নম্বর দিন।';
                                       return null;
                                     },

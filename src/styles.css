@@ -6162,3 +6162,21 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     max-width:150px!important;
   }
 }
+
+
+/* Restore a compact, crisp profile banner: preserve the landscape aspect ratio */
+.profile-redesign-page .profile-landscape-header{
+  min-height:190px!important;
+  height:auto!important;
+  padding:24px 28px!important;
+  background-size:cover!important;
+  background-position:center center!important;
+}
+@media(max-width:700px){
+  .profile-redesign-page .profile-landscape-header{
+    min-height:210px!important;
+    padding:18px 16px!important;
+    background-size:cover!important;
+    background-position:center center!important;
+  }
+}

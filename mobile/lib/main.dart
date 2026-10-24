@@ -72,9 +72,9 @@ class _SplashScreenState extends State<SplashScreen>
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
         PageRouteBuilder<void>(
-          pageBuilder: (_, __, ___) => const AuthScreen(),
+          pageBuilder: (_, _, _) => const AuthScreen(),
           transitionDuration: const Duration(milliseconds: 500),
-          transitionsBuilder: (_, animation, __, child) => FadeTransition(
+          transitionsBuilder: (_, animation, _, child) => FadeTransition(
             opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
             child: child,
           ),
@@ -93,8 +93,6 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     const green = Color(0xFF078C50);
-    const deepGreen = Color(0xFF064D35);
-    const mint = Color(0xFFDDF8E9);
     const ink = Color(0xFF063E32);
     const muted = Color(0xFF617D80);
     final isDark = Theme.of(context).brightness == Brightness.dark;

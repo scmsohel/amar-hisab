@@ -6817,3 +6817,16 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     align-content:stretch!important;
   }
 }
+
+
+/* Final targeted fix: the expense breakdown is in the right rail, not inside .charts.
+   Extend its bottom edge to align with the left analytics row without moving other cards. */
+@media (min-width:1251px){
+  .dashboard-side-column > .category{
+    height:236px!important;
+    min-height:236px!important;
+    max-height:none!important;
+    align-self:stretch!important;
+    box-sizing:border-box!important;
+  }
+}

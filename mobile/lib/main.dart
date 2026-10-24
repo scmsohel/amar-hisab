@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 void main() => runApp(const AmarHisabApp());
 
@@ -54,7 +55,6 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with TickerProviderStateMixin {
   late final AnimationController _floatController;
-  late final AnimationController _loadingController;
 
   @override
   void initState() {
@@ -63,11 +63,6 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
       duration: const Duration(milliseconds: 2400),
     )..repeat(reverse: true);
-    _loadingController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat();
-
     Future<void>.delayed(const Duration(milliseconds: 2600), () {
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
@@ -86,7 +81,6 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void dispose() {
     _floatController.dispose();
-    _loadingController.dispose();
     super.dispose();
   }
 
@@ -184,17 +178,13 @@ class _SplashScreenState extends State<SplashScreen>
                             ),
                           ),
                           SizedBox(height: compact ? 42 : 86),
-                          AnimatedBuilder(
-                            animation: _loadingController,
-                            builder: (context, _) => Transform.rotate(
-                              angle: _loadingController.value * 2 * 3.141592653589793,
-                              child: const SizedBox(
-                                width: 62,
-                                height: 62,
-                                child: CustomPaint(
-                                  painter: _SplashSpinnerPainter(),
-                                ),
-                              ),
+                          SizedBox(
+                            width: 62,
+                            height: 62,
+                            child: Lottie.asset(
+                              'assets/animations/loading_spinner.json',
+                              repeat: true,
+                              fit: BoxFit.contain,
                             ),
                           ),
                           const SizedBox(height: 22),
@@ -219,41 +209,6 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
   }
-}
-
-class _SplashSpinnerPainter extends CustomPainter {
-  const _SplashSpinnerPainter();
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = (size.shortestSide / 2) - 5;
-    final rect = Rect.fromCircle(center: center, radius: radius);
-
-    final trackPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 5.5
-      ..color = const Color(0xFF078C50).withValues(alpha: .14);
-    canvas.drawCircle(center, radius, trackPaint);
-
-    final ringPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 5.5
-      ..strokeCap = StrokeCap.round
-      ..shader = const SweepGradient(
-        colors: [
-          Color(0x0019D5B0),
-          Color(0xFF9FEAD4),
-          Color(0xFF19D5B0),
-          Color(0xFF078C50),
-        ],
-        stops: [0.0, 0.28, 0.68, 1.0],
-      ).createShader(rect);
-    canvas.drawArc(rect, -1.57079632679, 4.65, false, ringPaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _SplashSpinnerPainter oldDelegate) => false;
 }
 
 class _SplashWalletArt extends StatelessWidget {

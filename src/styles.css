@@ -6808,9 +6808,9 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
 }
 
 
-/* Let the expense breakdown card extend down to match the highlighted lower edge on desktop. */
+/* Align the dashboard expense breakdown card with the highlighted lower edge. */
 @media (min-width:1251px){
-  .dashboard-side-column > .category{
+  .charts > .category{
     min-height:260px!important;
     height:260px!important;
     box-sizing:border-box!important;

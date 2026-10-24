@@ -6901,3 +6901,11 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     transform: translateY(9px) !important;
   }
 }
+
+
+/* Dashboard trend chart: increase only the graph area, keeping its card height unchanged */
+@media (min-width: 1251px) {
+  .dashboard-main .charts > .chart-panel .chart {
+    height: 145px;
+  }
+}

@@ -213,7 +213,17 @@ class _SplashScreenState extends State<SplashScreen>
                       ),
                     ),
                   ),
-        class _SplashSpinnerPainter extends CustomPainter {
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _SplashSpinnerPainter extends CustomPainter {
   const _SplashSpinnerPainter();
 
   @override
@@ -246,10 +256,6 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   bool shouldRepaint(covariant _SplashSpinnerPainter oldDelegate) => false;
-}
-
-(covariant _SplashPulsePainter oldDelegate) =>
-      oldDelegate.progress != progress;
 }
 
 class _SplashWalletArt extends StatelessWidget {

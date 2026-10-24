@@ -156,13 +156,16 @@ class _SplashScreenState extends State<SplashScreen>
                                   ),
                                 ),
                                 const SizedBox(height: 2),
-                                Text(
-                                  'তথ্য প্রস্তুত করা হচ্ছে...',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: isDark ? const Color(0xFFB6D8C9) : muted,
-                                    fontSize: compact ? 20 : 24,
-                                    fontWeight: FontWeight.w500,
+                                Transform.translate(
+                                  offset: const Offset(0, -14),
+                                  child: Text(
+                                    'তথ্য প্রস্তুত করা হচ্ছে...',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: isDark ? const Color(0xFFB6D8C9) : muted,
+                                      fontSize: compact ? 20 : 24,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ),
                               ],

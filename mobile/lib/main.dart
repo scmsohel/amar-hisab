@@ -105,7 +105,7 @@ class _SplashScreenState extends State<SplashScreen>
         builder: (context, constraints) {
           final compact = constraints.maxHeight < 720;
           final artSize = (constraints.maxHeight * (compact ? .27 : .31))
-              .clamp(190.0, 330.0);
+              .clamp(190.0, 330.0).toDouble();
           return Stack(
             children: [
               Positioned.fill(
@@ -132,7 +132,7 @@ class _SplashScreenState extends State<SplashScreen>
                         minHeight: (constraints.maxHeight -
                                 MediaQuery.of(context).padding.vertical -
                                 (compact ? 20 : 40))
-                            .clamp(0.0, double.infinity),
+                            .clamp(0.0, double.infinity).toDouble(),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

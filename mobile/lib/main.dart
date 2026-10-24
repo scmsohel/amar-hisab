@@ -248,6 +248,10 @@ class _SplashScreenState extends State<SplashScreen>
   bool shouldRepaint(covariant _SplashSpinnerPainter oldDelegate) => false;
 }
 
+(covariant _SplashPulsePainter oldDelegate) =>
+      oldDelegate.progress != progress;
+}
+
 class _SplashWalletArt extends StatelessWidget {
   const _SplashWalletArt({required this.size});
 

@@ -101,15 +101,10 @@ class _SplashScreenState extends State<SplashScreen>
           return Stack(
             children: [
               Positioned.fill(
-                child: CustomPaint(
-                  painter: _SplashWavePainter(
-                    topColor: isDark
-                        ? const Color(0xFF123B2C)
-                        : const Color(0xFFCCF2DE),
-                    bottomColor: isDark
-                        ? const Color(0xFF0C4933)
-                        : const Color(0xFFB8F0D2),
-                  ),
+                child: Image.asset(
+                  'assets/animations/Minimal Mint Leaf Wave Background.png',
+                  fit: BoxFit.cover,
+                  alignment: Alignment.center,
                 ),
               ),
               SafeArea(
@@ -141,7 +136,10 @@ class _SplashScreenState extends State<SplashScreen>
                             child: SizedBox(
                               width: artSize,
                               height: artSize,
-                              child: _SplashWalletArt(size: artSize),
+                              child: Image.asset(
+                                'assets/animations/logo.png',
+                                fit: BoxFit.contain,
+                              ),
                             ),
                           ),
                           SizedBox(height: compact ? 12 : 22),

@@ -156,7 +156,7 @@ class _SplashScreenState extends State<SplashScreen>
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               color: isDark ? const Color(0xFFB6D8C9) : muted,
-                              fontSize: compact ? 18 : 21,
+                              fontSize: compact ? 20 : 24,
                               fontWeight: FontWeight.w500,
                             ),
                           ),

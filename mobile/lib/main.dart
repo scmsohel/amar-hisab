@@ -242,15 +242,6 @@ class _SplashScreenState extends State<SplashScreen>
         stops: [0.0, 0.28, 0.68, 1.0],
       ).createShader(rect);
     canvas.drawArc(rect, -1.57079632679, 4.65, false, ringPaint);
-
-    final highlightPaint = Paint()
-      ..color = const Color(0xFFB9F6D6)
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(
-      Offset(center.dx, center.dy - radius),
-      2.2,
-      highlightPaint,
-    );
   }
 
   @override

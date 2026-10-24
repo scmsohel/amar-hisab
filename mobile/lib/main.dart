@@ -186,20 +186,15 @@ class _SplashScreenState extends State<SplashScreen>
                             ),
                           ),
                           SizedBox(height: compact ? 42 : 86),
-                          AnimatedBuilder(
-                            animation: _loadingController,
-                            builder: (context, child) => Transform.rotate(
-                              angle: _loadingController.value * 6.283185307,
-                              child: child,
-                            ),
-                            child: SizedBox(
-                              width: 58,
-                              height: 58,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 7,
-                                strokeCap: StrokeCap.round,
-                                valueColor: const AlwaysStoppedAnimation<Color>(green),
-                                backgroundColor: green.withValues(alpha: .12),
+                          SizedBox(
+                            width: 200,
+                            height: 100,
+                            child: AnimatedBuilder(
+                              animation: _loadingController,
+                              builder: (context, _) => CustomPaint(
+                                painter: _SplashPulsePainter(
+                                  progress: _loadingController.value,
+                                ),
                               ),
                             ),
                           ),
@@ -225,6 +220,45 @@ class _SplashScreenState extends State<SplashScreen>
       ),
     );
   }
+}
+
+class _SplashPulsePainter extends CustomPainter {
+  const _SplashPulsePainter({required this.progress});
+
+  final double progress;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path()
+      ..moveTo(size.width * .06, size.height * .50)
+      ..lineTo(size.width * .27, size.height * .50)
+      ..quadraticBezierTo(size.width * .31, size.height * .50, size.width * .33, size.height * .62)
+      ..lineTo(size.width * .40, size.height * .86)
+      ..quadraticBezierTo(size.width * .43, size.height * .93, size.width * .46, size.height * .84)
+      ..lineTo(size.width * .57, size.height * .18)
+      ..quadraticBezierTo(size.width * .60, size.height * .06, size.width * .64, size.height * .18)
+      ..lineTo(size.width * .72, size.height * .48)
+      ..quadraticBezierTo(size.width * .74, size.height * .54, size.width * .78, size.height * .54)
+      ..lineTo(size.width * .94, size.height * .54);
+
+    final shift = progress * size.width * .35;
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 10
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round
+      ..shader = const LinearGradient(
+        colors: [Color(0xFF19D5B0), Color(0xFF9FEAD4)],
+      ).createShader(Offset.zero & size);
+    canvas.save();
+    canvas.translate(-shift * .10, 0);
+    canvas.drawPath(path, paint);
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(covariant _SplashPulsePainter oldDelegate) =>
+      oldDelegate.progress != progress;
 }
 
 class _SplashWalletArt extends StatelessWidget {

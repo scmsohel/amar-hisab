@@ -61,11 +61,11 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     _floatController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2200),
+      duration: const Duration(milliseconds: 2400),
     )..repeat(reverse: true);
     _loadingController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1100),
+      duration: const Duration(milliseconds: 1200),
     )..repeat();
 
     Future<void>.delayed(const Duration(milliseconds: 2600), () {
@@ -73,7 +73,7 @@ class _SplashScreenState extends State<SplashScreen>
       Navigator.of(context).pushReplacement(
         PageRouteBuilder<void>(
           pageBuilder: (_, __, ___) => const AuthScreen(),
-          transitionDuration: const Duration(milliseconds: 450),
+          transitionDuration: const Duration(milliseconds: 500),
           transitionsBuilder: (_, animation, __, child) => FadeTransition(
             opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
             child: child,
@@ -92,266 +92,398 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    const green = Color(0xFF078C50);
+    const deepGreen = Color(0xFF064D35);
+    const mint = Color(0xFFDDF8E9);
+    const ink = Color(0xFF063E32);
+    const muted = Color(0xFF617D80);
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final background = isDark ? const Color(0xFF071A13) : const Color(0xFFF9FFFB);
-    final titleColor = isDark ? const Color(0xFFE8FFF1) : const Color(0xFF073D2A);
-    final subtitleColor = isDark ? const Color(0xFFB4D2C3) : const Color(0xFF617C70);
-    const green = Color(0xFF079653);
-    const mint = Color(0xFFB9F2D0);
 
     return Scaffold(
-      backgroundColor: background,
-      body: Stack(
-        children: [
-          Positioned(
-            top: -105,
-            left: -95,
-            child: _SplashGlow(size: 300, color: mint.withValues(alpha: .42)),
-          ),
-          Positioned(
-            bottom: -130,
-            right: -95,
-            child: _SplashGlow(
-              size: 340,
-              color: green.withValues(alpha: isDark ? .12 : .10),
-            ),
-          ),
-          SafeArea(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 28),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    AnimatedBuilder(
-                      animation: _floatController,
-                      builder: (context, child) => Transform.translate(
-                        offset: Offset(
-                          0,
-                          -7 * Curves.easeInOut.transform(_floatController.value),
-                        ),
-                        child: child,
+      backgroundColor: isDark ? const Color(0xFF071B15) : const Color(0xFFFCFFFD),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxHeight < 720;
+          final artSize = (constraints.maxHeight * (compact ? .27 : .31))
+              .clamp(190.0, 330.0);
+          return Stack(
+            children: [
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: _SplashWavePainter(
+                    topColor: isDark
+                        ? const Color(0xFF123B2C)
+                        : const Color(0xFFCCF2DE),
+                    bottomColor: isDark
+                        ? const Color(0xFF0C4933)
+                        : const Color(0xFFB8F0D2),
+                  ),
+                ),
+              ),
+              SafeArea(
+                child: Center(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: compact ? 10 : 20,
+                    ),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: (constraints.maxHeight -
+                                MediaQuery.of(context).padding.vertical -
+                                (compact ? 20 : 40))
+                            .clamp(0.0, double.infinity),
                       ),
-                      child: Container(
-                        width: 222,
-                        height: 222,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: mint.withValues(alpha: isDark ? .10 : .28),
-                        ),
-                        child: Center(
-                          child: Container(
-                            width: 158,
-                            height: 142,
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [Color(0xFF13B96B), Color(0xFF047746)],
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          AnimatedBuilder(
+                            animation: _floatController,
+                            builder: (context, child) => Transform.translate(
+                              offset: Offset(
+                                0,
+                                -5 * Curves.easeInOut.transform(_floatController.value),
                               ),
-                              borderRadius: BorderRadius.circular(30),
-                              border: Border.all(
-                                color: Colors.white.withValues(alpha: .55),
-                                width: 2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: green.withValues(alpha: .24),
-                                  blurRadius: 28,
-                                  offset: const Offset(0, 16),
-                                ),
-                              ],
+                              child: child,
                             ),
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Positioned(
-                                  top: 22,
-                                  left: 20,
-                                  child: Container(
-                                    width: 62,
-                                    height: 7,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(alpha: .75),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 36,
-                                  left: 20,
-                                  child: Container(
-                                    width: 42,
-                                    height: 7,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(alpha: .48),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.eco_rounded,
-                                  size: 75,
-                                  color: const Color(0xFFA9F5C5),
-                                  shadows: [
-                                    Shadow(
-                                      color: Colors.black.withValues(alpha: .12),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                Positioned(
-                                  right: -2,
-                                  bottom: 24,
-                                  child: Container(
-                                    width: 60,
-                                    height: 47,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF075C3B),
-                                      borderRadius: const BorderRadius.horizontal(
-                                        left: Radius.circular(15),
-                                        right: Radius.circular(9),
-                                      ),
-                                      border: Border.all(
-                                        color: Colors.white.withValues(alpha: .25),
-                                      ),
-                                    ),
-                                    child: const Center(
-                                      child: Icon(
-                                        Icons.circle,
-                                        color: Color(0xFFFFD54F),
-                                        size: 24,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  top: 0,
-                                  right: 12,
-                                  child: Container(
-                                    width: 55,
-                                    height: 55,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      gradient: const LinearGradient(
-                                        colors: [Color(0xFFFFE66D), Color(0xFFFFB800)],
-                                      ),
-                                      border: Border.all(
-                                        color: Colors.white.withValues(alpha: .8),
-                                        width: 2,
-                                      ),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Color(0x335A4A00),
-                                          blurRadius: 10,
-                                          offset: Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Center(
-                                      child: Text(
-                                        '৳',
-                                        style: TextStyle(
-                                          color: Color(0xFF8A5700),
-                                          fontSize: 30,
-                                          fontWeight: FontWeight.w900,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                            child: SizedBox(
+                              width: artSize,
+                              height: artSize,
+                              child: _SplashWalletArt(size: artSize),
                             ),
                           ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 35),
-                    RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        style: TextStyle(
-                          fontSize: 39,
-                          height: 1.2,
-                          fontWeight: FontWeight.w900,
-                          color: titleColor,
-                          letterSpacing: -.8,
-                        ),
-                        children: const [
-                          TextSpan(text: 'আমার '),
-                          TextSpan(
-                            text: 'হিসাব',
-                            style: TextStyle(color: green),
+                          SizedBox(height: compact ? 12 : 22),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: RichText(
+                              textAlign: TextAlign.center,
+                              text: TextSpan(
+                                style: TextStyle(
+                                  fontSize: compact ? 42 : 52,
+                                  height: 1.15,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: -1.4,
+                                  color: isDark ? const Color(0xFFE9FFF2) : ink,
+                                ),
+                                children: const [
+                                  TextSpan(text: 'আমার '),
+                                  TextSpan(
+                                    text: 'হিসাব',
+                                    style: TextStyle(color: green),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'আপনার আয়-ব্যয়ের সহজ সঙ্গী',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: isDark ? const Color(0xFFB6D8C9) : muted,
+                              fontSize: compact ? 18 : 21,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          SizedBox(height: compact ? 42 : 86),
+                          AnimatedBuilder(
+                            animation: _loadingController,
+                            builder: (context, child) => Transform.rotate(
+                              angle: _loadingController.value * 6.283185307,
+                              child: child,
+                            ),
+                            child: SizedBox(
+                              width: 58,
+                              height: 58,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 7,
+                                strokeCap: StrokeCap.round,
+                                valueColor: const AlwaysStoppedAnimation<Color>(green),
+                                backgroundColor: green.withValues(alpha: .12),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 22),
+                          Text(
+                            'তথ্য প্রস্তুত করা হচ্ছে...',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: isDark ? const Color(0xFFB6D8C9) : muted,
+                              fontSize: compact ? 18 : 21,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'আপনার আয়-ব্যয়ের সহজ সঙ্গী',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: subtitleColor,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 76),
-                    AnimatedBuilder(
-                      animation: _loadingController,
-                      builder: (context, child) => Transform.rotate(
-                        angle: _loadingController.value * 6.283185307,
-                        child: child,
-                      ),
-                      child: SizedBox(
-                        width: 44,
-                        height: 44,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 4,
-                          strokeCap: StrokeCap.round,
-                          valueColor: const AlwaysStoppedAnimation<Color>(green),
-                          backgroundColor: green.withValues(alpha: .12),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    Text(
-                      'তথ্য প্রস্তুত করা হচ্ছে...',
-                      style: TextStyle(
-                        color: subtitleColor,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }
 }
 
-class _SplashGlow extends StatelessWidget {
-  const _SplashGlow({required this.size, required this.color});
+class _SplashWalletArt extends StatelessWidget {
+  const _SplashWalletArt({required this.size});
 
   final double size;
-  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    const green = Color(0xFF078D50);
+    const deepGreen = Color(0xFF07543A);
+    const mint = Color(0xFFA5EFC0);
+    return Stack(
+      alignment: Alignment.center,
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          width: size * .94,
+          height: size * .94,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: RadialGradient(
+              colors: [Color(0xFFE0F9E9), Color(0x00E0F9E9)],
+              stops: [0, 1],
+            ),
+          ),
+        ),
+        Positioned(
+          left: size * .02,
+          bottom: size * .20,
+          child: Icon(Icons.spa_rounded, size: size * .17, color: mint),
+        ),
+        Positioned(
+          right: size * .02,
+          bottom: size * .20,
+          child: Icon(Icons.eco_rounded, size: size * .16, color: mint),
+        ),
+        Positioned(
+          top: size * .24,
+          left: size * .14,
+          right: size * .14,
+          child: Container(
+            height: size * .53,
+            decoration: BoxDecoration(
+              color: deepGreen,
+              borderRadius: BorderRadius.circular(size * .12),
+              boxShadow: [
+                BoxShadow(
+                  color: green.withValues(alpha: .22),
+                  blurRadius: size * .08,
+                  offset: Offset(0, size * .055),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Positioned(
+          top: size * .20,
+          left: size * .22,
+          child: Container(
+            width: size * .47,
+            height: size * .25,
+            padding: EdgeInsets.all(size * .055),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF3FFF7),
+              borderRadius: BorderRadius.circular(size * .045),
+              boxShadow: const [
+                BoxShadow(color: Color(0x1F004A2D), blurRadius: 10, offset: Offset(0, 4)),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _SplashPaperLine(width: size * .25),
+                SizedBox(height: size * .035),
+                _SplashPaperLine(width: size * .20),
+                SizedBox(height: size * .035),
+                _SplashPaperLine(width: size * .29),
+              ],
+            ),
+          ),
+        ),
+        Positioned(
+          top: size * .39,
+          left: size * .12,
+          right: size * .12,
+          child: Container(
+            height: size * .42,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFF16B86B), Color(0xFF078449), Color(0xFF05663E)],
+              ),
+              borderRadius: BorderRadius.circular(size * .12),
+              border: Border.all(color: const Color(0xFF63D996), width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF006A3A).withValues(alpha: .25),
+                  blurRadius: 12,
+                  offset: Offset(0, size * .04),
+                ),
+              ],
+            ),
+            child: Stack(
+              children: [
+                Positioned(
+                  top: size * .035,
+                  left: size * .035,
+                  right: size * .035,
+                  child: Container(
+                    height: size * .07,
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(color: mint.withValues(alpha: .65), width: 2),
+                      ),
+                      borderRadius: BorderRadius.circular(size * .06),
+                    ),
+                  ),
+                ),
+                Center(
+                  child: Icon(Icons.eco_rounded, size: size * .34, color: mint),
+                ),
+                Positioned(
+                  right: -size * .04,
+                  bottom: size * .10,
+                  child: Container(
+                    width: size * .31,
+                    height: size * .19,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF0AA35C), Color(0xFF05643D)],
+                      ),
+                      borderRadius: BorderRadius.circular(size * .07),
+                      border: Border.all(color: const Color(0xFF5AD58F), width: 2),
+                    ),
+                    child: Center(
+                      child: Container(
+                        width: size * .105,
+                        height: size * .105,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [Color(0xFFFFE66D), Color(0xFFFFB900)],
+                          ),
+                          boxShadow: [
+                            BoxShadow(color: Color(0x44004D2C), blurRadius: 5, offset: Offset(0, 2)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Positioned(
+          top: size * .11,
+          right: size * .20,
+          child: Container(
+            width: size * .27,
+            height: size * .27,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Color(0xFFFFE75B), Color(0xFFFFB800), Color(0xFFE99A00)],
+              ),
+              border: Border.all(color: const Color(0xFFFFF1A4), width: 3),
+              boxShadow: const [
+                BoxShadow(color: Color(0x443E4A00), blurRadius: 10, offset: Offset(0, 5)),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                '৳',
+                style: TextStyle(
+                  color: const Color(0xFF9B6100),
+                  fontSize: size * .16,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _SplashPaperLine extends StatelessWidget {
+  const _SplashPaperLine({required this.width});
+
+  final double width;
 
   @override
   Widget build(BuildContext context) => Container(
-        width: size,
-        height: size,
+        width: width,
+        height: 5,
         decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          gradient: RadialGradient(
-            colors: [color, color.withValues(alpha: 0)],
-          ),
+          color: const Color(0xFF8DDEA9),
+          borderRadius: BorderRadius.circular(8),
         ),
       );
+}
+
+class _SplashWavePainter extends CustomPainter {
+  const _SplashWavePainter({required this.topColor, required this.bottomColor});
+
+  final Color topColor;
+  final Color bottomColor;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final topPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: [topColor, topColor.withValues(alpha: .10)],
+      ).createShader(Offset.zero & size);
+    final top = Path()
+      ..moveTo(0, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width * .68, 0)
+      ..cubicTo(size.width * .52, size.height * .13, size.width * .34, size.height * .18, 0, size.height * .27)
+      ..close();
+    canvas.drawPath(top, topPaint);
+
+    final bottomPaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [bottomColor.withValues(alpha: .58), bottomColor],
+      ).createShader(Offset(0, size.height * .66) & Size(size.width, size.height * .34));
+    final bottom = Path()
+      ..moveTo(0, size.height * .72)
+      ..cubicTo(size.width * .18, size.height * .69, size.width * .27, size.height * .88, size.width * .47, size.height * .91)
+      ..cubicTo(size.width * .69, size.height * .95, size.width * .77, size.height * .78, size.width, size.height * .76)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(bottom, bottomPaint);
+
+    final wave2Paint = Paint()..color = bottomColor.withValues(alpha: .30);
+    final wave2 = Path()
+      ..moveTo(0, size.height * .84)
+      ..cubicTo(size.width * .23, size.height * .79, size.width * .34, size.height * .98, size.width * .58, size.height * .94)
+      ..cubicTo(size.width * .76, size.height * .90, size.width * .86, size.height * .84, size.width, size.height * .88)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(wave2, wave2Paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _SplashWavePainter oldDelegate) =>
+      oldDelegate.topColor != topColor || oldDelegate.bottomColor != bottomColor;
 }
 
 enum AuthMode { login, signup }

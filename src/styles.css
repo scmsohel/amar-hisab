@@ -5892,12 +5892,13 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
 .main,.content,.dashboard-top,.dashboard-main,.hero-grid,.wallet-panel,.stats,.charts,.bottom{min-width:0;max-width:100%}
 .dashboard-top{grid-template-columns:minmax(0,2fr) minmax(260px,1fr)!important}
 .dashboard-main{min-width:0!important}
-.dashboard-main .hero-grid{grid-template-columns:minmax(0,.92fr) minmax(0,1.32fr)!important;min-width:0}
+.dashboard-main .hero-grid{grid-template-columns:minmax(0,.82fr) minmax(0,1.42fr)!important;min-width:0}
 .dashboard-main .balance,.dashboard-main .wallet-panel{min-width:0;max-width:100%}
 .dashboard-main .wallet-panel .wallets{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;overflow-x:hidden!important;overflow-y:auto!important;min-width:0}
 .dashboard-main .wallet-panel .wallet-box{min-width:0!important;max-width:100%;overflow:hidden}
 .dashboard-main .wallet-panel .wallet-box div{min-width:0;overflow:hidden}
 .dashboard-main .wallet-panel .wallet-box strong{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.dashboard-main .wallet-panel .wallet-box strong{font-size:clamp(10px,1.05vw,12px);white-space:nowrap;letter-spacing:-.2px}
 .stats{grid-template-columns:repeat(4,minmax(0,1fr))!important}
 .stats>*{min-width:0;max-width:100%;overflow:hidden}
 @media(max-width:1100px){

@@ -140,32 +140,24 @@ class _SplashScreenState extends State<SplashScreen>
                               ),
                             ),
                           ),
-                          SizedBox(height: compact ? 0 : 0),
-                          Transform.translate(
-                            offset: const Offset(0, -80),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                SizedBox(
-                                  width: 180,
-                                  height: 180,
-                                  child: Lottie.asset(
-                                    'assets/animations/loading_spinner.json',
-                                    repeat: true,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  'তথ্য প্রস্তুত করা হচ্ছে...',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: isDark ? const Color(0xFFB6D8C9) : muted,
-                                    fontSize: compact ? 20 : 24,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
+                          SizedBox(height: compact ? 24 : 42),
+                          SizedBox(
+                            width: 180,
+                            height: 180,
+                            child: Lottie.asset(
+                              'assets/animations/loading_spinner.json',
+                              repeat: true,
+                              fit: BoxFit.contain,
+                            ),
+                          ),
+                          const SizedBox(height: 22),
+                          Text(
+                            'তথ্য প্রস্তুত করা হচ্ছে...',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: isDark ? const Color(0xFFB6D8C9) : muted,
+                              fontSize: compact ? 20 : 24,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],

@@ -157,7 +157,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 ),
                                 const SizedBox(height: 2),
                                 Transform.translate(
-                                  offset: const Offset(0, -14),
+                                  offset: const Offset(0, -26),
                                   child: Text(
                                     'তথ্য প্রস্তুত করা হচ্ছে...',
                                     textAlign: TextAlign.center,

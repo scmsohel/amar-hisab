@@ -6865,3 +6865,26 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     box-sizing: border-box !important;
   }
 }
+
+
+/* Improve readability of the dashboard expense-breakdown chart text only. */
+@media (min-width:1251px) {
+  .dashboard-side-column > .category > .cat-row,
+  .dashboard-side-column > .category > .cat-row > span {
+    font-size: 14px !important;
+  }
+
+  .dashboard-side-column > .category > .cat-row > small,
+  .dashboard-side-column > .category > .cat-row .cat-values > span {
+    font-size: 12px !important;
+  }
+
+  .dashboard-side-column > .category > .cat-row > b,
+  .dashboard-side-column > .category > .cat-row .cat-values > strong {
+    font-size: 14px !important;
+  }
+
+  .dashboard-side-column > .category > .cat-row .cat-values {
+    gap: 5px !important;
+  }
+}

@@ -155,7 +155,7 @@ class _SplashScreenState extends State<SplashScreen>
                                     fit: BoxFit.contain,
                                   ),
                                 ),
-                                const SizedBox(height: 10),
+                                const SizedBox(height: 2),
                                 Text(
                                   'তথ্য প্রস্তুত করা হচ্ছে...',
                                   textAlign: TextAlign.center,

@@ -6830,3 +6830,38 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     box-sizing:border-box!important;
   }
 }
+
+
+/* Desktop alignment fix: let the right rail fill the dashboard-main height,
+   then let the expense breakdown take the remaining height below debts. */
+@media (min-width:1251px) {
+  .dashboard-top {
+    align-items: stretch !important;
+  }
+
+  .dashboard-top > .dashboard-main {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .dashboard-top > .dashboard-side-column {
+    align-self: stretch !important;
+    height: auto !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .dashboard-top > .dashboard-side-column > .hero-debts {
+    flex: 0 0 auto !important;
+  }
+
+  .dashboard-top > .dashboard-side-column > .category {
+    flex: 1 1 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    align-self: stretch !important;
+    box-sizing: border-box !important;
+  }
+}

@@ -6261,7 +6261,7 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
   }
   .dashboard-main .hero-grid{
     align-items:start!important;
-    grid-template-columns:minmax(0,.92fr) minmax(0,1.32fr)!important;
+    grid-template-columns:minmax(0,.70fr) minmax(0,1.54fr)!important;
   }
   .dashboard-main .wallet-panel{
     align-self:start!important;

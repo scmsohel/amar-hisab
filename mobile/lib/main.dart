@@ -275,7 +275,7 @@ class _WalletArtwork extends StatelessWidget {
   @override
   Widget build(BuildContext context) => LayoutBuilder(builder: (context, constraints) {
         final width = constraints.maxWidth;
-        final artWidth = width.clamp(260.0, 390.0);
+        final artWidth = width.clamp(260.0, 390.0).toDouble();
         return Center(
           child: SizedBox(
             width: artWidth,

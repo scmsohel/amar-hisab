@@ -3274,7 +3274,7 @@
 
 
 /* Dashboard clock: isolated styles for the header clock/date only */
-.welcome-copy{min-width:0}
+.welcome-copy{min-width:0;flex:1}.welcome h1{overflow-wrap:anywhere;min-width:0}
 .dashboard-clock{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-right:18px;flex-shrink:0;color:var(--text);white-space:nowrap}
 .clock-time{display:flex;align-items:center;gap:10px;color:#0b9f70}
 .clock-time svg{flex-shrink:0}

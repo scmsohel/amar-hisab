@@ -5904,7 +5904,7 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
 @media(max-width:1100px){
  .dashboard-top{grid-template-columns:minmax(0,1fr)!important}
  .dashboard-top>.side-widgets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));min-width:0}
- .dashboard-main .hero-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .dashboard-main .hero-grid{grid-template-columns:minmax(0,.82fr) minmax(0,1fr)!important}
  .dashboard-main .wallet-panel .wallets{grid-template-columns:repeat(2,minmax(0,1fr))!important}
  .stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
  .charts,.bottom{grid-template-columns:minmax(0,1fr)!important}
@@ -6753,5 +6753,38 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     font-size:clamp(24px,1.75vw,28px);
     letter-spacing:-.8px;
     white-space:nowrap;
+  }
+}
+
+
+/* Wallet amount visibility fix for medium desktop/tablet preview widths. */
+@media (min-width:701px) and (max-width:1100px){
+  .dashboard-main .hero-grid{
+    grid-template-columns:minmax(0,.82fr) minmax(0,1fr)!important;
+    gap:10px!important;
+  }
+  .dashboard-main .wallet-panel .wallets>.wallet-box{
+    flex:0 0 calc((100% - 24px)/4)!important;
+    width:calc((100% - 24px)/4)!important;
+    min-width:0!important;
+    max-width:none!important;
+    box-sizing:border-box!important;
+    padding:7px 5px!important;
+    gap:5px!important;
+  }
+  .dashboard-main .wallet-panel .wallets>.wallet-box>span{
+    width:23px!important;height:23px!important;flex:0 0 23px!important;
+  }
+  .dashboard-main .wallet-panel .wallets>.wallet-box .wallet-info{
+    flex:1 1 0!important;min-width:0!important;width:0!important;overflow:hidden!important;
+  }
+  .dashboard-main .wallet-panel .wallets>.wallet-box .wallet-info b{
+    display:block!important;font-size:9px!important;line-height:1.2!important;
+    white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+  }
+  .dashboard-main .wallet-panel .wallets>.wallet-box .wallet-info strong{
+    display:block!important;font-size:10px!important;line-height:1.25!important;
+    letter-spacing:-.35px!important;white-space:nowrap!important;
+    overflow:visible!important;text-overflow:clip!important;
   }
 }

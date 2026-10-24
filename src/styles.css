@@ -6888,3 +6888,16 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     gap: 5px !important;
   }
 }
+
+
+/* Vertically center the donut and category list within the taller expense card,
+   while keeping the card heading in its existing top position. */
+@media (min-width:1251px) {
+  .dashboard-side-column > .category > .donut {
+    transform: translate(-5px, 16px) !important;
+  }
+
+  .dashboard-side-column > .category > .cat-row {
+    transform: translateY(9px) !important;
+  }
+}

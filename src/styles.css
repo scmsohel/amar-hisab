@@ -6788,3 +6788,21 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     overflow:visible!important;text-overflow:clip!important;
   }
 }
+
+
+/* Match requested dashboard top-row proportions: shorten balance card and expand wallet summary into the freed space. */
+@media (min-width:701px) and (max-width:1100px){
+  .dashboard-main > .hero-grid,
+  .dashboard-main .hero-grid{
+    grid-template-columns:minmax(0,.68fr) minmax(0,1.32fr)!important;
+    gap:10px!important;
+  }
+  .dashboard-main .balance{
+    min-width:0!important;
+    width:auto!important;
+  }
+  .dashboard-main .wallet-panel{
+    min-width:0!important;
+    width:auto!important;
+  }
+}

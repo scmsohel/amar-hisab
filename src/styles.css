@@ -6734,3 +6734,23 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
 @media(max-width:480px){.ah-loading-scene{height:245px;transform:scale(.88);transform-origin:center bottom;margin-bottom:-8px}.ah-loading-copy p{font-size:13px}.ah-loading-wordmark{font-size:22px}}
 .ah-loading-screen.ah-loading-dark{--ah-load-bg:#101b24;--ah-load-ink:#e8f5ef;--ah-load-muted:#9aafa7;--ah-load-mint:#1c3930}.ah-loading-screen.ah-loading-dark:before{background:rgba(30,88,68,.28)}.ah-loading-screen.ah-loading-dark:after{background:rgba(22,67,52,.32)}.ah-loading-screen.ah-loading-dark .ah-scene-hill-back{background:#1d3c32}.ah-loading-screen.ah-loading-dark .ah-scene-hill-front{background:#255543}.ah-loading-screen.ah-loading-dark .ah-scene-ground{background:linear-gradient(180deg,#214b3c,#183a30)}.ah-loading-screen.ah-loading-dark .ah-finance-card{background:rgba(23,38,48,.96);border-color:#2a5143}.ah-loading-screen.ah-loading-dark .ah-scene-cloud{background:#263a43}.ah-loading-screen.ah-loading-dark .ah-loading-orbit{border-color:rgba(70,210,157,.19)}
 @media(prefers-reduced-motion:reduce){.ah-loading-screen *{animation:none!important;scroll-behavior:auto!important}}
+
+
+/* Fine-tune dashboard top row: give wallet summary a little more room without clipping the balance. */
+@media(min-width:1251px){
+  .dashboard-main .hero-grid{
+    grid-template-columns:minmax(0,.94fr) minmax(0,1.63fr) minmax(0,1fr);
+  }
+  .dashboard-main .balance-top{
+    padding-left:14px;
+    padding-right:14px;
+  }
+  .dashboard-main .balance-content{
+    min-width:0;
+  }
+  .dashboard-main .balance .big{
+    font-size:clamp(24px,1.75vw,28px);
+    letter-spacing:-.8px;
+    white-space:nowrap;
+  }
+}

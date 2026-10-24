@@ -142,39 +142,6 @@ class _SplashScreenState extends State<SplashScreen>
                               ),
                             ),
                           ),
-                          SizedBox(height: compact ? 12 : 22),
-                          FittedBox(
-                            fit: BoxFit.scaleDown,
-                            child: RichText(
-                              textAlign: TextAlign.center,
-                              text: TextSpan(
-                                style: TextStyle(
-                                  fontSize: compact ? 42 : 52,
-                                  height: 1.15,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: -1.4,
-                                  color: isDark ? const Color(0xFFE9FFF2) : ink,
-                                ),
-                                children: const [
-                                  TextSpan(text: 'আমার '),
-                                  TextSpan(
-                                    text: 'হিসাব',
-                                    style: TextStyle(color: green),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            'আপনার আয়-ব্যয়ের সহজ সঙ্গী',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: isDark ? const Color(0xFFB6D8C9) : muted,
-                              fontSize: compact ? 18 : 21,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
                           SizedBox(height: compact ? 24 : 42),
                           SizedBox(
                             width: 180,

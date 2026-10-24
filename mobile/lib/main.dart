@@ -186,14 +186,15 @@ class _SplashScreenState extends State<SplashScreen>
                             ),
                           ),
                           SizedBox(height: compact ? 42 : 86),
-                          SizedBox(
-                            width: 200,
-                            height: 100,
-                            child: AnimatedBuilder(
-                              animation: _loadingController,
-                              builder: (context, _) => CustomPaint(
-                                painter: _SplashPulsePainter(
-                                  progress: _loadingController.value,
+                          AnimatedBuilder(
+                            animation: _loadingController,
+                            builder: (context, _) => Transform.rotate(
+                              angle: _loadingController.value * 2 * 3.141592653589793,
+                              child: const SizedBox(
+                                width: 62,
+                                height: 62,
+                                child: CustomPaint(
+                                  painter: _SplashSpinnerPainter(),
                                 ),
                               ),
                             ),
@@ -212,52 +213,51 @@ class _SplashScreenState extends State<SplashScreen>
                       ),
                     ),
                   ),
-                ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
-  }
-}
-
-class _SplashPulsePainter extends CustomPainter {
-  const _SplashPulsePainter({required this.progress});
-
-  final double progress;
+        class _SplashSpinnerPainter extends CustomPainter {
+  const _SplashSpinnerPainter();
 
   @override
   void paint(Canvas canvas, Size size) {
-    final path = Path()
-      ..moveTo(size.width * .06, size.height * .50)
-      ..lineTo(size.width * .27, size.height * .50)
-      ..quadraticBezierTo(size.width * .31, size.height * .50, size.width * .33, size.height * .62)
-      ..lineTo(size.width * .40, size.height * .86)
-      ..quadraticBezierTo(size.width * .43, size.height * .93, size.width * .46, size.height * .84)
-      ..lineTo(size.width * .57, size.height * .18)
-      ..quadraticBezierTo(size.width * .60, size.height * .06, size.width * .64, size.height * .18)
-      ..lineTo(size.width * .72, size.height * .48)
-      ..quadraticBezierTo(size.width * .74, size.height * .54, size.width * .78, size.height * .54)
-      ..lineTo(size.width * .94, size.height * .54);
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = (size.shortestSide / 2) - 5;
+    final rect = Rect.fromCircle(center: center, radius: radius);
 
-    final shift = progress * size.width * .35;
-    final paint = Paint()
+    final trackPaint = Paint()
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 10
+      ..strokeWidth = 5.5
+      ..color = const Color(0xFF078C50).withValues(alpha: .14);
+    canvas.drawCircle(center, radius, trackPaint);
+
+    final ringPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 5.5
       ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..shader = const LinearGradient(
-        colors: [Color(0xFF19D5B0), Color(0xFF9FEAD4)],
-      ).createShader(Offset.zero & size);
-    canvas.save();
-    canvas.translate(-shift * .10, 0);
-    canvas.drawPath(path, paint);
-    canvas.restore();
+      ..shader = const SweepGradient(
+        colors: [
+          Color(0x0019D5B0),
+          Color(0xFF9FEAD4),
+          Color(0xFF19D5B0),
+          Color(0xFF078C50),
+        ],
+        stops: [0.0, 0.28, 0.68, 1.0],
+      ).createShader(rect);
+    canvas.drawArc(rect, -1.57079632679, 4.65, false, ringPaint);
+
+    final highlightPaint = Paint()
+      ..color = const Color(0xFFB9F6D6)
+      ..style = PaintingStyle.fill;
+    canvas.drawCircle(
+      Offset(center.dx, center.dy - radius),
+      2.2,
+      highlightPaint,
+    );
   }
 
   @override
-  bool shouldRepaint(covariant _SplashPulsePainter oldDelegate) =>
+  bool shouldRepaint(covariant _SplashSpinnerPainter oldDelegate) => false;
+}
+
+(covariant _SplashPulsePainter oldDelegate) =>
       oldDelegate.progress != progress;
 }
 

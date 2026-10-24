@@ -177,10 +177,10 @@ class _SplashScreenState extends State<SplashScreen>
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          SizedBox(height: compact ? 42 : 86),
+                          SizedBox(height: compact ? 24 : 42),
                           SizedBox(
-                            width: 62,
-                            height: 62,
+                            width: 180,
+                            height: 180,
                             child: Lottie.asset(
                               'assets/animations/loading_spinner.json',
                               repeat: true,
@@ -446,9 +446,9 @@ class _SplashWavePainter extends CustomPainter {
         colors: [bottomColor.withValues(alpha: .58), bottomColor],
       ).createShader(Offset(0, size.height * .66) & Size(size.width, size.height * .34));
     final bottom = Path()
-      ..moveTo(0, size.height * .72)
-      ..cubicTo(size.width * .18, size.height * .69, size.width * .27, size.height * .88, size.width * .47, size.height * .91)
-      ..cubicTo(size.width * .69, size.height * .95, size.width * .77, size.height * .78, size.width, size.height * .76)
+      ..moveTo(0, size.height * .82)
+      ..cubicTo(size.width * .18, size.height * .79, size.width * .27, size.height * .93, size.width * .47, size.height * .94)
+      ..cubicTo(size.width * .69, size.height * .97, size.width * .77, size.height * .86, size.width, size.height * .84)
       ..lineTo(size.width, size.height)
       ..lineTo(0, size.height)
       ..close();
@@ -456,9 +456,9 @@ class _SplashWavePainter extends CustomPainter {
 
     final wave2Paint = Paint()..color = bottomColor.withValues(alpha: .30);
     final wave2 = Path()
-      ..moveTo(0, size.height * .84)
-      ..cubicTo(size.width * .23, size.height * .79, size.width * .34, size.height * .98, size.width * .58, size.height * .94)
-      ..cubicTo(size.width * .76, size.height * .90, size.width * .86, size.height * .84, size.width, size.height * .88)
+      ..moveTo(0, size.height * .91)
+      ..cubicTo(size.width * .23, size.height * .87, size.width * .34, size.height, size.width * .58, size.height * .97)
+      ..cubicTo(size.width * .76, size.height * .94, size.width * .86, size.height * .91, size.width, size.height * .94)
       ..lineTo(size.width, size.height)
       ..lineTo(0, size.height)
       ..close();

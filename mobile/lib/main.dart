@@ -1069,11 +1069,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                         child: const Icon(Icons.person_rounded, color: _blue, size: 27),
                       ),
-                      IconButton(
-                        tooltip: _nightMode ? 'Day Mode' : 'Night Mode',
-                        onPressed: () => setState(() => _nightMode = !_nightMode),
-                        icon: Icon(_nightMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded, color: _ink),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 22),
@@ -1097,11 +1092,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                     child: Stack(
                       children: [
-                        const Positioned(
-                          right: 0,
-                          bottom: -8,
-                          child: Icon(Icons.eco_rounded, size: 100, color: Color(0x3321A66A)),
-                        ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

@@ -1012,45 +1012,240 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    body: Stack(children: [
-      Positioned.fill(child: Image.asset('assets/animations/Minimal Mint Leaf Wave Background.png', fit: BoxFit.cover)),
-      SafeArea(child: RefreshIndicator(onRefresh: _load, child: ListView(padding: const EdgeInsets.all(20), children: [
-        Row(children: [
-          const Icon(Icons.account_balance_wallet_rounded, color: _blue, size: 30),
-          const SizedBox(width: 10),
-          const Expanded(child: Text('আমার হিসাব', style: TextStyle(color: _ink, fontSize: 25, fontWeight: FontWeight.w900))),
-          IconButton(onPressed: _load, icon: const Icon(Icons.refresh_rounded, color: _ink)),
-        ]),
-        const SizedBox(height: 18),
-        Text('শুভ দিন, ' + _name + '!', style: const TextStyle(color: _ink, fontSize: 22, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 5),
-        const Text('ছোট ছোট সঠিক সিদ্ধান্ত, বড় পরিবর্তন আনে', style: TextStyle(color: _muted, fontSize: 13)),
-        const SizedBox(height: 24),
-        Container(
-          padding: const EdgeInsets.fromLTRB(22, 22, 22, 24),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(color: Colors.white, width: 1.5),
-            gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xF2FFFFFF), Color(0xE0E5FFF2), Color(0xD9C9F0DE)]),
-            boxShadow: [BoxShadow(color: _blue.withValues(alpha: .12), blurRadius: 28, offset: const Offset(0, 12))],
+        body: Stack(children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/animations/Minimal Mint Leaf Wave Background.png',
+              fit: BoxFit.cover,
+            ),
           ),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              const Expanded(child: Text('মোট ব্যালেন্স', style: TextStyle(color: _ink, fontSize: 17, fontWeight: FontWeight.w700))),
-              IconButton(onPressed: () => setState(() => _hidden = !_hidden), icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: _muted)),
-            ]),
-            const SizedBox(height: 4),
-            if (_loading) const LinearProgressIndicator()
-            else if (_error != null) Text(_error!, style: const TextStyle(color: Colors.redAccent, fontSize: 13))
-            else Text(_hidden ? '৳ ••••••' : _money(_balance), style: const TextStyle(color: Color(0xFF10251D), fontSize: 32, fontWeight: FontWeight.w900)),
-            const SizedBox(height: 14),
-            Text(_loading ? 'ব্যালেন্স লোড হচ্ছে...' : _error != null ? 'সার্ভার থেকে ডেটা পাওয়া যায়নি' : 'সার্ভারের হিসাব অনুযায়ী', style: const TextStyle(color: _muted, fontSize: 12, fontWeight: FontWeight.w600)),
-          ]),
-        ),
-        if (_error != null) Padding(padding: const EdgeInsets.only(top: 12), child: OutlinedButton.icon(onPressed: _load, icon: const Icon(Icons.refresh_rounded), label: const Text('আবার চেষ্টা করুন'))),
-      ]))),
-    ]),
-  );
+          const Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 330,
+            child: CustomPaint(painter: _DashboardLandscapePainter()),
+          ),
+          SafeArea(
+            child: RefreshIndicator(
+              onRefresh: _load,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
+                children: [
+                  Row(
+                    children: [
+                      IconButton(
+                        tooltip: 'মেনু',
+                        onPressed: () => _showDashboardMenu(context),
+                        icon: const Icon(Icons.menu_rounded, color: _ink, size: 29),
+                      ),
+                      const Expanded(
+                        child: Column(
+                          children: [
+                            Text('আমার হিসাব', style: TextStyle(color: _ink, fontSize: 23, fontWeight: FontWeight.w900)),
+                            SizedBox(height: 2),
+                            Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', style: TextStyle(color: _muted, fontSize: 10.5)),
+                          ],
+                        ),
+                      ),
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          IconButton(
+                            tooltip: 'নোটিফিকেশন',
+                            onPressed: () => _notice(context, 'এখন কোনো নতুন নোটিফিকেশন নেই।'),
+                            icon: const Icon(Icons.notifications_none_rounded, color: _ink, size: 27),
+                          ),
+                          Positioned(
+                            right: 9,
+                            top: 8,
+                            child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: Color(0xFFE53935), shape: BoxShape.circle)),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withValues(alpha: .85),
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        child: const Icon(Icons.person_rounded, color: _blue, size: 27),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  Text(
+                    'শুভ দিন, $_name! ☺',
+                    style: const TextStyle(color: Color(0xFF102B25), fontSize: 23, fontWeight: FontWeight.w900),
+                  ),
+                  const SizedBox(height: 5),
+                  const Text(
+                    'ছোট ছোট সঠিক সিদ্ধান্ত, বড় পরিবর্তন আনে',
+                    style: TextStyle(color: Color(0xFF506D66), fontSize: 12.5),
+                  ),
+                  const SizedBox(height: 126),
+                  Container(
+                    padding: const EdgeInsets.fromLTRB(22, 19, 20, 20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(29),
+                      border: Border.all(color: Colors.white.withValues(alpha: .95), width: 1.5),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.white.withValues(alpha: .84),
+                          const Color(0xFFD9F7EB).withValues(alpha: .87),
+                          const Color(0xFFBCEFD9).withValues(alpha: .82),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(color: const Color(0xFF176D51).withValues(alpha: .10), blurRadius: 24, offset: const Offset(0, 10)),
+                      ],
+                    ),
+                    child: Stack(
+                      children: [
+                        const Positioned(
+                          right: 0,
+                          bottom: -8,
+                          child: Icon(Icons.eco_rounded, size: 100, color: Color(0x3321A66A)),
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(children: [
+                              const Expanded(child: Text('মোট ব্যালেন্স', style: TextStyle(color: Color(0xFF183F32), fontSize: 17, fontWeight: FontWeight.w700))),
+                              IconButton(
+                                tooltip: _hidden ? 'ব্যালেন্স দেখান' : 'ব্যালেন্স লুকান',
+                                onPressed: () => setState(() => _hidden = !_hidden),
+                                icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: const Color(0xFF738982), size: 23),
+                              ),
+                            ]),
+                            const SizedBox(height: 3),
+                            if (_loading)
+                              const SizedBox(height: 42, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator(strokeWidth: 2.5))))
+                            else if (_error != null)
+                              Text(_error!, style: const TextStyle(color: Colors.redAccent, fontSize: 12))
+                            else
+                              Text(
+                                _hidden ? '৳ ••••••' : _money(_balance),
+                                style: const TextStyle(color: Color(0xFF101C18), fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: .2),
+                              ),
+                            const SizedBox(height: 8),
+                            Row(children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                                decoration: BoxDecoration(color: const Color(0xFF9CF1CE).withValues(alpha: .9), borderRadius: BorderRadius.circular(24)),
+                                child: const Row(children: [
+                                  Icon(Icons.trending_up_rounded, size: 17, color: Color(0xFF087C52)),
+                                  SizedBox(width: 3),
+                                  Text('মোট হিসাব', style: TextStyle(color: Color(0xFF086846), fontSize: 11, fontWeight: FontWeight.w800)),
+                                ]),
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(child: Text(
+                                _loading ? 'ব্যালেন্স লোড হচ্ছে...' : _error != null ? 'সার্ভার থেকে ডেটা পাওয়া যায়নি' : 'সার্ভারের হিসাব অনুযায়ী',
+                                style: const TextStyle(color: Color(0xFF526F66), fontSize: 11.5),
+                              )),
+                            ]),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (_error != null) ...[
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(onPressed: _load, icon: const Icon(Icons.refresh_rounded), label: const Text('আবার চেষ্টা করুন')),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ]),
+      );
+
+  void _showDashboardMenu(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.white,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          ListTile(leading: const Icon(Icons.refresh_rounded), title: const Text('ডেটা রিফ্রেশ'), onTap: () { Navigator.pop(sheetContext); _load(); }),
+          ListTile(leading: const Icon(Icons.dns_outlined), title: const Text('Server Settings'), onTap: () { Navigator.pop(sheetContext); Navigator.of(context).push(_route(const ServerSettingsScreen())); }),
+          ListTile(leading: const Icon(Icons.logout_rounded), title: const Text('লগআউট'), onTap: () { Navigator.pop(sheetContext); Navigator.of(context).pushReplacement(_route(const LoginScreen())); }),
+        ]),
+      ),
+    );
+  }
+}
+
+
+class _DashboardLandscapePainter extends CustomPainter {
+  const _DashboardLandscapePainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final sky = Paint()..shader = const LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [Color(0x00E0FFF4), Color(0xBDE0FFF4), Color(0xFFE3FFF1)],
+    ).createShader(Offset.zero & size);
+    canvas.drawRect(Offset.zero & size, sky);
+
+    final farHills = Path()
+      ..moveTo(0, size.height * .63)
+      ..cubicTo(size.width * .14, size.height * .48, size.width * .22, size.height * .49, size.width * .36, size.height * .60)
+      ..cubicTo(size.width * .48, size.height * .40, size.width * .61, size.height * .43, size.width * .72, size.height * .58)
+      ..cubicTo(size.width * .83, size.height * .44, size.width * .92, size.height * .47, size.width, size.height * .55)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(farHills, Paint()..color = const Color(0xFF9DDFCB).withValues(alpha: .62));
+
+    final hills = Path()
+      ..moveTo(0, size.height * .73)
+      ..cubicTo(size.width * .16, size.height * .58, size.width * .28, size.height * .65, size.width * .42, size.height * .72)
+      ..cubicTo(size.width * .58, size.height * .57, size.width * .70, size.height * .61, size.width * .81, size.height * .68)
+      ..cubicTo(size.width * .90, size.height * .59, size.width * .95, size.height * .59, size.width, size.height * .64)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(hills, Paint()..color = const Color(0xFF4DBD8B).withValues(alpha: .72));
+
+    final lake = Path()
+      ..moveTo(0, size.height * .78)
+      ..quadraticBezierTo(size.width * .45, size.height * .71, size.width, size.height * .77)
+      ..lineTo(size.width, size.height * .91)
+      ..quadraticBezierTo(size.width * .52, size.height * .85, 0, size.height * .92)
+      ..close();
+    canvas.drawPath(lake, Paint()..color = const Color(0xFF8FE4CE).withValues(alpha: .8));
+
+    final treePaint = Paint()..color = const Color(0xFF168858);
+    final trunkPaint = Paint()..color = const Color(0xFF806347);
+    final tx = size.width * .86;
+    final ty = size.height * .58;
+    canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTWH(tx - 3, ty + 7, 7, 30), const Radius.circular(3)), trunkPaint);
+    canvas.drawCircle(Offset(tx, ty), 20, treePaint);
+    canvas.drawCircle(Offset(tx - 13, ty + 9), 15, Paint()..color = const Color(0xFF24A86A));
+    canvas.drawCircle(Offset(tx + 14, ty + 10), 16, Paint()..color = const Color(0xFF0E754B));
+
+    final houseX = size.width * .70;
+    final houseY = size.height * .66;
+    final house = Paint()..color = const Color(0xFFFFF9E8);
+    canvas.drawRect(Rect.fromLTWH(houseX, houseY, 28, 20), house);
+    final roof = Path()
+      ..moveTo(houseX - 4, houseY + 2)
+      ..lineTo(houseX + 14, houseY - 12)
+      ..lineTo(houseX + 32, houseY + 2)
+      ..close();
+    canvas.drawPath(roof, Paint()..color = const Color(0xFF98684C));
+    canvas.drawRect(Rect.fromLTWH(houseX + 11, houseY + 9, 7, 11), Paint()..color = const Color(0xFF9B7657));
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashboardLandscapePainter oldDelegate) => false;
 }
 
 class InviteVerificationScreen extends StatefulWidget {

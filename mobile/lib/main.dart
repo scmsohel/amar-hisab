@@ -2,9 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:lottie/lottie.dart';
 
-void main() => runApp(const AmarHisabApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await _AuthApi.loadBaseUrl();
+  runApp(const AmarHisabApp());
+}
 
 const _blue = Color(0xFF00834A);
 const _deepBlue = Color(0xFF006B3D);
@@ -14,15 +19,90 @@ const _line = Color(0xFFDDEBE5);
 const _pale = Color(0xFFF2F7FF);
 
 class _AuthApi {
-  static const String _baseUrl = 'http://192.168.10.124:8088/api';
+  static const String _baseUrlPreferenceKey = 'amar_hisab_server_url';
   static final HttpClient _client = HttpClient()
     ..connectionTimeout = const Duration(seconds: 12);
+  static String? _baseUrl;
   static String? _sessionCookie;
+
+  static String? get baseUrl => _baseUrl;
+
+  static Future<void> loadBaseUrl() async {
+    final preferences = await SharedPreferences.getInstance();
+    final saved = preferences.getString(_baseUrlPreferenceKey);
+    _baseUrl = saved == null || saved.trim().isEmpty ? null : _normalizeUrl(saved);
+  }
+
+  static String _normalizeUrl(String value) => value.trim().replaceFirst(RegExp(r'/+$'), '');
+
+  static String? validateUrl(String value) {
+    final normalized = _normalizeUrl(value);
+    final uri = Uri.tryParse(normalized);
+    if (uri == null || !uri.hasAuthority || uri.host.isEmpty) {
+      return 'সঠিক Server URL দিন।';
+    }
+    if (uri.scheme != 'https') {
+      return 'নিরাপত্তার জন্য HTTPS Server URL ব্যবহার করুন।';
+    }
+    if (uri.userInfo.isNotEmpty || uri.query.isNotEmpty || uri.fragment.isNotEmpty) {
+      return 'URL-এ username, password, query বা fragment দেওয়া যাবে না।';
+    }
+    if (uri.path != '/api' && !uri.path.endsWith('/api')) {
+      return 'Server URL-এর শেষে /api থাকতে হবে।';
+    }
+    return null;
+  }
+
+  static Future<bool> testServerUrl(String value) async {
+    final validationError = validateUrl(value);
+    if (validationError != null) throw Exception(validationError);
+    final base = _normalizeUrl(value);
+    final uri = Uri.parse('$base/health');
+    final request = await _client.getUrl(uri).timeout(const Duration(seconds: 12));
+    request.headers.set(HttpHeaders.acceptHeader, 'application/json');
+    final response = await request.close().timeout(const Duration(seconds: 15));
+    final responseText = await response.transform(utf8.decoder).join();
+    if (response.statusCode != 200) {
+      throw Exception('Server health check ব্যর্থ হয়েছে (HTTP ${response.statusCode})।');
+    }
+    try {
+      final data = jsonDecode(responseText);
+      if (data is Map<String, dynamic> && data['status'] == 'ok') return true;
+    } on FormatException {
+      // Report a consistent connection error below.
+    }
+    throw Exception('Server-এর health response সঠিক নয়।');
+  }
+
+  static Future<void> saveBaseUrl(String value) async {
+    final normalized = _normalizeUrl(value);
+    final validationError = validateUrl(normalized);
+    if (validationError != null) throw Exception(validationError);
+    await testServerUrl(normalized);
+    final preferences = await SharedPreferences.getInstance();
+    if (_baseUrl != normalized) _sessionCookie = null;
+    await preferences.setString(_baseUrlPreferenceKey, normalized);
+    _baseUrl = normalized;
+  }
+
+  static Future<void> _ensureConfigured() async {
+    if (_baseUrl == null || _baseUrl!.isEmpty) {
+      throw Exception('আগে Settings থেকে Server Address সেট করুন।');
+    }
+    final validationError = validateUrl(_baseUrl!);
+    if (validationError != null) throw Exception(validationError);
+  }
+
+  static Future<void> checkConfiguredServer() async {
+    await _ensureConfigured();
+    await testServerUrl(_baseUrl!);
+  }
 
   static Future<Map<String, dynamic>> _post(
     String path,
     Map<String, dynamic> body,
   ) async {
+    await _ensureConfigured();
     final uri = Uri.parse('$_baseUrl$path');
     final request = await _client.postUrl(uri);
     request.headers.contentType = ContentType.json;
@@ -624,6 +704,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (_submitting || !(_formKey.currentState?.validate() ?? false)) return;
     setState(() => _submitting = true);
     try {
+      await _AuthApi.checkConfiguredServer();
       await _AuthApi.login(identity: _identity.text, password: _password.text);
       if (!mounted) return;
       _notice(context, 'লগইন সফল হয়েছে।');
@@ -648,6 +729,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Spacer(),
                 Transform.translate(offset: const Offset(-24, 10), child: SizedBox(width: 320, height: 165, child: ClipRect(child: Align(alignment: Alignment.topCenter, heightFactor: .30, child: Image.asset('assets/animations/logo.png', width: 320, fit: BoxFit.contain))))),
                 const Spacer(),
+                IconButton(
+                  tooltip: 'Server Settings',
+                  onPressed: () => Navigator.of(context).push(_route(const ServerSettingsScreen())),
+                  icon: const Icon(Icons.dns_outlined, color: _ink),
+                ),
               ]),
             ),
             Expanded(child: SingleChildScrollView(
@@ -705,6 +791,131 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 }
 
+
+class ServerSettingsScreen extends StatefulWidget {
+  const ServerSettingsScreen({super.key});
+
+  @override
+  State<ServerSettingsScreen> createState() => _ServerSettingsScreenState();
+}
+
+class _ServerSettingsScreenState extends State<ServerSettingsScreen> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _serverUrl;
+  bool _saving = false;
+  bool _testing = false;
+  bool _showHelp = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _serverUrl = TextEditingController(text: _AuthApi.baseUrl ?? '');
+  }
+
+  @override
+  void dispose() {
+    _serverUrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _testAndSave() async {
+    FocusScope.of(context).unfocus();
+    if (_saving || _testing || !(_formKey.currentState?.validate() ?? false)) return;
+    setState(() { _saving = true; _testing = true; });
+    try {
+      await _AuthApi.saveBaseUrl(_serverUrl.text);
+      if (!mounted) return;
+      _notice(context, 'Server সংযোগ সফল। Address সংরক্ষণ হয়েছে।');
+      Navigator.of(context).pop();
+    } catch (error) {
+      if (!mounted) return;
+      _notice(context, error.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() { _saving = false; _testing = false; });
+    }
+  }
+
+  Future<void> _testOnly() async {
+    FocusScope.of(context).unfocus();
+    if (_saving || _testing || !(_formKey.currentState?.validate() ?? false)) return;
+    setState(() => _testing = true);
+    try {
+      await _AuthApi.testServerUrl(_serverUrl.text);
+      if (!mounted) return;
+      _notice(context, 'Server API ও database connection ঠিক আছে।');
+    } catch (error) {
+      if (!mounted) return;
+      _notice(context, error.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _testing = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        body: Stack(children: [
+          const _CloudBackground(),
+          SafeArea(child: Column(children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 16, 20, 0),
+              child: Row(children: [
+                IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back_rounded, color: _ink)),
+                const Expanded(child: Text('Server Settings', style: TextStyle(fontSize: 21, fontWeight: FontWeight.w900, color: _ink))),
+                const Icon(Icons.dns_outlined, color: _blue, size: 26),
+              ]),
+            ),
+            Expanded(child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(22, 18, 22, 28),
+              child: Center(child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 430),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: .95),
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(color: Colors.white, width: 1.5),
+                    boxShadow: [BoxShadow(color: const Color(0xFF244A88).withValues(alpha: .07), blurRadius: 30, offset: const Offset(0, 12))],
+                  ),
+                  child: Form(key: _formKey, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                    const Icon(Icons.cloud_done_outlined, size: 44, color: _blue),
+                    const SizedBox(height: 12),
+                    const Text('আপনার Server Address', textAlign: TextAlign.center, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: _ink)),
+                    const SizedBox(height: 8),
+                    const Text('Cloudflare Tunnel দিয়ে প্রকাশ করা HTTPS API URL দিন। প্রথমবার কোনো server আগে থেকে নির্বাচন করা নেই।', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, height: 1.6, color: _muted)),
+                    const SizedBox(height: 22),
+                    TextFormField(
+                      controller: _serverUrl,
+                      keyboardType: TextInputType.url,
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      decoration: const InputDecoration(prefixIcon: Icon(Icons.link_rounded), hintText: 'https://your-domain.example/api', labelText: 'API Server URL'),
+                      validator: (value) => _AuthApi.validateUrl(value ?? ''),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text('URL-এর শেষে /api থাকতে হবে। উদাহরণ: https://amr.scsohel.site/api', style: TextStyle(fontSize: 12, height: 1.5, color: _muted)),
+                    const SizedBox(height: 18),
+                    _PrimaryButton(label: _testing ? 'সংযোগ পরীক্ষা হচ্ছে...' : 'শুধু সংযোগ পরীক্ষা', onPressed: _testing || _saving ? null : _testOnly),
+                    const SizedBox(height: 10),
+                    _PrimaryButton(label: _saving ? 'পরীক্ষা ও সংরক্ষণ হচ্ছে...' : 'Verify করে সংরক্ষণ', onPressed: _saving || _testing ? null : _testAndSave),
+                    const SizedBox(height: 14),
+                    OutlinedButton.icon(
+                      onPressed: () => setState(() => _showHelp = !_showHelp),
+                      icon: const Icon(Icons.info_outline_rounded),
+                      label: Text(_showHelp ? 'নির্দেশনা লুকান' : 'কোন URL ব্যবহার করব?'),
+                    ),
+                    if (_showHelp) ...[
+                      const SizedBox(height: 8),
+                      const Text('Server URL হলো আপনার public HTTPS address, যার /api/health endpoint {"status":"ok"} দেয়। শুধু domain-এর root URL নয়; /api অংশসহ লিখুন। Server বদলালে নতুন server-এর account ও data আলাদা হতে পারে.', style: TextStyle(fontSize: 12.5, height: 1.6, color: _muted)),
+                    ],
+                  ])),
+                ),
+              )),
+            )),
+          ])),
+        ]),
+      );
+}
+
 class InviteVerificationScreen extends StatefulWidget {
   const InviteVerificationScreen({super.key});
 
@@ -728,6 +939,7 @@ class _InviteVerificationScreenState extends State<InviteVerificationScreen> {
     if (_verifying || !(_formKey.currentState?.validate() ?? false)) return;
     setState(() => _verifying = true);
     try {
+      await _AuthApi.checkConfiguredServer();
       await _AuthApi.verifyInvite(_invite.text);
       if (!mounted) return;
       Navigator.of(context).pushReplacement(

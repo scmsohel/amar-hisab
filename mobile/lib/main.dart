@@ -686,16 +686,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       const _OrDivider(),
                       const SizedBox(height: 14),
                       OutlinedButton.icon(
-                        onPressed: () => _notice(context, 'ইনভাইট কোড ব্যবহার করে অ্যাকাউন্ট তৈরির জন্য সাইন আপ করুন।'),
+                        onPressed: () => Navigator.of(context).push(_route(const SignupScreen())),
                         icon: const Icon(Icons.groups_2_outlined, color: Color(0xFF00834A), size: 24),
                         label: const Text('ইনভাইট কোড দিয়ে যোগ দিন', style: TextStyle(color: _ink, fontWeight: FontWeight.w700, fontSize: 13)),
                         style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48), side: const BorderSide(color: _line), shape: const StadiumBorder()),
                       ),
-                      const SizedBox(height: 18),
-                      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        const Text('নতুন ব্যবহারকারী? ', style: TextStyle(color: _muted, fontSize: 12)),
-                        GestureDetector(onTap: () => Navigator.of(context).push(_route(const SignupScreen())), child: const Text('সাইন আপ করুন', style: TextStyle(color: _blue, fontWeight: FontWeight.w800, fontSize: 12))),
-                      ]),
+
                     ])),
                   ),
                 ]),

@@ -565,14 +565,11 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Row(children: [
                 const SizedBox(width: 42),
                 const Spacer(),
-                SizedBox(width: 150, height: 88, child: ClipRect(child: Align(alignment: Alignment.topCenter, heightFactor: .58, child: Image.asset('assets/animations/logo.png', width: 150, fit: BoxFit.contain)))),
+                SizedBox(width: 150, height: 88, child: ClipRect(child: Align(alignment: Alignment.topCenter, heightFactor: .42, child: Image.asset('assets/animations/logo.png', width: 150, fit: BoxFit.contain)))),
                 const Spacer(),
               ]),
             ),
             const SizedBox(height: 2),
-            const Text('আমার হিসাব', textAlign: TextAlign.center, style: TextStyle(fontSize: 29, fontWeight: FontWeight.w900, color: Color(0xFF075B3A))),
-            const SizedBox(height: 3),
-            const Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', textAlign: TextAlign.center, style: TextStyle(fontSize: 12.5, color: Color(0xFF687C78))),
             Expanded(child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(22, 10, 22, 24),
               child: Center(child: ConstrainedBox(
@@ -673,10 +670,7 @@ class _SignupScreenState extends State<SignupScreen> {
           Positioned.fill(child: Image.asset('assets/animations/Minimal Mint Leaf Wave Background.png', fit: BoxFit.cover)),
           SafeArea(child: Column(children: [
             const SizedBox(height: 8),
-            SizedBox(width: 150, height: 88, child: ClipRect(child: Align(alignment: Alignment.topCenter, heightFactor: .58, child: Image.asset('assets/animations/logo.png', width: 150, fit: BoxFit.contain)))),
-            const Text('আমার হিসাব', textAlign: TextAlign.center, style: TextStyle(fontSize: 29, fontWeight: FontWeight.w900, color: Color(0xFF075B3A))),
-            const SizedBox(height: 3),
-            const Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', textAlign: TextAlign.center, style: TextStyle(fontSize: 12.5, color: Color(0xFF687C78))),
+            SizedBox(width: 150, height: 88, child: ClipRect(child: Align(alignment: Alignment.topCenter, heightFactor: .42, child: Image.asset('assets/animations/logo.png', width: 150, fit: BoxFit.contain)))),
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 2, 16, 0),
               child: Row(children: [

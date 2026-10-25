@@ -1076,33 +1076,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 18),
-                  Text(
-                    'শুভ দিন, $_name! ☺',
-                    style: const TextStyle(color: Color(0xFF102B25), fontSize: 23, fontWeight: FontWeight.w900),
-                  ),
-                  const SizedBox(height: 5),
-                  const Text(
-                    'ছোট ছোট সঠিক সিদ্ধান্ত, বড় পরিবর্তন আনে',
-                    style: TextStyle(color: Color(0xFF506D66), fontSize: 12.5),
-                  ),
-                  const SizedBox(height: 126),
+                  const SizedBox(height: 22),
                   Container(
                     padding: const EdgeInsets.fromLTRB(22, 19, 20, 20),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(29),
-                      border: Border.all(color: Colors.white.withValues(alpha: .95), width: 1.5),
+                      border: Border.all(color: Colors.white.withValues(alpha: .82), width: 1.5),
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Colors.white.withValues(alpha: .84),
-                          const Color(0xFFD9F7EB).withValues(alpha: .87),
-                          const Color(0xFFBCEFD9).withValues(alpha: .82),
+                          Colors.white.withValues(alpha: .43),
+                          const Color(0xFFD9F7EB).withValues(alpha: .48),
+                          const Color(0xFFBCEFD9).withValues(alpha: .42),
                         ],
                       ),
                       boxShadow: [
-                        BoxShadow(color: const Color(0xFF176D51).withValues(alpha: .10), blurRadius: 24, offset: const Offset(0, 10)),
+                        BoxShadow(color: const Color(0xFF176D51).withValues(alpha: .08), blurRadius: 24, offset: const Offset(0, 10)),
                       ],
                     ),
                     child: Stack(

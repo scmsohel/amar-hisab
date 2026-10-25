@@ -560,7 +560,7 @@ class _LoginScreenState extends State<LoginScreen> {
         body: Stack(children: [
           Positioned.fill(child: Image.asset('assets/animations/Minimal Mint Leaf Wave Background.png', fit: BoxFit.cover)),
           SafeArea(child: Column(children: [
-            const SizedBox(height: 10),
+            const SizedBox(height: 24),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 0),
               child: Row(children: [
@@ -669,7 +669,7 @@ class _SignupScreenState extends State<SignupScreen> {
         body: Stack(children: [
           Positioned.fill(child: Image.asset('assets/animations/Minimal Mint Leaf Wave Background.png', fit: BoxFit.cover)),
           SafeArea(child: Column(children: [
-            const SizedBox(height: 18),
+            const SizedBox(height: 32),
             Transform.translate(offset: const Offset(-24, 10), child: SizedBox(width: 320, height: 165, child: ClipRect(child: Align(alignment: Alignment.topCenter, heightFactor: .30, child: Image.asset('assets/animations/logo.png', width: 320, fit: BoxFit.contain))))),
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 2, 16, 0),

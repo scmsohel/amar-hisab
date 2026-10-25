@@ -1022,13 +1022,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               fit: BoxFit.cover,
             ),
           ),
-          const Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 330,
-            child: CustomPaint(painter: _DashboardLandscapePainter()),
-          ),
           SafeArea(
             child: RefreshIndicator(
               onRefresh: _load,

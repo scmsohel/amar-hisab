@@ -144,6 +144,21 @@ app.post("/auth/logout", (_req, res) => {
   res.clearCookie(cookieName, { httpOnly: true, secure: cookieSecure, sameSite: "lax", path: "/" });
   res.json({ ok: true });
 });
+app.post("/auth/invite/verify", asyncRoute(async (req, res) => {
+  const invite = String(req.body?.invite || "").trim();
+  if (!invite) return res.status(400).json({ error: "ইনভাইট কোড দিন।" });
+
+  const inviteHash = createHmac("sha256", sessionSecret).update(invite).digest("hex");
+  const result = await pool.query(
+    "SELECT id FROM invitations WHERE code_hash=$1 AND used_by IS NULL AND expires_at>NOW()",
+    [inviteHash],
+  );
+  if (!result.rowCount) {
+    return res.status(400).json({ error: "ইনভাইট কোড ভুল, মেয়াদ শেষ, অথবা ব্যবহৃত হয়েছে।" });
+  }
+  res.json({ valid: true });
+}));
+
 app.post("/auth/register", asyncRoute(async (req, res) => {
   const invite = String(req.body?.invite || "").trim();
   const name = String(req.body?.name || "").trim();

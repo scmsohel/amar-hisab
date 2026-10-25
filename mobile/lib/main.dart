@@ -61,6 +61,9 @@ class _AuthApi {
   }) =>
       _post('/auth/login', {'identity': identity.trim(), 'password': password});
 
+  static Future<Map<String, dynamic>> verifyInvite(String invite) =>
+      _post('/auth/invite/verify', {'invite': invite.trim()});
+
   static Future<Map<String, dynamic>> register({
     required String invite,
     required String name,
@@ -686,7 +689,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const _OrDivider(),
                       const SizedBox(height: 14),
                       OutlinedButton.icon(
-                        onPressed: () => Navigator.of(context).push(_route(const SignupScreen())),
+                        onPressed: () => Navigator.of(context).push(_route(const InviteVerificationScreen())),
                         icon: const Icon(Icons.groups_2_outlined, color: Color(0xFF00834A), size: 24),
                         label: const Text('ইনভাইট কোড দিয়ে যোগ দিন', style: TextStyle(color: _ink, fontWeight: FontWeight.w700, fontSize: 13)),
                         style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48), side: const BorderSide(color: _line), shape: const StadiumBorder()),
@@ -702,8 +705,90 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 }
 
+class InviteVerificationScreen extends StatefulWidget {
+  const InviteVerificationScreen({super.key});
+
+  @override
+  State<InviteVerificationScreen> createState() => _InviteVerificationScreenState();
+}
+
+class _InviteVerificationScreenState extends State<InviteVerificationScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _invite = TextEditingController();
+  bool _verifying = false;
+
+  @override
+  void dispose() {
+    _invite.dispose();
+    super.dispose();
+  }
+
+  Future<void> _verify() async {
+    FocusScope.of(context).unfocus();
+    if (_verifying || !(_formKey.currentState?.validate() ?? false)) return;
+    setState(() => _verifying = true);
+    try {
+      await _AuthApi.verifyInvite(_invite.text);
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        _route(SignupScreen(verifiedInvite: _invite.text.trim())),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      _notice(context, error.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _verifying = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        body: Stack(children: [
+          Positioned.fill(child: Image.asset('assets/animations/Minimal Mint Leaf Wave Background.png', fit: BoxFit.cover)),
+          SafeArea(child: Column(children: [
+            const SizedBox(height: 32),
+            Transform.translate(offset: const Offset(-24, 10), child: SizedBox(width: 320, height: 165, child: ClipRect(child: Align(alignment: Alignment.topCenter, heightFactor: .30, child: Image.asset('assets/animations/logo.png', width: 320, fit: BoxFit.contain))))),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 2, 16, 0),
+              child: Row(children: [
+                IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back_rounded, color: _ink)),
+                const Spacer(),
+              ]),
+            ),
+            Expanded(child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(22, 12, 22, 22),
+              child: Center(child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 430),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: .95), borderRadius: BorderRadius.circular(30), border: Border.all(color: Colors.white, width: 1.5), boxShadow: [BoxShadow(color: const Color(0xFF244A88).withValues(alpha: .07), blurRadius: 30, offset: const Offset(0, 12))]),
+                  child: Form(key: _formKey, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                    const Icon(Icons.verified_user_outlined, size: 42, color: _blue),
+                    const SizedBox(height: 12),
+                    const Text('ইনভাইট কোড যাচাই', textAlign: TextAlign.center, style: TextStyle(fontSize: 23, fontWeight: FontWeight.w900, color: _ink)),
+                    const SizedBox(height: 8),
+                    const Text('আপনার পাওয়া ইনভাইট কোডটি লিখে যাচাই করুন। কোড সঠিক হলে পরের ধাপে অ্যাকাউন্ট তৈরি করতে পারবেন।', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, height: 1.6, color: _muted)),
+                    const SizedBox(height: 22),
+                    TextFormField(
+                      controller: _invite,
+                      textCapitalization: TextCapitalization.characters,
+                      decoration: const InputDecoration(prefixIcon: Icon(Icons.groups_2_outlined), hintText: 'ইনভাইট কোড লিখুন'),
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'ইনভাইট কোড দিন।' : null,
+                    ),
+                    const SizedBox(height: 18),
+                    _PrimaryButton(label: _verifying ? 'যাচাই হচ্ছে...' : 'Verify করুন', onPressed: _verifying ? null : _verify),
+                  ])),
+                ),
+              )),
+            )),
+          ])),
+        ]),
+      );
+}
+
 class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
+  const SignupScreen({super.key, this.verifiedInvite = ''});
+  final String verifiedInvite;
   @override
   State<SignupScreen> createState() => _SignupScreenState();
 }
@@ -721,6 +806,12 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _acceptedTerms = false;
   bool _submitting = false;
   bool _marketing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _invite.text = widget.verifiedInvite;
+  }
 
   @override
   void dispose() {
@@ -794,7 +885,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     padding: const EdgeInsets.fromLTRB(16, 17, 16, 18),
                     decoration: BoxDecoration(color: Colors.white.withValues(alpha: .95), borderRadius: BorderRadius.circular(28), border: Border.all(color: Colors.white, width: 1.5), boxShadow: [BoxShadow(color: const Color(0xFF244A88).withValues(alpha: .06), blurRadius: 26, offset: const Offset(0, 10))]),
                     child: Form(key: _formKey, child: Column(children: [
-                      TextFormField(controller: _invite, decoration: const InputDecoration(prefixIcon: Icon(Icons.groups_2_outlined), hintText: 'ইনভাইট কোড'), validator: (v) => (v == null || v.trim().isEmpty) ? 'ইনভাইট কোড দিন।' : null),
+                      TextFormField(controller: _invite, readOnly: widget.verifiedInvite.isNotEmpty, decoration: InputDecoration(prefixIcon: const Icon(Icons.groups_2_outlined), hintText: 'ইনভাইট কোড', suffixIcon: widget.verifiedInvite.isNotEmpty ? const Icon(Icons.verified_rounded, color: _blue) : null), validator: (v) => (v == null || v.trim().isEmpty) ? 'ইনভাইট কোড দিন।' : null),
                       const SizedBox(height: 9),
                       TextFormField(controller: _name, textCapitalization: TextCapitalization.words, decoration: const InputDecoration(prefixIcon: Icon(Icons.person_outline_rounded), hintText: 'আপনার নাম লিখুন'), validator: (v) => (v == null || v.trim().length < 2) ? 'সঠিক নাম লিখুন।' : null),
                       const SizedBox(height: 9),

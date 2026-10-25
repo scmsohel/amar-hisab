@@ -135,6 +135,39 @@ class _AuthApi {
     return data;
   }
 
+  static Future<Map<String, dynamic>> _get(String path) async {
+    await _ensureConfigured();
+    final request = await _client.getUrl(Uri.parse('$_baseUrl$path'));
+    request.headers.set(HttpHeaders.acceptHeader, 'application/json');
+    if (_sessionCookie != null) {
+      request.headers.set(HttpHeaders.cookieHeader, _sessionCookie!);
+    }
+    final response = await request.close().timeout(const Duration(seconds: 20));
+    final body = await response.transform(utf8.decoder).join();
+    Map<String, dynamic> data = {};
+    if (body.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(body);
+        if (decoded is Map<String, dynamic>) data = decoded;
+      } on FormatException {
+        data = {'error': 'সার্ভার থেকে সঠিক উত্তর পাওয়া যায়নি।'};
+      }
+    }
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(data['error']?.toString() ?? 'ডেটা আনা যায়নি।');
+    }
+    return data;
+  }
+
+  static Future<Map<String, dynamic>> loadDashboardData() async {
+    final results = await Future.wait([
+      _get('/auth/me'),
+      _get('/data/wallets'),
+      _get('/data/transactions'),
+    ]);
+    return {'user': results[0]['user'], 'wallets': results[1]['data'], 'transactions': results[2]['data']};
+  }
+
   static Future<Map<String, dynamic>> login({
     required String identity,
     required String password,
@@ -692,7 +725,7 @@ class _LoginScreenState extends State<LoginScreen> {
       await _AuthApi.checkConfiguredServer();
       await _AuthApi.login(identity: _identity.text, password: _password.text);
       if (!mounted) return;
-      _notice(context, 'লগইন সফল হয়েছে।');
+      Navigator.of(context).pushReplacement(_route(const DashboardScreen()));
     } catch (error) {
       if (!mounted) return;
       _notice(context, error.toString().replaceFirst('Exception: ', ''));
@@ -925,6 +958,99 @@ class _ServerSettingsScreenState extends State<ServerSettingsScreen> {
           ])),
         ]),
       );
+}
+
+class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({super.key});
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  bool _loading = true;
+  bool _hidden = false;
+  String _name = 'ব্যবহারকারী';
+  String? _error;
+  double _balance = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  double _amount(dynamic value) => value is num ? value.toDouble() : double.tryParse(value?.toString() ?? '') ?? 0;
+
+  Future<void> _load() async {
+    setState(() { _loading = true; _error = null; });
+    try {
+      final data = await _AuthApi.loadDashboardData();
+      final user = data['user'];
+      final wallets = data['wallets'] is List ? data['wallets'] as List : <dynamic>[];
+      final transactions = data['transactions'] is List ? data['transactions'] as List : <dynamic>[];
+      if (user is Map) _name = (user['name'] ?? 'ব্যবহারকারী').toString();
+      final opening = <String, double>{'ক্যাশ': 0, 'ব্যাংক': 0, 'বিকাশ': 0, 'নগদ': 0};
+      for (final item in wallets) {
+        if (item is Map) opening[(item['name'] ?? '').toString()] = _amount(item['base']);
+      }
+      var total = opening.values.fold<double>(0, (sum, value) => sum + value);
+      for (final item in transactions) {
+        if (item is! Map) continue;
+        final amount = _amount(item['amount']);
+        if (item['kind'] == 'আয়') total += amount;
+        if (item['kind'] == 'ব্যয়') total -= amount;
+      }
+      if (!mounted) return;
+      setState(() { _balance = total; _loading = false; });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() { _error = error.toString().replaceFirst('Exception: ', ''); _loading = false; });
+    }
+  }
+
+  String _money(double value) => '৳ ' + value.toStringAsFixed(2).replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',');
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    body: Stack(children: [
+      Positioned.fill(child: Image.asset('assets/animations/Minimal Mint Leaf Wave Background.png', fit: BoxFit.cover)),
+      SafeArea(child: RefreshIndicator(onRefresh: _load, child: ListView(padding: const EdgeInsets.all(20), children: [
+        Row(children: [
+          const Icon(Icons.account_balance_wallet_rounded, color: _blue, size: 30),
+          const SizedBox(width: 10),
+          const Expanded(child: Text('আমার হিসাব', style: TextStyle(color: _ink, fontSize: 25, fontWeight: FontWeight.w900))),
+          IconButton(onPressed: _load, icon: const Icon(Icons.refresh_rounded, color: _ink)),
+        ]),
+        const SizedBox(height: 18),
+        Text('শুভ দিন, ' + _name + '!', style: const TextStyle(color: _ink, fontSize: 22, fontWeight: FontWeight.w800)),
+        const SizedBox(height: 5),
+        const Text('ছোট ছোট সঠিক সিদ্ধান্ত, বড় পরিবর্তন আনে', style: TextStyle(color: _muted, fontSize: 13)),
+        const SizedBox(height: 24),
+        Container(
+          padding: const EdgeInsets.fromLTRB(22, 22, 22, 24),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            border: Border.all(color: Colors.white, width: 1.5),
+            gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xF2FFFFFF), Color(0xE0E5FFF2), Color(0xD9C9F0DE)]),
+            boxShadow: [BoxShadow(color: _blue.withValues(alpha: .12), blurRadius: 28, offset: const Offset(0, 12))],
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              const Expanded(child: Text('মোট ব্যালেন্স', style: TextStyle(color: _ink, fontSize: 17, fontWeight: FontWeight.w700))),
+              IconButton(onPressed: () => setState(() => _hidden = !_hidden), icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: _muted)),
+            ]),
+            const SizedBox(height: 4),
+            if (_loading) const LinearProgressIndicator()
+            else if (_error != null) Text(_error!, style: const TextStyle(color: Colors.redAccent, fontSize: 13))
+            else Text(_hidden ? '৳ ••••••' : _money(_balance), style: const TextStyle(color: Color(0xFF10251D), fontSize: 32, fontWeight: FontWeight.w900)),
+            const SizedBox(height: 14),
+            Text(_loading ? 'ব্যালেন্স লোড হচ্ছে...' : _error != null ? 'সার্ভার থেকে ডেটা পাওয়া যায়নি' : 'সার্ভারের হিসাব অনুযায়ী', style: const TextStyle(color: _muted, fontSize: 12, fontWeight: FontWeight.w600)),
+          ]),
+        ),
+        if (_error != null) Padding(padding: const EdgeInsets.only(top: 12), child: OutlinedButton.icon(onPressed: _load, icon: const Icon(Icons.refresh_rounded), label: const Text('আবার চেষ্টা করুন'))),
+      ]))),
+    ]),
+  );
 }
 
 class InviteVerificationScreen extends StatefulWidget {

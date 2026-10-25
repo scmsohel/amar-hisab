@@ -969,6 +969,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   bool _loading = true;
   bool _hidden = false;
+  bool _nightMode = false;
   String _name = 'ব্যবহারকারী';
   String? _error;
   double _balance = 0;
@@ -1015,7 +1016,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         body: Stack(children: [
           Positioned.fill(
             child: Image.asset(
-              'assets/animations/Minimal Mint Leaf Wave Background.png',
+              _nightMode
+                  ? 'assets/animations/Moonlit Lakeside Cottage.png'
+                  : 'assets/animations/Cheerful Countryside Lake Retreat.png',
               fit: BoxFit.cover,
             ),
           ),
@@ -1072,6 +1075,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           border: Border.all(color: Colors.white, width: 2),
                         ),
                         child: const Icon(Icons.person_rounded, color: _blue, size: 27),
+                      ),
+                      IconButton(
+                        tooltip: _nightMode ? 'Day Mode' : 'Night Mode',
+                        onPressed: () => setState(() => _nightMode = !_nightMode),
+                        icon: Icon(_nightMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded, color: _ink),
                       ),
                     ],
                   ),

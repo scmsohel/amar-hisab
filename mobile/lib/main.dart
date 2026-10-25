@@ -130,7 +130,7 @@ class _AuthApi {
     }
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw Exception(data['error']?.toString() ??
-          'অনুরোধ ব্যর্থ হয়েছে (' + response.statusCode.toString() + ')।');
+          'অনুরোধ ব্যর্থ হয়েছে (${response.statusCode})।');
     }
     return data;
   }
@@ -335,32 +335,17 @@ class _SplashScreenState extends State<SplashScreen>
   }
 }
 
-class _LanguageButton extends StatelessWidget {
-  const _LanguageButton();
-  @override
-  Widget build(BuildContext context) => TextButton.icon(
-        onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('ভাষা পরিবর্তনের সুবিধা পরবর্তী ধাপে যুক্ত হবে।')),
-        ),
-        iconAlignment: IconAlignment.end,
-        label: const Text('বাংলা', style: TextStyle(color: Color(0xFF172554), fontWeight: FontWeight.w700)),
-        icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 19, color: Color(0xFF172554)),
-      );
-}
-
 class _CloudBackground extends StatelessWidget {
-  const _CloudBackground({this.bottomWave = true});
-  final bool bottomWave;
+  const _CloudBackground();
 
   @override
-  Widget build(BuildContext context) => Positioned.fill(
-        child: CustomPaint(painter: _CloudPainter(bottomWave: bottomWave)),
+  Widget build(BuildContext context) => const Positioned.fill(
+        child: CustomPaint(painter: _CloudPainter()),
       );
 }
 
 class _CloudPainter extends CustomPainter {
-  _CloudPainter({required this.bottomWave});
-  final bool bottomWave;
+  const _CloudPainter();
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -388,7 +373,7 @@ class _CloudPainter extends CustomPainter {
     ).createShader(Rect.fromCircle(center: Offset(size.width * .5, size.height * .45), radius: size.width * .8));
     canvas.drawRect(rect, glow);
 
-    if (bottomWave) {
+    {
       final wave = Path()
         ..moveTo(0, size.height * .91)
         ..cubicTo(size.width * .2, size.height * .84, size.width * .35, size.height * .99, size.width * .58, size.height * .92)
@@ -412,7 +397,7 @@ class _CloudPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _CloudPainter oldDelegate) => oldDelegate.bottomWave != bottomWave;
+  bool shouldRepaint(covariant _CloudPainter oldDelegate) => false;
 }
 
 class OnboardingScreen extends StatefulWidget {

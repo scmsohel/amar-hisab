@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 void main() => runApp(const AmarHisabApp());
 
@@ -41,8 +42,148 @@ class AmarHisabApp extends StatelessWidget {
             ),
           ),
         ),
-        home: const OnboardingScreen(),
+        home: const SplashScreen(),
       );
+}
+
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen>
+    with TickerProviderStateMixin {
+  late final AnimationController _floatController;
+
+  @override
+  void initState() {
+    super.initState();
+    _floatController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 2400),
+    )..repeat(reverse: true);
+    Future<void>.delayed(const Duration(milliseconds: 2600), () {
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        PageRouteBuilder<void>(
+          pageBuilder: (_, _, _) => const LoginScreen(),
+          transitionDuration: const Duration(milliseconds: 500),
+          transitionsBuilder: (_, animation, _, child) => FadeTransition(
+            opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+            child: child,
+          ),
+        ),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _floatController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    const muted = Color(0xFF617D80);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF071B15) : const Color(0xFFFCFFFD),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxHeight < 720;
+          final artSize = (constraints.maxHeight * (compact ? .27 : .31))
+              .clamp(190.0, 330.0).toDouble();
+          return Stack(
+            children: [
+              Positioned.fill(
+                child: Image.asset(
+                  'assets/animations/Minimal Mint Leaf Wave Background.png',
+                  fit: BoxFit.cover,
+                  alignment: Alignment.center,
+                ),
+              ),
+              SafeArea(
+                child: Center(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: compact ? 10 : 20,
+                    ),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: (constraints.maxHeight -
+                                MediaQuery.of(context).padding.vertical -
+                                (compact ? 20 : 40))
+                            .clamp(0.0, double.infinity).toDouble(),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          AnimatedBuilder(
+                            animation: _floatController,
+                            builder: (context, child) => Transform.translate(
+                              offset: Offset(
+                                0,
+                                -5 * Curves.easeInOut.transform(_floatController.value),
+                              ),
+                              child: child,
+                            ),
+                            child: SizedBox(
+                              width: artSize,
+                              height: artSize,
+                              child: Image.asset(
+                                'assets/animations/logo.png',
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 0),
+                          Transform.translate(
+                            offset: const Offset(0, -60),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                SizedBox(
+                                  width: 180,
+                                  height: 180,
+                                  child: Lottie.asset(
+                                    'assets/animations/loading_spinner.json',
+                                    repeat: true,
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Transform.translate(
+                                  offset: const Offset(0, -36),
+                                  child: Text(
+                                    'তথ্য প্রস্তুত করা হচ্ছে...',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: isDark ? const Color(0xFFB6D8C9) : muted,
+                                      fontSize: compact ? 20 : 24,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
 }
 
 class _LanguageButton extends StatelessWidget {

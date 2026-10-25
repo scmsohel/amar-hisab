@@ -727,7 +727,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Row(children: [
                 const SizedBox(width: 42),
                 const Spacer(),
-                Transform.translate(offset: const Offset(-24, 10), child: SizedBox(width: 320, height: 165, child: ClipRect(child: Align(alignment: Alignment.topCenter, heightFactor: .30, child: Image.asset('assets/animations/logo.png', width: 320, fit: BoxFit.contain))))),
+                Transform.translate(offset: const Offset(-12, 10), child: SizedBox(width: 220, height: 135, child: ClipRect(child: Align(alignment: Alignment.topCenter, heightFactor: .30, child: Image.asset('assets/animations/logo.png', width: 220, fit: BoxFit.contain))))),
                 const Spacer(),
                 IconButton(
                   tooltip: 'Server Settings',
@@ -894,7 +894,7 @@ class _ServerSettingsScreenState extends State<ServerSettingsScreen> {
                     const SizedBox(height: 8),
                     const Text('URL-এর শেষে /api থাকতে হবে। উদাহরণ: https://amr.scsohel.site/api', style: TextStyle(fontSize: 12, height: 1.5, color: _muted)),
                     const SizedBox(height: 18),
-                    _PrimaryButton(label: _testing ? 'সংযোগ পরীক্ষা হচ্ছে...' : 'শুধু সংযোগ পরীক্ষা', onPressed: _testing || _saving ? null : _testOnly),
+                    _PrimaryButton(label: _testing && !_saving ? 'সংযোগ পরীক্ষা হচ্ছে...' : 'শুধু সংযোগ পরীক্ষা', onPressed: _testing || _saving ? null : _testOnly),
                     const SizedBox(height: 10),
                     _PrimaryButton(label: _saving ? 'পরীক্ষা ও সংরক্ষণ হচ্ছে...' : 'Verify করে সংরক্ষণ', onPressed: _saving || _testing ? null : _testAndSave),
                     const SizedBox(height: 14),

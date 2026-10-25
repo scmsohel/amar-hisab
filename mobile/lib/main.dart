@@ -1270,7 +1270,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   const Spacer(),
                   Text(
-                    'ধাপ \${_step + 1}/2',
+                    'ধাপ ${_step + 1}/2',
                     style: const TextStyle(
                       color: _muted,
                       fontSize: 12,

@@ -561,11 +561,11 @@ class _LoginScreenState extends State<LoginScreen> {
           Positioned.fill(child: Image.asset('assets/animations/Minimal Mint Leaf Wave Background.png', fit: BoxFit.cover)),
           SafeArea(child: Column(children: [
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 0),
               child: Row(children: [
                 const SizedBox(width: 42),
                 const Spacer(),
-                Image.asset('assets/animations/logo.png', width: 64, height: 64, fit: BoxFit.contain),
+                Image.asset('assets/animations/logo.png', width: 132, height: 104, fit: BoxFit.contain),
                 const Spacer(),
                 const _LanguageButton(),
               ]),

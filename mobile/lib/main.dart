@@ -567,7 +567,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Spacer(),
                 Image.asset('assets/animations/logo.png', width: 132, height: 104, fit: BoxFit.contain),
                 const Spacer(),
-                const _LanguageButton(),
               ]),
             ),
             Expanded(child: SingleChildScrollView(
@@ -575,11 +574,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Center(child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 430),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  const SizedBox(height: 2),
-                  const Text('আমার হিসাব', textAlign: TextAlign.center, style: TextStyle(fontSize: 31, fontWeight: FontWeight.w900, color: Color(0xFF075B3A))),
-                  const SizedBox(height: 4),
-                  const Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: _muted)),
-                  const SizedBox(height: 22),
+                  const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
                     decoration: BoxDecoration(color: Colors.white.withValues(alpha: .94), borderRadius: BorderRadius.circular(30), border: Border.all(color: Colors.white, width: 1.5), boxShadow: [BoxShadow(color: const Color(0xFF244A88).withValues(alpha: .07), blurRadius: 30, offset: const Offset(0, 12))]),
@@ -678,7 +673,6 @@ class _SignupScreenState extends State<SignupScreen> {
               child: Row(children: [
                 IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back_rounded, color: _ink)),
                 const Spacer(),
-                const _LanguageButton(),
               ]),
             ),
             Expanded(child: SingleChildScrollView(

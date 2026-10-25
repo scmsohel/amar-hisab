@@ -809,10 +809,14 @@ class _ServerSettingsScreenState extends State<ServerSettingsScreen> {
   @override
   void initState() {
     super.initState();
-    final savedUrl = _AuthApi.baseUrl ?? '';
-    final savedDomain = savedUrl
-        .replaceFirst(RegExp(r'^https://'), '')
-        .replaceFirst(RegExp(r'/api
+    var savedDomain = _AuthApi.baseUrl ?? '';
+    if (savedDomain.startsWith('https://')) {
+      savedDomain = savedDomain.substring('https://'.length);
+    }
+    if (savedDomain.endsWith('/api')) {
+      savedDomain = savedDomain.substring(0, savedDomain.length - '/api'.length);
+    }
+    _serverUrl = TextEditingController(text: savedDomain);
   }
 
   @override
@@ -822,7 +826,35 @@ class _ServerSettingsScreenState extends State<ServerSettingsScreen> {
   }
 
   String _apiUrl() {
-    final domain = _serverUrl.text.trim().replaceFirst(RegExp(r'/+
+    var domain = _serverUrl.text.trim();
+    while (domain.endsWith('/')) {
+      domain = domain.substring(0, domain.length - 1);
+    }
+    return 'https://' + domain + '/api';
+  }
+
+  String? _validateDomain(String? value) {
+    var domain = (value ?? '').trim();
+    while (domain.endsWith('/')) {
+      domain = domain.substring(0, domain.length - 1);
+    }
+    if (domain.isEmpty) return 'আপনার domain লিখুন।';
+    if (domain.contains('://') || domain.contains('/') ||
+        domain.contains('?') || domain.contains('#') ||
+        domain.contains('@') || domain.contains(' ')) {
+      return 'শুধু domain লিখুন, https:// বা /api নয়।';
+    }
+    final uri = Uri.tryParse('https://' + domain);
+    if (uri == null || !uri.hasAuthority || uri.host.isEmpty ||
+        uri.path.isNotEmpty || uri.query.isNotEmpty ||
+        uri.fragment.isNotEmpty || uri.userInfo.isNotEmpty) {
+      return 'সঠিক domain লিখুন।';
+    }
+    return _AuthApi.validateUrl(_apiUrl());
+  }
+
+  Future<void> _testAndSave() async {
+    FocusScope.of(context).unfocus();
     if (_saving || _testing || !(_formKey.currentState?.validate() ?? false)) return;
     setState(() { _saving = true; _testing = true; });
     try {
@@ -917,7 +949,7 @@ class _ServerSettingsScreenState extends State<ServerSettingsScreen> {
                       const Text('আপনার public HTTPS domain লিখুন। অ্যাপ নিজে https:// এবং /api যোগ করে /api/health endpoint পরীক্ষা করবে। Server বদলালে নতুন server-এর account ও data আলাদা হতে পারে.', style: TextStyle(fontSize: 12.5, height: 1.6, color: _muted)),
                     ],
                   ])),
-                ),
+                )),
               )),
             )),
           ])),

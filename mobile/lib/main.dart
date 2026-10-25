@@ -4,11 +4,11 @@ import 'package:lottie/lottie.dart';
 
 void main() => runApp(const AmarHisabApp());
 
-const _blue = Color(0xFF2563EB);
-const _deepBlue = Color(0xFF3347C8);
-const _ink = Color(0xFF101828);
-const _muted = Color(0xFF667085);
-const _line = Color(0xFFE3EAF5);
+const _blue = Color(0xFF00834A);
+const _deepBlue = Color(0xFF006B3D);
+const _ink = Color(0xFF075B3A);
+const _muted = Color(0xFF687C78);
+const _line = Color(0xFFDDEBE5);
 const _pale = Color(0xFFF2F7FF);
 
 class AmarHisabApp extends StatelessWidget {
@@ -558,14 +558,14 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
         body: Stack(children: [
-          const _CloudBackground(bottomWave: true),
+          Positioned.fill(child: Image.asset('assets/animations/Minimal Mint Leaf Wave Background.png', fit: BoxFit.cover)),
           SafeArea(child: Column(children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 2),
               child: Row(children: [
                 const SizedBox(width: 42),
                 const Spacer(),
-                const _BrandMark(size: 48),
+                Image.asset('assets/animations/logo.png', width: 64, height: 64, fit: BoxFit.contain),
                 const Spacer(),
                 const _LanguageButton(),
               ]),
@@ -576,29 +576,29 @@ class _LoginScreenState extends State<LoginScreen> {
                 constraints: const BoxConstraints(maxWidth: 430),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                   const SizedBox(height: 2),
-                  const Text('আমার হিসাব', textAlign: TextAlign.center, style: TextStyle(fontSize: 29, fontWeight: FontWeight.w900, color: _ink)),
+                  const Text('আমার হিসাব', textAlign: TextAlign.center, style: TextStyle(fontSize: 31, fontWeight: FontWeight.w900, color: Color(0xFF075B3A))),
                   const SizedBox(height: 4),
-                  const Text('আপনার আয়-ব্যয়ের হিসাব, এক জায়গায়', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: _muted)),
+                  const Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, color: _muted)),
                   const SizedBox(height: 22),
                   Container(
                     padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
                     decoration: BoxDecoration(color: Colors.white.withValues(alpha: .94), borderRadius: BorderRadius.circular(30), border: Border.all(color: Colors.white, width: 1.5), boxShadow: [BoxShadow(color: const Color(0xFF244A88).withValues(alpha: .07), blurRadius: 30, offset: const Offset(0, 12))]),
                     child: Form(key: _formKey, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                      const Text('আবারও স্বাগতম 👋', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: _ink)),
+                      const Text('লগইন করুন', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: _ink)),
                       const SizedBox(height: 6),
-                      const Text('আপনার অ্যাকাউন্ট লগইন করে\nআপনার হিসাব দেখুন', style: TextStyle(fontSize: 13.5, height: 1.5, color: _muted)),
+                      const Text('আপনার অ্যাকাউন্টে প্রবেশ করুন', style: TextStyle(fontSize: 13.5, height: 1.5, color: _muted)),
                       const SizedBox(height: 22),
                       TextFormField(
                         controller: _identity,
                         keyboardType: TextInputType.emailAddress,
-                        decoration: const InputDecoration(prefixIcon: Icon(Icons.mail_outline_rounded), hintText: 'ইমেইল অথবা মোবাইল নম্বর লিখুন'),
+                        decoration: const InputDecoration(prefixIcon: Icon(Icons.mail_outline_rounded), hintText: 'ইমেইল ঠিকানা'),
                         validator: (v) => (v == null || v.trim().isEmpty) ? 'ইমেইল অথবা মোবাইল নম্বর দিন।' : null,
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: _password,
                         obscureText: !_showPassword,
-                        decoration: InputDecoration(prefixIcon: const Icon(Icons.lock_outline_rounded), hintText: 'পাসওয়ার্ড লিখুন', suffixIcon: IconButton(onPressed: () => setState(() => _showPassword = !_showPassword), icon: Icon(_showPassword ? Icons.visibility_off_rounded : Icons.visibility_rounded))),
+                        decoration: InputDecoration(prefixIcon: const Icon(Icons.lock_outline_rounded), hintText: 'পাসওয়ার্ড', suffixIcon: IconButton(onPressed: () => setState(() => _showPassword = !_showPassword), icon: Icon(_showPassword ? Icons.visibility_off_rounded : Icons.visibility_rounded))),
                         validator: (v) => (v == null || v.isEmpty) ? 'পাসওয়ার্ড দিন।' : null,
                       ),
                       const SizedBox(height: 8),
@@ -613,15 +613,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       const _OrDivider(),
                       const SizedBox(height: 14),
                       OutlinedButton.icon(
-                        onPressed: () => _notice(context, 'Google Login চালু করতে OAuth configuration প্রয়োজন।'),
-                        icon: const Icon(Icons.g_mobiledata_rounded, color: Color(0xFF4285F4), size: 28),
-                        label: const Text('Google দিয়ে লগইন করুন', style: TextStyle(color: _ink, fontWeight: FontWeight.w700, fontSize: 13)),
+                        onPressed: () => _notice(context, 'ইনভাইট কোড ব্যবহার করে অ্যাকাউন্ট তৈরির জন্য সাইন আপ করুন।'),
+                        icon: const Icon(Icons.groups_2_outlined, color: Color(0xFF00834A), size: 24),
+                        label: const Text('ইনভাইট কোড দিয়ে যোগ দিন', style: TextStyle(color: _ink, fontWeight: FontWeight.w700, fontSize: 13)),
                         style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48), side: const BorderSide(color: _line), shape: const StadiumBorder()),
                       ),
                       const SizedBox(height: 18),
                       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        const Text('নতুন এখানে? ', style: TextStyle(color: _muted, fontSize: 12)),
-                        GestureDetector(onTap: () => Navigator.of(context).push(_route(const SignupScreen())), child: const Text('অ্যাকাউন্ট তৈরি করুন', style: TextStyle(color: _blue, fontWeight: FontWeight.w800, fontSize: 12))),
+                        const Text('নতুন ব্যবহারকারী? ', style: TextStyle(color: _muted, fontSize: 12)),
+                        GestureDetector(onTap: () => Navigator.of(context).push(_route(const SignupScreen())), child: const Text('সাইন আপ করুন', style: TextStyle(color: _blue, fontWeight: FontWeight.w800, fontSize: 12))),
                       ]),
                     ])),
                   ),
@@ -671,7 +671,7 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
         body: Stack(children: [
-          const _CloudBackground(bottomWave: true),
+          Positioned.fill(child: Image.asset('assets/animations/Minimal Mint Leaf Wave Background.png', fit: BoxFit.cover)),
           SafeArea(child: Column(children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 2, 16, 0),
@@ -686,14 +686,16 @@ class _SignupScreenState extends State<SignupScreen> {
               child: Center(child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 430),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  const Text('অ্যাকাউন্ট তৈরি করুন', style: TextStyle(fontSize: 25, fontWeight: FontWeight.w900, color: _ink)),
+                  const Text('অ্যাকাউন্ট তৈরি করুন', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF075B3A))),
                   const SizedBox(height: 7),
-                  const Text('আমার হিসাব-এ যোগ দিন এবং আপনার\nআয়-ব্যয়ের হিসাব সহজভাবে পরিচালনা করুন', style: TextStyle(fontSize: 13, height: 1.55, color: _muted)),
+                  const Text('ইনভাইট কোড দিয়ে যোগ দিন', style: TextStyle(fontSize: 13, height: 1.55, color: _muted)),
                   const SizedBox(height: 18),
                   Container(
                     padding: const EdgeInsets.fromLTRB(16, 17, 16, 18),
                     decoration: BoxDecoration(color: Colors.white.withValues(alpha: .95), borderRadius: BorderRadius.circular(28), border: Border.all(color: Colors.white, width: 1.5), boxShadow: [BoxShadow(color: const Color(0xFF244A88).withValues(alpha: .06), blurRadius: 26, offset: const Offset(0, 10))]),
                     child: Form(key: _formKey, child: Column(children: [
+                      TextFormField(controller: _invite, decoration: const InputDecoration(prefixIcon: Icon(Icons.groups_2_outlined), hintText: 'ইনভাইট কোড'), validator: (v) => (v == null || v.trim().isEmpty) ? 'ইনভাইট কোড দিন।' : null),
+                      const SizedBox(height: 9),
                       TextFormField(controller: _name, textCapitalization: TextCapitalization.words, decoration: const InputDecoration(prefixIcon: Icon(Icons.person_outline_rounded), hintText: 'আপনার নাম লিখুন'), validator: (v) => (v == null || v.trim().length < 2) ? 'সঠিক নাম লিখুন।' : null),
                       const SizedBox(height: 9),
                       TextFormField(controller: _email, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(prefixIcon: Icon(Icons.mail_outline_rounded), hintText: 'ইমেইল লিখুন'), validator: (v) { final s = (v ?? '').trim(); return s.contains('@') && s.contains('.') ? null : 'সঠিক ইমেইল লিখুন।'; }),
@@ -704,8 +706,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       const SizedBox(height: 9),
                       TextFormField(controller: _confirm, obscureText: !_showConfirm, decoration: InputDecoration(prefixIcon: const Icon(Icons.lock_outline_rounded), hintText: 'পাসওয়ার্ড আবার লিখুন', suffixIcon: IconButton(onPressed: () => setState(() => _showConfirm = !_showConfirm), icon: Icon(_showConfirm ? Icons.visibility_off_rounded : Icons.visibility_rounded))), validator: (v) => v == _password.text ? null : 'পাসওয়ার্ড দুটি মিলছে না।'),
                       const SizedBox(height: 9),
-                      TextFormField(controller: _invite, decoration: const InputDecoration(prefixIcon: Icon(Icons.card_giftcard_rounded), hintText: 'ইনভাইটেশন কোড (ঐচ্ছিক)')),
-                      const SizedBox(height: 10),
+
                       CheckboxListTile(
                         value: _acceptedTerms,
                         onChanged: (v) => setState(() => _acceptedTerms = v ?? false),

@@ -1039,6 +1039,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _password = TextEditingController();
   final _confirm = TextEditingController();
   final _invite = TextEditingController();
+  int _step = 0;
   bool _showPassword = false;
   bool _showConfirm = false;
   bool _acceptedTerms = false;
@@ -1053,8 +1054,24 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   void dispose() {
-    _name.dispose(); _email.dispose(); _mobile.dispose(); _password.dispose(); _confirm.dispose(); _invite.dispose();
+    _name.dispose();
+    _email.dispose();
+    _mobile.dispose();
+    _password.dispose();
+    _confirm.dispose();
+    _invite.dispose();
     super.dispose();
+  }
+
+  void _nextStep() {
+    FocusScope.of(context).unfocus();
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    setState(() => _step = 1);
+  }
+
+  void _previousStep() {
+    FocusScope.of(context).unfocus();
+    setState(() => _step = 0);
   }
 
   Future<void> _submit() async {
@@ -1096,75 +1113,288 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
+  Widget _buildAccountFields() => Column(children: [
+        TextFormField(
+          controller: _invite,
+          readOnly: widget.verifiedInvite.isNotEmpty,
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.groups_2_outlined),
+            hintText: 'ইনভাইট কোড',
+            suffixIcon: widget.verifiedInvite.isNotEmpty
+                ? const Icon(Icons.verified_rounded, color: _blue)
+                : null,
+          ),
+          validator: (v) =>
+              (v == null || v.trim().isEmpty) ? 'ইনভাইট কোড দিন।' : null,
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _name,
+          textCapitalization: TextCapitalization.words,
+          decoration: const InputDecoration(
+            prefixIcon: Icon(Icons.person_outline_rounded),
+            hintText: 'আপনার নাম লিখুন',
+          ),
+          validator: (v) =>
+              (v == null || v.trim().length < 2) ? 'সঠিক নাম লিখুন।' : null,
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _email,
+          keyboardType: TextInputType.emailAddress,
+          decoration: const InputDecoration(
+            prefixIcon: Icon(Icons.mail_outline_rounded),
+            hintText: 'ইমেইল লিখুন',
+          ),
+          validator: (v) {
+            final s = (v ?? '').trim();
+            return s.contains('@') && s.contains('.')
+                ? null
+                : 'সঠিক ইমেইল লিখুন।';
+          },
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _mobile,
+          keyboardType: TextInputType.phone,
+          decoration: const InputDecoration(
+            prefixIcon: Icon(Icons.phone_iphone_rounded),
+            hintText: 'মোবাইল নম্বর লিখুন',
+          ),
+          validator: (v) =>
+              (v ?? '').replaceAll(RegExp(r'\D'), '').length >= 10
+                  ? null
+                  : 'সঠিক মোবাইল নম্বর লিখুন।',
+        ),
+      ]);
+
+  Widget _buildSecurityFields() => Column(children: [
+        TextFormField(
+          controller: _password,
+          obscureText: !_showPassword,
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.lock_outline_rounded),
+            hintText: 'পাসওয়ার্ড লিখুন',
+            suffixIcon: IconButton(
+              onPressed: () =>
+                  setState(() => _showPassword = !_showPassword),
+              icon: Icon(_showPassword
+                  ? Icons.visibility_off_rounded
+                  : Icons.visibility_rounded),
+            ),
+          ),
+          validator: (v) => (v ?? '').length >= 8
+              ? null
+              : 'পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে।',
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _confirm,
+          obscureText: !_showConfirm,
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.lock_outline_rounded),
+            hintText: 'পাসওয়ার্ড আবার লিখুন',
+            suffixIcon: IconButton(
+              onPressed: () => setState(() => _showConfirm = !_showConfirm),
+              icon: Icon(_showConfirm
+                  ? Icons.visibility_off_rounded
+                  : Icons.visibility_rounded),
+            ),
+          ),
+          validator: (v) =>
+              v == _password.text ? null : 'পাসওয়ার্ড দুটি মিলছে না।',
+        ),
+        const SizedBox(height: 12),
+        CheckboxListTile(
+          value: _acceptedTerms,
+          onChanged: (v) => setState(() => _acceptedTerms = v ?? false),
+          contentPadding: EdgeInsets.zero,
+          controlAffinity: ListTileControlAffinity.leading,
+          dense: true,
+          title: const Text(
+            'আমি শর্তাবলি এবং গোপনীয়তা নীতি পড়েছি এবং সম্মত আছি',
+            style: TextStyle(fontSize: 11.5, color: _ink, height: 1.4),
+          ),
+        ),
+        CheckboxListTile(
+          value: _marketing,
+          onChanged: (v) => setState(() => _marketing = v ?? false),
+          contentPadding: EdgeInsets.zero,
+          controlAffinity: ListTileControlAffinity.leading,
+          dense: true,
+          title: const Text(
+            'আমাকে আপডেট ও গুরুত্বপূর্ণ তথ্য জানাবেন',
+            style: TextStyle(fontSize: 11.5, color: _muted),
+          ),
+        ),
+      ]);
+
   @override
   Widget build(BuildContext context) => Scaffold(
         body: Stack(children: [
-          Positioned.fill(child: Image.asset('assets/animations/Minimal Mint Leaf Wave Background.png', fit: BoxFit.cover)),
-          SafeArea(child: Column(children: [
-            const SizedBox(height: 32),
-            Transform.translate(offset: const Offset(-24, 10), child: SizedBox(width: 320, height: 165, child: ClipRect(child: Align(alignment: Alignment.topCenter, heightFactor: .30, child: Image.asset('assets/animations/logo.png', width: 320, fit: BoxFit.contain))))),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(14, 2, 16, 0),
-              child: Row(children: [
-                IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back_rounded, color: _ink)),
-                const Spacer(),
-              ]),
+          Positioned.fill(
+            child: Image.asset(
+              'assets/animations/Minimal Mint Leaf Wave Background.png',
+              fit: BoxFit.cover,
             ),
-            Expanded(child: SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(22, 2, 22, 22),
-              child: Center(child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 430),
-                child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                  const Text('অ্যাকাউন্ট তৈরি করুন', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFF075B3A))),
-                  const SizedBox(height: 7),
-                  const Text('ইনভাইট কোড দিয়ে যোগ দিন', style: TextStyle(fontSize: 13, height: 1.55, color: _muted)),
-                  const SizedBox(height: 18),
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(16, 17, 16, 18),
-                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: .95), borderRadius: BorderRadius.circular(28), border: Border.all(color: Colors.white, width: 1.5), boxShadow: [BoxShadow(color: const Color(0xFF244A88).withValues(alpha: .06), blurRadius: 26, offset: const Offset(0, 10))]),
-                    child: Form(key: _formKey, child: Column(children: [
-                      TextFormField(controller: _invite, readOnly: widget.verifiedInvite.isNotEmpty, decoration: InputDecoration(prefixIcon: const Icon(Icons.groups_2_outlined), hintText: 'ইনভাইট কোড', suffixIcon: widget.verifiedInvite.isNotEmpty ? const Icon(Icons.verified_rounded, color: _blue) : null), validator: (v) => (v == null || v.trim().isEmpty) ? 'ইনভাইট কোড দিন।' : null),
-                      const SizedBox(height: 9),
-                      TextFormField(controller: _name, textCapitalization: TextCapitalization.words, decoration: const InputDecoration(prefixIcon: Icon(Icons.person_outline_rounded), hintText: 'আপনার নাম লিখুন'), validator: (v) => (v == null || v.trim().length < 2) ? 'সঠিক নাম লিখুন।' : null),
-                      const SizedBox(height: 9),
-                      TextFormField(controller: _email, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(prefixIcon: Icon(Icons.mail_outline_rounded), hintText: 'ইমেইল লিখুন'), validator: (v) { final s = (v ?? '').trim(); return s.contains('@') && s.contains('.') ? null : 'সঠিক ইমেইল লিখুন।'; }),
-                      const SizedBox(height: 9),
-                      TextFormField(controller: _mobile, keyboardType: TextInputType.phone, decoration: const InputDecoration(prefixIcon: Icon(Icons.phone_iphone_rounded), hintText: 'মোবাইল নম্বর লিখুন'), validator: (v) => (v ?? '').replaceAll(RegExp(r'\D'), '').length >= 10 ? null : 'সঠিক মোবাইল নম্বর লিখুন।'),
-                      const SizedBox(height: 9),
-                      TextFormField(controller: _password, obscureText: !_showPassword, decoration: InputDecoration(prefixIcon: const Icon(Icons.lock_outline_rounded), hintText: 'পাসওয়ার্ড লিখুন', suffixIcon: IconButton(onPressed: () => setState(() => _showPassword = !_showPassword), icon: Icon(_showPassword ? Icons.visibility_off_rounded : Icons.visibility_rounded))), validator: (v) => (v ?? '').length >= 8 ? null : 'পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে।'),
-                      const SizedBox(height: 9),
-                      TextFormField(controller: _confirm, obscureText: !_showConfirm, decoration: InputDecoration(prefixIcon: const Icon(Icons.lock_outline_rounded), hintText: 'পাসওয়ার্ড আবার লিখুন', suffixIcon: IconButton(onPressed: () => setState(() => _showConfirm = !_showConfirm), icon: Icon(_showConfirm ? Icons.visibility_off_rounded : Icons.visibility_rounded))), validator: (v) => v == _password.text ? null : 'পাসওয়ার্ড দুটি মিলছে না।'),
-                      const SizedBox(height: 9),
-
-                      CheckboxListTile(
-                        value: _acceptedTerms,
-                        onChanged: (v) => setState(() => _acceptedTerms = v ?? false),
-                        contentPadding: EdgeInsets.zero,
-                        controlAffinity: ListTileControlAffinity.leading,
-                        dense: true,
-                        title: const Text('আমি শর্তাবলি এবং গোপনীয়তা নীতি পড়েছি এবং সম্মত আছি', style: TextStyle(fontSize: 11.5, color: _ink, height: 1.4)),
+          ),
+          SafeArea(
+            child: Column(children: [
+              const SizedBox(height: 32),
+              Transform.translate(
+                offset: const Offset(-24, 10),
+                child: SizedBox(
+                  width: 320,
+                  height: 165,
+                  child: ClipRect(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      heightFactor: .30,
+                      child: Image.asset(
+                        'assets/animations/logo.png',
+                        width: 320,
+                        fit: BoxFit.contain,
                       ),
-                      CheckboxListTile(
-                        value: _marketing,
-                        onChanged: (v) => setState(() => _marketing = v ?? false),
-                        contentPadding: EdgeInsets.zero,
-                        controlAffinity: ListTileControlAffinity.leading,
-                        dense: true,
-                        title: const Text('আমাকে আপডেট ও গুরুত্বপূর্ণ তথ্য জানাবেন', style: TextStyle(fontSize: 11.5, color: _muted)),
-                      ),
-                      const SizedBox(height: 8),
-                      _PrimaryButton(label: _submitting ? 'অ্যাকাউন্ট তৈরি হচ্ছে...' : 'অ্যাকাউন্ট তৈরি করুন', onPressed: _submitting ? null : _submit),
-                      const SizedBox(height: 14),
-                      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        const Flexible(child: Text('ইতিমধ্যে অ্যাকাউন্ট আছে? ', style: TextStyle(color: _muted, fontSize: 12))),
-                        GestureDetector(onTap: () => Navigator.of(context).pop(), child: const Text('লগইন করুন', style: TextStyle(color: _blue, fontWeight: FontWeight.w800, fontSize: 12))),
-                      ]),
-                    ])),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 2, 16, 0),
+                child: Row(children: [
+                  IconButton(
+                    onPressed: _step == 1
+                        ? _previousStep
+                        : () => Navigator.of(context).maybePop(),
+                    icon: const Icon(Icons.arrow_back_rounded, color: _ink),
+                  ),
+                  const Spacer(),
+                  Text(
+                    'ধাপ \${_step + 1}/2',
+                    style: const TextStyle(
+                      color: _muted,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ]),
-              )),
-            )),
-          ])),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(22, 2, 22, 22),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 430),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            _step == 0
+                                ? 'অ্যাকাউন্ট তৈরি করুন'
+                                : 'অ্যাকাউন্ট সুরক্ষিত করুন',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF075B3A),
+                            ),
+                          ),
+                          const SizedBox(height: 7),
+                          Text(
+                            _step == 0
+                                ? 'ইনভাইট কোড ও আপনার তথ্য দিন'
+                                : 'পাসওয়ার্ড সেট করুন এবং সম্মতি দিন',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              height: 1.55,
+                              color: _muted,
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          Container(
+                            padding: const EdgeInsets.fromLTRB(16, 17, 16, 18),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: .95),
+                              borderRadius: BorderRadius.circular(28),
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 1.5,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF244A88)
+                                      .withValues(alpha: .06),
+                                  blurRadius: 26,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                children: [
+                                  if (_step == 0)
+                                    _buildAccountFields()
+                                  else
+                                    _buildSecurityFields(),
+                                  const SizedBox(height: 12),
+                                  _PrimaryButton(
+                                    label: _step == 0
+                                        ? 'পরবর্তী ধাপ'
+                                        : (_submitting
+                                            ? 'অ্যাকাউন্ট তৈরি হচ্ছে...'
+                                            : 'অ্যাকাউন্ট তৈরি করুন'),
+                                    onPressed: _submitting
+                                        ? null
+                                        : (_step == 0 ? _nextStep : _submit),
+                                  ),
+                                  const SizedBox(height: 14),
+                                  if (_step == 1)
+                                    TextButton.icon(
+                                      onPressed: _previousStep,
+                                      icon: const Icon(
+                                        Icons.arrow_back_rounded,
+                                        size: 17,
+                                      ),
+                                      label: const Text('আগের ধাপে ফিরে যান'),
+                                    ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Flexible(
+                                        child: Text(
+                                          'ইতিমধ্যে অ্যাকাউন্ট আছে? ',
+                                          style: TextStyle(
+                                            color: _muted,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () =>
+                                            Navigator.of(context).pop(),
+                                        child: const Text(
+                                          'লগইন করুন',
+                                          style: TextStyle(
+                                            color: _blue,
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ]),
+          ),
         ]),
       );
 }

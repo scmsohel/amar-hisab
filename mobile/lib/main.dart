@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -10,6 +12,70 @@ const _ink = Color(0xFF075B3A);
 const _muted = Color(0xFF687C78);
 const _line = Color(0xFFDDEBE5);
 const _pale = Color(0xFFF2F7FF);
+
+class _AuthApi {
+  static const String _baseUrl = 'http://192.168.10.124:8088/api';
+  static final HttpClient _client = HttpClient()
+    ..connectionTimeout = const Duration(seconds: 12);
+  static String? _sessionCookie;
+
+  static Future<Map<String, dynamic>> _post(
+    String path,
+    Map<String, dynamic> body,
+  ) async {
+    final uri = Uri.parse('$_baseUrl$path');
+    final request = await _client.postUrl(uri);
+    request.headers.contentType = ContentType.json;
+    request.headers.set(HttpHeaders.acceptHeader, 'application/json');
+    if (_sessionCookie != null) {
+      request.headers.set(HttpHeaders.cookieHeader, _sessionCookie!);
+    }
+    request.write(jsonEncode(body));
+    final response = await request.close().timeout(const Duration(seconds: 20));
+    final setCookie = response.headers[HttpHeaders.setCookieHeader];
+    if (setCookie != null && setCookie.isNotEmpty) {
+      _sessionCookie = setCookie
+          .map((value) => value.split(';').first)
+          .join('; ');
+    }
+    final responseText = await response.transform(utf8.decoder).join();
+    Map<String, dynamic> data = {};
+    if (responseText.isNotEmpty) {
+      try {
+        final decoded = jsonDecode(responseText);
+        if (decoded is Map<String, dynamic>) data = decoded;
+      } on FormatException {
+        data = {'error': 'সার্ভার থেকে সঠিক উত্তর পাওয়া যায়নি।'};
+      }
+    }
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(data['error']?.toString() ??
+          'অনুরোধ ব্যর্থ হয়েছে (' + response.statusCode.toString() + ')।');
+    }
+    return data;
+  }
+
+  static Future<Map<String, dynamic>> login({
+    required String identity,
+    required String password,
+  }) =>
+      _post('/auth/login', {'identity': identity.trim(), 'password': password});
+
+  static Future<Map<String, dynamic>> register({
+    required String invite,
+    required String name,
+    required String email,
+    required String mobile,
+    required String password,
+  }) =>
+      _post('/auth/register', {
+        'invite': invite.trim(),
+        'name': name.trim(),
+        'email': email.trim(),
+        'mobile': mobile.trim(),
+        'password': password,
+      });
+}
 
 class AmarHisabApp extends StatelessWidget {
   const AmarHisabApp({super.key});
@@ -541,6 +607,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _password = TextEditingController();
   bool _showPassword = false;
   bool _remember = false;
+  bool _submitting = false;
 
   @override
   void dispose() {
@@ -549,10 +616,20 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     FocusScope.of(context).unfocus();
-    if (!(_formKey.currentState?.validate() ?? false)) return;
-    Navigator.of(context).push(_route(const LoadingScreen()));
+    if (_submitting || !(_formKey.currentState?.validate() ?? false)) return;
+    setState(() => _submitting = true);
+    try {
+      await _AuthApi.login(identity: _identity.text, password: _password.text);
+      if (!mounted) return;
+      _notice(context, 'লগইন সফল হয়েছে।');
+    } catch (error) {
+      if (!mounted) return;
+      _notice(context, error.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
   }
 
   @override
@@ -604,7 +681,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         TextButton(onPressed: () => _notice(context, 'পাসওয়ার্ড পুনরুদ্ধারের API এখনো সংযুক্ত করা হয়নি।'), child: const Text('পাসওয়ার্ড ভুলে গেছেন?', style: TextStyle(color: _blue, fontSize: 11.5, fontWeight: FontWeight.w700))),
                       ]),
                       const SizedBox(height: 8),
-                      _PrimaryButton(label: 'লগইন করুন', onPressed: _submit),
+                      _PrimaryButton(label: _submitting ? 'লগইন হচ্ছে...' : 'লগইন করুন', onPressed: _submitting ? null : _submit),
                       const SizedBox(height: 18),
                       const _OrDivider(),
                       const SizedBox(height: 14),
@@ -646,6 +723,7 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _showPassword = false;
   bool _showConfirm = false;
   bool _acceptedTerms = false;
+  bool _submitting = false;
   bool _marketing = false;
 
   @override
@@ -654,14 +732,31 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     FocusScope.of(context).unfocus();
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (_submitting || !(_formKey.currentState?.validate() ?? false)) return;
     if (!_acceptedTerms) {
       _notice(context, 'চালিয়ে যেতে শর্তাবলি ও গোপনীয়তা নীতি গ্রহণ করুন।');
       return;
     }
-    Navigator.of(context).push(_route(const LoadingScreen(isSignup: true)));
+    setState(() => _submitting = true);
+    try {
+      await _AuthApi.register(
+        invite: _invite.text,
+        name: _name.text,
+        email: _email.text,
+        mobile: _mobile.text,
+        password: _password.text,
+      );
+      if (!mounted) return;
+      _notice(context, 'অ্যাকাউন্ট তৈরি হয়েছে। এখন লগইন করতে পারবেন।');
+      Navigator.of(context).pop();
+    } catch (error) {
+      if (!mounted) return;
+      _notice(context, error.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
   }
 
   @override
@@ -721,7 +816,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         title: const Text('আমাকে আপডেট ও গুরুত্বপূর্ণ তথ্য জানাবেন', style: TextStyle(fontSize: 11.5, color: _muted)),
                       ),
                       const SizedBox(height: 8),
-                      _PrimaryButton(label: 'অ্যাকাউন্ট তৈরি করুন', onPressed: _submit),
+                      _PrimaryButton(label: _submitting ? 'অ্যাকাউন্ট তৈরি হচ্ছে...' : 'অ্যাকাউন্ট তৈরি করুন', onPressed: _submitting ? null : _submit),
                       const SizedBox(height: 14),
                       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                         const Flexible(child: Text('ইতিমধ্যে অ্যাকাউন্ট আছে? ', style: TextStyle(color: _muted, fontSize: 12))),

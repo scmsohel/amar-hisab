@@ -749,8 +749,20 @@ class _SignupScreenState extends State<SignupScreen> {
         password: _password.text,
       );
       if (!mounted) return;
-      _notice(context, 'অ্যাকাউন্ট তৈরি হয়েছে। এখন লগইন করতে পারবেন।');
-      Navigator.of(context).pop();
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('সাইন আপ সফল'),
+          content: const Text('অ্যাকাউন্ট তৈরি হয়েছে। এখন লগইন করতে পারবেন।'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('ঠিক আছে'),
+            ),
+          ],
+        ),
+      );
+      if (mounted) Navigator.of(context).pop();
     } catch (error) {
       if (!mounted) return;
       _notice(context, error.toString().replaceFirst('Exception: ', ''));
@@ -927,7 +939,7 @@ class _LoadingStep extends StatelessWidget {
 class _PrimaryButton extends StatelessWidget {
   const _PrimaryButton({required this.label, required this.onPressed});
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   @override
   Widget build(BuildContext context) => SizedBox(
         height: 52,

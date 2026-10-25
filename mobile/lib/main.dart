@@ -569,9 +569,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Spacer(),
               ]),
             ),
-            const Text('আমার হিসাব', textAlign: TextAlign.center, style: TextStyle(fontSize: 29, fontWeight: FontWeight.w900, color: Color(0xFF075B3A))),
-            const SizedBox(height: 3),
-            const Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', textAlign: TextAlign.center, style: TextStyle(fontSize: 12.5, color: Color(0xFF687C78))),
             Expanded(child: SingleChildScrollView(
               padding: const EdgeInsets.fromLTRB(22, 8, 22, 24),
               child: Center(child: ConstrainedBox(
@@ -673,9 +670,6 @@ class _SignupScreenState extends State<SignupScreen> {
           SafeArea(child: Column(children: [
             const SizedBox(height: 8),
             SizedBox(width: 170, height: 94, child: ClipRect(child: Align(alignment: Alignment.topCenter, heightFactor: .30, child: Image.asset('assets/animations/logo.png', width: 170, fit: BoxFit.contain)))),
-            const Text('আমার হিসাব', textAlign: TextAlign.center, style: TextStyle(fontSize: 29, fontWeight: FontWeight.w900, color: Color(0xFF075B3A))),
-            const SizedBox(height: 3),
-            const Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', textAlign: TextAlign.center, style: TextStyle(fontSize: 12.5, color: Color(0xFF687C78))),
             Padding(
               padding: const EdgeInsets.fromLTRB(14, 2, 16, 0),
               child: Row(children: [

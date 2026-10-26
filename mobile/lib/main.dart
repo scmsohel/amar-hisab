@@ -1254,14 +1254,14 @@ class _BalanceNeonChartPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Reference-inspired wide two-peak wave: rise, dip, then rise again.
-    // The chart occupies the lower-right area without covering the balance text.
+    // Two broad waves matching the reference: a rounded first peak,
+    // a deep smooth valley, then a second rise toward the right edge.
     final path = Path()
       ..moveTo(size.width * .02, size.height * .91)
-      ..cubicTo(size.width * .13, size.height * .90, size.width * .19, size.height * .78, size.width * .29, size.height * .59)
-      ..cubicTo(size.width * .38, size.height * .39, size.width * .43, size.height * .08, size.width * .53, size.height * .10)
-      ..cubicTo(size.width * .63, size.height * .12, size.width * .67, size.height * .63, size.width * .76, size.height * .72)
-      ..cubicTo(size.width * .85, size.height * .81, size.width * .91, size.height * .49, size.width, size.height * .30);
+      ..cubicTo(size.width * .15, size.height * .90, size.width * .23, size.height * .79, size.width * .34, size.height * .54)
+      ..cubicTo(size.width * .43, size.height * .34, size.width * .49, size.height * .17, size.width * .57, size.height * .22)
+      ..cubicTo(size.width * .66, size.height * .25, size.width * .70, size.height * .63, size.width * .79, size.height * .70)
+      ..cubicTo(size.width * .88, size.height * .77, size.width * .94, size.height * .48, size.width, size.height * .28);
 
     final fillPath = Path.from(path)
       ..lineTo(size.width, size.height)
@@ -1273,30 +1273,31 @@ class _BalanceNeonChartPainter extends CustomPainter {
         ..shader = const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0x5533FFD0), Color(0x0010AFC7)],
+          colors: [Color(0x4433FFD0), Color(0x0010AFC7)],
         ).createShader(Offset.zero & size),
     );
 
-    // A second, softer wave sits underneath the main curve.
+    // Secondary wave follows the same rhythm, softly offset underneath.
     final secondary = Path()
-      ..moveTo(size.width * .02, size.height * .99)
-      ..cubicTo(size.width * .17, size.height * .85, size.width * .24, size.height * .78, size.width * .34, size.height * .69)
-      ..cubicTo(size.width * .44, size.height * .56, size.width * .49, size.height * .25, size.width * .57, size.height * .27)
-      ..cubicTo(size.width * .67, size.height * .28, size.width * .72, size.height * .70, size.width * .80, size.height * .80)
-      ..cubicTo(size.width * .88, size.height * .87, size.width * .95, size.height * .59, size.width, size.height * .47);
+      ..moveTo(0, size.height * .98)
+      ..cubicTo(size.width * .17, size.height * .91, size.width * .25, size.height * .83, size.width * .36, size.height * .66)
+      ..cubicTo(size.width * .46, size.height * .47, size.width * .51, size.height * .31, size.width * .59, size.height * .35)
+      ..cubicTo(size.width * .68, size.height * .39, size.width * .73, size.height * .72, size.width * .81, size.height * .79)
+      ..cubicTo(size.width * .89, size.height * .84, size.width * .96, size.height * .62, size.width, size.height * .48);
     canvas.drawPath(
       secondary,
       Paint()
-        ..color = const Color(0xFF00DCC5).withValues(alpha: .22)
+        ..color = const Color(0xFF00DCC5).withValues(alpha: .20)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 7
         ..strokeCap = StrokeCap.round
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7),
     );
+
     canvas.drawPath(
       path,
       Paint()
-        ..color = const Color(0xFF00E7D2).withValues(alpha: .68)
+        ..color = const Color(0xFF00E7D2).withValues(alpha: .70)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 4
         ..strokeCap = StrokeCap.round
@@ -1313,8 +1314,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
         ..strokeJoin = StrokeJoin.round,
     );
 
-    // Taller, more varied bars across the lower-right edge, as in the reference.
-    const bars = [18.0, 32.0, 51.0, 37.0, 68.0, 47.0, 43.0, 61.0];
+    const bars = [19.0, 32.0, 49.0, 37.0, 63.0, 45.0, 41.0, 56.0];
     const barWidth = 10.0;
     const gap = 5.0;
     final totalWidth = bars.length * barWidth + (bars.length - 1) * gap;

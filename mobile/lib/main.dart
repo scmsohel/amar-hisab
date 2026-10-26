@@ -1002,7 +1002,6 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   bool _loading = true;
   bool _hidden = false;
-  final bool _nightMode = false;
   String? _error;
   double _balance = 0;
 

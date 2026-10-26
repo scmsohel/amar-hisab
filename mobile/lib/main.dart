@@ -1138,8 +1138,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           const Positioned(
                             right: -18,
                             bottom: -16,
-                            width: 265,
-                            height: 135,
+                            width: 300,
+                            height: 112,
                             child: IgnorePointer(child: CustomPaint(painter: _BalanceNeonChartPainter())),
                           ),
                           Column(
@@ -1254,18 +1254,18 @@ class _BalanceNeonChartPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Option B: a broad double-wave curve with a soft teal glow.
-    // Keep the left portion clear for the balance amount.
+    // Lower, wider double-wave: keep the upper peak comfortably below
+    // the card title and let the lower wave remain clearly visible.
     final path = Path()
-      ..moveTo(size.width * .24, size.height * .91)
-      ..cubicTo(size.width * .35, size.height * .90, size.width * .40, size.height * .78, size.width * .47, size.height * .57)
-      ..cubicTo(size.width * .54, size.height * .35, size.width * .59, size.height * .07, size.width * .68, size.height * .13)
-      ..cubicTo(size.width * .75, size.height * .17, size.width * .77, size.height * .47, size.width * .84, size.height * .63)
-      ..cubicTo(size.width * .90, size.height * .77, size.width * .95, size.height * .50, size.width, size.height * .36);
+      ..moveTo(size.width * .20, size.height * .91)
+      ..cubicTo(size.width * .32, size.height * .90, size.width * .39, size.height * .82, size.width * .46, size.height * .66)
+      ..cubicTo(size.width * .53, size.height * .49, size.width * .59, size.height * .20, size.width * .68, size.height * .25)
+      ..cubicTo(size.width * .75, size.height * .28, size.width * .78, size.height * .56, size.width * .85, size.height * .68)
+      ..cubicTo(size.width * .91, size.height * .78, size.width * .96, size.height * .57, size.width, size.height * .47);
 
     final fillPath = Path.from(path)
       ..lineTo(size.width, size.height)
-      ..lineTo(size.width * .24, size.height)
+      ..lineTo(size.width * .20, size.height)
       ..close();
     canvas.drawPath(
       fillPath,
@@ -1273,19 +1273,19 @@ class _BalanceNeonChartPainter extends CustomPainter {
         ..shader = const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0x5533FFD0), Color(0x0010AFC7)],
+          colors: [Color(0x4433FFD0), Color(0x0010AFC7)],
         ).createShader(Offset.zero & size),
     );
 
     final secondary = Path()
-      ..moveTo(size.width * .28, size.height * .97)
-      ..cubicTo(size.width * .40, size.height * .87, size.width * .47, size.height * .80, size.width * .54, size.height * .56)
-      ..cubicTo(size.width * .62, size.height * .30, size.width * .68, size.height * .21, size.width * .76, size.height * .48)
-      ..cubicTo(size.width * .84, size.height * .76, size.width * .91, size.height * .81, size.width, size.height * .49);
+      ..moveTo(size.width * .25, size.height * .98)
+      ..cubicTo(size.width * .38, size.height * .88, size.width * .47, size.height * .85, size.width * .55, size.height * .66)
+      ..cubicTo(size.width * .63, size.height * .43, size.width * .69, size.height * .34, size.width * .77, size.height * .58)
+      ..cubicTo(size.width * .85, size.height * .78, size.width * .92, size.height * .84, size.width, size.height * .61);
     canvas.drawPath(
       secondary,
       Paint()
-        ..color = const Color(0xFF00DCC5).withValues(alpha: .18)
+        ..color = const Color(0xFF00DCC5).withValues(alpha: .17)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 6
         ..strokeCap = StrokeCap.round
@@ -1294,24 +1294,24 @@ class _BalanceNeonChartPainter extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = const Color(0xFF00E7D2).withValues(alpha: .68)
+        ..color = const Color(0xFF00E7D2).withValues(alpha: .62)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 4
+        ..strokeWidth = 3.5
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
     );
     canvas.drawPath(
       path,
       Paint()
         ..color = const Color(0xFF70FFE2)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.8
+        ..strokeWidth = 1.7
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round,
     );
 
-    const bars = [16.0, 25.0, 42.0, 31.0, 55.0, 39.0, 35.0, 49.0];
+    const bars = [18.0, 29.0, 42.0, 34.0, 50.0, 39.0, 35.0, 45.0];
     const barWidth = 8.0;
     const gap = 4.0;
     final totalWidth = bars.length * barWidth + (bars.length - 1) * gap;

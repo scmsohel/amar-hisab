@@ -1103,9 +1103,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Colors.white.withValues(alpha: .43),
-                          const Color(0xFFD9F7EB).withValues(alpha: .48),
-                          const Color(0xFFBCEFD9).withValues(alpha: .42),
+                          Colors.white.withValues(alpha: .58),
+                          const Color(0xFFD9F7EB).withValues(alpha: .62),
+                          const Color(0xFFBCEFD9).withValues(alpha: .56),
                         ],
                       ),
                       boxShadow: [
@@ -1165,6 +1165,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
           ),
+          Positioned.fill(
+            child: ClipPath(
+              clipper: _DashboardLeafOverlayClipper(),
+              child: Image.asset(
+                _nightMode
+                    ? 'assets/animations/Moonlit Lakeside Cottage.png'
+                    : 'assets/animations/Cheerful Countryside Lake Retreat.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
         ]),
       );
 
@@ -1184,6 +1195,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
+
+class _DashboardLeafOverlayClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final w = size.width;
+    final h = size.height;
+    // Reveal only the existing plant on the right side of the background,
+    // so it is painted in front of the translucent balance card.
+    return Path()
+      ..moveTo(w * .73, h * .22)
+      ..cubicTo(w * .77, h * .205, w * .81, h * .235, w * .83, h * .265)
+      ..cubicTo(w * .86, h * .245, w * .89, h * .25, w * .92, h * .28)
+      ..cubicTo(w * .95, h * .31, w * .96, h * .35, w * .94, h * .38)
+      ..cubicTo(w * .97, h * .40, w * .98, h * .44, w * .95, h * .47)
+      ..cubicTo(w * .93, h * .50, w * .91, h * .52, w * .89, h * .55)
+      ..cubicTo(w * .92, h * .57, w * .96, h * .59, w * .97, h * .63)
+      ..cubicTo(w * .98, h * .67, w * .94, h * .70, w * .90, h * .71)
+      ..cubicTo(w * .88, h * .75, w * .87, h * .79, w * .84, h * .81)
+      ..lineTo(w * .76, h * .81)
+      ..cubicTo(w * .72, h * .77, w * .71, h * .72, w * .70, h * .68)
+      ..cubicTo(w * .66, h * .66, w * .64, h * .62, w * .66, h * .59)
+      ..cubicTo(w * .68, h * .56, w * .71, h * .57, w * .74, h * .59)
+      ..cubicTo(w * .70, h * .55, w * .68, h * .51, w * .69, h * .48)
+      ..cubicTo(w * .70, h * .44, w * .74, h * .43, w * .77, h * .46)
+      ..cubicTo(w * .75, h * .42, w * .73, h * .39, w * .73, h * .35)
+      ..cubicTo(w * .71, h * .31, w * .70, h * .26, w * .73, h * .22)
+      ..close();
+  }
+
+  @override
+  bool shouldReclip(covariant _DashboardLeafOverlayClipper oldClipper) => false;
+}
 
 class _DashboardLandscapePainter extends CustomPainter {
   const _DashboardLandscapePainter();

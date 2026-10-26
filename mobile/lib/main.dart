@@ -1254,15 +1254,14 @@ class _BalanceNeonChartPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Start almost flat and low, climb gradually to a broad peak,
-    // dip in a long smooth valley, then lift again at the right edge.
+    // Low, wide reference wave: restrained height, rounded peak,
+    // a visible valley and a small second rise at the far right.
     final path = Path()
-      ..moveTo(0, size.height * .96)
-      ..cubicTo(size.width * .14, size.height * .96, size.width * .22, size.height * .94, size.width * .32, size.height * .83)
-      ..cubicTo(size.width * .42, size.height * .72, size.width * .50, size.height * .42, size.width * .59, size.height * .27)
-      ..cubicTo(size.width * .65, size.height * .17, size.width * .70, size.height * .16, size.width * .75, size.height * .29)
-      ..cubicTo(size.width * .82, size.height * .46, size.width * .85, size.height * .75, size.width * .91, size.height * .79)
-      ..cubicTo(size.width * .95, size.height * .82, size.width * .98, size.height * .67, size.width, size.height * .59);
+      ..moveTo(0, size.height * .91)
+      ..cubicTo(size.width * .15, size.height * .91, size.width * .24, size.height * .87, size.width * .35, size.height * .73)
+      ..cubicTo(size.width * .45, size.height * .60, size.width * .52, size.height * .34, size.width * .61, size.height * .31)
+      ..cubicTo(size.width * .69, size.height * .29, size.width * .75, size.height * .58, size.width * .82, size.height * .69)
+      ..cubicTo(size.width * .89, size.height * .79, size.width * .95, size.height * .65, size.width, size.height * .53);
 
     final fillPath = Path.from(path)
       ..lineTo(size.width, size.height)
@@ -1274,50 +1273,48 @@ class _BalanceNeonChartPainter extends CustomPainter {
         ..shader = const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0x4433FFD0), Color(0x0010AFC7)],
+          colors: [Color(0x3333FFD0), Color(0x0010AFC7)],
         ).createShader(Offset.zero & size),
     );
 
-    // A lower, softer echo of the same wave for depth.
     final secondary = Path()
-      ..moveTo(0, size.height * .99)
-      ..cubicTo(size.width * .18, size.height * .99, size.width * .27, size.height * .96, size.width * .37, size.height * .88)
-      ..cubicTo(size.width * .47, size.height * .79, size.width * .54, size.height * .52, size.width * .62, size.height * .39)
-      ..cubicTo(size.width * .68, size.height * .30, size.width * .73, size.height * .30, size.width * .78, size.height * .43)
-      ..cubicTo(size.width * .85, size.height * .62, size.width * .89, size.height * .83, size.width * .94, size.height * .86)
-      ..cubicTo(size.width * .97, size.height * .87, size.width * .99, size.height * .76, size.width, size.height * .70);
+      ..moveTo(0, size.height * .97)
+      ..cubicTo(size.width * .16, size.height * .96, size.width * .27, size.height * .92, size.width * .38, size.height * .81)
+      ..cubicTo(size.width * .48, size.height * .70, size.width * .55, size.height * .45, size.width * .63, size.height * .42)
+      ..cubicTo(size.width * .72, size.height * .40, size.width * .77, size.height * .68, size.width * .84, size.height * .78)
+      ..cubicTo(size.width * .91, size.height * .85, size.width * .97, size.height * .74, size.width, size.height * .65);
     canvas.drawPath(
       secondary,
       Paint()
-        ..color = const Color(0xFF00DCC5).withValues(alpha: .20)
+        ..color = const Color(0xFF00DCC5).withValues(alpha: .17)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 7
+        ..strokeWidth = 6
         ..strokeCap = StrokeCap.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7),
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
     );
     canvas.drawPath(
       path,
       Paint()
-        ..color = const Color(0xFF00E7D2).withValues(alpha: .70)
+        ..color = const Color(0xFF00E7D2).withValues(alpha: .65)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 4
+        ..strokeWidth = 3.2
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
     );
     canvas.drawPath(
       path,
       Paint()
         ..color = const Color(0xFF70FFE2)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.8
+        ..strokeWidth = 1.6
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round,
     );
 
-    const bars = [18.0, 31.0, 48.0, 36.0, 62.0, 44.0, 40.0, 55.0];
-    const barWidth = 10.0;
-    const gap = 5.0;
+    const bars = [15.0, 23.0, 35.0, 27.0, 43.0, 32.0, 29.0, 38.0];
+    const barWidth = 9.0;
+    const gap = 4.0;
     final totalWidth = bars.length * barWidth + (bars.length - 1) * gap;
     final startX = size.width - totalWidth;
     for (var i = 0; i < bars.length; i++) {
@@ -1328,7 +1325,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
       );
       canvas.drawRRect(
         rect,
-        Paint()..color = const Color(0xFF00E7A0).withValues(alpha: .36),
+        Paint()..color = const Color(0xFF00E7A0).withValues(alpha: .34),
       );
     }
   }

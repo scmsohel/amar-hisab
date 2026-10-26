@@ -1037,9 +1037,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text('আমার হিসাব', style: TextStyle(color: _ink, fontSize: 23, fontWeight: FontWeight.w900)),
-                              const SizedBox(height: 0),
-                              const Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', style: TextStyle(color: _muted, fontSize: 10.5)),
+                              const Text('আমার হিসাব', style: TextStyle(color: _ink, fontSize: 23, fontWeight: FontWeight.w900, height: 1.0)),
+                              const SizedBox(height: -2),
+                              const Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', style: TextStyle(color: _muted, fontSize: 10.5, height: 1.0)),
                             ],
                           ),
                         ),

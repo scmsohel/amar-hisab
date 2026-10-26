@@ -1165,16 +1165,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
           ),
-          Positioned(
-            top: 154,
-            right: 5,
-            width: 155,
-            height: 205,
+          Positioned.fill(
             child: IgnorePointer(
-              child: Image.asset(
-                'assets/animations/Glossy Green Corner Plant.png',
-                fit: BoxFit.contain,
-                alignment: Alignment.bottomRight,
+              child: LayoutBuilder(
+                builder: (context, constraints) => Stack(
+                  children: [
+                    Positioned(
+                      right: -4,
+                      top: constraints.maxHeight * 0.145,
+                      width: constraints.maxWidth * 0.39,
+                      height: constraints.maxHeight * 0.34,
+                      child: Image.asset(
+                        'assets/animations/Glossy Green Corner Plant.png',
+                        fit: BoxFit.contain,
+                        alignment: Alignment.bottomRight,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

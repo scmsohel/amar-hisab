@@ -1097,59 +1097,71 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: Container(
                     padding: const EdgeInsets.fromLTRB(22, 19, 20, 20),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(29),
-                      border: Border.all(color: Colors.white.withValues(alpha: .82), width: 1.5),
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(color: const Color(0xFF00E7A0).withValues(alpha: .78), width: 1.25),
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Colors.white.withValues(alpha: .58),
-                          const Color(0xFFD9F7EB).withValues(alpha: .62),
-                          const Color(0xFFBCEFD9).withValues(alpha: .56),
+                          const Color(0xE908342F),
+                          const Color(0xE904252F),
+                          const Color(0xE902182A),
                         ],
                       ),
                       boxShadow: [
-                        BoxShadow(color: const Color(0xFF176D51).withValues(alpha: .08), blurRadius: 24, offset: const Offset(0, 10)),
+                        BoxShadow(color: const Color(0xFF00F0A0).withValues(alpha: .18), blurRadius: 24, spreadRadius: 1, offset: const Offset(0, 5)),
+                        BoxShadow(color: const Color(0xFF00111E).withValues(alpha: .28), blurRadius: 18, offset: const Offset(0, 10)),
                       ],
                     ),
                     child: Stack(
                       children: [
+                        const Positioned(
+                          right: -2,
+                          bottom: -3,
+                          width: 205,
+                          height: 105,
+                          child: IgnorePointer(child: CustomPaint(painter: _BalanceNeonChartPainter())),
+                        ),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(children: [
-                              const Expanded(child: Text('মোট ব্যালেন্স', style: TextStyle(color: Color(0xFF183F32), fontSize: 17, fontWeight: FontWeight.w700))),
+                              const Expanded(child: Text('মোট ব্যালেন্স', style: TextStyle(color: Color(0xFFF0FFF9), fontSize: 17, fontWeight: FontWeight.w700))),
                               IconButton(
                                 tooltip: _hidden ? 'ব্যালেন্স দেখান' : 'ব্যালেন্স লুকান',
                                 onPressed: () => setState(() => _hidden = !_hidden),
-                                icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: const Color(0xFF738982), size: 23),
+                                icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: const Color(0xFFB9FBE5), size: 23),
                               ),
                             ]),
                             const SizedBox(height: 3),
                             if (_loading)
-                              const SizedBox(height: 42, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator(strokeWidth: 2.5))))
+                              const SizedBox(height: 42, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator(strokeWidth: 2.5, color: Color(0xFF00E7A0)))))
                             else if (_error != null)
-                              Text(_error!, style: const TextStyle(color: Colors.redAccent, fontSize: 12))
+                              Text(_error!, style: const TextStyle(color: Color(0xFFFF6868), fontSize: 12))
                             else
                               Text(
                                 _hidden ? '৳ ••••••' : _money(_balance),
-                                style: const TextStyle(color: Color(0xFF101C18), fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: .2),
+                                style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: .2),
                               ),
                             const SizedBox(height: 8),
                             Row(children: [
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                                decoration: BoxDecoration(color: const Color(0xFF9CF1CE).withValues(alpha: .9), borderRadius: BorderRadius.circular(24)),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF00E7A0).withValues(alpha: .16),
+                                  border: Border.all(color: const Color(0xFF00E7A0).withValues(alpha: .62)),
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
                                 child: const Row(children: [
-                                  Icon(Icons.trending_up_rounded, size: 17, color: Color(0xFF087C52)),
+                                  Icon(Icons.trending_up_rounded, size: 17, color: Color(0xFF00F0A0)),
                                   SizedBox(width: 3),
-                                  Text('মোট হিসাব', style: TextStyle(color: Color(0xFF086846), fontSize: 11, fontWeight: FontWeight.w800)),
+                                  Text('মোট হিসাব', style: TextStyle(color: Color(0xFFBFFFF0), fontSize: 11, fontWeight: FontWeight.w800)),
                                 ]),
                               ),
                               const SizedBox(width: 10),
                               Expanded(child: Text(
                                 _loading ? 'ব্যালেন্স লোড হচ্ছে...' : _error != null ? 'সার্ভার থেকে ডেটা পাওয়া যায়নি' : 'সার্ভারের হিসাব অনুযায়ী',
-                                style: const TextStyle(color: Color(0xFF526F66), fontSize: 11.5),
+                                style: const TextStyle(color: Color(0xFFB8D9D7), fontSize: 11.5),
                               )),
                             ]),
                           ],
@@ -1211,6 +1223,77 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
+
+class _BalanceNeonChartPainter extends CustomPainter {
+  const _BalanceNeonChartPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final points = <Offset>[
+      Offset(0, size.height * .88),
+      Offset(size.width * .13, size.height * .79),
+      Offset(size.width * .28, size.height * .60),
+      Offset(size.width * .43, size.height * .66),
+      Offset(size.width * .59, size.height * .30),
+      Offset(size.width * .72, size.height * .10),
+      Offset(size.width * .84, size.height * .34),
+      Offset(size.width * .94, size.height * .25),
+      Offset(size.width, size.height * .18),
+    ];
+    final path = Path()..moveTo(points.first.dx, points.first.dy);
+    for (var i = 1; i < points.length; i++) {
+      final previous = points[i - 1];
+      final current = points[i];
+      final midX = (previous.dx + current.dx) / 2;
+      path.cubicTo(midX, previous.dy, midX, current.dy, current.dx, current.dy);
+    }
+    final fillPath = Path.from(path)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(
+      fillPath,
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0x6600E7A0), Color(0x0000E7A0)],
+        ).createShader(Offset.zero & size),
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = const Color(0xFF00F0A0)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.5
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = const Color(0xFF39FFC0)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.8
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
+    final bars = [18.0, 31.0, 43.0, 60.0, 39.0, 47.0, 32.0, 38.0];
+    for (var i = 0; i < bars.length; i++) {
+      final x = size.width * (.43 + i * .075);
+      final barHeight = bars[i];
+      final rect = RRect.fromRectAndRadius(
+        Rect.fromLTWH(x, size.height - barHeight, 10, barHeight),
+        const Radius.circular(4),
+      );
+      canvas.drawRRect(rect, Paint()..color = const Color(0xFF00E7A0).withValues(alpha: .34));
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _BalanceNeonChartPainter oldDelegate) => false;
+}
 
 class _DashboardLandscapePainter extends CustomPainter {
   const _DashboardLandscapePainter();

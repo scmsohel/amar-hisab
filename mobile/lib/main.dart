@@ -1120,46 +1120,47 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Transform.translate(
                     offset: const Offset(0, 3),
                     child: Container(
-                      constraints: const BoxConstraints(minHeight: 245),
-                      padding: const EdgeInsets.fromLTRB(25, 18, 22, 20),
+                      padding: const EdgeInsets.fromLTRB(22, 14, 18, 16),
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(28),
-                        border: Border.all(color: const Color(0xFF00E7A0).withValues(alpha: .82), width: 1.4),
+                        borderRadius: BorderRadius.circular(25),
+                        border: Border.all(color: const Color(0xFF00E7A0).withValues(alpha: .78), width: 1.25),
                         gradient: const LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [Color(0xF0063D32), Color(0xF0042B32), Color(0xF0021B2A)],
+                          colors: [Color(0xE908342F), Color(0xE904252F), Color(0xE902182A)],
                         ),
                         boxShadow: [
-                          BoxShadow(color: const Color(0xFF00F0A0).withValues(alpha: .20), blurRadius: 27, spreadRadius: 1, offset: const Offset(0, 6)),
-                          BoxShadow(color: const Color(0xFF00111E).withValues(alpha: .30), blurRadius: 20, offset: const Offset(0, 11)),
+                          BoxShadow(color: const Color(0xFF00F0A0).withValues(alpha: .18), blurRadius: 24, spreadRadius: 1, offset: const Offset(0, 5)),
+                          BoxShadow(color: const Color(0xFF00111E).withValues(alpha: .28), blurRadius: 18, offset: const Offset(0, 10)),
                         ],
                       ),
                       child: Stack(
                         children: [
                           const Positioned(
-                            right: -22,
-                            bottom: -21,
-                            width: 300,
-                            height: 165,
+                            right: -18,
+                            bottom: -16,
+                            width: 265,
+                            height: 135,
                             child: IgnorePointer(child: CustomPaint(painter: _BalanceNeonChartPainter())),
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Row(
                                 children: [
-                                  const Expanded(
-                                    child: Text('মোট ব্যালেন্স', style: TextStyle(color: Color(0xFFF0FFF9), fontSize: 19, fontWeight: FontWeight.w700)),
-                                  ),
+                                  const Text('মোট ব্যালেন্স', style: TextStyle(color: Color(0xFFF0FFF9), fontSize: 17, fontWeight: FontWeight.w700)),
+                                  const SizedBox(width: 5),
                                   IconButton(
+                                    constraints: const BoxConstraints.tightFor(width: 34, height: 34),
+                                    padding: EdgeInsets.zero,
                                     tooltip: _hidden ? 'ব্যালেন্স দেখান' : 'ব্যালেন্স লুকান',
                                     onPressed: () => setState(() => _hidden = !_hidden),
-                                    icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: const Color(0xFFB9FBE5), size: 25),
+                                    icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: const Color(0xFFB9FBE5), size: 23),
                                   ),
-                                  const SizedBox(width: 8),
+                                  const Spacer(),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFF32DDB0).withValues(alpha: .12),
                                       border: Border.all(color: const Color(0xFF43E8BE).withValues(alpha: .34)),
@@ -1168,48 +1169,48 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     child: const Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Text('এই মাস', style: TextStyle(color: Color(0xFFD7FFF4), fontSize: 13, fontWeight: FontWeight.w700)),
-                                        SizedBox(width: 8),
-                                        Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFFD7FFF4), size: 19),
+                                        Text('এই মাস', style: TextStyle(color: Color(0xFFD7FFF4), fontSize: 12, fontWeight: FontWeight.w700)),
+                                        SizedBox(width: 5),
+                                        Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFFD7FFF4), size: 17),
                                       ],
                                     ),
                                   ),
                                 ],
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 2),
                               if (_loading)
-                                const SizedBox(height: 57, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 30, height: 30, child: CircularProgressIndicator(strokeWidth: 2.5, color: Color(0xFF00E7A0)))))
+                                const SizedBox(height: 42, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator(strokeWidth: 2.5, color: Color(0xFF00E7A0)))))
                               else if (_error != null)
                                 Text(_error!, style: const TextStyle(color: Color(0xFFFF6868), fontSize: 12))
                               else
                                 Text(
                                   _hidden ? '৳ ••••••' : _money(_balance),
-                                  style: const TextStyle(color: Colors.white, fontSize: 39, fontWeight: FontWeight.w900, letterSpacing: .2),
+                                  style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: .2),
                                 ),
-                              const SizedBox(height: 14),
+                              const SizedBox(height: 7),
                               Row(
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF00E7A0).withValues(alpha: .17),
-                                      border: Border.all(color: const Color(0xFF00E7A0).withValues(alpha: .60)),
-                                      borderRadius: BorderRadius.circular(28),
+                                      color: const Color(0xFF00E7A0).withValues(alpha: .16),
+                                      border: Border.all(color: const Color(0xFF00E7A0).withValues(alpha: .62)),
+                                      borderRadius: BorderRadius.circular(24),
                                     ),
                                     child: const Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(Icons.trending_up_rounded, size: 18, color: Color(0xFF00F0A0)),
-                                        SizedBox(width: 5),
-                                        Text('মোট হিসাব', style: TextStyle(color: Color(0xFFBFFFF0), fontSize: 12, fontWeight: FontWeight.w800)),
+                                        Icon(Icons.trending_up_rounded, size: 15, color: Color(0xFF00F0A0)),
+                                        SizedBox(width: 3),
+                                        Text('মোট হিসাব', style: TextStyle(color: Color(0xFFBFFFF0), fontSize: 11, fontWeight: FontWeight.w800)),
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
+                                  const SizedBox(width: 9),
                                   Expanded(
                                     child: Text(
                                       _loading ? 'ব্যালেন্স লোড হচ্ছে...' : _error != null ? 'সার্ভার থেকে ডেটা পাওয়া যায়নি' : 'সার্ভারের হিসাব অনুযায়ী',
-                                      style: const TextStyle(color: Color(0xFFB8D9D7), fontSize: 12),
+                                      style: const TextStyle(color: Color(0xFFB8D9D7), fontSize: 11),
                                     ),
                                   ),
                                 ],
@@ -1256,14 +1257,17 @@ class _BalanceNeonChartPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final points = <Offset>[
       Offset(0, size.height * .88),
-      Offset(size.width * .13, size.height * .79),
-      Offset(size.width * .28, size.height * .60),
-      Offset(size.width * .43, size.height * .66),
-      Offset(size.width * .59, size.height * .30),
-      Offset(size.width * .72, size.height * .10),
-      Offset(size.width * .84, size.height * .34),
-      Offset(size.width * .94, size.height * .25),
-      Offset(size.width, size.height * .18),
+      Offset(size.width * .10, size.height * .82),
+      Offset(size.width * .20, size.height * .68),
+      Offset(size.width * .30, size.height * .66),
+      Offset(size.width * .40, size.height * .35),
+      Offset(size.width * .48, size.height * .28),
+      Offset(size.width * .57, size.height * .06),
+      Offset(size.width * .66, size.height * .14),
+      Offset(size.width * .76, size.height * .43),
+      Offset(size.width * .84, size.height * .61),
+      Offset(size.width * .92, size.height * .48),
+      Offset(size.width, size.height * .35),
     ];
     final path = Path()..moveTo(points.first.dx, points.first.dy);
     for (var i = 1; i < points.length; i++) {
@@ -1272,6 +1276,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
       final midX = (previous.dx + current.dx) / 2;
       path.cubicTo(midX, previous.dy, midX, current.dy, current.dx, current.dy);
     }
+
     final fillPath = Path.from(path)
       ..lineTo(size.width, size.height)
       ..lineTo(0, size.height)
@@ -1282,15 +1287,30 @@ class _BalanceNeonChartPainter extends CustomPainter {
         ..shader = const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0x6600E7A0), Color(0x0000E7A0)],
+          colors: [Color(0x5533FFD0), Color(0x0010AFC7)],
         ).createShader(Offset.zero & size),
+    );
+
+    // Subtle secondary wave underneath the main curve, like the reference.
+    final secondary = Path()
+      ..moveTo(0, size.height * .94)
+      ..cubicTo(size.width * .20, size.height * .72, size.width * .27, size.height * .93, size.width * .43, size.height * .72)
+      ..cubicTo(size.width * .58, size.height * .40, size.width * .64, size.height * .25, size.width * .78, size.height * .61)
+      ..cubicTo(size.width * .88, size.height * .78, size.width * .94, size.height * .58, size.width, size.height * .48);
+    canvas.drawPath(
+      secondary,
+      Paint()
+        ..color = const Color(0xFF00CDBB).withValues(alpha: .18)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 5
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5),
     );
     canvas.drawPath(
       path,
       Paint()
-        ..color = const Color(0xFF00F0A0)
+        ..color = const Color(0xFF00E7D2)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.5
+        ..strokeWidth = 3
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
@@ -1298,21 +1318,28 @@ class _BalanceNeonChartPainter extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = const Color(0xFF39FFC0)
+        ..color = const Color(0xFF66FFE0)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.8
+        ..strokeWidth = 1.7
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round,
     );
-    final bars = [18.0, 31.0, 43.0, 60.0, 39.0, 47.0, 32.0, 38.0];
+
+    const bars = [18.0, 31.0, 48.0, 35.0, 58.0, 42.0, 38.0, 53.0];
+    const barWidth = 9.0;
+    const gap = 4.0;
+    final totalWidth = bars.length * barWidth + (bars.length - 1) * gap;
+    final startX = size.width - totalWidth;
     for (var i = 0; i < bars.length; i++) {
-      final x = size.width * (.43 + i * .075);
       final barHeight = bars[i];
       final rect = RRect.fromRectAndRadius(
-        Rect.fromLTWH(x, size.height - barHeight, 10, barHeight),
+        Rect.fromLTWH(startX + i * (barWidth + gap), size.height - barHeight, barWidth, barHeight),
         const Radius.circular(4),
       );
-      canvas.drawRRect(rect, Paint()..color = const Color(0xFF00E7A0).withValues(alpha: .34));
+      canvas.drawRRect(
+        rect,
+        Paint()..color = const Color(0xFF00E7A0).withValues(alpha: .32),
+      );
     }
   }
 

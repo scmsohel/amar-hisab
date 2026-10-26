@@ -1028,7 +1028,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: ListView(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
                 children: [
-                  Row(
+                  Transform.translate(
+                    offset: const Offset(0, -4),
+                    child: Row(
                     children: [
                       IconButton(
                         tooltip: 'মেনু',
@@ -1070,7 +1072,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         child: const Icon(Icons.person_rounded, color: _blue, size: 27),
                       ),
                     ],
-                  ),
+                  )),
                   const SizedBox(height: 0),
                   Container(
                     padding: const EdgeInsets.fromLTRB(22, 19, 20, 20),

@@ -1081,8 +1081,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 0),
-                  Container(
+                  Transform.translate(
+                    offset: const Offset(0, -6),
+                    child: Container(
                     padding: const EdgeInsets.fromLTRB(22, 19, 20, 20),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(29),
@@ -1144,7 +1145,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       ],
                     ),
-                  ),
+                  )),
                   if (_error != null) ...[
                     const SizedBox(height: 12),
                     OutlinedButton.icon(onPressed: _load, icon: const Icon(Icons.refresh_rounded), label: const Text('আবার চেষ্টা করুন')),

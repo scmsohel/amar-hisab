@@ -1151,7 +1151,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   const Text('মোট ব্যালেন্স', style: TextStyle(color: Color(0xFFF0FFF9), fontSize: 17, fontWeight: FontWeight.w700)),
                                   const SizedBox(width: 5),
                                   IconButton(
-                                    constraints: const BoxConstraints.tightFor(width: 34, height: 34),
+                                    constraints: const BoxConstraints.tightFor(width: 30, height: 28),
                                     padding: EdgeInsets.zero,
                                     tooltip: _hidden ? 'ব্যালেন্স দেখান' : 'ব্যালেন্স লুকান',
                                     onPressed: () => setState(() => _hidden = !_hidden),

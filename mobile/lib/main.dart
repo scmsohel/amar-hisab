@@ -1319,7 +1319,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
     const gap = 3.0;
     final totalWidth = bars.length * barWidth + (bars.length - 1) * gap;
     // Keep the expanded group left-shifted while adding six bars on its right.
-    final startX = size.width - totalWidth - 72.0;
+    final startX = size.width - totalWidth - 42.0;
     for (var i = 0; i < bars.length; i++) {
       final barHeight = bars[i];
       final rect = RRect.fromRectAndRadius(

@@ -1039,7 +1039,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  String _money(double value) => '৳ ' + value.toStringAsFixed(2).replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',');
+  String _money(double value) => '৳ ${value.toStringAsFixed(2).replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',')}';
 
   @override
   Widget build(BuildContext context) => Scaffold(

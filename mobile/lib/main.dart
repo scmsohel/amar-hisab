@@ -1120,80 +1120,106 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Transform.translate(
                     offset: const Offset(0, 3),
                     child: Container(
-                    padding: const EdgeInsets.fromLTRB(22, 19, 20, 20),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(color: const Color(0xFF00E7A0).withValues(alpha: .78), width: 1.25),
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          const Color(0xE908342F),
-                          const Color(0xE904252F),
-                          const Color(0xE902182A),
+                      constraints: const BoxConstraints(minHeight: 245),
+                      padding: const EdgeInsets.fromLTRB(25, 18, 22, 20),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(28),
+                        border: Border.all(color: const Color(0xFF00E7A0).withValues(alpha: .82), width: 1.4),
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xF0063D32), Color(0xF0042B32), Color(0xF0021B2A)],
+                        ),
+                        boxShadow: [
+                          BoxShadow(color: const Color(0xFF00F0A0).withValues(alpha: .20), blurRadius: 27, spreadRadius: 1, offset: const Offset(0, 6)),
+                          BoxShadow(color: const Color(0xFF00111E).withValues(alpha: .30), blurRadius: 20, offset: const Offset(0, 11)),
                         ],
                       ),
-                      boxShadow: [
-                        BoxShadow(color: const Color(0xFF00F0A0).withValues(alpha: .18), blurRadius: 24, spreadRadius: 1, offset: const Offset(0, 5)),
-                        BoxShadow(color: const Color(0xFF00111E).withValues(alpha: .28), blurRadius: 18, offset: const Offset(0, 10)),
-                      ],
-                    ),
-                    child: Stack(
-                      children: [
-                        const Positioned(
-                          right: -2,
-                          bottom: -3,
-                          width: 205,
-                          height: 105,
-                          child: IgnorePointer(child: CustomPaint(painter: _BalanceNeonChartPainter())),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(children: [
-                              const Expanded(child: Text('মোট ব্যালেন্স', style: TextStyle(color: Color(0xFFF0FFF9), fontSize: 17, fontWeight: FontWeight.w700))),
-                              IconButton(
-                                tooltip: _hidden ? 'ব্যালেন্স দেখান' : 'ব্যালেন্স লুকান',
-                                onPressed: () => setState(() => _hidden = !_hidden),
-                                icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: const Color(0xFFB9FBE5), size: 23),
+                      child: Stack(
+                        children: [
+                          const Positioned(
+                            right: -22,
+                            bottom: -21,
+                            width: 300,
+                            height: 165,
+                            child: IgnorePointer(child: CustomPaint(painter: _BalanceNeonChartPainter())),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Expanded(
+                                    child: Text('মোট ব্যালেন্স', style: TextStyle(color: Color(0xFFF0FFF9), fontSize: 19, fontWeight: FontWeight.w700)),
+                                  ),
+                                  IconButton(
+                                    tooltip: _hidden ? 'ব্যালেন্স দেখান' : 'ব্যালেন্স লুকান',
+                                    onPressed: () => setState(() => _hidden = !_hidden),
+                                    icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: const Color(0xFFB9FBE5), size: 25),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF32DDB0).withValues(alpha: .12),
+                                      border: Border.all(color: const Color(0xFF43E8BE).withValues(alpha: .34)),
+                                      borderRadius: BorderRadius.circular(28),
+                                    ),
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text('এই মাস', style: TextStyle(color: Color(0xFFD7FFF4), fontSize: 13, fontWeight: FontWeight.w700)),
+                                        SizedBox(width: 8),
+                                        Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFFD7FFF4), size: 19),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ]),
-                            const SizedBox(height: 3),
-                            if (_loading)
-                              const SizedBox(height: 42, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator(strokeWidth: 2.5, color: Color(0xFF00E7A0)))))
-                            else if (_error != null)
-                              Text(_error!, style: const TextStyle(color: Color(0xFFFF6868), fontSize: 12))
-                            else
-                              Text(
-                                _hidden ? '৳ ••••••' : _money(_balance),
-                                style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: .2),
-                              ),
-                            const SizedBox(height: 8),
-                            Row(children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF00E7A0).withValues(alpha: .16),
-                                  border: Border.all(color: const Color(0xFF00E7A0).withValues(alpha: .62)),
-                                  borderRadius: BorderRadius.circular(24),
+                              const SizedBox(height: 4),
+                              if (_loading)
+                                const SizedBox(height: 57, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 30, height: 30, child: CircularProgressIndicator(strokeWidth: 2.5, color: Color(0xFF00E7A0)))))
+                              else if (_error != null)
+                                Text(_error!, style: const TextStyle(color: Color(0xFFFF6868), fontSize: 12))
+                              else
+                                Text(
+                                  _hidden ? '৳ ••••••' : _money(_balance),
+                                  style: const TextStyle(color: Colors.white, fontSize: 39, fontWeight: FontWeight.w900, letterSpacing: .2),
                                 ),
-                                child: const Row(children: [
-                                  Icon(Icons.trending_up_rounded, size: 17, color: Color(0xFF00F0A0)),
-                                  SizedBox(width: 3),
-                                  Text('মোট হিসাব', style: TextStyle(color: Color(0xFFBFFFF0), fontSize: 11, fontWeight: FontWeight.w800)),
-                                ]),
+                              const SizedBox(height: 14),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF00E7A0).withValues(alpha: .17),
+                                      border: Border.all(color: const Color(0xFF00E7A0).withValues(alpha: .60)),
+                                      borderRadius: BorderRadius.circular(28),
+                                    ),
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.trending_up_rounded, size: 18, color: Color(0xFF00F0A0)),
+                                        SizedBox(width: 5),
+                                        Text('মোট হিসাব', style: TextStyle(color: Color(0xFFBFFFF0), fontSize: 12, fontWeight: FontWeight.w800)),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Text(
+                                      _loading ? 'ব্যালেন্স লোড হচ্ছে...' : _error != null ? 'সার্ভার থেকে ডেটা পাওয়া যায়নি' : 'সার্ভারের হিসাব অনুযায়ী',
+                                      style: const TextStyle(color: Color(0xFFB8D9D7), fontSize: 12),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: 10),
-                              Expanded(child: Text(
-                                _loading ? 'ব্যালেন্স লোড হচ্ছে...' : _error != null ? 'সার্ভার থেকে ডেটা পাওয়া যায়নি' : 'সার্ভারের হিসাব অনুযায়ী',
-                                style: const TextStyle(color: Color(0xFFB8D9D7), fontSize: 11.5),
-                              )),
-                            ]),
-                          ],
-                        ),
-                      ],
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  )),
+                  ),
                   if (_error != null) ...[
                     const SizedBox(height: 12),
                     OutlinedButton.icon(onPressed: _load, icon: const Icon(Icons.refresh_rounded), label: const Text('আবার চেষ্টা করুন')),

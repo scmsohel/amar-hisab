@@ -1313,8 +1313,9 @@ class _BalanceNeonChartPainter extends CustomPainter {
     );
 
     // Bars begin at the marked lower baseline and rise only to the marked heights.
-    const bars = [7.0, 13.0, 20.0, 15.0, 27.0, 19.0, 17.0, 23.0];
-    const barWidth = 8.0;
+    // Tall, clearly visible vertical bars across the marked lower-right area.
+    const bars = [18.0, 30.0, 44.0, 34.0, 60.0, 43.0, 37.0, 52.0];
+    const barWidth = 9.0;
     const gap = 4.0;
     final totalWidth = bars.length * barWidth + (bars.length - 1) * gap;
     final startX = size.width - totalWidth;
@@ -1326,7 +1327,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
       );
       canvas.drawRRect(
         rect,
-        Paint()..color = const Color(0xFF00E7A0).withValues(alpha: .34),
+        Paint()..color = const Color(0xFF00E7A0).withValues(alpha: .38),
       );
     }
   }

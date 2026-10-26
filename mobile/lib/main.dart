@@ -1334,7 +1334,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _BalanceNeonChartPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _BalanceNeonChartPainter oldDelegate) => true;
 }
 
 class InviteVerificationScreen extends StatefulWidget {

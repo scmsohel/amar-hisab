@@ -1047,10 +1047,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                         Row(
                           children: [
-                            IconButton(
-                              tooltip: 'মেনু',
-                              onPressed: () => _showDashboardMenu(context),
-                              icon: const Icon(Icons.menu_rounded, color: _ink, size: 29),
+                            Transform.translate(
+                              offset: const Offset(0, -2),
+                              child: IconButton(
+                                tooltip: 'মেনু',
+                                onPressed: () => _showDashboardMenu(context),
+                                icon: const Icon(Icons.menu_rounded, color: _ink, size: 29),
+                              ),
                             ),
                             const Spacer(),
                             Transform.translate(

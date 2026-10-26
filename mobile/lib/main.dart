@@ -1254,14 +1254,15 @@ class _BalanceNeonChartPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Match the hand-marked reference: the wave stays low at the left,
-    // climbs gradually to one broad late peak, dips, then rises at the edge.
+    // Start almost flat and low, climb gradually to a broad peak,
+    // dip in a long smooth valley, then lift again at the right edge.
     final path = Path()
-      ..moveTo(size.width * .02, size.height * .96)
-      ..cubicTo(size.width * .17, size.height * .96, size.width * .27, size.height * .89, size.width * .39, size.height * .72)
-      ..cubicTo(size.width * .50, size.height * .56, size.width * .57, size.height * .18, size.width * .68, size.height * .16)
-      ..cubicTo(size.width * .77, size.height * .14, size.width * .81, size.height * .58, size.width * .88, size.height * .72)
-      ..cubicTo(size.width * .93, size.height * .81, size.width * .97, size.height * .60, size.width, size.height * .48);
+      ..moveTo(0, size.height * .96)
+      ..cubicTo(size.width * .14, size.height * .96, size.width * .22, size.height * .94, size.width * .32, size.height * .83)
+      ..cubicTo(size.width * .42, size.height * .72, size.width * .50, size.height * .42, size.width * .59, size.height * .27)
+      ..cubicTo(size.width * .65, size.height * .17, size.width * .70, size.height * .16, size.width * .75, size.height * .29)
+      ..cubicTo(size.width * .82, size.height * .46, size.width * .85, size.height * .75, size.width * .91, size.height * .79)
+      ..cubicTo(size.width * .95, size.height * .82, size.width * .98, size.height * .67, size.width, size.height * .59);
 
     final fillPath = Path.from(path)
       ..lineTo(size.width, size.height)
@@ -1277,13 +1278,14 @@ class _BalanceNeonChartPainter extends CustomPainter {
         ).createShader(Offset.zero & size),
     );
 
-    // Soft secondary wave sits lower and follows the same broad rhythm.
+    // A lower, softer echo of the same wave for depth.
     final secondary = Path()
       ..moveTo(0, size.height * .99)
-      ..cubicTo(size.width * .18, size.height * .98, size.width * .30, size.height * .91, size.width * .42, size.height * .79)
-      ..cubicTo(size.width * .54, size.height * .64, size.width * .60, size.height * .30, size.width * .70, size.height * .29)
-      ..cubicTo(size.width * .79, size.height * .28, size.width * .83, size.height * .68, size.width * .90, size.height * .81)
-      ..cubicTo(size.width * .95, size.height * .86, size.width * .98, size.height * .71, size.width, size.height * .62);
+      ..cubicTo(size.width * .18, size.height * .99, size.width * .27, size.height * .96, size.width * .37, size.height * .88)
+      ..cubicTo(size.width * .47, size.height * .79, size.width * .54, size.height * .52, size.width * .62, size.height * .39)
+      ..cubicTo(size.width * .68, size.height * .30, size.width * .73, size.height * .30, size.width * .78, size.height * .43)
+      ..cubicTo(size.width * .85, size.height * .62, size.width * .89, size.height * .83, size.width * .94, size.height * .86)
+      ..cubicTo(size.width * .97, size.height * .87, size.width * .99, size.height * .76, size.width, size.height * .70);
     canvas.drawPath(
       secondary,
       Paint()
@@ -1293,7 +1295,6 @@ class _BalanceNeonChartPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round
         ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7),
     );
-
     canvas.drawPath(
       path,
       Paint()

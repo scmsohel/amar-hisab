@@ -1314,12 +1314,12 @@ class _BalanceNeonChartPainter extends CustomPainter {
 
     // Bars begin at the marked lower baseline and rise only to the marked heights.
     // Tall, clearly visible vertical bars across the marked lower-right area.
-    const bars = [12.0, 18.0, 27.0, 39.0, 31.0, 46.0, 34.0, 55.0, 40.0, 49.0, 35.0, 44.0, 24.0, 36.0, 29.0, 47.0, 33.0, 42.0];
+    const bars = [12.0, 18.0, 27.0, 39.0, 31.0, 46.0, 34.0, 55.0, 40.0, 49.0, 35.0, 44.0, 24.0, 36.0, 29.0, 47.0, 33.0, 42.0, 28.0, 38.0];
     const barWidth = 7.0;
     const gap = 3.0;
     final totalWidth = bars.length * barWidth + (bars.length - 1) * gap;
     // Keep the expanded group left-shifted while adding six bars on its right.
-    final startX = size.width - totalWidth - 42.0;
+    final startX = size.width - totalWidth - 40.0;
     for (var i = 0; i < bars.length; i++) {
       final barHeight = bars[i];
       final rect = RRect.fromRectAndRadius(

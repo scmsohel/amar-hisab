@@ -1190,9 +1190,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ),
                                 ),
                               const SizedBox(height: 0),
-                              Row(
-                                children: [
-                                  Container(
+                              Transform.translate(
+                                offset: const Offset(0, -10),
+                                child: Row(
+                                  children: [
+                                    Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFF00E7A0).withValues(alpha: .16),
@@ -1215,7 +1217,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       style: const TextStyle(color: Color(0xFFB8D9D7), fontSize: 11),
                                     ),
                                   ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ],
                           ),

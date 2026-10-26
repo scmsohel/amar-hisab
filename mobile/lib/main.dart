@@ -1093,7 +1093,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   Transform.translate(
-                    offset: const Offset(0, -6),
+                    offset: const Offset(0, 3),
                     child: Container(
                     padding: const EdgeInsets.fromLTRB(22, 19, 20, 20),
                     decoration: BoxDecoration(

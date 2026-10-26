@@ -1030,49 +1030,57 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   Transform.translate(
                     offset: const Offset(0, -4),
-                    child: Row(
-                    children: [
-                      IconButton(
-                        tooltip: 'মেনু',
-                        onPressed: () => _showDashboardMenu(context),
-                        icon: const Icon(Icons.menu_rounded, color: _ink, size: 29),
-                      ),
-                      const Expanded(
-                        child: Column(
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text('আমার হিসাব', style: TextStyle(color: _ink, fontSize: 23, fontWeight: FontWeight.w900)),
+                              const SizedBox(height: 0),
+                              const Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', style: TextStyle(color: _muted, fontSize: 10.5)),
+                            ],
+                          ),
+                        ),
+                        Row(
                           children: [
-                            Text('আমার হিসাব', style: TextStyle(color: _ink, fontSize: 23, fontWeight: FontWeight.w900)),
-                            SizedBox(height: 2),
-                            Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', style: TextStyle(color: _muted, fontSize: 10.5)),
+                            IconButton(
+                              tooltip: 'মেনু',
+                              onPressed: () => _showDashboardMenu(context),
+                              icon: const Icon(Icons.menu_rounded, color: _ink, size: 29),
+                            ),
+                            const Spacer(),
+                            Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                IconButton(
+                                  tooltip: 'নোটিফিকেশন',
+                                  onPressed: () => _notice(context, 'এখন কোনো নতুন নোটিফিকেশন নেই।'),
+                                  icon: const Icon(Icons.notifications_none_rounded, color: _ink, size: 27),
+                                ),
+                                Positioned(
+                                  right: 9,
+                                  top: 8,
+                                  child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: Color(0xFFE53935), shape: BoxShape.circle)),
+                                ),
+                              ],
+                            ),
+                            Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.white.withValues(alpha: .85),
+                                border: Border.all(color: Colors.white, width: 2),
+                              ),
+                              child: const Icon(Icons.person_rounded, color: _blue, size: 27),
+                            ),
                           ],
                         ),
-                      ),
-                      Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          IconButton(
-                            tooltip: 'নোটিফিকেশন',
-                            onPressed: () => _notice(context, 'এখন কোনো নতুন নোটিফিকেশন নেই।'),
-                            icon: const Icon(Icons.notifications_none_rounded, color: _ink, size: 27),
-                          ),
-                          Positioned(
-                            right: 9,
-                            top: 8,
-                            child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: Color(0xFFE53935), shape: BoxShape.circle)),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withValues(alpha: .85),
-                          border: Border.all(color: Colors.white, width: 2),
-                        ),
-                        child: const Icon(Icons.person_rounded, color: _blue, size: 27),
-                      ),
-                    ],
-                  )),
+                      ],
+                    ),
+                  ),
                   const SizedBox(height: 0),
                   Container(
                     padding: const EdgeInsets.fromLTRB(22, 19, 20, 20),

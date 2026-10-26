@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lottie/lottie.dart';
 
 Future<void> main() async {
@@ -20,6 +21,8 @@ const _pale = Color(0xFFF2F7FF);
 
 class _AuthApi {
   static const String _baseUrlPreferenceKey = 'amar_hisab_server_url';
+  static const String _sessionCookieKey = 'amar_hisab_session_cookie';
+  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
   static final HttpClient _client = HttpClient()
     ..connectionTimeout = const Duration(seconds: 12);
   static String? _baseUrl;
@@ -31,6 +34,7 @@ class _AuthApi {
     final preferences = await SharedPreferences.getInstance();
     final saved = preferences.getString(_baseUrlPreferenceKey);
     _baseUrl = saved == null || saved.trim().isEmpty ? null : _normalizeUrl(saved);
+    _sessionCookie = await _secureStorage.read(key: _sessionCookieKey);
   }
 
   static String _normalizeUrl(String value) => value.trim().replaceFirst(RegExp(r'/+$'), '');
@@ -80,7 +84,10 @@ class _AuthApi {
     if (validationError != null) throw Exception(validationError);
     await testServerUrl(normalized);
     final preferences = await SharedPreferences.getInstance();
-    if (_baseUrl != normalized) _sessionCookie = null;
+    if (_baseUrl != normalized) {
+      _sessionCookie = null;
+      await _secureStorage.delete(key: _sessionCookieKey);
+    }
     await preferences.setString(_baseUrlPreferenceKey, normalized);
     _baseUrl = normalized;
   }
@@ -117,6 +124,7 @@ class _AuthApi {
       _sessionCookie = setCookie
           .map((value) => value.split(';').first)
           .join('; ');
+      await _secureStorage.write(key: _sessionCookieKey, value: _sessionCookie);
     }
     final responseText = await response.transform(utf8.decoder).join();
     Map<String, dynamic> data = {};
@@ -157,6 +165,24 @@ class _AuthApi {
       throw Exception(data['error']?.toString() ?? 'ডেটা আনা যায়নি।');
     }
     return data;
+  }
+
+  static Future<bool> restoreSession() async {
+    if (_sessionCookie == null || _sessionCookie!.isEmpty || _baseUrl == null) {
+      return false;
+    }
+    try {
+      await _get('/auth/me');
+      return true;
+    } catch (_) {
+      await clearSession();
+      return false;
+    }
+  }
+
+  static Future<void> clearSession() async {
+    _sessionCookie = null;
+    await _secureStorage.delete(key: _sessionCookieKey);
   }
 
   static Future<Map<String, dynamic>> loadDashboardData() async {
@@ -246,19 +272,26 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
       duration: const Duration(milliseconds: 2400),
     )..repeat(reverse: true);
-    Future<void>.delayed(const Duration(milliseconds: 2600), () {
-      if (!mounted) return;
-      Navigator.of(context).pushReplacement(
-        PageRouteBuilder<void>(
-          pageBuilder: (_, _, _) => const LoginScreen(),
-          transitionDuration: const Duration(milliseconds: 500),
-          transitionsBuilder: (_, animation, _, child) => FadeTransition(
-            opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
-            child: child,
-          ),
+    _openInitialScreen();
+  }
+
+  Future<void> _openInitialScreen() async {
+    await Future<void>.delayed(const Duration(milliseconds: 2600));
+    if (!mounted) return;
+    final hasSession = await _AuthApi.restoreSession();
+    if (!mounted) return;
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder<void>(
+        pageBuilder: (_, _, _) => hasSession
+            ? const DashboardScreen()
+            : const LoginScreen(),
+        transitionDuration: const Duration(milliseconds: 500),
+        transitionsBuilder: (_, animation, _, child) => FadeTransition(
+          opacity: CurvedAnimation(parent: animation, curve: Curves.easeOut),
+          child: child,
         ),
-      );
-    });
+      ),
+    );
   }
 
   @override
@@ -1216,7 +1249,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(mainAxisSize: MainAxisSize.min, children: [
           ListTile(leading: const Icon(Icons.refresh_rounded), title: const Text('ডেটা রিফ্রেশ'), onTap: () { Navigator.pop(sheetContext); _load(); }),
           ListTile(leading: const Icon(Icons.dns_outlined), title: const Text('Server Settings'), onTap: () { Navigator.pop(sheetContext); Navigator.of(context).push(_route(const ServerSettingsScreen())); }),
-          ListTile(leading: const Icon(Icons.logout_rounded), title: const Text('লগআউট'), onTap: () { Navigator.pop(sheetContext); Navigator.of(context).pushReplacement(_route(const LoginScreen())); }),
+          ListTile(leading: const Icon(Icons.logout_rounded), title: const Text('লগআউট'), onTap: () async { Navigator.pop(sheetContext); await _AuthApi.clearSession(); if (context.mounted) Navigator.of(context).pushAndRemoveUntil(_route(const LoginScreen()), (route) => false); }),
         ]),
       ),
     );

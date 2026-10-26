@@ -1320,7 +1320,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
     final totalWidth = bars.length * barWidth + (bars.length - 1) * gap;
     // Spread the bars leftward across the chart instead of clustering them
     // only at the far-right corner, matching the user's marked area.
-    final startX = size.width - totalWidth - 52.0;
+    final startX = size.width - totalWidth - 92.0;
     for (var i = 0; i < bars.length; i++) {
       final barHeight = bars[i];
       final rect = RRect.fromRectAndRadius(

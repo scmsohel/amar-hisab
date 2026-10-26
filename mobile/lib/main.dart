@@ -1320,7 +1320,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
     final totalWidth = bars.length * barWidth + (bars.length - 1) * gap;
     // Spread the bars across the whole marked lower-right region, including
     // the far-right section where bars were missing.
-    final startX = size.width - totalWidth - 6.0;
+    final startX = size.width - totalWidth - 52.0;
     for (var i = 0; i < bars.length; i++) {
       final barHeight = bars[i];
       final rect = RRect.fromRectAndRadius(

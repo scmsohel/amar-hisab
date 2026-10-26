@@ -1168,21 +1168,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Positioned.fill(
             child: IgnorePointer(
               child: LayoutBuilder(
-                builder: (context, constraints) => Stack(
-                  children: [
-                    Positioned(
-                      right: -4,
-                      top: constraints.maxHeight * 0.145,
-                      width: constraints.maxWidth * 0.39,
-                      height: constraints.maxHeight * 0.34,
-                      child: Image.asset(
-                        'assets/animations/Glossy Green Corner Plant.png',
-                        fit: BoxFit.contain,
-                        alignment: Alignment.bottomRight,
+                builder: (context, constraints) {
+                  final screenW = constraints.maxWidth;
+                  final screenH = constraints.maxHeight;
+                  return Stack(
+                    children: [
+                      Positioned(
+                        // Match the plant's location in the lake background;
+                        // render it at near full original visual scale.
+                        right: -screenW * 0.015,
+                        top: screenH * 0.205,
+                        width: screenW * 0.48,
+                        height: screenH * 0.49,
+                        child: Image.asset(
+                          'assets/animations/Glossy Green Corner Plant.png',
+                          fit: BoxFit.contain,
+                          alignment: Alignment.bottomRight,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  );
+                },
               ),
             ),
           ),

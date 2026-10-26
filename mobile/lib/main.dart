@@ -1118,11 +1118,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   Transform.translate(
                     offset: const Offset(0, 3),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 340),
-                        child: Container(
-                      padding: const EdgeInsets.fromLTRB(22, 14, 18, 16),
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(22, 10, 18, 12),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(25),
                         border: Border.all(color: const Color(0xFF00E7A0).withValues(alpha: .78), width: 1.25),
@@ -1189,7 +1186,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   _hidden ? '৳ ••••••' : _money(_balance),
                                   style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: .2),
                                 ),
-                              const SizedBox(height: 7),
+                              const SizedBox(height: 4),
                               Row(
                                 children: [
                                   Container(
@@ -1220,8 +1217,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ],
                           ),
                         ],
-                      ),
-                    ),
                       ),
                     ),
                   ),

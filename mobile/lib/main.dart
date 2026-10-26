@@ -1118,7 +1118,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   Transform.translate(
                     offset: const Offset(0, 3),
-                    child: Container(
+                    child: Center(
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 340),
+                        child: Container(
                       padding: const EdgeInsets.fromLTRB(22, 14, 18, 16),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(25),
@@ -1217,6 +1220,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ],
                           ),
                         ],
+                      ),
+                    ),
                       ),
                     ),
                   ),

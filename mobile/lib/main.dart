@@ -1182,9 +1182,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               else if (_error != null)
                                 Text(_error!, style: const TextStyle(color: Color(0xFFFF6868), fontSize: 12))
                               else
-                                Text(
-                                  _hidden ? '৳ ••••••' : _money(_balance),
-                                  style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: .2),
+                                Transform.translate(
+                                  offset: const Offset(0, -6),
+                                  child: Text(
+                                    _hidden ? '৳ ••••••' : _money(_balance),
+                                    style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: .2),
+                                  ),
                                 ),
                               const SizedBox(height: 0),
                               Row(

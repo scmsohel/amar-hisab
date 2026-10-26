@@ -1165,14 +1165,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
           ),
-          Positioned.fill(
-            child: ClipPath(
-              clipper: _DashboardLeafOverlayClipper(),
+          Positioned(
+            top: 154,
+            right: 5,
+            width: 155,
+            height: 205,
+            child: IgnorePointer(
               child: Image.asset(
-                _nightMode
-                    ? 'assets/animations/Moonlit Lakeside Cottage.png'
-                    : 'assets/animations/Cheerful Countryside Lake Retreat.png',
-                fit: BoxFit.cover,
+                'assets/animations/Glossy Green Corner Plant.png',
+                fit: BoxFit.contain,
+                alignment: Alignment.bottomRight,
               ),
             ),
           ),
@@ -1195,37 +1197,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
-
-class _DashboardLeafOverlayClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final w = size.width;
-    final h = size.height;
-    // Mask follows the existing right-side leaf cluster near the balance card.
-    return Path()
-      ..moveTo(w * .73, h * .22)
-      ..cubicTo(w * .77, h * .215, w * .81, h * .235, w * .83, h * .265)
-      ..cubicTo(w * .86, h * .245, w * .89, h * .25, w * .92, h * .28)
-      ..cubicTo(w * .95, h * .295, w * .96, h * .32, w * .94, h * .34)
-      ..cubicTo(w * .97, h * .345, w * .98, h * .36, w * .95, h * .37)
-      ..cubicTo(w * .93, h * .38, w * .91, h * .385, w * .89, h * .39)
-      ..cubicTo(w * .92, h * .39, w * .96, h * .40, w * .97, h * .415)
-      ..cubicTo(w * .98, h * .43, w * .94, h * .44, w * .90, h * .445)
-      ..cubicTo(w * .88, h * .455, w * .87, h * .46, w * .84, h * .46)
-      ..lineTo(w * .76, h * .43)
-      ..cubicTo(w * .72, h * .415, w * .71, h * .395, w * .70, h * .38)
-      ..cubicTo(w * .66, h * .37, w * .64, h * .35, w * .66, h * .335)
-      ..cubicTo(w * .68, h * .32, w * .71, h * .325, w * .74, h * .34)
-      ..cubicTo(w * .70, h * .32, w * .68, h * .30, w * .69, h * .285)
-      ..cubicTo(w * .70, h * .27, w * .74, h * .27, w * .77, h * .29)
-      ..cubicTo(w * .75, h * .27, w * .73, h * .25, w * .73, h * .235)
-      ..cubicTo(w * .71, h * .23, w * .70, h * .225, w * .73, h * .22)
-      ..close();
-  }
-
-  @override
-  bool shouldReclip(covariant _DashboardLeafOverlayClipper oldClipper) => false;
-}
 
 class _DashboardLandscapePainter extends CustomPainter {
   const _DashboardLandscapePainter();

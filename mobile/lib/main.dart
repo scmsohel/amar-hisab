@@ -1044,13 +1044,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) => Scaffold(
         body: Stack(children: [
-          Positioned.fill(
-            child: Image.asset(
-              _nightMode
-                  ? 'assets/animations/Moonlit Lakeside Cottage.png'
-                  : 'assets/animations/Cheerful Countryside Lake Retreat.png',
-              fit: BoxFit.cover,
-            ),
+          const Positioned.fill(
+            child: ColoredBox(color: Color(0xFF061713)),
           ),
           SafeArea(
             child: RefreshIndicator(
@@ -1207,33 +1202,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
           ),
-          Positioned.fill(
-            child: IgnorePointer(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final screenW = constraints.maxWidth;
-                  final screenH = constraints.maxHeight;
-                  return Stack(
-                    children: [
-                      Positioned(
-                        // Match the plant's location in the lake background;
-                        // render it at near full original visual scale.
-                        right: -screenW * 0.015,
-                        top: screenH * 0.205,
-                        width: screenW * 0.48,
-                        height: screenH * 0.49,
-                        child: Image.asset(
-                          'assets/animations/Glossy Green Corner Plant.png',
-                          fit: BoxFit.contain,
-                          alignment: Alignment.bottomRight,
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-          ),
+
         ]),
       );
 

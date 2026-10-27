@@ -1150,7 +1150,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               children: [
                               Row(
                                 children: [
-                                  const Text('মোট ব্যালেন্স', style: TextStyle(color: Color(0xFFF0FFF9), fontSize: 17, fontWeight: FontWeight.w700)),
+                                  const Text('মোট ব্যালেন্স', style: TextStyle(color: Color(0xFFF0FFF9), fontSize: 14, fontWeight: FontWeight.w700)),
                                   const SizedBox(width: 5),
                                   IconButton(
                                     constraints: const BoxConstraints.tightFor(width: 30, height: 28),
@@ -1185,7 +1185,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 Text(_error!, style: const TextStyle(color: Color(0xFFFF6868), fontSize: 12))
                               else
                                 Transform.translate(
-                                  offset: const Offset(0, -26),
+                                  offset: const Offset(0, -29),
                                   child: Text(
                                     _hidden ? '৳ ••••••' : _money(_balance),
                                     style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: .2),

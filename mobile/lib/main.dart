@@ -1185,7 +1185,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 Text(_error!, style: const TextStyle(color: Color(0xFFFF6868), fontSize: 12))
                               else
                                 Transform.translate(
-                                  offset: const Offset(0, -27),
+                                  offset: const Offset(0, -23),
                                   child: Text(
                                     _hidden ? '৳ ••••••' : _money(_balance),
                                     style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: .2),

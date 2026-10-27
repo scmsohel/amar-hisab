@@ -1140,7 +1140,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             bottom: -16,
                             width: 330,
                             height: 150,
-                            child: IgnorePointer(child: CustomPaint(painter: _BalanceNeonChartPainter())),
+                            child: ClipRect(child: IgnorePointer(child: CustomPaint(painter: _BalanceNeonChartPainter()))),
                           ),
                           Transform.translate(
                             offset: const Offset(0, -3),
@@ -1336,7 +1336,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
     const gap = 3.0;
     final totalWidth = bars.length * barWidth + (bars.length - 1) * gap;
     // Keep the expanded group left-shifted while adding six bars on its right.
-    final startX = size.width - totalWidth - 20.0;
+    final startX = size.width - totalWidth;
     for (var i = 0; i < bars.length; i++) {
       final barHeight = bars[i];
       final rect = RRect.fromRectAndRadius(

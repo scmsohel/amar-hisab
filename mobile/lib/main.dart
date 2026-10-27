@@ -1136,7 +1136,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: Stack(
                         children: [
                           const Positioned(
-                            right: 0,
+                            right: -18,
                             bottom: -16,
                             width: 330,
                             height: 150,

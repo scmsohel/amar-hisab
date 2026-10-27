@@ -1142,10 +1142,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             height: 150,
                             child: IgnorePointer(child: CustomPaint(painter: _BalanceNeonChartPainter())),
                           ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
+                          Transform.translate(
+                            offset: const Offset(0, -3),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
                               Row(
                                 children: [
                                   const Text('মোট ব্যালেন্স', style: TextStyle(color: Color(0xFFF0FFF9), fontSize: 17, fontWeight: FontWeight.w700)),
@@ -1183,7 +1185,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 Text(_error!, style: const TextStyle(color: Color(0xFFFF6868), fontSize: 12))
                               else
                                 Transform.translate(
-                                  offset: const Offset(0, -22),
+                                  offset: const Offset(0, -26),
                                   child: Text(
                                     _hidden ? '৳ ••••••' : _money(_balance),
                                     style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: .2),
@@ -1228,7 +1230,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ),
                                 ),
                               ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),

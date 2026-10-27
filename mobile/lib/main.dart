@@ -1190,10 +1190,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ),
                                 ),
                               const SizedBox(height: 0),
-                              Transform.translate(
-                                offset: const Offset(0, -24),
-                                child: Row(
-                                  children: [
+                              SizedBox(
+                                height: 4,
+                                child: OverflowBox(
+                                  alignment: Alignment.topCenter,
+                                  minHeight: 28,
+                                  maxHeight: 28,
+                                  child: Transform.translate(
+                                    offset: const Offset(0, -24),
+                                    child: Row(
+                                      children: [
                                     Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                     decoration: BoxDecoration(
@@ -1217,7 +1223,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       style: const TextStyle(color: Color(0xFFB8D9D7), fontSize: 11),
                                     ),
                                   ),
-                                  ],
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],

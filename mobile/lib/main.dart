@@ -1183,7 +1183,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 Text(_error!, style: const TextStyle(color: Color(0xFFFF6868), fontSize: 12))
                               else
                                 Transform.translate(
-                                  offset: const Offset(0, -10),
+                                  offset: const Offset(0, -14),
                                   child: Text(
                                     _hidden ? '৳ ••••••' : _money(_balance),
                                     style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: .2),
@@ -1191,7 +1191,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ),
                               const SizedBox(height: 0),
                               Transform.translate(
-                                offset: const Offset(0, -10),
+                                offset: const Offset(0, -14),
                                 child: Row(
                                   children: [
                                     Container(

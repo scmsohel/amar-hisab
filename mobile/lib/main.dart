@@ -1180,7 +1180,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               ),
                               const SizedBox(height: 0),
                               if (_loading)
-                                const SizedBox(height: 42, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator(strokeWidth: 2.5, color: Color(0xFF00E7A0)))))
+                                const SizedBox(height: 30, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF00E7A0)))))
                               else if (_error != null)
                                 Text(_error!, style: const TextStyle(color: Color(0xFFFF6868), fontSize: 12))
                               else

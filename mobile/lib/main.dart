@@ -1126,11 +1126,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         gradient: const LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [Color(0xE908342F), Color(0xE904252F), Color(0xE902182A)],
+                          colors: [Color(0xD908302B), Color(0xD904232B), Color(0xD9021725)],
                         ),
                         boxShadow: [
-                          BoxShadow(color: const Color(0xFF00F0A0).withValues(alpha: .18), blurRadius: 24, spreadRadius: 1, offset: const Offset(0, 5)),
-                          BoxShadow(color: const Color(0xFF00111E).withValues(alpha: .28), blurRadius: 18, offset: const Offset(0, 10)),
+                          BoxShadow(color: const Color(0xFF00F0A0).withValues(alpha: .08), blurRadius: 14, spreadRadius: 0, offset: const Offset(0, 3)),
+                          BoxShadow(color: const Color(0xFF00111E).withValues(alpha: .14), blurRadius: 10, offset: const Offset(0, 4)),
                         ],
                       ),
                       child: Stack(

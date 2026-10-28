@@ -1188,7 +1188,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   offset: const Offset(0, -19),
                                   child: Text(
                                     _hidden ? '৳ ••••••' : _money(_balance),
-                                    style: const TextStyle(color: Colors.white, fontSize: 31, fontWeight: FontWeight.w900, letterSpacing: .2),
+                                    style: const TextStyle(color: Colors.white, fontSize: 29, fontWeight: FontWeight.w900, letterSpacing: .2),
                                   ),
                                 ),
                               const SizedBox(height: 0),

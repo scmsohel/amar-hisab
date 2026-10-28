@@ -1157,7 +1157,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     padding: EdgeInsets.zero,
                                     tooltip: _hidden ? 'ব্যালেন্স দেখান' : 'ব্যালেন্স লুকান',
                                     onPressed: () => setState(() => _hidden = !_hidden),
-                                    icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: const Color(0xFFB9FBE5), size: 23),
+                                    icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: const Color(0xFFB9FBE5), size: 18),
                                   ),
                                   const Spacer(),
                                   Container(

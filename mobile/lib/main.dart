@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lottie/lottie.dart';
@@ -9,6 +10,12 @@ import 'package:lottie/lottie.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _AuthApi.loadBaseUrl();
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Color(0xFF061713),
+    statusBarIconBrightness: Brightness.light,
+    systemNavigationBarColor: Color(0xFF061713),
+    systemNavigationBarIconBrightness: Brightness.light,
+  ));
   runApp(const AmarHisabApp());
 }
 
@@ -1076,7 +1083,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               child: IconButton(
                                 tooltip: 'মেনু',
                                 onPressed: () => _showDashboardMenu(context),
-                                icon: const Icon(Icons.menu_rounded, color: _ink, size: 29),
+                                icon: const Icon(Icons.menu_rounded, color: Color(0xFFD7FFF4), size: 27),
                               ),
                             ),
                             const Spacer(),
@@ -1088,7 +1095,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   IconButton(
                                     tooltip: 'নোটিফিকেশন',
                                     onPressed: () => _notice(context, 'এখন কোনো নতুন নোটিফিকেশন নেই।'),
-                                    icon: const Icon(Icons.notifications_none_rounded, color: _ink, size: 27),
+                                    icon: const Icon(Icons.notifications_none_rounded, color: Color(0xFFD7FFF4), size: 25),
                                   ),
                                   Positioned(
                                     right: 9,
@@ -1105,10 +1112,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 height: 38,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: Colors.white.withValues(alpha: .85),
-                                  border: Border.all(color: Colors.white, width: 2),
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [Color(0xFF4DE2B2), Color(0xFF087A5B)],
+                                  ),
+                                  border: Border.all(color: const Color(0xFFE7FFF7), width: 1.5),
+                                  boxShadow: [
+                                    BoxShadow(color: const Color(0xFF00E7A0).withValues(alpha: .14), blurRadius: 8),
+                                  ],
                                 ),
-                                child: const Icon(Icons.person_rounded, color: _blue, size: 27),
+                                child: const Icon(Icons.person_rounded, color: Colors.white, size: 26),
                               ),
                             ),
                           ],

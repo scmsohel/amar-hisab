@@ -1181,7 +1181,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               const SizedBox(height: 0),
                               if (_loading)
                                 Transform.translate(
-                                  offset: const Offset(0, -19),
+                                  offset: const Offset(18, -19),
                                   child: const SizedBox(height: 30, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF00E7A0))))),
                                 )
                               else if (_error != null)

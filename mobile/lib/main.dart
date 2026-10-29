@@ -1373,15 +1373,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final formattedBalance = balance.toStringAsFixed(0).replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',');
     final isBikash = name == 'বিকাশ';
     final isNagad = name == 'নগদ';
+    final lightCardColor = isBikash
+        ? const Color(0xFFFFEAF2)
+        : isNagad
+            ? const Color(0xFFFFF0E2)
+            : name == 'ক্যাশ'
+                ? const Color(0xFFE7F8EF)
+                : const Color(0xFFEAF3FF);
     return Container(
       padding: const EdgeInsets.fromLTRB(2, 6, 2, 6),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xB8072638) : const Color(0xF9FFFFFF),
+        color: isDark ? const Color(0xB8072638) : lightCardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: isDark ? accent.withValues(alpha: .48) : const Color(0xFFEAF4EF)),
+        border: Border.all(
+          color: isDark ? accent.withValues(alpha: .48) : lightCardColor.withValues(alpha: .95),
+        ),
         boxShadow: isDark
             ? [BoxShadow(color: accent.withValues(alpha: .06), blurRadius: 9, offset: const Offset(0, 3))]
-            : [BoxShadow(color: const Color(0xFF145A43).withValues(alpha: .035), blurRadius: 8, offset: const Offset(0, 3))],
+            : [BoxShadow(color: accent.withValues(alpha: .10), blurRadius: 8, offset: const Offset(0, 3))],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

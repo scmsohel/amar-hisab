@@ -1508,27 +1508,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   borderRadius: BorderRadius.circular(12),
                   side: BorderSide(color: isDark ? const Color(0xFF245363) : const Color(0xFFD9E9E4)),
                 ),
+                constraints: const BoxConstraints(maxHeight: 190, minWidth: 112, maxWidth: 112),
                 itemBuilder: (context) => [
-                  for (final option in const <(int, String)>[
-                    (3, '৩ দিন'), (7, '৭ দিন'), (15, '১৫ দিন'),
-                    (30, '১ মাস'), (90, '৩ মাস'), (180, '৬ মাস'), (365, '১ বছর'),
-                  ])
-                    PopupMenuItem<int>(
-                      value: option.$1,
-                      height: 38,
-                      child: Row(children: [
-                        if (_chartRangeDays == option.$1)
-                          const Icon(Icons.check_rounded, size: 15, color: Color(0xFF00B982))
-                        else
-                          const SizedBox(width: 15),
-                        const SizedBox(width: 6),
-                        Text(option.$2, style: TextStyle(
-                          color: _chartRangeDays == option.$1 ? const Color(0xFF00B982) : textColor,
-                          fontSize: 11,
-                          fontWeight: _chartRangeDays == option.$1 ? FontWeight.w800 : FontWeight.w600,
-                        )),
-                      ]),
+                  PopupMenuItem<int>(
+                    enabled: false,
+                    height: 184,
+                    padding: EdgeInsets.zero,
+                    child: SizedBox(
+                      height: 184,
+                      width: 112,
+                      child: Scrollbar(
+                        thumbVisibility: true,
+                        child: ListView(
+                          padding: EdgeInsets.zero,
+                          children: [
+                            for (final option in const <(int, String)>[
+                              (3, '৩ দিন'), (7, '৭ দিন'), (15, '১৫ দিন'),
+                              (30, '১ মাস'), (90, '৩ মাস'), (180, '৬ মাস'), (365, '১ বছর'),
+                            ])
+                              InkWell(
+                                onTap: () {
+                                  Navigator.of(context).pop();
+                                  setState(() => _chartRangeDays = option.$1);
+                                },
+                                child: Container(
+                                  height: 34,
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  color: _chartRangeDays == option.$1
+                                      ? (isDark ? const Color(0xFF31505A) : const Color(0xFFE0F5ED))
+                                      : Colors.transparent,
+                                  child: Row(children: [
+                                    if (_chartRangeDays == option.$1)
+                                      const Icon(Icons.check_rounded, size: 13, color: Color(0xFF00B982))
+                                    else
+                                      const SizedBox(width: 13),
+                                    const SizedBox(width: 5),
+                                    Text(option.$2, style: TextStyle(
+                                      color: _chartRangeDays == option.$1 ? const Color(0xFF00B982) : textColor,
+                                      fontSize: 10.5,
+                                      fontWeight: _chartRangeDays == option.$1 ? FontWeight.w800 : FontWeight.w600,
+                                    )),
+                                  ]),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
                     ),
+                  ),
                 ],
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),

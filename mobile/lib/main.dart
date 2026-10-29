@@ -1080,28 +1080,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) => AnnotatedRegion<SystemUiOverlayStyle>(
-        value: const SystemUiOverlayStyle(
-          statusBarColor: Color(0xFF061713),
-          statusBarIconBrightness: Brightness.light,
-          statusBarBrightness: Brightness.dark,
-          systemNavigationBarColor: Color(0xFF061713),
-          systemNavigationBarIconBrightness: Brightness.light,
+        value: SystemUiOverlayStyle(
+          statusBarColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF061B2D) : const Color(0xFFF3F8F5),
+          statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: Theme.of(context).brightness == Brightness.dark ? Brightness.dark : Brightness.light,
+          systemNavigationBarColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF061713) : const Color(0xFFF3F8F5),
+          systemNavigationBarIconBrightness: Theme.of(context).brightness == Brightness.dark ? Brightness.light : Brightness.dark,
         ),
         child: Scaffold(
         body: Stack(children: [
-          const Positioned.fill(
+          Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFF061B2D),
-                    Color(0xFF041827),
-                    Color(0xFF031A1B),
-                    Color(0xFF061713),
-                  ],
-                  stops: [0.0, 0.34, 0.72, 1.0],
+                  colors: Theme.of(context).brightness == Brightness.dark
+                      ? const [Color(0xFF061B2D), Color(0xFF041827), Color(0xFF031A1B), Color(0xFF061713)]
+                      : const [Color(0xFFF3F8F5), Color(0xFFEAF5EF), Color(0xFFF7FBF8), Color(0xFFF3F8F5)],
+                  stops: const [0.0, 0.34, 0.72, 1.0],
                 ),
               ),
             ),
@@ -1121,10 +1118,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text('আমার হিসাব', style: TextStyle(color: Color(0xFF4DE2B2), fontSize: 23, fontWeight: FontWeight.w900, height: 1.0)),
+                              Text('আমার হিসাব', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF4DE2B2) : const Color(0xFF087A5B), fontSize: 23, fontWeight: FontWeight.w900, height: 1.0)),
                               Transform.translate(
                                 offset: const Offset(0, -2),
-                                child: const Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', style: TextStyle(color: Color(0xFFB8D9D7), fontSize: 10.5, height: 1.0)),
+                                child: Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFB8D9D7) : const Color(0xFF587267), fontSize: 10.5, height: 1.0)),
                               ),
                             ],
                           ),
@@ -1136,7 +1133,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               child: IconButton(
                                 tooltip: 'মেনু',
                                 onPressed: () => _showDashboardMenu(context),
-                                icon: const Icon(Icons.menu_rounded, color: Color(0xFFD7FFF4), size: 27),
+                                icon: Icon(Icons.menu_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD7FFF4) : const Color(0xFF087A5B), size: 27),
                               ),
                             ),
                             const Spacer(),
@@ -1148,7 +1145,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   IconButton(
                                     tooltip: 'নোটিফিকেশন',
                                     onPressed: () => _notice(context, 'এখন কোনো নতুন নোটিফিকেশন নেই।'),
-                                    icon: const Icon(Icons.notifications_none_rounded, color: Color(0xFFD7FFF4), size: 25),
+                                    icon: Icon(Icons.notifications_none_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD7FFF4) : const Color(0xFF087A5B), size: 25),
                                   ),
                                   Positioned(
                                     right: 9,

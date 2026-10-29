@@ -1056,7 +1056,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _money(double value) => '৳ ${value.toStringAsFixed(2).replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',')}';
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => AnnotatedRegion<SystemUiOverlayStyle>(
+        value: const SystemUiOverlayStyle(
+          statusBarColor: Color(0xFF061713),
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+          systemNavigationBarColor: Color(0xFF061713),
+          systemNavigationBarIconBrightness: Brightness.light,
+        ),
+        child: Scaffold(
         body: Stack(children: [
           const Positioned.fill(
             child: ColoredBox(color: Color(0xFF061713)),

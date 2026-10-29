@@ -775,15 +775,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => AnnotatedRegion<SystemUiOverlayStyle>(
-        value: const SystemUiOverlayStyle(
-          statusBarColor: Color(0xFF061713),
-          statusBarIconBrightness: Brightness.light,
-          statusBarBrightness: Brightness.dark,
-          systemNavigationBarColor: Color(0xFF061713),
-          systemNavigationBarIconBrightness: Brightness.light,
-        ),
-        child: Scaffold(
+  Widget build(BuildContext context) => Scaffold(
         body: Stack(children: [
           Positioned.fill(child: Image.asset('assets/animations/Minimal Mint Leaf Wave Background.png', fit: BoxFit.cover)),
           SafeArea(child: Column(children: [

@@ -1369,28 +1369,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final balance = _walletBalances[name] ?? 0;
     final formattedBalance = balance.toStringAsFixed(0).replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',');
+    final isBikash = name == 'বিকাশ';
+    final isNagad = name == 'নগদ';
     return Container(
-      padding: const EdgeInsets.fromLTRB(5, 10, 5, 9),
+      padding: const EdgeInsets.fromLTRB(3, 10, 3, 9),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xB8072638) : const Color(0xF9FFFFFF),
-        borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: isDark ? accent.withValues(alpha: .55) : const Color(0xFFDCEFE6)),
+        borderRadius: BorderRadius.circular(17),
+        border: Border.all(color: isDark ? accent.withValues(alpha: .48) : const Color(0xFFEAF4EF)),
         boxShadow: isDark
-            ? [BoxShadow(color: accent.withValues(alpha: .07), blurRadius: 10, offset: const Offset(0, 3))]
-            : [BoxShadow(color: const Color(0xFF145A43).withValues(alpha: .045), blurRadius: 10, offset: const Offset(0, 4))],
+            ? [BoxShadow(color: accent.withValues(alpha: .06), blurRadius: 9, offset: const Offset(0, 3))]
+            : [BoxShadow(color: const Color(0xFF145A43).withValues(alpha: .035), blurRadius: 8, offset: const Offset(0, 3))],
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
         children: [
-          Container(
-            width: 32, height: 32,
-            decoration: BoxDecoration(color: accent.withValues(alpha: isDark ? .18 : .12), borderRadius: BorderRadius.circular(10)),
-            child: Icon(icon, color: accent, size: 19),
+          SizedBox(
+            width: 42,
+            height: 42,
+            child: isBikash || isNagad
+                ? Center(child: Text(isBikash ? 'b' : 'ন', style: TextStyle(color: accent, fontSize: isBikash ? 35 : 30, fontWeight: FontWeight.w900, fontStyle: isBikash ? FontStyle.italic : FontStyle.normal)))
+                : Icon(icon, color: accent, size: 36),
           ),
-          const SizedBox(height: 7),
-          Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFE8FFF7) : const Color(0xFF155A45), fontSize: 11, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 4),
-          FittedBox(fit: BoxFit.scaleDown, child: Text(_hidden ? '৳ •••••' : '৳ ' + formattedBalance, maxLines: 1, style: TextStyle(color: isDark ? Colors.white : const Color(0xFF073F32), fontSize: 12, fontWeight: FontWeight.w900))),
+          const SizedBox(height: 5),
+          Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFE8FFF7) : const Color(0xFF155A45), fontSize: 13, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 5),
+          FittedBox(fit: BoxFit.scaleDown, child: Text(_hidden ? '৳ •••••' : '৳ ' + formattedBalance, maxLines: 1, style: TextStyle(color: isDark ? Colors.white : const Color(0xFF073F32), fontSize: 15, fontWeight: FontWeight.w900))),
         ],
       ),
     );

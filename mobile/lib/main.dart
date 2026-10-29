@@ -1468,8 +1468,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final mutedColor = isDark ? const Color(0xFF9ABBB4) : const Color(0xFF64877C);
     final cardColor = isDark ? const Color(0xFF062537) : const Color(0xFFF9FFFC);
     final borderColor = isDark ? const Color(0xFF12605D) : const Color(0xFFD7EEE5);
-    return Container(
-      padding: const EdgeInsets.fromLTRB(10, 7, 10, 6),
+    return Transform.translate(
+      offset: const Offset(0, -3),
+      child: Container(
+      padding: const EdgeInsets.fromLTRB(7, 4, 7, 3),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(18),
@@ -1649,6 +1651,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
+    ),
     );
   }
 

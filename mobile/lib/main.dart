@@ -1233,7 +1233,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     padding: EdgeInsets.zero,
                                     tooltip: _hidden ? 'ব্যালেন্স দেখান' : 'ব্যালেন্স লুকান',
                                     onPressed: () => setState(() => _hidden = !_hidden),
-                                    icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: const Color(0xFFB9FBE5), size: 18),
+                                    icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFB9FBE5) : const Color(0xFF168565), size: 18),
                                   ),
                                   const Spacer(),
                                   Container(
@@ -1249,7 +1249,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       ),
                                       borderRadius: BorderRadius.circular(28),
                                     ),
-                                    child: const Row(
+                                    child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Text('এই মাস', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD7FFF4) : const Color(0xFF155A45), fontSize: 12, fontWeight: FontWeight.w700)),
@@ -1264,7 +1264,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               if (_loading)
                                 Transform.translate(
                                   offset: const Offset(18, -19),
-                                  child: const SizedBox(height: 30, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00E7A0) : const Color(0xFF00A875))))),
+                                  child: SizedBox(height: 30, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00E7A0) : const Color(0xFF00A875))))),
                                 )
                               else if (_error != null)
                                 Text(_error!, style: const TextStyle(color: Color(0xFFFF6868), fontSize: 12))
@@ -1300,7 +1300,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       ),
                                       borderRadius: BorderRadius.circular(24),
                                     ),
-                                    child: const Row(
+                                    child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Icon(Icons.trending_up_rounded, size: 15, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00F0A0) : const Color(0xFF008D62)),

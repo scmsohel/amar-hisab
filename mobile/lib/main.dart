@@ -1576,9 +1576,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           SizedBox(
-            height: 150,
+            height: 115,
             child: Stack(
               children: [
                 Positioned.fill(

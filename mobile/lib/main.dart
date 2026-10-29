@@ -1766,9 +1766,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          FittedBox(fit: BoxFit.scaleDown, child: Text(_money(total), style: TextStyle(color: textColor, fontSize: 10.5, fontWeight: FontWeight.w900))),
+                          SizedBox(
+                            width: 44,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(_money(total), style: TextStyle(color: textColor, fontSize: 9, fontWeight: FontWeight.w900)),
+                            ),
+                          ),
                           const SizedBox(height: 2),
-                          Text(isIncome ? 'মোট আয়' : 'মোট খরচ', style: TextStyle(color: mutedColor, fontSize: 8.5)),
+                          Text(isIncome ? 'মোট আয়' : 'মোট খরচ', style: TextStyle(color: mutedColor, fontSize: 7.5)),
                         ],
                       ),
                     ),
@@ -1897,7 +1903,7 @@ class _DonutSummaryPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (size.width <= 0 || size.height <= 0) return;
     final side = size.width < size.height ? size.width : size.height;
-    final stroke = side * .18;
+    final stroke = side * .14;
     final rect = Rect.fromCenter(center: Offset(size.width / 2, size.height / 2), width: side - stroke, height: side - stroke);
     final base = Paint()..color = const Color(0xFF8A9B9A).withValues(alpha: .12)..style = PaintingStyle.stroke..strokeWidth = stroke;
     canvas.drawCircle(rect.center, rect.width / 2, base);

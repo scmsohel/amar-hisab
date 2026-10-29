@@ -1432,9 +1432,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   const SizedBox(height: 11),
                   _incomeExpenseChart(),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 4),
                   _incomeExpenseDonuts(),
-                  const SizedBox(height: 10),
                   if (_error != null) ...[
                     const SizedBox(height: 12),
                     OutlinedButton.icon(onPressed: _load, icon: const Icon(Icons.refresh_rounded), label: const Text('আবার চেষ্টা করুন')),
@@ -1706,7 +1705,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final mutedColor = isDark ? const Color(0xFF9ABBB4) : const Color(0xFF64877C);
     final monthLabel = monthOffset == 0 ? 'এই মাস' : monthOffset == 1 ? 'গত মাস' : '$monthOffset মাস আগে';
     return Container(
-      padding: const EdgeInsets.fromLTRB(9, 9, 8, 9),
+      padding: const EdgeInsets.fromLTRB(7, 5, 6, 4),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(16),
@@ -1753,9 +1752,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 3),
           SizedBox(
-            height: 112,
+            height: 96,
             child: Row(
               children: [
                 Expanded(
@@ -1789,7 +1788,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     children: [
                       for (var i = 0; i < shown.length; i++)
                         Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          padding: const EdgeInsets.symmetric(vertical: 1),
                           child: Row(
                             children: [
                               Container(width: 6, height: 6, decoration: BoxDecoration(color: palette[i % palette.length], shape: BoxShape.circle)),

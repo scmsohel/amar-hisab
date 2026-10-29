@@ -10,11 +10,15 @@ import 'package:lottie/lottie.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _AuthApi.loadBaseUrl();
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Color(0xFF061713),
-    statusBarIconBrightness: Brightness.light,
-    systemNavigationBarColor: Color(0xFF061713),
-    systemNavigationBarIconBrightness: Brightness.light,
+  final preferences = await SharedPreferences.getInstance();
+  _appThemeMode.value = preferences.getString(_themePreferenceKey) == 'light'
+      ? ThemeMode.light
+      : ThemeMode.dark;
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: _appThemeMode.value == ThemeMode.dark ? const Color(0xFF061B2D) : const Color(0xFFF3F8F5),
+    statusBarIconBrightness: _appThemeMode.value == ThemeMode.dark ? Brightness.light : Brightness.dark,
+    systemNavigationBarColor: _appThemeMode.value == ThemeMode.dark ? const Color(0xFF061713) : const Color(0xFFF3F8F5),
+    systemNavigationBarIconBrightness: _appThemeMode.value == ThemeMode.dark ? Brightness.light : Brightness.dark,
   ));
   runApp(const AmarHisabApp());
 }
@@ -25,6 +29,21 @@ const _ink = Color(0xFF075B3A);
 const _muted = Color(0xFF687C78);
 const _line = Color(0xFFDDEBE5);
 const _pale = Color(0xFFF2F7FF);
+
+const String _themePreferenceKey = 'amar_hisab_theme_mode';
+final ValueNotifier<ThemeMode> _appThemeMode = ValueNotifier<ThemeMode>(ThemeMode.dark);
+
+Future<void> _setAppThemeMode(ThemeMode mode) async {
+  _appThemeMode.value = mode;
+  final preferences = await SharedPreferences.getInstance();
+  await preferences.setString(_themePreferenceKey, mode == ThemeMode.light ? 'light' : 'dark');
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: mode == ThemeMode.dark ? const Color(0xFF061B2D) : const Color(0xFFF3F8F5),
+    statusBarIconBrightness: mode == ThemeMode.dark ? Brightness.light : Brightness.dark,
+    systemNavigationBarColor: mode == ThemeMode.dark ? const Color(0xFF061713) : const Color(0xFFF3F8F5),
+    systemNavigationBarIconBrightness: mode == ThemeMode.dark ? Brightness.light : Brightness.dark,
+  ));
+}
 
 class _AuthApi {
   static const String _baseUrlPreferenceKey = 'amar_hisab_server_url';
@@ -230,34 +249,46 @@ class AmarHisabApp extends StatelessWidget {
   const AmarHisabApp({super.key});
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-        title: 'আমার হিসাব',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          useMaterial3: true,
-          fontFamily: 'Roboto',
-          scaffoldBackgroundColor: _pale,
-          colorScheme: ColorScheme.fromSeed(seedColor: _blue),
-          inputDecorationTheme: InputDecorationTheme(
-            filled: true,
-            fillColor: const Color(0xFFF9FBFF),
-            hintStyle: const TextStyle(color: Color(0xFF8B95A7), fontSize: 14),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
-              borderSide: const BorderSide(color: _line),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
-              borderSide: const BorderSide(color: _line),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
-              borderSide: const BorderSide(color: _blue, width: 1.4),
+  Widget build(BuildContext context) => ValueListenableBuilder<ThemeMode>(
+        valueListenable: _appThemeMode,
+        builder: (context, mode, _) => MaterialApp(
+          title: 'আমার হিসাব',
+          debugShowCheckedModeBanner: false,
+          themeMode: mode,
+          theme: ThemeData(
+            useMaterial3: true,
+            brightness: Brightness.light,
+            fontFamily: 'Roboto',
+            scaffoldBackgroundColor: const Color(0xFFF3F8F5),
+            colorScheme: ColorScheme.fromSeed(seedColor: _blue, brightness: Brightness.light),
+            inputDecorationTheme: InputDecorationTheme(
+              filled: true,
+              fillColor: const Color(0xFFF9FBFF),
+              hintStyle: const TextStyle(color: Color(0xFF8B95A7), fontSize: 14),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(18),
+                borderSide: const BorderSide(color: _line),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(18),
+                borderSide: const BorderSide(color: _line),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(18),
+                borderSide: const BorderSide(color: _blue, width: 1.4),
+              ),
             ),
           ),
+          darkTheme: ThemeData(
+            useMaterial3: true,
+            brightness: Brightness.dark,
+            fontFamily: 'Roboto',
+            scaffoldBackgroundColor: const Color(0xFF061713),
+            colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4DE2B2), brightness: Brightness.dark),
+          ),
+          home: const SplashScreen(),
         ),
-        home: const SplashScreen(),
       );
 }
 
@@ -1290,12 +1321,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
 
   void _showDashboardMenu(BuildContext context) {
+    final isDark = _appThemeMode.value == ThemeMode.dark;
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? const Color(0xFF0A2527) : Colors.white,
       showDragHandle: true,
       builder: (sheetContext) => SafeArea(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
+          SwitchListTile(
+            secondary: Icon(isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded),
+            title: Text(isDark ? 'Dark Future Mode' : 'Light Mode'),
+            subtitle: Text(isDark ? 'Premium dark theme চালু' : 'Light theme চালু'),
+            value: isDark,
+            onChanged: (value) async {
+              await _setAppThemeMode(value ? ThemeMode.dark : ThemeMode.light);
+              if (sheetContext.mounted) Navigator.pop(sheetContext);
+            },
+          ),
           ListTile(leading: const Icon(Icons.refresh_rounded), title: const Text('ডেটা রিফ্রেশ'), onTap: () { Navigator.pop(sheetContext); _load(); }),
           ListTile(leading: const Icon(Icons.dns_outlined), title: const Text('Server Settings'), onTap: () { Navigator.pop(sheetContext); Navigator.of(context).push(_route(const ServerSettingsScreen())); }),
           ListTile(leading: const Icon(Icons.logout_rounded), title: const Text('লগআউট'), onTap: () async { Navigator.pop(sheetContext); await _AuthApi.clearSession(); if (context.mounted) Navigator.of(context).pushAndRemoveUntil(_route(const LoginScreen()), (route) => false); }),

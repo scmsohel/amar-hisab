@@ -1044,6 +1044,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String? _error;
   double _balance = 0;
   double? _monthChangePercent;
+  String _monthChangeMessage = 'গত মাসের তুলনার ডেটা নেই';
   Map<String, double> _walletBalances = {'ক্যাশ': 0, 'ব্যাংক': 0, 'বিকাশ': 0, 'নগদ': 0};
 
   @override
@@ -1053,6 +1054,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   double _amount(dynamic value) => value is num ? value.toDouble() : double.tryParse(value?.toString() ?? '') ?? 0;
+
+  DateTime? _parseTransactionDate(dynamic value) {
+    if (value == null) return null;
+    final raw = value.toString().trim();
+    if (raw.isEmpty) return null;
+    final direct = DateTime.tryParse(raw);
+    if (direct != null) return direct;
+    final normalized = raw
+        .replaceAll('০', '0').replaceAll('১', '1').replaceAll('২', '2')
+        .replaceAll('৩', '3').replaceAll('৪', '4').replaceAll('৫', '5')
+        .replaceAll('৬', '6').replaceAll('৭', '7').replaceAll('৮', '8')
+        .replaceAll('৯', '9').replaceAll('.', '').trim();
+    final match = RegExp(r'(\\d{1,2})\\s+([^,\\s]+)[, ]+\\s*(\\d{4})').firstMatch(normalized);
+    if (match == null) return null;
+    const months = <String>[
+      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
+      'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর',
+    ];
+    final token = match.group(2)!;
+    final month = months.indexWhere((name) => name.startsWith(token) || token.startsWith(name));
+    if (month < 0) return null;
+    return DateTime.tryParse('${match.group(3)}-${(month + 1).toString().padLeft(2, '0')}-${match.group(1)!.padLeft(2, '0')}');
+  }
 
   Future<void> _load() async {
     setState(() { _loading = true; _error = null; });
@@ -1069,22 +1093,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final now = DateTime.now();
       final currentMonthStart = DateTime(now.year, now.month);
       final nextMonthStart = DateTime(now.year, now.month + 1);
+      final previousMonthStart = DateTime(now.year, now.month - 1);
+      final previousMonthEnd = currentMonthStart;
       var total = openingTotal;
-      var previousMonthBalance = openingTotal;
-      var hasUndatedTransaction = false;
+      var currentMonthIncome = 0.0;
+      var currentMonthExpense = 0.0;
+      var previousMonthIncome = 0.0;
+      var previousMonthExpense = 0.0;
       for (final item in transactions) {
         if (item is! Map) continue;
         final amount = _amount(item['amount']);
         final kind = (item['kind'] ?? '').toString();
-        final signedAmount = kind == 'আয়' ? amount : kind == 'ব্যয়' ? -amount : 0.0;
-        final rawDate = (item['dateInput'] ?? item['date_input'] ?? item['date'] ?? item['createdAt'] ?? item['created_at'] ?? '').toString();
-        final transactionDate = DateTime.tryParse(rawDate);
-        if (transactionDate == null) {
-          if (signedAmount != 0) hasUndatedTransaction = true;
-        } else if (transactionDate.isBefore(nextMonthStart)) {
-          total += signedAmount;
-          if (transactionDate.isBefore(currentMonthStart)) {
-            previousMonthBalance += signedAmount;
+        final rawDate = item['dateInput'] ?? item['date_input'] ?? item['date'] ?? item['createdAt'] ?? item['created_at'];
+        final transactionDate = _parseTransactionDate(rawDate);
+        if (transactionDate != null) {
+          if (transactionDate.isBefore(nextMonthStart)) {
+            if (kind == 'আয়') total += amount;
+            if (kind == 'ব্যয়') total -= amount;
+          }
+          if (!transactionDate.isBefore(currentMonthStart) && transactionDate.isBefore(nextMonthStart)) {
+            if (kind == 'আয়') currentMonthIncome += amount;
+            if (kind == 'ব্যয়') currentMonthExpense += amount;
+          } else if (!transactionDate.isBefore(previousMonthStart) && transactionDate.isBefore(previousMonthEnd)) {
+            if (kind == 'আয়') previousMonthIncome += amount;
+            if (kind == 'ব্যয়') previousMonthExpense += amount;
           }
         }
         final walletName = (item['wallet'] ?? item['walletName'] ?? item['wallet_name'] ?? item['accountName'] ?? item['account'] ?? '').toString();
@@ -1093,14 +1125,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
           if (kind == 'ব্যয়') walletBalances[walletName] = walletBalances[walletName]! - amount;
         }
       }
-      final monthChangePercent = !hasUndatedTransaction && previousMonthBalance != 0
-          ? ((total - previousMonthBalance) / previousMonthBalance.abs()) * 100
-          : null;
+      final currentNet = currentMonthIncome - currentMonthExpense;
+      final previousNet = previousMonthIncome - previousMonthExpense;
+      final double? monthChangePercent = previousNet == 0 ? null : ((currentNet - previousNet) / previousNet.abs()) * 100;
+      final monthChangeMessage = currentNet == 0 && previousNet == 0
+          ? 'এখনো কোনো লেনদেন নেই'
+          : previousNet == 0
+              ? 'এই মাসে নতুন লেনদেন'
+              : '${monthChangePercent!.abs().toStringAsFixed(1)}% গত মাসের তুলনায়';
       if (!mounted) return;
       setState(() {
         _balance = total;
         _walletBalances = walletBalances;
         _monthChangePercent = monthChangePercent;
+        _monthChangeMessage = monthChangeMessage;
         _loading = false;
       });
     } catch (error) {
@@ -1339,9 +1377,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         Icon(Icons.trending_up_rounded, size: 15, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00F0A0) : const Color(0xFF008D62)),
                                         SizedBox(width: 3),
                                         Text(
-                                          _monthChangePercent == null
-                                              ? 'গত মাসের তুলনার ডেটা নেই'
-                                              : '${_monthChangePercent! >= 0 ? '+' : ''}${_monthChangePercent!.toStringAsFixed(1)}% গত মাসের তুলনায়',
+                                          _monthChangeMessage,
                                           style: TextStyle(
                                             color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFBFFFF0) : const Color(0xFF17634A),
                                             fontSize: 10.5,

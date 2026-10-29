@@ -1043,6 +1043,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool _hidden = false;
   String? _error;
   double _balance = 0;
+  double? _monthChangePercent;
   Map<String, double> _walletBalances = {'ক্যাশ': 0, 'ব্যাংক': 0, 'বিকাশ': 0, 'নগদ': 0};
 
   @override
@@ -1064,21 +1065,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
         if (item is Map) opening[(item['name'] ?? '').toString()] = _amount(item['base']);
       }
       final walletBalances = Map<String, double>.from(opening);
-      var total = opening.values.fold<double>(0, (sum, value) => sum + value);
+      final openingTotal = opening.values.fold<double>(0, (sum, value) => sum + value);
+      final now = DateTime.now();
+      final currentMonthStart = DateTime(now.year, now.month);
+      final nextMonthStart = DateTime(now.year, now.month + 1);
+      var total = openingTotal;
+      var previousMonthBalance = openingTotal;
+      var hasUndatedTransaction = false;
       for (final item in transactions) {
         if (item is! Map) continue;
         final amount = _amount(item['amount']);
         final kind = (item['kind'] ?? '').toString();
-        if (kind == 'আয়') total += amount;
-        if (kind == 'ব্যয়') total -= amount;
+        final signedAmount = kind == 'আয়' ? amount : kind == 'ব্যয়' ? -amount : 0.0;
+        final rawDate = (item['dateInput'] ?? item['date_input'] ?? item['date'] ?? item['createdAt'] ?? item['created_at'] ?? '').toString();
+        final transactionDate = DateTime.tryParse(rawDate);
+        if (transactionDate == null) {
+          if (signedAmount != 0) hasUndatedTransaction = true;
+        } else if (transactionDate.isBefore(nextMonthStart)) {
+          total += signedAmount;
+          if (transactionDate.isBefore(currentMonthStart)) {
+            previousMonthBalance += signedAmount;
+          }
+        }
         final walletName = (item['wallet'] ?? item['walletName'] ?? item['wallet_name'] ?? item['accountName'] ?? item['account'] ?? '').toString();
         if (walletBalances.containsKey(walletName)) {
           if (kind == 'আয়') walletBalances[walletName] = walletBalances[walletName]! + amount;
           if (kind == 'ব্যয়') walletBalances[walletName] = walletBalances[walletName]! - amount;
         }
       }
+      final monthChangePercent = !hasUndatedTransaction && previousMonthBalance != 0
+          ? ((total - previousMonthBalance) / previousMonthBalance.abs()) * 100
+          : null;
       if (!mounted) return;
-      setState(() { _balance = total; _walletBalances = walletBalances; _loading = false; });
+      setState(() {
+        _balance = total;
+        _walletBalances = walletBalances;
+        _monthChangePercent = monthChangePercent;
+        _loading = false;
+      });
     } catch (error) {
       if (!mounted) return;
       setState(() { _error = error.toString().replaceFirst('Exception: ', ''); _loading = false; });
@@ -1314,7 +1338,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                       children: [
                                         Icon(Icons.trending_up_rounded, size: 15, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00F0A0) : const Color(0xFF008D62)),
                                         SizedBox(width: 3),
-                                        Text('মোট হিসাব', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFBFFFF0) : const Color(0xFF17634A), fontSize: 11, fontWeight: FontWeight.w800)),
+                                        Text(
+                                          _monthChangePercent == null
+                                              ? 'গত মাসের তুলনার ডেটা নেই'
+                                              : '${_monthChangePercent! >= 0 ? '+' : ''}${_monthChangePercent!.toStringAsFixed(1)}% গত মাসের তুলনায়',
+                                          style: TextStyle(
+                                            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFBFFFF0) : const Color(0xFF17634A),
+                                            fontSize: 10.5,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),

@@ -1254,6 +1254,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 11),
                   Transform.translate(
                     offset: const Offset(0, 0),
                     child: Container(
@@ -1427,7 +1428,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 11),
                   _incomeExpenseChart(),
                   const SizedBox(height: 10),
                   if (_error != null) ...[

@@ -1512,10 +1512,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 itemBuilder: (context) => [
                   PopupMenuItem<int>(
                     enabled: false,
-                    height: 184,
+                    height: 112,
                     padding: EdgeInsets.zero,
                     child: SizedBox(
-                      height: 184,
+                      height: 112,
                       width: 112,
                       child: Scrollbar(
                         thumbVisibility: true,

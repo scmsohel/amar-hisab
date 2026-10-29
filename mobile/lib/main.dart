@@ -1186,25 +1186,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       padding: const EdgeInsets.fromLTRB(15, 0, 8, 2),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(25),
-                        border: Border.all(color: const Color(0xFF00E7A0).withValues(alpha: .78), width: 1.25),
-                        gradient: const LinearGradient(
+                        border: Border.all(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? const Color(0xFF00E7A0).withValues(alpha: .78)
+                              : const Color(0xFF79DDB8),
+                          width: 1.25,
+                        ),
+                        gradient: LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
-                          colors: [Color(0xD908302B), Color(0xD904232B), Color(0xD9021725)],
+                          colors: Theme.of(context).brightness == Brightness.dark
+                              ? const [Color(0xD908302B), Color(0xD904232B), Color(0xD9021725)]
+                              : const [Color(0xFFF9FFFC), Color(0xFFEAFBF3), Color(0xFFF5FFFA)],
                         ),
-                        boxShadow: [
-                          BoxShadow(color: const Color(0xFF00F0A0).withValues(alpha: .08), blurRadius: 14, spreadRadius: 0, offset: const Offset(0, 3)),
-                          BoxShadow(color: const Color(0xFF00111E).withValues(alpha: .14), blurRadius: 10, offset: const Offset(0, 4)),
-                        ],
+                        boxShadow: Theme.of(context).brightness == Brightness.dark
+                            ? [
+                                BoxShadow(color: const Color(0xFF00F0A0).withValues(alpha: .08), blurRadius: 14, spreadRadius: 0, offset: const Offset(0, 3)),
+                                BoxShadow(color: const Color(0xFF00111E).withValues(alpha: .14), blurRadius: 10, offset: const Offset(0, 4)),
+                              ]
+                            : [
+                                BoxShadow(color: const Color(0xFF39B98A).withValues(alpha: .10), blurRadius: 18, offset: const Offset(0, 7)),
+                                BoxShadow(color: const Color(0xFF0B5B43).withValues(alpha: .035), blurRadius: 6, offset: const Offset(0, 2)),
+                              ],
                       ),
                       child: Stack(
                         children: [
-                          const Positioned(
+                          Positioned(
                             right: -18,
                             bottom: -16,
                             width: 330,
                             height: 150,
-                            child: ClipRect(child: IgnorePointer(child: CustomPaint(painter: _BalanceNeonChartPainter()))),
+                            child: ClipRect(child: IgnorePointer(child: CustomPaint(painter: _BalanceNeonChartPainter(isDark: Theme.of(context).brightness == Brightness.dark)))),
                           ),
                           Transform.translate(
                             offset: const Offset(0, -3),
@@ -1214,7 +1226,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               children: [
                               Row(
                                 children: [
-                                  const Text('মোট ব্যালেন্স', style: TextStyle(color: Color(0xFFF0FFF9), fontSize: 13, height: 1, fontWeight: FontWeight.w700)),
+                                  Text('মোট ব্যালেন্স', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF0FFF9) : const Color(0xFF155A45), fontSize: 13, height: 1, fontWeight: FontWeight.w700)),
                                   const SizedBox(width: 0),
                                   IconButton(
                                     constraints: const BoxConstraints.tightFor(width: 24, height: 28),
@@ -1227,16 +1239,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF32DDB0).withValues(alpha: .12),
-                                      border: Border.all(color: const Color(0xFF43E8BE).withValues(alpha: .34)),
+                                      color: Theme.of(context).brightness == Brightness.dark
+                                          ? const Color(0xFF32DDB0).withValues(alpha: .12)
+                                          : const Color(0xFFBDF5DF).withValues(alpha: .48),
+                                      border: Border.all(
+                                        color: Theme.of(context).brightness == Brightness.dark
+                                            ? const Color(0xFF43E8BE).withValues(alpha: .34)
+                                            : const Color(0xFF6FD9B2).withValues(alpha: .58),
+                                      ),
                                       borderRadius: BorderRadius.circular(28),
                                     ),
                                     child: const Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Text('এই মাস', style: TextStyle(color: Color(0xFFD7FFF4), fontSize: 12, fontWeight: FontWeight.w700)),
+                                        Text('এই মাস', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD7FFF4) : const Color(0xFF155A45), fontSize: 12, fontWeight: FontWeight.w700)),
                                         SizedBox(width: 5),
-                                        Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFFD7FFF4), size: 17),
+                                        Icon(Icons.keyboard_arrow_down_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD7FFF4) : const Color(0xFF155A45), size: 17),
                                       ],
                                     ),
                                   ),
@@ -1246,7 +1264,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               if (_loading)
                                 Transform.translate(
                                   offset: const Offset(18, -19),
-                                  child: const SizedBox(height: 30, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF00E7A0))))),
+                                  child: const SizedBox(height: 30, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00E7A0) : const Color(0xFF00A875))))),
                                 )
                               else if (_error != null)
                                 Text(_error!, style: const TextStyle(color: Color(0xFFFF6868), fontSize: 12))
@@ -1255,7 +1273,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   offset: const Offset(0, -19),
                                   child: Text(
                                     _hidden ? '৳ ••••••' : _money(_balance),
-                                    style: const TextStyle(color: Colors.white, fontSize: 29, fontWeight: FontWeight.w900, letterSpacing: .2),
+                                    style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF075B45), fontSize: 29, fontWeight: FontWeight.w900, letterSpacing: .2),
                                   ),
                                 ),
                               const SizedBox(height: 0),
@@ -1272,16 +1290,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF00E7A0).withValues(alpha: .16),
-                                      border: Border.all(color: const Color(0xFF00E7A0).withValues(alpha: .62)),
+                                      color: Theme.of(context).brightness == Brightness.dark
+                                          ? const Color(0xFF00E7A0).withValues(alpha: .16)
+                                          : const Color(0xFFB5F2D9),
+                                      border: Border.all(
+                                        color: Theme.of(context).brightness == Brightness.dark
+                                            ? const Color(0xFF00E7A0).withValues(alpha: .62)
+                                            : const Color(0xFF72DDB5),
+                                      ),
                                       borderRadius: BorderRadius.circular(24),
                                     ),
                                     child: const Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(Icons.trending_up_rounded, size: 15, color: Color(0xFF00F0A0)),
+                                        Icon(Icons.trending_up_rounded, size: 15, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00F0A0) : const Color(0xFF008D62)),
                                         SizedBox(width: 3),
-                                        Text('মোট হিসাব', style: TextStyle(color: Color(0xFFBFFFF0), fontSize: 11, fontWeight: FontWeight.w800)),
+                                        Text('মোট হিসাব', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFBFFFF0) : const Color(0xFF17634A), fontSize: 11, fontWeight: FontWeight.w800)),
                                       ],
                                     ),
                                   ),
@@ -1289,7 +1313,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   Expanded(
                                     child: Text(
                                       _loading ? 'ব্যালেন্স লোড হচ্ছে...' : _error != null ? 'সার্ভার থেকে ডেটা পাওয়া যায়নি' : 'সার্ভারের হিসাব অনুযায়ী',
-                                      style: const TextStyle(color: Color(0xFFB8D9D7), fontSize: 11),
+                                      style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFB8D9D7) : const Color(0xFF55796B), fontSize: 11),
                                     ),
                                   ),
                                       ],
@@ -1346,7 +1370,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
 
 class _BalanceNeonChartPainter extends CustomPainter {
-  const _BalanceNeonChartPainter();
+  const _BalanceNeonChartPainter({required this.isDark});
+
+  final bool isDark;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -1369,7 +1395,9 @@ class _BalanceNeonChartPainter extends CustomPainter {
         ..shader = const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [Color(0x3033FFD0), Color(0x0010AFC7)],
+          colors: isDark
+              ? const [Color(0x3033FFD0), Color(0x0010AFC7)]
+              : const [Color(0x4533D9A0), Color(0x00FFFFFF)],
         ).createShader(Offset.zero & size),
     );
 
@@ -1382,7 +1410,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
     canvas.drawPath(
       secondary,
       Paint()
-        ..color = const Color(0xFF00DCC5).withValues(alpha: .16)
+        ..color = (isDark ? const Color(0xFF00DCC5) : const Color(0xFF13C58B)).withValues(alpha: isDark ? .16 : .08)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 6
         ..strokeCap = StrokeCap.round
@@ -1391,7 +1419,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = const Color(0xFF00E7D2).withValues(alpha: .60)
+        ..color = (isDark ? const Color(0xFF00E7D2) : const Color(0xFF00B981)).withValues(alpha: isDark ? .60 : .28)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3
         ..strokeCap = StrokeCap.round
@@ -1401,7 +1429,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = const Color(0xFF70FFE2)
+        ..color = isDark ? const Color(0xFF70FFE2) : const Color(0xFF00B981)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.6
         ..strokeCap = StrokeCap.round
@@ -1424,7 +1452,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
       );
       canvas.drawRRect(
         rect,
-        Paint()..color = const Color(0xFF00E7A0).withValues(alpha: .38),
+        Paint()..color = (isDark ? const Color(0xFF00E7A0) : const Color(0xFF16B981)).withValues(alpha: isDark ? .38 : .30),
       );
     }
   }

@@ -1382,7 +1382,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         Text(
                                           _monthChangePercent == null
                                               ? _monthChangeMessage
-                                              : '${_monthChangePercent!.abs().toStringAsFixed(1)}%',
+                                              : '${_monthChangePercent! >= 0 ? '+' : '-'}${_monthChangePercent!.abs().toStringAsFixed(1)}% গত মাসের তুলনায়',
                                           style: TextStyle(
                                             color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFBFFFF0) : const Color(0xFF17634A),
                                             fontSize: 10.5,

@@ -775,7 +775,15 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => AnnotatedRegion<SystemUiOverlayStyle>(
+        value: const SystemUiOverlayStyle(
+          statusBarColor: Color(0xFF061713),
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+          systemNavigationBarColor: Color(0xFF061713),
+          systemNavigationBarIconBrightness: Brightness.light,
+        ),
+        child: Scaffold(
         body: Stack(children: [
           Positioned.fill(child: Image.asset('assets/animations/Minimal Mint Leaf Wave Background.png', fit: BoxFit.cover)),
           SafeArea(child: Column(children: [
@@ -1068,10 +1076,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Text('আমার হিসাব', style: TextStyle(color: _ink, fontSize: 23, fontWeight: FontWeight.w900, height: 1.0)),
+                              const Text('আমার হিসাব', style: TextStyle(color: Color(0xFF4DE2B2), fontSize: 23, fontWeight: FontWeight.w900, height: 1.0)),
                               Transform.translate(
                                 offset: const Offset(0, -2),
-                                child: const Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', style: TextStyle(color: _muted, fontSize: 10.5, height: 1.0)),
+                                child: const Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', style: TextStyle(color: Color(0xFFB8D9D7), fontSize: 10.5, height: 1.0)),
                               ),
                             ],
                           ),
@@ -1264,6 +1272,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
 
         ]),
+        ),
       );
 
   void _showDashboardMenu(BuildContext context) {

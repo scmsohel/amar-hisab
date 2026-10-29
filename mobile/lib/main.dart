@@ -1704,7 +1704,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final borderColor = isDark ? const Color(0xFF12605D) : const Color(0xFFD7EEE5);
     final textColor = isDark ? const Color(0xFFDDFBF1) : const Color(0xFF164F40);
     final mutedColor = isDark ? const Color(0xFF9ABBB4) : const Color(0xFF64877C);
-    final monthLabel = monthOffset == 0 ? 'এই মাস' : monthOffset == 1 ? 'গত মাস' : '\$monthOffset মাস আগে';
+    final monthLabel = monthOffset == 0 ? 'এই মাস' : monthOffset == 1 ? 'গত মাস' : '$monthOffset মাস আগে';
     return Container(
       padding: const EdgeInsets.fromLTRB(9, 9, 8, 9),
       decoration: BoxDecoration(
@@ -1736,7 +1736,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     PopupMenuItem<int>(
                       value: offset,
                       height: 34,
-                      child: Text(offset == 0 ? 'এই মাস' : offset == 1 ? 'গত মাস' : '\$offset মাস আগে', style: TextStyle(color: textColor, fontSize: 10.5)),
+                      child: Text(offset == 0 ? 'এই মাস' : offset == 1 ? 'গত মাস' : '$offset মাস আগে', style: TextStyle(color: textColor, fontSize: 10.5)),
                     ),
                 ],
                 child: Container(

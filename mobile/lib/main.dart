@@ -1066,7 +1066,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         .replaceAll('৩', '3').replaceAll('৪', '4').replaceAll('৫', '5')
         .replaceAll('৬', '6').replaceAll('৭', '7').replaceAll('৮', '8')
         .replaceAll('৯', '9').replaceAll('.', '').trim();
-    final match = RegExp(r'(\\d{1,2})\\s+([^,\\s]+)[, ]+\\s*(\\d{4})').firstMatch(normalized);
+    final match = RegExp(r'(\d{1,2})\s+([^,\s]+)[, ]+\s*(\d{4})').firstMatch(normalized);
     if (match == null) return null;
     const months = <String>[
       'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',

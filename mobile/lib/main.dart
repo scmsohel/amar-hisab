@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -1388,9 +1389,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
           SizedBox(
             width: 42,
             height: 42,
-            child: isBikash || isNagad
-                ? Center(child: Text(isBikash ? 'b' : 'ন', style: TextStyle(color: accent, fontSize: isBikash ? 35 : 30, fontWeight: FontWeight.w900, fontStyle: isBikash ? FontStyle.italic : FontStyle.normal)))
-                : Icon(icon, color: accent, size: 36),
+            child: isBikash
+                ? SvgPicture.asset('assets/wallets/bkash-mark.svg', fit: BoxFit.contain)
+                : isNagad
+                    ? SvgPicture.asset('assets/wallets/nagad-mark.svg', fit: BoxFit.contain)
+                    : Icon(icon, color: accent, size: 36),
           ),
           const SizedBox(height: 5),
           Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFE8FFF7) : const Color(0xFF155A45), fontSize: 13, fontWeight: FontWeight.w700)),

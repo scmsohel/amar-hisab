@@ -1184,7 +1184,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
                 children: [
                   Transform.translate(
-                    offset: const Offset(0, -4),
+                    offset: const Offset(0, 0),
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
@@ -1255,7 +1255,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   Transform.translate(
-                    offset: const Offset(0, 3),
+                    offset: const Offset(0, 0),
                     child: Container(
                       padding: const EdgeInsets.fromLTRB(15, 0, 8, 2),
                       decoration: BoxDecoration(

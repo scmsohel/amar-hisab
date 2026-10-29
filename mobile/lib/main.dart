@@ -1427,7 +1427,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 11),
+                  const SizedBox(height: 6),
                   _incomeExpenseChart(),
                   const SizedBox(height: 10),
                   if (_error != null) ...[
@@ -1469,7 +1469,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final cardColor = isDark ? const Color(0xFF062537) : const Color(0xFFF9FFFC);
     final borderColor = isDark ? const Color(0xFF12605D) : const Color(0xFFD7EEE5);
     return Container(
-      padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+      padding: const EdgeInsets.fromLTRB(10, 7, 10, 6),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(18),

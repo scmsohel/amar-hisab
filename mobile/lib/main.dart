@@ -1392,7 +1392,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
     canvas.drawPath(
       fillPath,
       Paint()
-        ..shader = const LinearGradient(
+        ..shader = LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: isDark

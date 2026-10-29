@@ -1045,6 +1045,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   double _balance = 0;
   double? _monthChangePercent;
   String _monthChangeMessage = 'গত মাসের তুলনার ডেটা নেই';
+  List<Map<String, dynamic>> _transactions = <Map<String, dynamic>>[];
   Map<String, double> _walletBalances = {'ক্যাশ': 0, 'ব্যাংক': 0, 'বিকাশ': 0, 'নগদ': 0};
 
   @override
@@ -1139,6 +1140,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _walletBalances = walletBalances;
         _monthChangePercent = monthChangePercent;
         _monthChangeMessage = monthChangeMessage;
+        _transactions = transactions.whereType<Map>().map((item) => Map<String, dynamic>.from(item)).toList();
         _loading = false;
       });
     } catch (error) {
@@ -1424,6 +1426,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 14),
+                  _incomeExpenseChart(),
                   const SizedBox(height: 10),
                   if (_error != null) ...[
                     const SizedBox(height: 12),
@@ -1437,6 +1441,149 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ]),
         ),
       );
+
+  Widget _incomeExpenseChart() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final now = DateTime.now();
+    final monthStart = DateTime(now.year, now.month);
+    final nextMonth = DateTime(now.year, now.month + 1);
+    final days = DateTime(now.year, now.month + 1, 0).day;
+    final income = List<double>.filled(days, 0);
+    final expense = List<double>.filled(days, 0);
+    for (final tx in _transactions) {
+      final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
+      if (date == null || date.isBefore(monthStart) || !date.isBefore(nextMonth)) continue;
+      final index = date.day - 1;
+      final amount = _amount(tx['amount']);
+      if (tx['kind'] == 'আয়') income[index] += amount;
+      if (tx['kind'] == 'ব্যয়') expense[index] += amount;
+    }
+    final totalIncome = income.fold<double>(0, (sum, value) => sum + value);
+    final totalExpense = expense.fold<double>(0, (sum, value) => sum + value);
+    final maximum = <double>[...income, ...expense].fold<double>(0, (maxValue, value) => value > maxValue ? value : maxValue);
+    final chartMax = maximum <= 0 ? 1.0 : maximum * 1.2;
+    final textColor = isDark ? const Color(0xFFDDFBF1) : const Color(0xFF164F40);
+    final mutedColor = isDark ? const Color(0xFF9ABBB4) : const Color(0xFF64877C);
+    final cardColor = isDark ? const Color(0xFF062537) : const Color(0xFFF9FFFC);
+    final borderColor = isDark ? const Color(0xFF12605D) : const Color(0xFFD7EEE5);
+    return Container(
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 10),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor),
+        boxShadow: [
+          BoxShadow(
+            color: (isDark ? const Color(0xFF00E7A0) : const Color(0xFF168565)).withValues(alpha: isDark ? .07 : .045),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.bar_chart_rounded, color: Color(0xFF00A878), size: 21),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'আয় ও খরচের হিসাব',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w800),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF00E7A0).withValues(alpha: .12) : const Color(0xFFDDF9EE),
+                  border: Border.all(color: isDark ? const Color(0xFF00E7A0).withValues(alpha: .25) : const Color(0xFFB9EBDD)),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('এই মাস', style: TextStyle(color: textColor, fontSize: 10.5, fontWeight: FontWeight.w700)),
+                    const SizedBox(width: 3),
+                    Icon(Icons.keyboard_arrow_down_rounded, color: textColor, size: 15),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 150,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: CustomPaint(
+                          painter: _IncomeExpenseChartPainter(
+                            income: income,
+                            expense: expense,
+                            maxValue: chartMax,
+                            isDark: isDark,
+                          ),
+                          child: const SizedBox.expand(),
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: List.generate(6, (index) {
+                          final day = ((days - 1) * index / 5).round() + 1;
+                          return Text('$day', style: TextStyle(color: mutedColor, fontSize: 8.5));
+                        }),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                SizedBox(
+                  width: 78,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(children: [
+                        Container(width: 7, height: 7, decoration: const BoxDecoration(color: Color(0xFF00C98B), shape: BoxShape.circle)),
+                        const SizedBox(width: 4),
+                        Text('আয়', style: TextStyle(color: mutedColor, fontSize: 10)),
+                      ]),
+                      const SizedBox(height: 3),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(_money(totalIncome), style: TextStyle(color: textColor, fontSize: 10.5, fontWeight: FontWeight.w800)),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(children: [
+                        Container(width: 7, height: 7, decoration: const BoxDecoration(color: Color(0xFFFF5757), shape: BoxShape.circle)),
+                        const SizedBox(width: 4),
+                        Text('খরচ', style: TextStyle(color: mutedColor, fontSize: 10)),
+                      ]),
+                      const SizedBox(height: 3),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Text(_money(totalExpense), style: TextStyle(color: textColor, fontSize: 10.5, fontWeight: FontWeight.w800)),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _walletCard(String name, IconData icon, Color accent) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -1519,6 +1666,121 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
+
+
+class _IncomeExpenseChartPainter extends CustomPainter {
+  final List<double> income;
+  final List<double> expense;
+  final double maxValue;
+  final bool isDark;
+
+  const _IncomeExpenseChartPainter({
+    required this.income,
+    required this.expense,
+    required this.maxValue,
+    required this.isDark,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.width <= 0 || size.height <= 0) return;
+    final plot = Rect.fromLTWH(0, 4, size.width, size.height - 8);
+    final gridPaint = Paint()
+      ..color = (isDark ? const Color(0xFF1A5360) : const Color(0xFFDDEFE9)).withValues(alpha: .75)
+      ..strokeWidth = .7;
+    for (var i = 0; i <= 4; i++) {
+      final y = plot.top + plot.height * i / 4;
+      canvas.drawLine(Offset(plot.left, y), Offset(plot.right, y), gridPaint);
+    }
+    for (var i = 0; i <= 5; i++) {
+      final x = plot.left + plot.width * i / 5;
+      canvas.drawLine(Offset(x, plot.top), Offset(x, plot.bottom), gridPaint);
+    }
+    if (income.isEmpty || expense.isEmpty) return;
+    final incomePath = _makePath(income, plot, maxValue);
+    final expensePath = _makePath(expense, plot, maxValue);
+    final incomeFill = Path.from(incomePath)
+      ..lineTo(plot.right, plot.bottom)
+      ..lineTo(plot.left, plot.bottom)
+      ..close();
+    final expenseFill = Path.from(expensePath)
+      ..lineTo(plot.right, plot.bottom)
+      ..lineTo(plot.left, plot.bottom)
+      ..close();
+    final incomePaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          const Color(0xFF00D99A).withValues(alpha: .42),
+          const Color(0xFF00D99A).withValues(alpha: .035),
+        ],
+      ).createShader(plot);
+    final expensePaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          const Color(0xFFFF6262).withValues(alpha: .36),
+          const Color(0xFFFF6262).withValues(alpha: .025),
+        ],
+      ).createShader(plot);
+    canvas.drawPath(incomeFill, incomePaint);
+    canvas.drawPath(expenseFill, expensePaint);
+    canvas.drawPath(incomePath, Paint()
+      ..color = const Color(0xFF00D99A)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.7
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round);
+    canvas.drawPath(expensePath, Paint()
+      ..color = const Color(0xFFFF6262)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.7
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round);
+    if (income.any((value) => value > 0)) {
+      final peakIndex = income.indexOf(income.reduce((a, b) => a > b ? a : b));
+      final point = _pointAt(income, peakIndex, plot, maxValue);
+      canvas.drawCircle(point, 3, Paint()..color = const Color(0xFF00D99A));
+      canvas.drawCircle(point, 5, Paint()..color = const Color(0xFF00D99A).withValues(alpha: .18));
+    }
+    if (expense.any((value) => value > 0)) {
+      final peakIndex = expense.indexOf(expense.reduce((a, b) => a > b ? a : b));
+      final point = _pointAt(expense, peakIndex, plot, maxValue);
+      canvas.drawCircle(point, 2.5, Paint()..color = const Color(0xFFFF6262));
+    }
+  }
+
+  Path _makePath(List<double> values, Rect plot, double max) {
+    final path = Path();
+    if (values.isEmpty) return path;
+    for (var i = 0; i < values.length; i++) {
+      final point = _pointAt(values, i, plot, max);
+      if (i == 0) {
+        path.moveTo(point.dx, point.dy);
+      } else {
+        final previous = _pointAt(values, i - 1, plot, max);
+        final midX = (previous.dx + point.dx) / 2;
+        path.cubicTo(midX, previous.dy, midX, point.dy, point.dx, point.dy);
+      }
+    }
+    return path;
+  }
+
+  Offset _pointAt(List<double> values, int index, Rect plot, double max) {
+    final x = values.length <= 1 ? plot.left : plot.left + plot.width * index / (values.length - 1);
+    final y = plot.bottom - (values[index] / max).clamp(0.0, 1.0) * plot.height;
+    return Offset(x, y);
+  }
+
+  @override
+  bool shouldRepaint(covariant _IncomeExpenseChartPainter oldDelegate) =>
+      oldDelegate.income != income ||
+      oldDelegate.expense != expense ||
+      oldDelegate.maxValue != maxValue ||
+      oldDelegate.isDark != isDark;
+}
 
 class _BalanceNeonChartPainter extends CustomPainter {
   const _BalanceNeonChartPainter({required this.isDark});

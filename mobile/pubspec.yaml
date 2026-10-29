@@ -13,6 +13,7 @@ dependencies:
   lottie: ^3.3.1
   shared_preferences: ^2.5.3
   flutter_secure_storage: ^9.2.4
+  flutter_svg: ^2.0.17
 
 dev_dependencies:
   flutter_test:
@@ -28,3 +29,5 @@ flutter:
     - assets/animations/Cheerful Countryside Lake Retreat.png
     - assets/animations/Moonlit Lakeside Cottage.png
     - assets/animations/Glossy Green Corner Plant.png
+    - assets/wallets/bkash-mark.svg
+    - assets/wallets/nagad-mark.svg

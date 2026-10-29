@@ -1377,7 +1377,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         Icon(Icons.trending_up_rounded, size: 15, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00F0A0) : const Color(0xFF008D62)),
                                         SizedBox(width: 3),
                                         Text(
-                                          _monthChangeMessage,
+                                          _monthChangePercent == null
+                                              ? _monthChangeMessage
+                                              : '${_monthChangePercent!.abs().toStringAsFixed(1)}%',
                                           style: TextStyle(
                                             color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFBFFFF0) : const Color(0xFF17634A),
                                             fontSize: 10.5,
@@ -1390,7 +1392,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   const SizedBox(width: 9),
                                   Expanded(
                                     child: Text(
-                                      _loading ? 'ব্যালেন্স লোড হচ্ছে...' : _error != null ? 'সার্ভার থেকে ডেটা পাওয়া যায়নি' : 'সার্ভারের হিসাব অনুযায়ী',
+                                      _loading ? 'ব্যালেন্স লোড হচ্ছে...' : _error != null ? 'সার্ভার থেকে ডেটা পাওয়া যায়নি' : '',
                                       style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFB8D9D7) : const Color(0xFF55796B), fontSize: 11),
                                     ),
                                   ),

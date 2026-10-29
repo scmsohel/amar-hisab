@@ -1381,7 +1381,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ? const [Color(0xFFCCF7E7), Color(0xFFF7FFFB)]
                 : const [Color(0xFFD7E7FF), Color(0xFFF8FBFF)];
     return Container(
-      padding: const EdgeInsets.fromLTRB(2, 6, 2, 6),
+      padding: const EdgeInsets.fromLTRB(2, 4, 2, 4),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xB8072638) : null,
         gradient: isDark
@@ -1404,18 +1404,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
         mainAxisSize: MainAxisSize.max,
         children: [
           SizedBox(
-            width: 28,
-            height: 28,
+            width: 34,
+            height: 34,
             child: isBikash
                 ? SvgPicture.asset('assets/wallets/bkash-mark.svg', fit: BoxFit.contain)
                 : isNagad
                     ? SvgPicture.asset('assets/wallets/nagad-mark.svg', fit: BoxFit.contain)
-                    : Icon(icon, color: accent, size: 25),
+                    : Icon(icon, color: accent, size: 30),
           ),
-          const SizedBox(height: 2),
-          Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFE8FFF7) : const Color(0xFF155A45), fontSize: 10.5, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 2),
-          FittedBox(fit: BoxFit.scaleDown, child: Text(_hidden ? '৳ •••••' : '৳ ' + formattedBalance, maxLines: 1, style: TextStyle(color: isDark ? Colors.white : const Color(0xFF073F32), fontSize: 11.5, fontWeight: FontWeight.w900))),
+          const SizedBox(height: 1),
+          Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFE8FFF7) : const Color(0xFF155A45), fontSize: 12, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 1),
+          FittedBox(fit: BoxFit.scaleDown, child: Text(_hidden ? '৳ •••••' : '৳ ' + formattedBalance, maxLines: 1, style: TextStyle(color: isDark ? Colors.white : const Color(0xFF073F32), fontSize: 13, fontWeight: FontWeight.w900))),
         ],
       ),
     );

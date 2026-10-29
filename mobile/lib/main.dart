@@ -1042,6 +1042,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   bool _hidden = false;
   String? _error;
   double _balance = 0;
+  Map<String, double> _walletBalances = {'ক্যাশ': 0, 'ব্যাংক': 0, 'বিকাশ': 0, 'নগদ': 0};
 
   @override
   void initState() {
@@ -1061,15 +1062,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
       for (final item in wallets) {
         if (item is Map) opening[(item['name'] ?? '').toString()] = _amount(item['base']);
       }
+      final walletBalances = Map<String, double>.from(opening);
       var total = opening.values.fold<double>(0, (sum, value) => sum + value);
       for (final item in transactions) {
         if (item is! Map) continue;
         final amount = _amount(item['amount']);
-        if (item['kind'] == 'আয়') total += amount;
-        if (item['kind'] == 'ব্যয়') total -= amount;
+        final kind = (item['kind'] ?? '').toString();
+        if (kind == 'আয়') total += amount;
+        if (kind == 'ব্যয়') total -= amount;
+        final walletName = (item['wallet'] ?? item['walletName'] ?? item['wallet_name'] ?? item['accountName'] ?? item['account'] ?? '').toString();
+        if (walletBalances.containsKey(walletName)) {
+          if (kind == 'আয়') walletBalances[walletName] = walletBalances[walletName]! + amount;
+          if (kind == 'ব্যয়') walletBalances[walletName] = walletBalances[walletName]! - amount;
+        }
       }
       if (!mounted) return;
-      setState(() { _balance = total; _loading = false; });
+      setState(() { _balance = total; _walletBalances = walletBalances; _loading = false; });
     } catch (error) {
       if (!mounted) return;
       setState(() { _error = error.toString().replaceFirst('Exception: ', ''); _loading = false; });
@@ -1328,6 +1336,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 14),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Expanded(child: _walletCard('ক্যাশ', Icons.account_balance_wallet_rounded, const Color(0xFF16B981))),
+                      const SizedBox(width: 7),
+                      Expanded(child: _walletCard('ব্যাংক', Icons.account_balance_rounded, const Color(0xFF1688D4))),
+                      const SizedBox(width: 7),
+                      Expanded(child: _walletCard('বিকাশ', Icons.payments_rounded, const Color(0xFFE83E8C))),
+                      const SizedBox(width: 7),
+                      Expanded(child: _walletCard('নগদ', Icons.account_balance_wallet_rounded, const Color(0xFFFF8A00))),
+                    ],
+                  ),
                   if (_error != null) ...[
                     const SizedBox(height: 12),
                     OutlinedButton.icon(onPressed: _load, icon: const Icon(Icons.refresh_rounded), label: const Text('আবার চেষ্টা করুন')),
@@ -1340,6 +1361,37 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ]),
         ),
       );
+
+  Widget _walletCard(String name, IconData icon, Color accent) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final balance = _walletBalances[name] ?? 0;
+    final formattedBalance = balance.toStringAsFixed(0).replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',');
+    return Container(
+      padding: const EdgeInsets.fromLTRB(5, 10, 5, 9),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xB8072638) : const Color(0xF9FFFFFF),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: isDark ? accent.withValues(alpha: .55) : const Color(0xFFDCEFE6)),
+        boxShadow: isDark
+            ? [BoxShadow(color: accent.withValues(alpha: .07), blurRadius: 10, offset: const Offset(0, 3))]
+            : [BoxShadow(color: const Color(0xFF145A43).withValues(alpha: .045), blurRadius: 10, offset: const Offset(0, 4))],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 32, height: 32,
+            decoration: BoxDecoration(color: accent.withValues(alpha: isDark ? .18 : .12), borderRadius: BorderRadius.circular(10)),
+            child: Icon(icon, color: accent, size: 19),
+          ),
+          const SizedBox(height: 7),
+          Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFE8FFF7) : const Color(0xFF155A45), fontSize: 11, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 4),
+          FittedBox(fit: BoxFit.scaleDown, child: Text(_hidden ? '৳ •••••' : '৳ ' + formattedBalance, maxLines: 1, style: TextStyle(color: isDark ? Colors.white : const Color(0xFF073F32), fontSize: 12, fontWeight: FontWeight.w900))),
+        ],
+      ),
+    );
+  }
 
   void _showDashboardMenu(BuildContext context) {
     final isDark = _appThemeMode.value == ThemeMode.dark;

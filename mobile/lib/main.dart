@@ -1337,17 +1337,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   const SizedBox(height: 14),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(child: _walletCard('ক্যাশ', Icons.account_balance_wallet_rounded, const Color(0xFF16B981))),
-                      const SizedBox(width: 7),
-                      Expanded(child: _walletCard('ব্যাংক', Icons.account_balance_rounded, const Color(0xFF1688D4))),
-                      const SizedBox(width: 7),
-                      Expanded(child: _walletCard('বিকাশ', Icons.payments_rounded, const Color(0xFFE83E8C))),
-                      const SizedBox(width: 7),
-                      Expanded(child: _walletCard('নগদ', Icons.account_balance_wallet_rounded, const Color(0xFFFF8A00))),
-                    ],
+                  SizedBox(
+                    height: 112,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(child: _walletCard('ক্যাশ', Icons.account_balance_wallet_rounded, const Color(0xFF16B981))),
+                        const SizedBox(width: 7),
+                        Expanded(child: _walletCard('ব্যাংক', Icons.account_balance_rounded, const Color(0xFF1688D4))),
+                        const SizedBox(width: 7),
+                        Expanded(child: _walletCard('বিকাশ', Icons.payments_rounded, const Color(0xFFE83E8C))),
+                        const SizedBox(width: 7),
+                        Expanded(child: _walletCard('নগদ', Icons.account_balance_wallet_rounded, const Color(0xFFFF8A00))),
+                      ],
+                    ),
                   ),
                   if (_error != null) ...[
                     const SizedBox(height: 12),

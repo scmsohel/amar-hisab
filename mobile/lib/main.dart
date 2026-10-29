@@ -1516,65 +1516,72 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 8),
           SizedBox(
             height: 150,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            child: Stack(
               children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: CustomPaint(
-                          painter: _IncomeExpenseChartPainter(
-                            income: income,
-                            expense: expense,
-                            maxValue: chartMax,
-                            isDark: isDark,
+                Positioned.fill(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 2),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: CustomPaint(
+                            painter: _IncomeExpenseChartPainter(
+                              income: income,
+                              expense: expense,
+                              maxValue: chartMax,
+                              isDark: isDark,
+                            ),
+                            child: const SizedBox.expand(),
                           ),
-                          child: const SizedBox.expand(),
                         ),
-                      ),
-                      const SizedBox(height: 3),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: List.generate(6, (index) {
-                          final day = ((days - 1) * index / 5).round() + 1;
-                          return Text('$day', style: TextStyle(color: mutedColor, fontSize: 8.5));
-                        }),
-                      ),
-                    ],
+                        const SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: List.generate(6, (index) {
+                            final day = ((days - 1) * index / 5).round() + 1;
+                            return Text('$day', style: TextStyle(color: mutedColor, fontSize: 8.5));
+                          }),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(width: 8),
-                SizedBox(
-                  width: 78,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(children: [
-                        Container(width: 7, height: 7, decoration: const BoxDecoration(color: Color(0xFF00C98B), shape: BoxShape.circle)),
-                        const SizedBox(width: 4),
-                        Text('আয়', style: TextStyle(color: mutedColor, fontSize: 10)),
-                      ]),
-                      const SizedBox(height: 3),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(_money(totalIncome), style: TextStyle(color: textColor, fontSize: 10.5, fontWeight: FontWeight.w800)),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(children: [
-                        Container(width: 7, height: 7, decoration: const BoxDecoration(color: Color(0xFFFF5757), shape: BoxShape.circle)),
-                        const SizedBox(width: 4),
-                        Text('খরচ', style: TextStyle(color: mutedColor, fontSize: 10)),
-                      ]),
-                      const SizedBox(height: 3),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Text(_money(totalExpense), style: TextStyle(color: textColor, fontSize: 10.5, fontWeight: FontWeight.w800)),
-                      ),
-                    ],
+                Positioned(
+                  top: 4,
+                  right: 2,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: (isDark ? const Color(0xFF062537) : const Color(0xFFF9FFFC)).withValues(alpha: .88),
+                      borderRadius: BorderRadius.circular(9),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(mainAxisSize: MainAxisSize.min, children: [
+                          Container(width: 7, height: 7, decoration: const BoxDecoration(color: Color(0xFF00C98B), shape: BoxShape.circle)),
+                          const SizedBox(width: 5),
+                          Text('আয়', style: TextStyle(color: mutedColor, fontSize: 10)),
+                          const SizedBox(width: 10),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(_money(totalIncome), style: TextStyle(color: textColor, fontSize: 10.5, fontWeight: FontWeight.w800)),
+                          ),
+                        ]),
+                        const SizedBox(height: 5),
+                        Row(mainAxisSize: MainAxisSize.min, children: [
+                          Container(width: 7, height: 7, decoration: const BoxDecoration(color: Color(0xFFFF5757), shape: BoxShape.circle)),
+                          const SizedBox(width: 5),
+                          Text('খরচ', style: TextStyle(color: mutedColor, fontSize: 10)),
+                          const SizedBox(width: 10),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(_money(totalExpense), style: TextStyle(color: textColor, fontSize: 10.5, fontWeight: FontWeight.w800)),
+                          ),
+                        ]),
+                      ],
+                    ),
                   ),
                 ),
               ],

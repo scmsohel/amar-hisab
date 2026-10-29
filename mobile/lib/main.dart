@@ -1059,7 +1059,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Scaffold(
         body: Stack(children: [
           const Positioned.fill(
-            child: ColoredBox(color: Color(0xFF061713)),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFF061B2D),
+                    Color(0xFF041827),
+                    Color(0xFF031A1B),
+                    Color(0xFF061713),
+                  ],
+                  stops: [0.0, 0.34, 0.72, 1.0],
+                ),
+              ),
+            ),
           ),
           SafeArea(
             child: RefreshIndicator(

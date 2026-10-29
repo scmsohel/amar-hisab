@@ -1549,12 +1549,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Positioned(
                   top: 4,
                   right: 2,
-                  child: Container(
+                  child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: (isDark ? const Color(0xFF062537) : const Color(0xFFF9FFFC)).withValues(alpha: .88),
-                      borderRadius: BorderRadius.circular(9),
-                    ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,

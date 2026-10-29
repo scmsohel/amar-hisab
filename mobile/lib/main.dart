@@ -1047,6 +1047,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _monthChangeMessage = 'গত মাসের তুলনার ডেটা নেই';
   List<Map<String, dynamic>> _transactions = <Map<String, dynamic>>[];
   int _chartRangeDays = 30;
+  int _incomeDonutMonthOffset = 0;
+  int _expenseDonutMonthOffset = 0;
   Map<String, double> _walletBalances = {'ক্যাশ': 0, 'ব্যাংক': 0, 'বিকাশ': 0, 'নগদ': 0};
 
   @override
@@ -1431,6 +1433,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   const SizedBox(height: 11),
                   _incomeExpenseChart(),
                   const SizedBox(height: 10),
+                  _incomeExpenseDonuts(),
+                  const SizedBox(height: 10),
                   if (_error != null) ...[
                     const SizedBox(height: 12),
                     OutlinedButton.icon(onPressed: _load, icon: const Icon(Icons.refresh_rounded), label: const Text('আবার চেষ্টা করুন')),
@@ -1653,6 +1657,154 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
+  Widget _incomeExpenseDonuts() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: _donutSummaryCard(isIncome: true, monthOffset: _incomeDonutMonthOffset)),
+        const SizedBox(width: 8),
+        Expanded(child: _donutSummaryCard(isIncome: false, monthOffset: _expenseDonutMonthOffset)),
+      ],
+    );
+  }
+
+  Widget _donutSummaryCard({required bool isIncome, required int monthOffset}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final now = DateTime.now();
+    final selectedMonth = DateTime(now.year, now.month - monthOffset);
+    final nextMonth = DateTime(selectedMonth.year, selectedMonth.month + 1);
+    final totals = <String, double>{};
+    for (final tx in _transactions) {
+      final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
+      if (date == null || date.isBefore(DateTime(selectedMonth.year, selectedMonth.month)) || !date.isBefore(nextMonth)) continue;
+      if ((tx['kind'] ?? '').toString() != (isIncome ? 'আয়' : 'ব্যয়')) continue;
+      final category = (tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? tx['categoryTitle'] ?? tx['category_title'] ?? tx['subcategory'] ?? '').toString().trim();
+      final key = category.isEmpty ? 'অন্যান্য' : category;
+      totals[key] = (totals[key] ?? 0) + _amount(tx['amount']);
+    }
+    final entries = totals.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final shown = entries.take(5).toList();
+    final remainder = entries.skip(5).fold<double>(0, (sum, entry) => sum + entry.value);
+    if (remainder > 0) {
+      final otherIndex = shown.indexWhere((entry) => entry.key == 'অন্যান্য');
+      if (otherIndex >= 0) {
+        shown[otherIndex] = MapEntry('অন্যান্য', shown[otherIndex].value + remainder);
+      } else {
+        shown.add(MapEntry('অন্যান্য', remainder));
+      }
+    }
+    final total = entries.fold<double>(0, (sum, entry) => sum + entry.value);
+    const palette = <Color>[
+      Color(0xFF00B982), Color(0xFFFF625B), Color(0xFFFFA62B),
+      Color(0xFF1688D4), Color(0xFFC13EE8), Color(0xFF00C9A7),
+    ];
+    final title = isIncome ? 'আয়ের উৎস' : 'খরচের বিভাগ';
+    final cardColor = isDark ? const Color(0xFF062537) : const Color(0xFFF9FFFC);
+    final borderColor = isDark ? const Color(0xFF12605D) : const Color(0xFFD7EEE5);
+    final textColor = isDark ? const Color(0xFFDDFBF1) : const Color(0xFF164F40);
+    final mutedColor = isDark ? const Color(0xFF9ABBB4) : const Color(0xFF64877C);
+    final monthLabel = monthOffset == 0 ? 'এই মাস' : monthOffset == 1 ? 'গত মাস' : '\$monthOffset মাস আগে';
+    return Container(
+      padding: const EdgeInsets.fromLTRB(9, 9, 8, 9),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w800))),
+              PopupMenuButton<int>(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 90, maxWidth: 110),
+                tooltip: 'মাস নির্বাচন করুন',
+                onSelected: (value) => setState(() {
+                  if (isIncome) {
+                    _incomeDonutMonthOffset = value;
+                  } else {
+                    _expenseDonutMonthOffset = value;
+                  }
+                }),
+                color: isDark ? const Color(0xFF102A38) : Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                itemBuilder: (context) => [
+                  for (var offset = 0; offset < 6; offset++)
+                    PopupMenuItem<int>(
+                      value: offset,
+                      height: 34,
+                      child: Text(offset == 0 ? 'এই মাস' : offset == 1 ? 'গত মাস' : '\$offset মাস আগে', style: TextStyle(color: textColor, fontSize: 10.5)),
+                    ),
+                ],
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF00E7A0).withValues(alpha: .12) : const Color(0xFFDDF9EE),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text(monthLabel, style: TextStyle(color: textColor, fontSize: 9, fontWeight: FontWeight.w700)),
+                    Icon(Icons.keyboard_arrow_down_rounded, size: 12, color: textColor),
+                  ]),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            height: 112,
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 5,
+                  child: SizedBox.expand(
+                    child: CustomPaint(
+                      painter: _DonutSummaryPainter(values: shown.map((entry) => entry.value).toList(), colors: List<Color>.generate(shown.length, (i) => palette[i % palette.length])),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          FittedBox(fit: BoxFit.scaleDown, child: Text(_money(total), style: TextStyle(color: textColor, fontSize: 10.5, fontWeight: FontWeight.w900))),
+                          const SizedBox(height: 2),
+                          Text(isIncome ? 'মোট আয়' : 'মোট খরচ', style: TextStyle(color: mutedColor, fontSize: 8.5)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  flex: 4,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (var i = 0; i < shown.length; i++)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            children: [
+                              Container(width: 6, height: 6, decoration: BoxDecoration(color: palette[i % palette.length], shape: BoxShape.circle)),
+                              const SizedBox(width: 4),
+                              Expanded(child: Text(shown[i].key, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: mutedColor, fontSize: 8))),
+                              const SizedBox(width: 2),
+                              Text(total > 0 ? '\${(shown[i].value / total * 100).round()}%' : '0%', style: TextStyle(color: textColor, fontSize: 8, fontWeight: FontWeight.w700)),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _walletCard(String name, IconData icon, Color accent) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final balance = _walletBalances[name] ?? 0;
@@ -1735,6 +1887,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
 }
 
 
+
+class _DonutSummaryPainter extends CustomPainter {
+  final List<double> values;
+  final List<Color> colors;
+  const _DonutSummaryPainter({required this.values, required this.colors});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.width <= 0 || size.height <= 0) return;
+    final side = size.width < size.height ? size.width : size.height;
+    final stroke = side * .18;
+    final rect = Rect.fromCenter(center: Offset(size.width / 2, size.height / 2), width: side - stroke, height: side - stroke);
+    final base = Paint()..color = const Color(0xFF8A9B9A).withValues(alpha: .12)..style = PaintingStyle.stroke..strokeWidth = stroke;
+    canvas.drawCircle(rect.center, rect.width / 2, base);
+    final total = values.fold<double>(0, (sum, value) => sum + value);
+    if (total <= 0) return;
+    var start = -1.57079632679;
+    for (var i = 0; i < values.length; i++) {
+      final sweep = values[i] / total * 6.28318530718;
+      final paint = Paint()
+        ..shader = SweepGradient(
+          startAngle: start,
+          endAngle: start + sweep,
+          colors: [colors[i].withValues(alpha: .72), colors[i], colors[i].withValues(alpha: .9)],
+        ).createShader(rect)
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.butt
+        ..strokeWidth = stroke;
+      canvas.drawArc(rect, start, sweep, false, paint);
+      start += sweep;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DonutSummaryPainter oldDelegate) =>
+      oldDelegate.values != values || oldDelegate.colors != colors;
+}
 
 class _IncomeExpenseChartPainter extends CustomPainter {
   final List<double> income;

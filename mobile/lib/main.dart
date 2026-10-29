@@ -1339,7 +1339,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   const SizedBox(height: 14),
                   SizedBox(
-                    height: 112,
+                    height: 86,
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -1353,6 +1353,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ],
                     ),
                   ),
+                  const SizedBox(height: 10),
                   if (_error != null) ...[
                     const SizedBox(height: 12),
                     OutlinedButton.icon(onPressed: _load, icon: const Icon(Icons.refresh_rounded), label: const Text('আবার চেষ্টা করুন')),
@@ -1373,10 +1374,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final isBikash = name == 'বিকাশ';
     final isNagad = name == 'নগদ';
     return Container(
-      padding: const EdgeInsets.fromLTRB(3, 10, 3, 9),
+      padding: const EdgeInsets.fromLTRB(2, 6, 2, 6),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xB8072638) : const Color(0xF9FFFFFF),
-        borderRadius: BorderRadius.circular(17),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: isDark ? accent.withValues(alpha: .48) : const Color(0xFFEAF4EF)),
         boxShadow: isDark
             ? [BoxShadow(color: accent.withValues(alpha: .06), blurRadius: 9, offset: const Offset(0, 3))]
@@ -1387,18 +1388,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
         mainAxisSize: MainAxisSize.max,
         children: [
           SizedBox(
-            width: 42,
-            height: 42,
+            width: 28,
+            height: 28,
             child: isBikash
                 ? SvgPicture.asset('assets/wallets/bkash-mark.svg', fit: BoxFit.contain)
                 : isNagad
                     ? SvgPicture.asset('assets/wallets/nagad-mark.svg', fit: BoxFit.contain)
-                    : Icon(icon, color: accent, size: 36),
+                    : Icon(icon, color: accent, size: 25),
           ),
-          const SizedBox(height: 5),
-          Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFE8FFF7) : const Color(0xFF155A45), fontSize: 13, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 5),
-          FittedBox(fit: BoxFit.scaleDown, child: Text(_hidden ? '৳ •••••' : '৳ ' + formattedBalance, maxLines: 1, style: TextStyle(color: isDark ? Colors.white : const Color(0xFF073F32), fontSize: 15, fontWeight: FontWeight.w900))),
+          const SizedBox(height: 2),
+          Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFE8FFF7) : const Color(0xFF155A45), fontSize: 10.5, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 2),
+          FittedBox(fit: BoxFit.scaleDown, child: Text(_hidden ? '৳ •••••' : '৳ ' + formattedBalance, maxLines: 1, style: TextStyle(color: isDark ? Colors.white : const Color(0xFF073F32), fontSize: 11.5, fontWeight: FontWeight.w900))),
         ],
       ),
     );

@@ -1790,7 +1790,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               const SizedBox(width: 4),
                               Expanded(child: Text(shown[i].key, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: mutedColor, fontSize: 8))),
                               const SizedBox(width: 2),
-                              Text(total > 0 ? '\${(shown[i].value / total * 100).round()}%' : '0%', style: TextStyle(color: textColor, fontSize: 8, fontWeight: FontWeight.w700)),
+                              Text(total > 0 ? '${(shown[i].value / total * 100).round()}%' : '0%', style: TextStyle(color: textColor, fontSize: 8, fontWeight: FontWeight.w700)),
                             ],
                           ),
                         ),

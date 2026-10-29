@@ -1373,24 +1373,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final formattedBalance = balance.toStringAsFixed(0).replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',');
     final isBikash = name == 'বিকাশ';
     final isNagad = name == 'নগদ';
-    final lightCardColor = isBikash
-        ? const Color(0xFFFFEAF2)
+    final lightGradientColors = isBikash
+        ? const [Color(0xFFFFD6E7), Color(0xFFFFF7FA)]
         : isNagad
-            ? const Color(0xFFFFF0E2)
+            ? const [Color(0xFFFFE2C7), Color(0xFFFFFBF6)]
             : name == 'ক্যাশ'
-                ? const Color(0xFFE7F8EF)
-                : const Color(0xFFEAF3FF);
+                ? const [Color(0xFFCCF7E7), Color(0xFFF7FFFB)]
+                : const [Color(0xFFD7E7FF), Color(0xFFF8FBFF)];
     return Container(
       padding: const EdgeInsets.fromLTRB(2, 6, 2, 6),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xB8072638) : lightCardColor,
+        color: isDark ? const Color(0xB8072638) : null,
+        gradient: isDark
+            ? null
+            : LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: lightGradientColors,
+              ),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? accent.withValues(alpha: .48) : lightCardColor.withValues(alpha: .95),
+          color: isDark ? accent.withValues(alpha: .48) : lightGradientColors.first.withValues(alpha: .75),
         ),
         boxShadow: isDark
             ? [BoxShadow(color: accent.withValues(alpha: .06), blurRadius: 9, offset: const Offset(0, 3))]
-            : [BoxShadow(color: accent.withValues(alpha: .10), blurRadius: 8, offset: const Offset(0, 3))],
+            : [BoxShadow(color: accent.withValues(alpha: .12), blurRadius: 8, offset: const Offset(0, 3))],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

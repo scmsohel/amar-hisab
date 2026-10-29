@@ -1046,6 +1046,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   double? _monthChangePercent;
   String _monthChangeMessage = 'গত মাসের তুলনার ডেটা নেই';
   List<Map<String, dynamic>> _transactions = <Map<String, dynamic>>[];
+  int _chartRangeDays = 30;
   Map<String, double> _walletBalances = {'ক্যাশ': 0, 'ব্যাংক': 0, 'বিকাশ': 0, 'নগদ': 0};
 
   @override
@@ -1445,15 +1446,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _incomeExpenseChart() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final now = DateTime.now();
-    final monthStart = DateTime(now.year, now.month);
-    final nextMonth = DateTime(now.year, now.month + 1);
-    final days = DateTime(now.year, now.month + 1, 0).day;
+    final rangeEnd = DateTime(now.year, now.month, now.day + 1);
+    final rangeStart = rangeEnd.subtract(Duration(days: _chartRangeDays));
+    final days = _chartRangeDays;
     final income = List<double>.filled(days, 0);
     final expense = List<double>.filled(days, 0);
     for (final tx in _transactions) {
       final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
-      if (date == null || date.isBefore(monthStart) || !date.isBefore(nextMonth)) continue;
-      final index = date.day - 1;
+      if (date == null || date.isBefore(rangeStart) || !date.isBefore(rangeEnd)) continue;
+      final index = date.difference(rangeStart).inDays;
+      if (index < 0 || index >= days) continue;
       final amount = _amount(tx['amount']);
       if (tx['kind'] == 'আয়') income[index] += amount;
       if (tx['kind'] == 'ব্যয়') expense[index] += amount;
@@ -1495,20 +1497,54 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w800),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-                decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF00E7A0).withValues(alpha: .12) : const Color(0xFFDDF9EE),
-                  border: Border.all(color: isDark ? const Color(0xFF00E7A0).withValues(alpha: .25) : const Color(0xFFB9EBDD)),
-                  borderRadius: BorderRadius.circular(20),
+              PopupMenuButton<int>(
+                initialValue: _chartRangeDays,
+                tooltip: 'গ্রাফের সময় নির্বাচন করুন',
+                onSelected: (value) => setState(() => _chartRangeDays = value),
+                color: isDark ? const Color(0xFF102A38) : const Color(0xFFFFFFFF),
+                surfaceTintColor: Colors.transparent,
+                elevation: 10,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: isDark ? const Color(0xFF245363) : const Color(0xFFD9E9E4)),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('এই মাস', style: TextStyle(color: textColor, fontSize: 10.5, fontWeight: FontWeight.w700)),
+                itemBuilder: (context) => [
+                  for (final option in const <(int, String)>[
+                    (3, '৩ দিন'), (7, '৭ দিন'), (15, '১৫ দিন'),
+                    (30, '১ মাস'), (90, '৩ মাস'), (180, '৬ মাস'), (365, '১ বছর'),
+                  ])
+                    PopupMenuItem<int>(
+                      value: option.$1,
+                      height: 38,
+                      child: Row(children: [
+                        if (_chartRangeDays == option.$1)
+                          const Icon(Icons.check_rounded, size: 15, color: Color(0xFF00B982))
+                        else
+                          const SizedBox(width: 15),
+                        const SizedBox(width: 6),
+                        Text(option.$2, style: TextStyle(
+                          color: _chartRangeDays == option.$1 ? const Color(0xFF00B982) : textColor,
+                          fontSize: 11,
+                          fontWeight: _chartRangeDays == option.$1 ? FontWeight.w800 : FontWeight.w600,
+                        )),
+                      ]),
+                    ),
+                ],
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF00E7A0).withValues(alpha: .12) : const Color(0xFFDDF9EE),
+                    border: Border.all(color: isDark ? const Color(0xFF00E7A0).withValues(alpha: .25) : const Color(0xFFB9EBDD)),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text(
+                      _chartRangeDays == 3 ? '৩ দিন' : _chartRangeDays == 7 ? '৭ দিন' : _chartRangeDays == 15 ? '১৫ দিন' : _chartRangeDays == 30 ? '১ মাস' : _chartRangeDays == 90 ? '৩ মাস' : _chartRangeDays == 180 ? '৬ মাস' : '১ বছর',
+                      style: TextStyle(color: textColor, fontSize: 10.5, fontWeight: FontWeight.w700),
+                    ),
                     const SizedBox(width: 3),
                     Icon(Icons.keyboard_arrow_down_rounded, color: textColor, size: 15),
-                  ],
+                  ]),
                 ),
               ),
             ],
@@ -1538,8 +1574,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: List.generate(6, (index) {
-                            final day = ((days - 1) * index / 5).round() + 1;
-                            return Text('$day', style: TextStyle(color: mutedColor, fontSize: 8.5));
+                            final dayOffset = ((days - 1) * index / 5).round();
+                            final labelDate = rangeStart.add(Duration(days: dayOffset));
+                            return Text('${labelDate.day}', style: TextStyle(color: mutedColor, fontSize: 8.5));
                           }),
                         ),
                       ],

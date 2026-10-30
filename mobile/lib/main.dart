@@ -1901,33 +1901,65 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(top: 7, bottom: 3),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 10),
       decoration: BoxDecoration(
         color: background,
         borderRadius: BorderRadius.circular(10),
       ),
       child: Row(
         children: [
-          Expanded(child: _categorySummaryValue('অবশিষ্ট', remaining, remaining >= 0 ? const Color(0xFF1688D4) : const Color(0xFFE27A21), muted)),
-          Expanded(child: _categorySummaryValue('ব্যয়', expense, const Color(0xFFE92743), muted)),
-          Expanded(child: _categorySummaryValue('আয়', income, const Color(0xFF00A653), muted)),
+          Expanded(
+            child: _categorySummaryValue(
+              'অবশিষ্ট', remaining,
+              remaining >= 0 ? const Color(0xFF1688D4) : const Color(0xFFE27A21),
+              muted, TextAlign.left,
+            ),
+          ),
+          Expanded(
+            child: _categorySummaryValue(
+              'ব্যয়', expense, const Color(0xFFE92743), muted, TextAlign.center,
+            ),
+          ),
+          Expanded(
+            child: _categorySummaryValue(
+              'আয়', income, const Color(0xFF00A653), muted, TextAlign.right,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _categorySummaryValue(String label, double amount, Color valueColor, Color muted) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
+  Widget _categorySummaryValue(
+    String label,
+    double amount,
+    Color valueColor,
+    Color muted,
+    TextAlign alignment,
+  ) {
+    return Row(
+      mainAxisAlignment: alignment == TextAlign.left
+          ? MainAxisAlignment.start
+          : alignment == TextAlign.right
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.center,
       children: [
-        Text('$label: ', style: TextStyle(color: muted, fontSize: 9.5, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 2),
-        Text(
-          _bengaliDigits(_money(amount)),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(color: valueColor, fontSize: 11, fontWeight: FontWeight.w900),
+        Text('$label: ', style: TextStyle(color: muted, fontSize: 9, fontWeight: FontWeight.w600)),
+        Flexible(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: alignment == TextAlign.left
+                ? Alignment.centerLeft
+                : alignment == TextAlign.right
+                    ? Alignment.centerRight
+                    : Alignment.center,
+            child: Text(
+              _bengaliDigits(_money(amount)),
+              maxLines: 1,
+              softWrap: false,
+              style: TextStyle(color: valueColor, fontSize: 10.5, fontWeight: FontWeight.w900),
+            ),
+          ),
         ),
       ],
     );

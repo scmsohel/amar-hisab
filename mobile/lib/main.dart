@@ -1515,20 +1515,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return groups;
   }
 
+  String _bengaliDigits(String value) => value
+      .replaceAll('0', '০').replaceAll('1', '১').replaceAll('2', '২')
+      .replaceAll('3', '৩').replaceAll('4', '৪').replaceAll('5', '৫')
+      .replaceAll('6', '৬').replaceAll('7', '৭').replaceAll('8', '৮')
+      .replaceAll('9', '৯');
+
   Widget _transactionDateHeading(List<Map<String, dynamic>> items, bool isDark) {
-    final label = items.isEmpty ? 'তারিখ পাওয়া যায়নি' : _transactionDateTimeLabel(items.first).split(',').first;
-    final total = items.fold<double>(0, (sum, tx) => sum + (tx['kind'] == 'ট্রান্সফার' ? 0 : _amount(tx['amount'])));
-    final color = items.any((tx) => tx['kind'] == 'ব্যয়') ? const Color(0xFFE92743) : const Color(0xFF00A653);
+    final date = items.isEmpty
+        ? null
+        : _parseTransactionDate(items.first['dateInput'] ?? items.first['date_input'] ?? items.first['date'] ?? items.first['createdAt'] ?? items.first['created_at']);
+    const months = <String>[
+      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
+      'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর',
+    ];
+    final dateLabel = date == null
+        ? 'তারিখ পাওয়া যায়নি'
+        : '${_bengaliDigits(date.day.toString())} ${months[date.month - 1]}, ${_bengaliDigits(date.year.toString())}';
+    final income = items.where((tx) => tx['kind'] == 'আয়')
+        .fold<double>(0, (sum, tx) => sum + _amount(tx['amount']));
+    final expense = items.where((tx) => tx['kind'] == 'ব্যয়')
+        .fold<double>(0, (sum, tx) => sum + _amount(tx['amount']));
+    final muted = isDark ? const Color(0xFF9BAEAA) : const Color(0xFF71818C);
+    final dateColor = isDark ? const Color(0xFFC3D4D0) : const Color(0xFF526875);
     return Padding(
       padding: const EdgeInsets.fromLTRB(1, 12, 2, 8),
       child: Row(children: [
-        Text(label, style: TextStyle(color: isDark ? const Color(0xFFC3D4D0) : const Color(0xFF526875), fontSize: 12, fontWeight: FontWeight.w700)),
-        const SizedBox(width: 9),
-        Expanded(child: Divider(height: 1, color: isDark ? const Color(0xFF29433E) : const Color(0xFFDCE4E8))),
-        const SizedBox(width: 9),
-        Text('মোট', style: TextStyle(color: isDark ? const Color(0xFF9BAEAA) : const Color(0xFF71818C), fontSize: 11)),
+        Flexible(
+          flex: 5,
+          child: Text(dateLabel, maxLines: 1, overflow: TextOverflow.ellipsis,
+            style: TextStyle(color: dateColor, fontSize: 11, fontWeight: FontWeight.w700)),
+        ),
         const SizedBox(width: 5),
-        Text(_money(total), style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w900)),
+        Text('${_bengaliDigits(items.length.toString())}টি',
+          style: TextStyle(color: muted, fontSize: 9.5)),
+        const SizedBox(width: 7),
+        Expanded(
+          child: Divider(height: 1, color: isDark ? const Color(0xFF29433E) : const Color(0xFFDCE4E8)),
+        ),
+        const SizedBox(width: 7),
+        Text('আয়: ', style: TextStyle(color: muted, fontSize: 9)),
+        Text(_bengaliDigits(_money(income)), maxLines: 1,
+          style: const TextStyle(color: Color(0xFF00A653), fontSize: 9.5, fontWeight: FontWeight.w900)),
+        const SizedBox(width: 6),
+        Text('ব্যয়: ', style: TextStyle(color: muted, fontSize: 9)),
+        Text(_bengaliDigits(_money(expense)), maxLines: 1,
+          style: const TextStyle(color: Color(0xFFE92743), fontSize: 9.5, fontWeight: FontWeight.w900)),
       ]),
     );
   }

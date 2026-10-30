@@ -1413,7 +1413,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ),
                                   const Spacer(),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
                                     decoration: BoxDecoration(
                                       color: Theme.of(context).brightness == Brightness.dark
                                           ? const Color(0xFF55BFFF).withValues(alpha: .12)
@@ -1823,7 +1823,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(10, 2, 10, 5),
+      padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF0D2033) : const Color(0xFFFCFEFD),
         borderRadius: BorderRadius.circular(20),
@@ -1833,7 +1833,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(2, 2, 2, 1),
+            padding: const EdgeInsets.fromLTRB(2, 5, 2, 2),
             child: Row(children: [
               Expanded(
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -1885,9 +1885,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ]),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 5),
           SizedBox(
-            height: 30,
+            height: 34,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
@@ -1916,7 +1916,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           if (_recentTransactionsCategory != 'সব')
             _recentCategorySummary(items, isDark),
-          const SizedBox(height: 2),
+          const SizedBox(height: 4),
           Expanded(
             child: RefreshIndicator(
               onRefresh: _load,

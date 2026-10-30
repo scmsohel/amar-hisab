@@ -1291,7 +1291,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 height: 38,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  gradient: const LinearGradient(
+                                  gradient: LinearGradient(
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
                                     colors: [_appAccentColor.value.withValues(alpha: .72), _appAccentColor.value],

@@ -1622,7 +1622,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: style.accent.withValues(alpha: isDark ? .24 : .05)),
       ),
-      child: Row(children: [
+      child: InkWell(
+        onTap: () => _showTransactionDetails(tx),
+        borderRadius: BorderRadius.circular(18),
+        child: Row(children: [
         Container(width: 48, height: 48, decoration: BoxDecoration(color: style.accent.withValues(alpha: .08), borderRadius: BorderRadius.circular(15)), child: Icon(style.icon, color: style.accent, size: 25)),
         const SizedBox(width: 10),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1647,7 +1650,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           onSelected: (_) => _showTransactionDetails(tx),
           itemBuilder: (_) => const [PopupMenuItem(value: 'details', child: Text('বিস্তারিত দেখুন'))],
         ),
-      ]),
+        ]),
+      ),
     );
   }
 

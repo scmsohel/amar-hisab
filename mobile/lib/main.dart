@@ -997,7 +997,8 @@ class _ServerSettingsScreenState extends State<ServerSettingsScreen> {
                     const SizedBox(height: 12),
                     const Text('আপনার Server Address', textAlign: TextAlign.center, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: _ink)),
                     const SizedBox(height: 8),
-                    const Text('Cloudflare Tunnel দিয়ে প্রকাশ করা HTTPS API URL দিন। প্রথমবার কোনো server আগে থেকে নির্বাচন করা নেই।', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, height: 1.6, color: _muted)),                    const SizedBox(height: 22),
+                    const Text('Cloudflare Tunnel দিয়ে প্রকাশ করা HTTPS API URL দিন। প্রথমবার কোনো server আগে থেকে নির্বাচন করা নেই।', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, height: 1.6, color: _muted)),
+                    const SizedBox(height: 22),
                     TextFormField(
                       controller: _serverUrl,
                       keyboardType: TextInputType.url,
@@ -1493,7 +1494,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   ({Color accent, Color tint, IconData icon}) _transactionStyle(Map<String, dynamic> tx) {
     final kind = (tx['kind'] ?? '').toString();
-    final value = '\${tx['title'] ?? tx['description'] ?? ''} \${tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? ''}'.toLowerCase();
+    final value = '${tx['title'] ?? tx['description'] ?? ''} ${tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? ''}'.toLowerCase();
     if (kind == 'আয়') return (accent: const Color(0xFF00A653), tint: const Color(0xFFE8F9F0), icon: Icons.south_rounded);
     if (kind == 'ট্রান্সফার' || kind.toLowerCase() == 'transfer') return (accent: const Color(0xFF1688D4), tint: const Color(0xFFEAF4FF), icon: Icons.swap_horiz_rounded);
     if (value.contains('খাবার') || value.contains('food')) return (accent: const Color(0xFFE92743), tint: const Color(0xFFFFEDF0), icon: Icons.restaurant_rounded);
@@ -1508,7 +1509,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final groups = <String, List<Map<String, dynamic>>>{};
     for (final tx in items) {
       final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
-      final key = date == null ? 'unknown' : '\${date.year}-\${date.month}-\${date.day}';
+      final key = date == null ? 'unknown' : '${date.year}-${date.month}-${date.day}';
       groups.putIfAbsent(key, () => <Map<String, dynamic>>[]).add(tx);
     }
     return groups;
@@ -1562,7 +1563,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ])),
         const SizedBox(width: 5),
         SizedBox(width: 98, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerRight, child: Text('$prefix \${_money(_amount(tx['amount']))}', maxLines: 1, style: TextStyle(color: amountColor, fontSize: 14, fontWeight: FontWeight.w900))),
+          FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerRight, child: Text('$prefix ${_money(_amount(tx['amount']))}', maxLines: 1, style: TextStyle(color: amountColor, fontSize: 14, fontWeight: FontWeight.w900))),
           const SizedBox(height: 5),
           if (category.isNotEmpty) Container(
             constraints: const BoxConstraints(maxWidth: 96),
@@ -1592,7 +1593,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(padding: const EdgeInsets.fromLTRB(2, 7, 2, 3), child: Row(children: [
           Expanded(child: Text('সাম্প্রতিক লেনদেন', style: TextStyle(color: titleColor, fontSize: 15, fontWeight: FontWeight.w900))),
-          Text('\${items.length}টি', style: TextStyle(color: isDark ? const Color(0xFF9ABBB4) : const Color(0xFF71818C), fontSize: 11)),
+          Text('${items.length}টি', style: TextStyle(color: isDark ? const Color(0xFF9ABBB4) : const Color(0xFF71818C), fontSize: 11)),
           const SizedBox(width: 8),
           InkWell(onTap: _showAllTransactions, child: Padding(padding: const EdgeInsets.all(5), child: Text('সব দেখুন  ›', style: TextStyle(color: isDark ? const Color(0xFF4DE2B2) : const Color(0xFF00A875), fontSize: 11, fontWeight: FontWeight.w800)))),
         ])),
@@ -1618,7 +1619,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         Text(_money(_amount(tx['amount'])), style: TextStyle(color: _transactionStyle(tx).accent, fontSize: 22, fontWeight: FontWeight.w900)),
         if (category.isNotEmpty) Text('ক্যাটাগরি: $category'),
         if (wallet.isNotEmpty) Text('ওয়ালেট: $wallet'),
-        Text('তারিখ: \${_transactionDateTimeLabel(tx)}'),
+        Text('তারিখ: ${_transactionDateTimeLabel(tx)}'),
       ]),
       actions: [TextButton(onPressed: () => Navigator.of(dialogContext).pop(), child: const Text('বন্ধ করুন'))],
     ));
@@ -2047,7 +2048,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           SizedBox(
                             width: 44,
                             child: FittedBox(
-                              fit: BoxFit.scaleDown,                              child: Text(_money(total), style: TextStyle(color: textColor, fontSize: 9, fontWeight: FontWeight.w900)),
+                              fit: BoxFit.scaleDown,
+                              child: Text(_money(total), style: TextStyle(color: textColor, fontSize: 9, fontWeight: FontWeight.w900)),
                             ),
                           ),
                           const SizedBox(height: 2),

@@ -16,19 +16,19 @@ Future<void> main() async {
       ? ThemeMode.light
       : ThemeMode.dark;
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: _appThemeMode.value == ThemeMode.dark ? const Color(0xFF061B2D) : const Color(0xFFF3F8F5),
+    statusBarColor: _appThemeMode.value == ThemeMode.dark ? const Color(0xFF071827) : const Color(0xFFF3F8F5),
     statusBarIconBrightness: _appThemeMode.value == ThemeMode.dark ? Brightness.light : Brightness.dark,
-    systemNavigationBarColor: _appThemeMode.value == ThemeMode.dark ? const Color(0xFF061713) : const Color(0xFFF3F8F5),
+    systemNavigationBarColor: _appThemeMode.value == ThemeMode.dark ? const Color(0xFF071827) : const Color(0xFFF3F8F5),
     systemNavigationBarIconBrightness: _appThemeMode.value == ThemeMode.dark ? Brightness.light : Brightness.dark,
   ));
   runApp(const AmarHisabApp());
 }
 
-const _blue = Color(0xFF00834A);
-const _deepBlue = Color(0xFF006B3D);
-const _ink = Color(0xFF075B3A);
+const _blue = Color(0xFF287FCB);
+const _deepBlue = Color(0xFF1C5F9D);
+const _ink = Color(0xFF174A72);
 const _muted = Color(0xFF687C78);
-const _line = Color(0xFFDDEBE5);
+const _line = Color(0xFFDCE6F0);
 
 const String _themePreferenceKey = 'amar_hisab_theme_mode';
 final ValueNotifier<ThemeMode> _appThemeMode = ValueNotifier<ThemeMode>(ThemeMode.dark);
@@ -38,9 +38,9 @@ Future<void> _setAppThemeMode(ThemeMode mode) async {
   final preferences = await SharedPreferences.getInstance();
   await preferences.setString(_themePreferenceKey, mode == ThemeMode.light ? 'light' : 'dark');
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: mode == ThemeMode.dark ? const Color(0xFF061B2D) : const Color(0xFFF3F8F5),
+    statusBarColor: mode == ThemeMode.dark ? const Color(0xFF071827) : const Color(0xFFF3F8F5),
     statusBarIconBrightness: mode == ThemeMode.dark ? Brightness.light : Brightness.dark,
-    systemNavigationBarColor: mode == ThemeMode.dark ? const Color(0xFF061713) : const Color(0xFFF3F8F5),
+    systemNavigationBarColor: mode == ThemeMode.dark ? const Color(0xFF071827) : const Color(0xFFF3F8F5),
     systemNavigationBarIconBrightness: mode == ThemeMode.dark ? Brightness.light : Brightness.dark,
   ));
 }
@@ -310,8 +310,8 @@ class AmarHisabApp extends StatelessWidget {
             useMaterial3: true,
             brightness: Brightness.dark,
             fontFamily: 'Roboto',
-            scaffoldBackgroundColor: const Color(0xFF061713),
-            colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4DE2B2), brightness: Brightness.dark),
+            scaffoldBackgroundColor: const Color(0xFF071827),
+            colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6CCBFF), brightness: Brightness.dark),
           ),
           home: const SplashScreen(),
         ),
@@ -1191,10 +1191,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) => AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle(
-          statusBarColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF061B2D) : const Color(0xFFF3F8F5),
+          statusBarColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF071827) : const Color(0xFFF3F8F5),
           statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark ? Brightness.light : Brightness.dark,
           statusBarBrightness: Theme.of(context).brightness == Brightness.dark ? Brightness.dark : Brightness.light,
-          systemNavigationBarColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF061713) : const Color(0xFFF3F8F5),
+          systemNavigationBarColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF071827) : const Color(0xFFF3F8F5),
           systemNavigationBarIconBrightness: Theme.of(context).brightness == Brightness.dark ? Brightness.light : Brightness.dark,
         ),
         child: Scaffold(
@@ -1206,7 +1206,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: Theme.of(context).brightness == Brightness.dark
-                      ? const [Color(0xFF061B2D), Color(0xFF041827), Color(0xFF031A1B), Color(0xFF061713)]
+                      ? const [Color(0xFF071827), Color(0xFF081B2D), Color(0xFF0A1E32), Color(0xFF071827)]
                       : const [Color(0xFFF3F8F5), Color(0xFFEAF5EF), Color(0xFFF7FBF8), Color(0xFFF3F8F5)],
                   stops: const [0.0, 0.34, 0.72, 1.0],
                 ),
@@ -1233,10 +1233,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text('আমার হিসাব', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF4DE2B2) : const Color(0xFF087A5B), fontSize: 23, fontWeight: FontWeight.w900, height: 1.0)),
+                              Text('আমার হিসাব', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF6CCBFF) : const Color(0xFF087A5B), fontSize: 23, fontWeight: FontWeight.w900, height: 1.0)),
                               Transform.translate(
                                 offset: const Offset(0, -2),
-                                child: Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFB8D9D7) : const Color(0xFF587267), fontSize: 10.5, height: 1.0)),
+                                child: Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFB9CADB) : const Color(0xFF587267), fontSize: 10.5, height: 1.0)),
                               ),
                             ],
                           ),
@@ -1248,7 +1248,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               child: IconButton(
                                 tooltip: 'মেনু',
                                 onPressed: () => _showDashboardMenu(context),
-                                icon: Icon(Icons.menu_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD7FFF4) : const Color(0xFF087A5B), size: 27),
+                                icon: Icon(Icons.menu_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : const Color(0xFF087A5B), size: 27),
                               ),
                             ),
                             const Spacer(),
@@ -1260,7 +1260,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   IconButton(
                                     tooltip: 'নোটিফিকেশন',
                                     onPressed: () => _notice(context, 'এখন কোনো নতুন নোটিফিকেশন নেই।'),
-                                    icon: Icon(Icons.notifications_none_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD7FFF4) : const Color(0xFF087A5B), size: 25),
+                                    icon: Icon(Icons.notifications_none_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : const Color(0xFF087A5B), size: 25),
                                   ),
                                   Positioned(
                                     right: 9,
@@ -1280,11 +1280,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   gradient: const LinearGradient(
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
-                                    colors: [Color(0xFF4DE2B2), Color(0xFF087A5B)],
+                                    colors: [Color(0xFF6CCBFF), Color(0xFF087A5B)],
                                   ),
                                   border: Border.all(color: const Color(0xFFE7FFF7), width: 1.5),
                                   boxShadow: [
-                                    BoxShadow(color: const Color(0xFF00E7A0).withValues(alpha: .14), blurRadius: 8),
+                                    BoxShadow(color: const Color(0xFF4ABEFF).withValues(alpha: .14), blurRadius: 8),
                                   ],
                                 ),
                                 child: const Icon(Icons.person_rounded, color: Colors.white, size: 26),
@@ -1305,7 +1305,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         borderRadius: BorderRadius.circular(25),
                         border: Border.all(
                           color: Theme.of(context).brightness == Brightness.dark
-                              ? const Color(0xFF00E7A0).withValues(alpha: .78)
+                              ? const Color(0xFF4ABEFF).withValues(alpha: .78)
                               : const Color(0xFF79DDB8),
                           width: 1.25,
                         ),
@@ -1313,13 +1313,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: Theme.of(context).brightness == Brightness.dark
-                              ? const [Color(0xD908302B), Color(0xD904232B), Color(0xD9021725)]
+                              ? const [Color(0xD9163048), Color(0xD910263C), Color(0xD9081B2D)]
                               : const [Color(0xFFF9FFFC), Color(0xFFEAFBF3), Color(0xFFF5FFFA)],
                         ),
                         boxShadow: Theme.of(context).brightness == Brightness.dark
                             ? [
-                                BoxShadow(color: const Color(0xFF00F0A0).withValues(alpha: .08), blurRadius: 14, spreadRadius: 0, offset: const Offset(0, 3)),
-                                BoxShadow(color: const Color(0xFF00111E).withValues(alpha: .14), blurRadius: 10, offset: const Offset(0, 4)),
+                                BoxShadow(color: const Color(0xFF65C8FF).withValues(alpha: .08), blurRadius: 14, spreadRadius: 0, offset: const Offset(0, 3)),
+                                BoxShadow(color: const Color(0xFF000F20).withValues(alpha: .14), blurRadius: 10, offset: const Offset(0, 4)),
                               ]
                             : [
                                 BoxShadow(color: const Color(0xFF39B98A).withValues(alpha: .10), blurRadius: 18, offset: const Offset(0, 7)),
@@ -1350,18 +1350,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     padding: EdgeInsets.zero,
                                     tooltip: _hidden ? 'ব্যালেন্স দেখান' : 'ব্যালেন্স লুকান',
                                     onPressed: () => setState(() => _hidden = !_hidden),
-                                    icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFB9FBE5) : const Color(0xFF168565), size: 18),
+                                    icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFB8E3FF) : const Color(0xFF168565), size: 18),
                                   ),
                                   const Spacer(),
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                                     decoration: BoxDecoration(
                                       color: Theme.of(context).brightness == Brightness.dark
-                                          ? const Color(0xFF32DDB0).withValues(alpha: .12)
+                                          ? const Color(0xFF55BFFF).withValues(alpha: .12)
                                           : const Color(0xFFBDF5DF).withValues(alpha: .48),
                                       border: Border.all(
                                         color: Theme.of(context).brightness == Brightness.dark
-                                            ? const Color(0xFF43E8BE).withValues(alpha: .34)
+                                            ? const Color(0xFF67C7FF).withValues(alpha: .34)
                                             : const Color(0xFF6FD9B2).withValues(alpha: .58),
                                       ),
                                       borderRadius: BorderRadius.circular(28),
@@ -1369,9 +1369,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Text('এই মাস', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD7FFF4) : const Color(0xFF155A45), fontSize: 12, fontWeight: FontWeight.w700)),
+                                        Text('এই মাস', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : const Color(0xFF155A45), fontSize: 12, fontWeight: FontWeight.w700)),
                                         SizedBox(width: 5),
-                                        Icon(Icons.keyboard_arrow_down_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD7FFF4) : const Color(0xFF155A45), size: 17),
+                                        Icon(Icons.keyboard_arrow_down_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : const Color(0xFF155A45), size: 17),
                                       ],
                                     ),
                                   ),
@@ -1381,7 +1381,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               if (_loading)
                                 Transform.translate(
                                   offset: const Offset(18, -19),
-                                  child: SizedBox(height: 30, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00E7A0) : const Color(0xFF00A875))))),
+                                  child: SizedBox(height: 30, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF4ABEFF) : const Color(0xFF00A875))))),
                                 )
                               else if (_error != null)
                                 Text(_error!, style: const TextStyle(color: Color(0xFFFF6868), fontSize: 12))
@@ -1408,11 +1408,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                     decoration: BoxDecoration(
                                       color: Theme.of(context).brightness == Brightness.dark
-                                          ? const Color(0xFF00E7A0).withValues(alpha: .16)
+                                          ? const Color(0xFF4ABEFF).withValues(alpha: .16)
                                           : const Color(0xFFE7F5EE),
                                       border: Border.all(
                                         color: Theme.of(context).brightness == Brightness.dark
-                                            ? const Color(0xFF00E7A0).withValues(alpha: .62)
+                                            ? const Color(0xFF4ABEFF).withValues(alpha: .62)
                                             : const Color(0xFFC6E5D5),
                                       ),
                                       borderRadius: BorderRadius.circular(24),
@@ -1420,14 +1420,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(Icons.trending_up_rounded, size: 15, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00F0A0) : const Color(0xFF579779)),
+                                        Icon(Icons.trending_up_rounded, size: 15, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF65C8FF) : const Color(0xFF579779)),
                                         SizedBox(width: 3),
                                         Text(
                                           _monthChangePercent == null
                                               ? _monthChangeMessage
                                               : '${_monthChangePercent! >= 0 ? '+' : '-'}${_monthChangePercent!.abs().toStringAsFixed(1)}% গত মাসের তুলনায়',
                                           style: TextStyle(
-                                            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFBFFFF0) : const Color(0xFF527D69),
+                                            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD6EEFF) : const Color(0xFF527D69),
                                             fontSize: 10.5,
                                             fontWeight: FontWeight.w800,
                                           ),
@@ -1439,7 +1439,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   Expanded(
                                     child: Text(
                                       _loading ? 'ব্যালেন্স লোড হচ্ছে...' : _error != null ? 'সার্ভার থেকে ডেটা পাওয়া যায়নি' : '',
-                                      style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFB8D9D7) : const Color(0xFF55796B), fontSize: 11),
+                                      style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFB9CADB) : const Color(0xFF55796B), fontSize: 11),
                                     ),
                                   ),
                                       ],
@@ -1696,7 +1696,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.fromLTRB(10, 10, 3, 10),
       decoration: BoxDecoration(
-        color: isDark ? Color.lerp(const Color(0xFF102B27), style.accent, .10) : style.tint,
+        color: isDark ? Color.lerp(const Color(0xFF14283A), style.accent, .10) : style.tint,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: style.accent.withValues(alpha: isDark ? .24 : .05)),
       ),
@@ -1708,8 +1708,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const SizedBox(width: 10),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFF1FAF6) : const Color(0xFF111827), fontSize: 14, fontWeight: FontWeight.w900)),
-          if (subtitle.isNotEmpty) Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFB1C5BE) : const Color(0xFF657481), fontSize: 11.5)),
-          Row(children: [Icon(Icons.access_time_rounded, size: 13, color: isDark ? const Color(0xFF9EB5AC) : const Color(0xFF7B8993)), const SizedBox(width: 4), Text(_transactionDateTimeLabel(tx).split(', ').last, style: TextStyle(color: isDark ? const Color(0xFF9EB5AC) : const Color(0xFF71808C), fontSize: 10.5))]),
+          if (subtitle.isNotEmpty) Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFAABBCD) : const Color(0xFF657481), fontSize: 11.5)),
+          Row(children: [Icon(Icons.access_time_rounded, size: 13, color: isDark ? const Color(0xFF91A6BC) : const Color(0xFF7B8993)), const SizedBox(width: 4), Text(_transactionDateTimeLabel(tx).split(', ').last, style: TextStyle(color: isDark ? const Color(0xFF91A6BC) : const Color(0xFF71808C), fontSize: 10.5))]),
         ])),
         const SizedBox(width: 5),
         SizedBox(width: 98, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -1766,9 +1766,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(11, 5, 11, 8),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF071F1B) : const Color(0xFFFCFEFD),
+        color: isDark ? const Color(0xFF0D2033) : const Color(0xFFFCFEFD),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isDark ? const Color(0xFF21483D) : const Color(0xFFE2ECE7)),
+        border: Border.all(color: isDark ? const Color(0xFF29445D) : const Color(0xFFE2ECE7)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1780,7 +1780,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Flexible(child: Text('সাম্প্রতিক লেনদেন', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: titleColor, fontSize: 15, fontWeight: FontWeight.w900))),
                   const SizedBox(width: 5),
-                  Text('${_bengaliDigits(items.length.toString())}টি', style: TextStyle(color: isDark ? const Color(0xFF9ABBB4) : const Color(0xFF71818C), fontSize: 10.5)),
+                  Text('${_bengaliDigits(items.length.toString())}টি', style: TextStyle(color: isDark ? const Color(0xFF94A9BF) : const Color(0xFF71818C), fontSize: 10.5)),
                 ]),
               ),
               PopupMenuButton<String>(
@@ -1806,13 +1806,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF00E7A0).withValues(alpha: .12) : const Color(0xFFF0F5F3),
+                    color: isDark ? const Color(0xFF4ABEFF).withValues(alpha: .12) : const Color(0xFFF0F5F3),
                     borderRadius: BorderRadius.circular(9),
-                    border: Border.all(color: isDark ? const Color(0xFF28584B) : const Color(0xFFE1EAE5)),
+                    border: Border.all(color: isDark ? const Color(0xFF385A76) : const Color(0xFFE1EAE5)),
                   ),
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Text(selectedMonthLabel, style: TextStyle(color: isDark ? const Color(0xFFDDFBF1) : const Color(0xFF526875), fontSize: 9.5, fontWeight: FontWeight.w700)),
-                    Icon(Icons.keyboard_arrow_down_rounded, size: 13, color: isDark ? const Color(0xFFDDFBF1) : const Color(0xFF526875)),
+                    Text(selectedMonthLabel, style: TextStyle(color: isDark ? const Color(0xFFDCEBFA) : const Color(0xFF526875), fontSize: 9.5, fontWeight: FontWeight.w700)),
+                    Icon(Icons.keyboard_arrow_down_rounded, size: 13, color: isDark ? const Color(0xFFDCEBFA) : const Color(0xFF526875)),
                   ]),
                 ),
               ),
@@ -1821,7 +1821,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 onTap: _showAllTransactions,
                 child: Padding(
                   padding: const EdgeInsets.all(4),
-                  child: Text('সব দেখুন  ›', style: TextStyle(color: isDark ? const Color(0xFF4DE2B2) : const Color(0xFF00A875), fontSize: 10.5, fontWeight: FontWeight.w800)),
+                  child: Text('সব দেখুন  ›', style: TextStyle(color: isDark ? const Color(0xFF6CCBFF) : const Color(0xFF00A875), fontSize: 10.5, fontWeight: FontWeight.w800)),
                 ),
               ),
             ]),
@@ -1974,7 +1974,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final selectedColor = const Color(0xFF087FF5);
     final foreground = selected
         ? Colors.white
-        : isDark ? const Color(0xFFB7C9C2) : const Color(0xFF738292);
+        : isDark ? const Color(0xFFB7C7D8) : const Color(0xFF738292);
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -1985,12 +1985,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
           decoration: BoxDecoration(
             color: selected
                 ? selectedColor
-                : isDark ? const Color(0xFF102B27) : Colors.white,
+                : isDark ? const Color(0xFF14283A) : Colors.white,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: selected
                   ? selectedColor
-                  : isDark ? const Color(0xFF29483F) : const Color(0xFFE1E8EF),
+                  : isDark ? const Color(0xFF344B62) : const Color(0xFFE1E8EF),
             ),
           ),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -2107,7 +2107,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final category = (tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? '').toString();
     final wallet = (tx['wallet'] ?? tx['walletName'] ?? tx['wallet_name'] ?? tx['accountName'] ?? '').toString();
     showDialog<void>(context: context, builder: (dialogContext) => AlertDialog(
-      backgroundColor: isDark ? const Color(0xFF102B27) : Colors.white,
+      backgroundColor: isDark ? const Color(0xFF14283A) : Colors.white,
       title: Text(title),
       content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(_money(_amount(tx['amount'])), style: TextStyle(color: _transactionStyle(tx).accent, fontSize: 22, fontWeight: FontWeight.w900)),
@@ -2125,7 +2125,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: isDark ? const Color(0xFF061B2D) : const Color(0xFFF3F8F5),
+      backgroundColor: isDark ? const Color(0xFF071827) : const Color(0xFFF3F8F5),
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (sheetContext) => DraggableScrollableSheet(
         expand: false,
@@ -2136,8 +2136,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
             child: Row(children: [
-              Expanded(child: Text('সব লেনদেন', style: TextStyle(color: isDark ? const Color(0xFFDDFBF1) : const Color(0xFF164F40), fontSize: 16, fontWeight: FontWeight.w900))),
-              Text('${items.length}টি', style: TextStyle(color: isDark ? const Color(0xFF9ABBB4) : const Color(0xFF64877C), fontSize: 11)),
+              Expanded(child: Text('সব লেনদেন', style: TextStyle(color: isDark ? const Color(0xFFDCEBFA) : const Color(0xFF164F40), fontSize: 16, fontWeight: FontWeight.w900))),
+              Text('${items.length}টি', style: TextStyle(color: isDark ? const Color(0xFF94A9BF) : const Color(0xFF64877C), fontSize: 11)),
             ]),
           ),
           Expanded(child: items.isEmpty
@@ -2146,7 +2146,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 controller: controller,
                 padding: const EdgeInsets.fromLTRB(12, 4, 12, 20),
                 itemCount: items.length,
-                separatorBuilder: (_, _) => Divider(height: 1, indent: 52, color: isDark ? const Color(0xFF12605D) : const Color(0xFFD7EEE5)),
+                separatorBuilder: (_, _) => Divider(height: 1, indent: 52, color: isDark ? const Color(0xFF36536F) : const Color(0xFFD7EEE5)),
                 itemBuilder: (_, index) => _recentTransactionRow(items[index]),
               )),
         ]),
@@ -2212,7 +2212,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ])));
     }
     return Row(children: [
-      summaryCard(title: 'আয়', amount: monthIncome, subtitle: '', icon: Icons.south_rounded, accent: const Color(0xFF00B982), tint: const Color(0xFFE7FBF3), showTrend: true, change: incomeChange),
+      summaryCard(title: 'আয়', amount: monthIncome, subtitle: '', icon: Icons.south_rounded, accent: const Color(0xFF39BDF8), tint: const Color(0xFFE7FBF3), showTrend: true, change: incomeChange),
       const SizedBox(width: 5),
       summaryCard(title: 'ব্যয়', amount: monthExpense, subtitle: '', icon: Icons.north_rounded, accent: const Color(0xFFFF625B), tint: const Color(0xFFFFEEEE), showTrend: true, change: expenseChange),
       const SizedBox(width: 5),
@@ -2242,10 +2242,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final totalExpense = expense.fold<double>(0, (sum, value) => sum + value);
     final maximum = <double>[...income, ...expense].fold<double>(0, (maxValue, value) => value > maxValue ? value : maxValue);
     final chartMax = maximum <= 0 ? 1.0 : maximum * 1.2;
-    final textColor = isDark ? const Color(0xFFDDFBF1) : const Color(0xFF164F40);
-    final mutedColor = isDark ? const Color(0xFF9ABBB4) : const Color(0xFF64877C);
-    final cardColor = isDark ? const Color(0xFF062537) : const Color(0xFFF9FFFC);
-    final borderColor = isDark ? const Color(0xFF12605D) : const Color(0xFFD7EEE5);
+    final textColor = isDark ? const Color(0xFFDCEBFA) : const Color(0xFF164F40);
+    final mutedColor = isDark ? const Color(0xFF94A9BF) : const Color(0xFF64877C);
+    final cardColor = isDark ? const Color(0xFF0D2033) : const Color(0xFFF9FFFC);
+    final borderColor = isDark ? const Color(0xFF36536F) : const Color(0xFFD7EEE5);
     return Container(
       padding: const EdgeInsets.fromLTRB(7, 4, 7, 3),
       decoration: BoxDecoration(
@@ -2254,7 +2254,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: (isDark ? const Color(0xFF00E7A0) : const Color(0xFF168565)).withValues(alpha: isDark ? .07 : .045),
+            color: (isDark ? const Color(0xFF4ABEFF) : const Color(0xFF168565)).withValues(alpha: isDark ? .07 : .045),
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),
@@ -2265,7 +2265,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.bar_chart_rounded, color: Color(0xFF00A878), size: 21),
+              Icon(Icons.bar_chart_rounded, color: isDark ? const Color(0xFF68C5FF) : const Color(0xFF00A878), size: 21),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -2313,7 +2313,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   height: 34,
                                   padding: const EdgeInsets.symmetric(horizontal: 8),
                                   color: _chartRangeDays == option.$1
-                                      ? (isDark ? const Color(0xFF31505A) : const Color(0xFFE0F5ED))
+                                      ? (isDark ? const Color(0xFF284B6A) : const Color(0xFFE0F5ED))
                                       : Colors.transparent,
                                   child: Row(children: [
                                     if (_chartRangeDays == option.$1)
@@ -2338,8 +2338,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF00E7A0).withValues(alpha: .12) : const Color(0xFFDDF9EE),
-                    border: Border.all(color: isDark ? const Color(0xFF00E7A0).withValues(alpha: .25) : const Color(0xFFB9EBDD)),
+                    color: isDark ? const Color(0xFF4ABEFF).withValues(alpha: .12) : const Color(0xFFDDF9EE),
+                    border: Border.all(color: isDark ? const Color(0xFF4ABEFF).withValues(alpha: .25) : const Color(0xFFB9EBDD)),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -2472,10 +2472,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       Color(0xFF1688D4), Color(0xFFC13EE8), Color(0xFF00C9A7),
     ];
     final title = isIncome ? 'আয়ের উৎস' : 'খরচের বিভাগ';
-    final cardColor = isDark ? const Color(0xFF062537) : const Color(0xFFF9FFFC);
-    final borderColor = isDark ? const Color(0xFF12605D) : const Color(0xFFD7EEE5);
-    final textColor = isDark ? const Color(0xFFDDFBF1) : const Color(0xFF164F40);
-    final mutedColor = isDark ? const Color(0xFF9ABBB4) : const Color(0xFF64877C);
+    final cardColor = isDark ? const Color(0xFF0D2033) : const Color(0xFFF9FFFC);
+    final borderColor = isDark ? const Color(0xFF36536F) : const Color(0xFFD7EEE5);
+    final textColor = isDark ? const Color(0xFFDCEBFA) : const Color(0xFF164F40);
+    final mutedColor = isDark ? const Color(0xFF94A9BF) : const Color(0xFF64877C);
     final monthLabel = monthOffset == 0 ? 'এই মাস' : monthOffset == 1 ? 'গত মাস' : '$monthOffset মাস আগে';
     return Container(
       padding: const EdgeInsets.fromLTRB(7, 3, 6, 2),
@@ -2514,7 +2514,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
                   decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF00E7A0).withValues(alpha: .12) : const Color(0xFFDDF9EE),
+                    color: isDark ? const Color(0xFF4ABEFF).withValues(alpha: .12) : const Color(0xFFDDF9EE),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -2641,7 +2641,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final isDark = _appThemeMode.value == ThemeMode.dark;
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: isDark ? const Color(0xFF0A2527) : Colors.white,
+      backgroundColor: isDark ? const Color(0xFF10243A) : Colors.white,
       showDragHandle: true,
       builder: (sheetContext) => SafeArea(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -2865,7 +2865,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
     canvas.drawPath(
       secondary,
       Paint()
-        ..color = (isDark ? const Color(0xFF00DCC5) : const Color(0xFF13C58B)).withValues(alpha: isDark ? .16 : .08)
+        ..color = (isDark ? const Color(0xFF3BADEB) : const Color(0xFF13C58B)).withValues(alpha: isDark ? .16 : .08)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 6
         ..strokeCap = StrokeCap.round
@@ -2874,7 +2874,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = (isDark ? const Color(0xFF00E7D2) : const Color(0xFF00B981)).withValues(alpha: isDark ? .60 : .28)
+        ..color = (isDark ? const Color(0xFF4ABEFF) : const Color(0xFF00B981)).withValues(alpha: isDark ? .60 : .28)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3
         ..strokeCap = StrokeCap.round
@@ -2884,7 +2884,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = isDark ? const Color(0xFF70FFE2) : const Color(0xFF00B981)
+        ..color = isDark ? const Color(0xFF9AD9FF) : const Color(0xFF00B981)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.6
         ..strokeCap = StrokeCap.round
@@ -2907,7 +2907,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
       );
       canvas.drawRRect(
         rect,
-        Paint()..color = (isDark ? const Color(0xFF00E7A0) : const Color(0xFF16B981)).withValues(alpha: isDark ? .38 : .30),
+        Paint()..color = (isDark ? const Color(0xFF4ABEFF) : const Color(0xFF16B981)).withValues(alpha: isDark ? .38 : .30),
       );
     }
   }

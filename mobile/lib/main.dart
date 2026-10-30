@@ -1752,8 +1752,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final amountColor = isIncome ? const Color(0xFF00A653) : isTransfer ? const Color(0xFF1688D4) : const Color(0xFFE92743);
     final prefix = isIncome ? '+' : isTransfer ? '↔' : '−';
     return Container(
-      margin: const EdgeInsets.only(bottom: 6),
-      padding: const EdgeInsets.fromLTRB(8, 5, 2, 5),
+      margin: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.fromLTRB(8, 3, 2, 3),
       decoration: BoxDecoration(
         color: isDark ? Color.lerp(const Color(0xFF14283A), style.accent, .10) : style.tint,
         borderRadius: BorderRadius.circular(15),
@@ -1764,7 +1764,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         onTap: () => _showTransactionDetails(tx),
         borderRadius: BorderRadius.circular(15),
         child: Row(children: [
-        Container(width: 42, height: 42, decoration: BoxDecoration(color: style.accent.withValues(alpha: .08), borderRadius: BorderRadius.circular(14)), child: Icon(style.icon, color: style.accent, size: 23)),
+        Container(width: 36, height: 36, decoration: BoxDecoration(color: style.accent.withValues(alpha: .08), borderRadius: BorderRadius.circular(12)), child: Icon(style.icon, color: style.accent, size: 21)),
         const SizedBox(width: 10),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFF1FAF6) : const Color(0xFF111827), fontSize: 13, fontWeight: FontWeight.w900)),
@@ -1774,7 +1774,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         const SizedBox(width: 5),
         SizedBox(width: 98, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
           FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerRight, child: Text('$prefix ${_money(_amount(tx['amount']))}', maxLines: 1, style: TextStyle(color: amountColor, fontSize: 13, fontWeight: FontWeight.w900))),
-          const SizedBox(height: 5),
+          const SizedBox(height: 3),
           if (category.isNotEmpty) Container(
             constraints: const BoxConstraints(maxWidth: 96),
             padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),

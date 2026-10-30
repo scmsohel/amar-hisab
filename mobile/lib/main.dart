@@ -1498,7 +1498,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final debtTotal = unpaidDebts.fold<double>(0, (sum, item) {
       final payments = item['payments'] is List ? item['payments'] as List : <dynamic>[];
       final paid = payments.whereType<Map>().fold<double>(0, (value, payment) => value + _amount(payment['amount']));
-      return sum + (_amount(item['amount']) - paid).clamp(0, double.infinity);
+      return sum + (_amount(item['amount']) - paid).clamp(0, double.infinity).toDouble();
     });
     final billTotal = _bills.fold<double>(0, (sum, item) => sum + _amount(item['amount']));
     Widget summaryCard({required String title, required double amount, required String subtitle, required IconData icon, required Color accent, required Color tint, required bool showTrend, double? change}) {

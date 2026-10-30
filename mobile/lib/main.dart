@@ -1649,14 +1649,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                          SizedBox(
+                            width: donutSize * .68,
                             child: FittedBox(
                               fit: BoxFit.scaleDown,
-                              child: Text(_hidden ? '৳ •••••' : _money(expenseTotal), style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w900)),
+                              child: Text(
+                                _hidden ? '৳ •••••' : _money(expenseTotal),
+                                maxLines: 1,
+                                softWrap: false,
+                                style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w900),
+                              ),
                             ),
                           ),
-                          Text('মোট খরচ', style: TextStyle(color: mutedColor, fontSize: 9)),
+                          SizedBox(
+                            width: donutSize * .68,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text('মোট খরচ', maxLines: 1, softWrap: false, style: TextStyle(color: mutedColor, fontSize: 9)),
+                            ),
+                          ),
                         ],
                       ),
                     ),

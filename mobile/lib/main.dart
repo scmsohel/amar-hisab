@@ -1525,13 +1525,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final date = items.isEmpty
         ? null
         : _parseTransactionDate(items.first['dateInput'] ?? items.first['date_input'] ?? items.first['date'] ?? items.first['createdAt'] ?? items.first['created_at']);
-    const months = <String>[
-      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
-      'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর',
-    ];
     final dateLabel = date == null
         ? 'তারিখ পাওয়া যায়নি'
-        : '${_bengaliDigits(date.day.toString())} ${months[date.month - 1]}, ${_bengaliDigits(date.year.toString())}';
+        : '${_bengaliDigits(date.day.toString().padLeft(2, '0'))}/${_bengaliDigits(date.month.toString().padLeft(2, '0'))}/${_bengaliDigits(date.year.toString())}';
     final income = items.where((tx) => tx['kind'] == 'আয়')
         .fold<double>(0, (sum, tx) => sum + _amount(tx['amount']));
     final expense = items.where((tx) => tx['kind'] == 'ব্যয়')

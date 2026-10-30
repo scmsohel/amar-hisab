@@ -1078,6 +1078,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _chartRangeDays = 30;
   int _incomeDonutMonthOffset = 0;
   int _expenseDonutMonthOffset = 0;
+  String _recentTransactionsMonthKey = _monthKey(DateTime.now());
   Map<String, double> _walletBalances = {'ক্যাশ': 0, 'ব্যাংক': 0, 'বিকাশ': 0, 'নগদ': 0};
 
   @override
@@ -1500,6 +1501,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
 
 
+  static String _monthKey(DateTime date) => '${date.year}-${date.month.toString().padLeft(2, '0')}';
+
+  String _monthLabel(String key) {
+    const months = <String>[
+      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
+      'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর',
+    ];
+    final parts = key.split('-');
+    final year = int.tryParse(parts.first) ?? DateTime.now().year;
+    final month = parts.length > 1 ? int.tryParse(parts[1]) ?? 1 : 1;
+    return '${months[(month - 1).clamp(0, 11)]} ${_bengaliDigits(year.toString())}';
+  }
+
+  List<String> _recentTransactionMonthOptions() {
+    final keys = <String>{_monthKey(DateTime.now())};
+    for (final tx in _transactions) {
+      final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
+      if (date != null) keys.add(_monthKey(date));
+    }
+    final sorted = keys.toList()..sort((a, b) => b.compareTo(a));
+    return sorted;
+  }
+
+  List<Map<String, dynamic>> _visibleRecentTransactions() {
+    final items = _sortedRecentTransactions();
+    if (_recentTransactionsMonthKey == 'all') return items;
+    return items.where((tx) {
+      final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
+      return date != null && _monthKey(date) == _recentTransactionsMonthKey;
+    }).toList();
+  }
+
   List<Map<String, dynamic>> _sortedRecentTransactions() {
     final items = List<Map<String, dynamic>>.from(_transactions);
     items.sort((a, b) {
@@ -1688,7 +1721,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Widget _recentTransactionsCard() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final items = _sortedRecentTransactions();
+    final items = _visibleRecentTransactions();
+    final monthOptions = _recentTransactionMonthOptions();
+    final selectedMonthLabel = _recentTransactionsMonthKey == 'all'
+        ? 'সব মাস'
+        : _monthLabel(_recentTransactionsMonthKey);
     final groups = _groupTransactionsByDate(items);
     final titleColor = isDark ? const Color(0xFFE5F8F0) : const Color(0xFF164F40);
     final listChildren = <Widget>[];
@@ -1713,14 +1750,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Padding(
             padding: const EdgeInsets.fromLTRB(2, 7, 2, 3),
             child: Row(children: [
-              Expanded(child: Text('সাম্প্রতিক লেনদেন', style: TextStyle(color: titleColor, fontSize: 15, fontWeight: FontWeight.w900))),
-              Text('${items.length}টি', style: TextStyle(color: isDark ? const Color(0xFF9ABBB4) : const Color(0xFF71818C), fontSize: 11)),
-              const SizedBox(width: 8),
+              Expanded(
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Flexible(child: Text('সাম্প্রতিক লেনদেন', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: titleColor, fontSize: 15, fontWeight: FontWeight.w900))),
+                  const SizedBox(width: 5),
+                  Text('${_bengaliDigits(items.length.toString())}টি', style: TextStyle(color: isDark ? const Color(0xFF9ABBB4) : const Color(0xFF71818C), fontSize: 10.5)),
+                ]),
+              ),
+              PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 112, maxWidth: 150),
+                tooltip: 'মাস নির্বাচন করুন',
+                onSelected: (value) => setState(() => _recentTransactionsMonthKey = value),
+                color: isDark ? const Color(0xFF102A38) : Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                itemBuilder: (context) => [
+                  PopupMenuItem<String>(
+                    value: 'all',
+                    height: 36,
+                    child: Text('সব মাস', style: TextStyle(color: titleColor, fontSize: 11)),
+                  ),
+                  for (final monthKey in monthOptions)
+                    PopupMenuItem<String>(
+                      value: monthKey,
+                      height: 36,
+                      child: Text(_monthLabel(monthKey), style: TextStyle(color: titleColor, fontSize: 11)),
+                    ),
+                ],
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF00E7A0).withValues(alpha: .12) : const Color(0xFFF0F5F3),
+                    borderRadius: BorderRadius.circular(9),
+                    border: Border.all(color: isDark ? const Color(0xFF28584B) : const Color(0xFFE1EAE5)),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text(selectedMonthLabel, style: TextStyle(color: isDark ? const Color(0xFFDDFBF1) : const Color(0xFF526875), fontSize: 9.5, fontWeight: FontWeight.w700)),
+                    Icon(Icons.keyboard_arrow_down_rounded, size: 13, color: isDark ? const Color(0xFFDDFBF1) : const Color(0xFF526875)),
+                  ]),
+                ),
+              ),
+              const SizedBox(width: 3),
               InkWell(
                 onTap: _showAllTransactions,
                 child: Padding(
-                  padding: const EdgeInsets.all(5),
-                  child: Text('সব দেখুন  ›', style: TextStyle(color: isDark ? const Color(0xFF4DE2B2) : const Color(0xFF00A875), fontSize: 11, fontWeight: FontWeight.w800)),
+                  padding: const EdgeInsets.all(4),
+                  child: Text('সব দেখুন  ›', style: TextStyle(color: isDark ? const Color(0xFF4DE2B2) : const Color(0xFF00A875), fontSize: 10.5, fontWeight: FontWeight.w800)),
                 ),
               ),
             ]),
@@ -1868,7 +1943,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _showAllTransactions() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final items = _sortedRecentTransactions();
+    final items = _visibleRecentTransactions();
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,

@@ -1590,15 +1590,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
           flex: 4,
           child: Column(
             children: [
-              metricCard(title: 'এই মাসের আয়', amount: monthIncome, income: true, change: incomeChange),
+              Expanded(child: metricCard(title: 'এই মাসের আয়', amount: monthIncome, income: true, change: incomeChange)),
               const SizedBox(height: 8),
-              metricCard(title: 'এই মাসের ব্যয়', amount: monthExpense, income: false, change: expenseChange),
+              Expanded(child: metricCard(title: 'এই মাসের ব্যয়', amount: monthExpense, income: false, change: expenseChange)),
             ],
           ),
         ),

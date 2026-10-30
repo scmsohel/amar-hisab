@@ -1495,14 +1495,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
   ({Color accent, Color tint, IconData icon}) _transactionStyle(Map<String, dynamic> tx) {
     final kind = (tx['kind'] ?? '').toString();
     final value = '${tx['title'] ?? tx['description'] ?? ''} ${tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? ''}'.toLowerCase();
-    if (kind == 'আয়') return (accent: const Color(0xFF00A653), tint: const Color(0xFFE8F9F0), icon: Icons.south_rounded);
+    if (kind == 'আয়') return (accent: const Color(0xFF00A653), tint: const Color(0xFFF3FBF6), icon: Icons.south_rounded);
     if (kind == 'ট্রান্সফার' || kind.toLowerCase() == 'transfer') return (accent: const Color(0xFF1688D4), tint: const Color(0xFFEAF4FF), icon: Icons.swap_horiz_rounded);
-    if (value.contains('খাবার') || value.contains('food')) return (accent: const Color(0xFFE92743), tint: const Color(0xFFFFEDF0), icon: Icons.restaurant_rounded);
+    if (value.contains('খাবার') || value.contains('food')) return (accent: const Color(0xFFE92743), tint: const Color(0xFFFFF7F8), icon: Icons.restaurant_rounded);
     if (value.contains('বাসা') || value.contains('বাড়ি') || value.contains('লোন')) return (accent: const Color(0xFFD96A00), tint: const Color(0xFFFFF1E1), icon: Icons.home_rounded);
-    if (value.contains('ইন্টারনেট') || value.contains('বিল')) return (accent: const Color(0xFF00A653), tint: const Color(0xFFE8F9F0), icon: Icons.router_rounded);
+    if (value.contains('ইন্টারনেট') || value.contains('বিল')) return (accent: const Color(0xFF00A653), tint: const Color(0xFFF3FBF6), icon: Icons.router_rounded);
     if (value.contains('উপহার')) return (accent: const Color(0xFF8627D9), tint: const Color(0xFFF5EBFF), icon: Icons.card_giftcard_rounded);
     if (value.contains('যাতায়াত') || value.contains('বাস')) return (accent: const Color(0xFF1688D4), tint: const Color(0xFFEAF4FF), icon: Icons.directions_bus_rounded);
-    return (accent: const Color(0xFFE92743), tint: const Color(0xFFFFEDF0), icon: Icons.shopping_cart_rounded);
+    return (accent: const Color(0xFFE92743), tint: const Color(0xFFFFF7F8), icon: Icons.shopping_cart_rounded);
   }
 
   Map<String, List<Map<String, dynamic>>> _groupTransactionsByDate(List<Map<String, dynamic>> items) {
@@ -1551,10 +1551,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       decoration: BoxDecoration(
         color: isDark ? Color.lerp(const Color(0xFF102B27), style.accent, .10) : style.tint,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: style.accent.withValues(alpha: isDark ? .24 : .08)),
+        border: Border.all(color: style.accent.withValues(alpha: isDark ? .24 : .05)),
       ),
       child: Row(children: [
-        Container(width: 48, height: 48, decoration: BoxDecoration(color: style.accent.withValues(alpha: .13), borderRadius: BorderRadius.circular(15)), child: Icon(style.icon, color: style.accent, size: 25)),
+        Container(width: 48, height: 48, decoration: BoxDecoration(color: style.accent.withValues(alpha: .08), borderRadius: BorderRadius.circular(15)), child: Icon(style.icon, color: style.accent, size: 25)),
         const SizedBox(width: 10),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFF1FAF6) : const Color(0xFF111827), fontSize: 14, fontWeight: FontWeight.w900)),
@@ -1568,7 +1568,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           if (category.isNotEmpty) Container(
             constraints: const BoxConstraints(maxWidth: 96),
             padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-            decoration: BoxDecoration(color: style.accent.withValues(alpha: .10), borderRadius: BorderRadius.circular(20), border: Border.all(color: style.accent.withValues(alpha: .15))),
+            decoration: BoxDecoration(color: style.accent.withValues(alpha: .06), borderRadius: BorderRadius.circular(20), border: Border.all(color: style.accent.withValues(alpha: .10))),
             child: Text(category, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: style.accent, fontSize: 10, fontWeight: FontWeight.w800)),
           ),
         ])),

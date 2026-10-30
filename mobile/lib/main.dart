@@ -1500,7 +1500,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final paid = payments.whereType<Map>().fold<double>(0, (value, payment) => value + _amount(payment['amount']));
       return sum + (_amount(item['amount']) - paid).clamp(0, double.infinity).toDouble();
     });
-    final billTotal = _bills.fold<double>(0, (sum, item) => sum + _amount(item['amount']));
+    final unpaidBills = _bills.where((item) {
+      final status = (item['status'] ?? '').toString();
+      return status != 'পরিশোধিত' && status != 'সম্পন্ন';
+    }).toList();
+    final billTotal = unpaidBills.fold<double>(0, (sum, item) => sum + _amount(item['amount']));
     Widget summaryCard({required String title, required double amount, required String subtitle, required IconData icon, required Color accent, required Color tint, required bool showTrend, double? change}) {
       final foreground = isDark ? const Color(0xFFEAF7F2) : const Color(0xFF183E35);
       final muted = isDark ? const Color(0xFFA9C4BA) : const Color(0xFF617B73);
@@ -1528,7 +1532,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       const SizedBox(width: 5),
       summaryCard(title: 'দেনা', amount: debtTotal, subtitle: '${unpaidDebts.length} জন', icon: Icons.payments_rounded, accent: const Color(0xFFF29A16), tint: const Color(0xFFFFF6E8), showTrend: false),
       const SizedBox(width: 5),
-      summaryCard(title: 'বিল', amount: billTotal, subtitle: '${_bills.length} টি', icon: Icons.calendar_month_rounded, accent: const Color(0xFF2588F5), tint: const Color(0xFFEEF6FF), showTrend: false),
+      summaryCard(title: 'বিল', amount: billTotal, subtitle: '${unpaidBills.length} টি বাকি', icon: Icons.calendar_month_rounded, accent: const Color(0xFF2588F5), tint: const Color(0xFFEEF6FF), showTrend: false),
     ]);
   }
   Widget _incomeExpenseChart() {

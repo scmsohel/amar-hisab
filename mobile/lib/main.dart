@@ -1635,7 +1635,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 8),
           LayoutBuilder(
             builder: (context, constraints) {
-              final donutSize = constraints.maxWidth < 220 ? 82.0 : constraints.maxWidth < 330 ? 104.0 : 132.0;
+              const donutSize = 80.0;
               return Row(
                 children: [
                   SizedBox(

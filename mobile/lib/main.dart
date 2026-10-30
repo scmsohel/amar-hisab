@@ -1270,7 +1270,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const SizedBox(height: 9),
                       Row(
                         children: [
-                          _profileStat(card, border, title, muted, Icons.people_alt_rounded, const Color(0xFF1688F8), '৩', 'ওয়ালেট'),
+                          _profileStat(card, border, title, muted, Icons.people_alt_rounded, const Color(0xFF1688F8), _loading ? '—' : _bengaliDigits(_walletCount.toString()), 'ওয়ালেট'),
                           const SizedBox(width: 7),
                           _profileStat(card, border, title, muted, Icons.receipt_long_rounded, const Color(0xFF16B981), _loading ? '—' : _bengaliDigits(_transactionCount.toString()), 'মোট লেনদেন'),
                           const SizedBox(width: 7),

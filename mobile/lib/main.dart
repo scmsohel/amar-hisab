@@ -1505,8 +1505,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     Widget metricCard({required String title, required double amount, required bool income}) {
       final accent = income ? const Color(0xFF00B982) : const Color(0xFFFF625B);
-      return Expanded(
-        child: Container(
+      return Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
           decoration: BoxDecoration(
             color: accent.withValues(alpha: isDark ? .10 : .075),
@@ -1537,8 +1536,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ),
-        ),
-      );
+        );
     }
 
     final monthLabel = _expenseDonutMonthOffset == 0 ? 'এই মাস' : _expenseDonutMonthOffset == 1 ? 'গত মাস' : '$_expenseDonutMonthOffset মাস আগে';
@@ -1646,7 +1644,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       builder: (context, constraints) {
         if (constraints.maxWidth >= 520) {
           return Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 flex: 4,
@@ -1667,9 +1665,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             Row(
               children: [
-                metricCard(title: 'এই মাসের আয়', amount: monthIncome, income: true),
+                Expanded(child: metricCard(title: 'এই মাসের আয়', amount: monthIncome, income: true)),
                 const SizedBox(width: 8),
-                metricCard(title: 'এই মাসের ব্যয়', amount: monthExpense, income: false),
+                Expanded(child: metricCard(title: 'এই মাসের ব্যয়', amount: monthExpense, income: false)),
               ],
             ),
             const SizedBox(height: 9),

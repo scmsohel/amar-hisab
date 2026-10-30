@@ -1207,8 +1207,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             Transform.translate(
                               offset: const Offset(0, -2),
                               child: IconButton(
-                                constraints: const BoxConstraints.tightFor(width: 48, height: 36),
-                                padding: EdgeInsets.zero,
                                 tooltip: 'মেনু',
                                 onPressed: () => _showDashboardMenu(context),
                                 icon: Icon(Icons.menu_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD7FFF4) : const Color(0xFF087A5B), size: 27),
@@ -1221,8 +1219,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 clipBehavior: Clip.none,
                                 children: [
                                   IconButton(
-                                    constraints: const BoxConstraints.tightFor(width: 48, height: 36),
-                                    padding: EdgeInsets.zero,
                                     tooltip: 'নোটিফিকেশন',
                                     onPressed: () => _notice(context, 'এখন কোনো নতুন নোটিফিকেশন নেই।'),
                                     icon: Icon(Icons.notifications_none_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD7FFF4) : const Color(0xFF087A5B), size: 25),

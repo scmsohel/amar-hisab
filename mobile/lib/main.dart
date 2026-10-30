@@ -1522,6 +1522,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       return ClipRRect(
         borderRadius: BorderRadius.circular(15),
         child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 9),
           decoration: BoxDecoration(
             color: accent.withValues(alpha: isDark ? .10 : .075),
             borderRadius: BorderRadius.circular(15),
@@ -1539,10 +1540,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 9),
-                child: Row(
-                  children: [
+              Row(
+                children: [
               Container(
                 width: 27, height: 27,
                 decoration: BoxDecoration(color: accent.withValues(alpha: .16), shape: BoxShape.circle),
@@ -1580,8 +1579,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ],
                 ),
               ),
-                  ],
-                ),
+                ],
               ),
             ],
           ),
@@ -1649,25 +1647,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SizedBox(
-                            width: donutSize * .68,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
                             child: FittedBox(
                               fit: BoxFit.scaleDown,
-                              child: Text(
-                                _hidden ? '৳ •••••' : _money(expenseTotal),
-                                maxLines: 1,
-                                softWrap: false,
-                                style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w900),
-                              ),
+                              child: Text(_hidden ? '৳ •••••' : _money(expenseTotal), style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w900)),
                             ),
                           ),
-                          SizedBox(
-                            width: donutSize * .68,
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text('মোট খরচ', maxLines: 1, softWrap: false, style: TextStyle(color: mutedColor, fontSize: 9)),
-                            ),
-                          ),
+                          Text('মোট খরচ', style: TextStyle(color: mutedColor, fontSize: 9)),
                         ],
                       ),
                     ),

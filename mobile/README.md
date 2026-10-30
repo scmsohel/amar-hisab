@@ -13,6 +13,7 @@ From this directory, run:
 
 ```powershell
 flutter create --project-name amar_hisab_mobile --platforms android .
+.\scripts\set-app-name.ps1
 flutter pub get
 flutter run
 ```

@@ -2271,7 +2271,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ])));
     }
     return Row(children: [
-      summaryCard(title: 'আয়', amount: monthIncome, subtitle: '', icon: Icons.south_rounded, accent: const Color(0xFF39BDF8), tint: const Color(0xFFE7FBF3), showTrend: true, change: incomeChange),
+      summaryCard(title: 'আয়', amount: monthIncome, subtitle: '', icon: Icons.south_rounded, accent: isDark ? const Color(0xFF39BDF8) : const Color(0xFF00A875), tint: const Color(0xFFE7FBF3), showTrend: true, change: incomeChange),
       const SizedBox(width: 5),
       summaryCard(title: 'ব্যয়', amount: monthExpense, subtitle: '', icon: Icons.north_rounded, accent: const Color(0xFFFF625B), tint: const Color(0xFFFFEEEE), showTrend: true, change: expenseChange),
       const SizedBox(width: 5),

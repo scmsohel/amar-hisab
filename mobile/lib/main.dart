@@ -1455,6 +1455,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const SizedBox(height: 6),
                     _incomeExpenseDonuts(),
                   ],
+                  const SizedBox(height: 12),
+                  _recentTransactionsCard(),
                   if (_error != null) ...[
                     const SizedBox(height: 12),
                     OutlinedButton.icon(onPressed: _load, icon: const Icon(Icons.refresh_rounded), label: const Text('আবার চেষ্টা করুন')),
@@ -1467,6 +1469,145 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ]),
         ),
       );
+
+
+  List<Map<String, dynamic>> _sortedRecentTransactions() {
+    final items = List<Map<String, dynamic>>.from(_transactions);
+    items.sort((a, b) {
+      final aDate = _parseTransactionDate(a['dateInput'] ?? a['date_input'] ?? a['date'] ?? a['createdAt'] ?? a['created_at']);
+      final bDate = _parseTransactionDate(b['dateInput'] ?? b['date_input'] ?? b['date'] ?? b['createdAt'] ?? b['created_at']);
+      if (aDate == null && bDate == null) return 0;
+      if (aDate == null) return 1;
+      if (bDate == null) return -1;
+      return bDate.compareTo(aDate);
+    });
+    return items;
+  }
+
+  String _transactionDateTimeLabel(Map<String, dynamic> tx) {
+    final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
+    final time = (tx['timeInput'] ?? tx['time_input'] ?? tx['time'] ?? '').toString().trim();
+    if (date == null) return time.isEmpty ? '' : time;
+    final dateText = '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+    return time.isEmpty ? dateText : '$dateText, $time';
+  }
+
+  Widget _recentTransactionRow(Map<String, dynamic> tx) {
+    final kind = (tx['kind'] ?? '').toString();
+    final isIncome = kind == 'আয়';
+    final isTransfer = kind == 'ট্রান্সফার' || kind.toLowerCase() == 'transfer';
+    final accent = isIncome ? const Color(0xFF00A875) : isTransfer ? const Color(0xFF1688D4) : const Color(0xFFFF5757);
+    final icon = isIncome ? Icons.south_rounded : isTransfer ? Icons.swap_horiz_rounded : Icons.north_rounded;
+    final title = (tx['title'] ?? tx['description'] ?? tx['note'] ?? tx['name'] ?? 'লেনদেন').toString();
+    final category = (tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? tx['categoryTitle'] ?? tx['category_title'] ?? '').toString();
+    final wallet = (tx['wallet'] ?? tx['walletName'] ?? tx['wallet_name'] ?? tx['accountName'] ?? tx['account'] ?? '').toString();
+    final transferTo = (tx['transferTo'] ?? tx['transfer_to'] ?? '').toString();
+    final subtitle = [category, wallet.isEmpty ? '' : (isTransfer && transferTo.isNotEmpty ? '$wallet → $transferTo' : wallet)].where((value) => value.trim().isNotEmpty).join(' • ');
+    final dateLabel = _transactionDateTimeLabel(tx);
+    final amount = _amount(tx['amount']);
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      child: Row(
+        children: [
+          Container(
+            width: 34, height: 34,
+            decoration: BoxDecoration(color: accent.withValues(alpha: .13), shape: BoxShape.circle),
+            child: Icon(icon, color: accent, size: 19),
+          ),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title, maxLines: 1, overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFE8FFF7) : const Color(0xFF183E35), fontSize: 11.5, fontWeight: FontWeight.w800)),
+              if (subtitle.isNotEmpty)
+                Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF9ABBB4) : const Color(0xFF789087), fontSize: 9)),
+              if (dateLabel.isNotEmpty)
+                Text(dateLabel, maxLines: 1, overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF789A92) : const Color(0xFF91A39B), fontSize: 8.5)),
+            ]),
+          ),
+          const SizedBox(width: 6),
+          Text('${isIncome ? '+' : isTransfer ? '↔' : '−'} ${_money(amount)}',
+            maxLines: 1, style: TextStyle(color: accent, fontSize: 11, fontWeight: FontWeight.w900)),
+        ],
+      ),
+    );
+  }
+
+  Widget _recentTransactionsCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final items = _sortedRecentTransactions();
+    final cardColor = isDark ? const Color(0xFF062537) : const Color(0xFFF9FFFC);
+    final borderColor = isDark ? const Color(0xFF12605D) : const Color(0xFFD7EEE5);
+    final titleColor = isDark ? const Color(0xFFDDFBF1) : const Color(0xFF164F40);
+    return Container(
+      decoration: BoxDecoration(color: cardColor, borderRadius: BorderRadius.circular(17), border: Border.all(color: borderColor)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(11, 9, 9, 5),
+          child: Row(children: [
+            Expanded(child: Text('সাম্প্রতিক লেনদেন', style: TextStyle(color: titleColor, fontSize: 13, fontWeight: FontWeight.w900))),
+            InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: () => _showAllTransactions(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Text('সব দেখুন', style: TextStyle(color: isDark ? const Color(0xFF4DE2B2) : const Color(0xFF00A875), fontSize: 10, fontWeight: FontWeight.w800)),
+                  Icon(Icons.chevron_right_rounded, size: 15, color: isDark ? const Color(0xFF4DE2B2) : const Color(0xFF00A875)),
+                ]),
+              ),
+            ),
+          ]),
+        ),
+        if (_loading && items.isEmpty)
+          const Padding(padding: EdgeInsets.all(16), child: Center(child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))))
+        else if (items.isEmpty)
+          Padding(padding: const EdgeInsets.all(14), child: Center(child: Text('এখনো কোনো লেনদেন নেই', style: TextStyle(color: titleColor, fontSize: 10))))
+        else
+          for (var i = 0; i < items.length; i++) ...[
+            if (i > 0) Divider(height: 1, thickness: .6, indent: 52, endIndent: 9, color: borderColor),
+            _recentTransactionRow(items[i]),
+          ],
+      ]),
+    );
+  }
+
+  void _showAllTransactions() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final items = _sortedRecentTransactions();
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: isDark ? const Color(0xFF061B2D) : const Color(0xFFF3F8F5),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (sheetContext) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: .88,
+        minChildSize: .5,
+        maxChildSize: .96,
+        builder: (context, controller) => Column(children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: Row(children: [
+              Expanded(child: Text('সব লেনদেন', style: TextStyle(color: isDark ? const Color(0xFFDDFBF1) : const Color(0xFF164F40), fontSize: 16, fontWeight: FontWeight.w900))),
+              Text('${items.length}টি', style: TextStyle(color: isDark ? const Color(0xFF9ABBB4) : const Color(0xFF64877C), fontSize: 11)),
+            ]),
+          ),
+          Expanded(child: items.isEmpty
+            ? Center(child: Text('এখনো কোনো লেনদেন নেই', style: TextStyle(color: isDark ? Colors.white70 : const Color(0xFF64877C))))
+            : ListView.separated(
+                controller: controller,
+                padding: const EdgeInsets.fromLTRB(12, 4, 12, 20),
+                itemCount: items.length,
+                separatorBuilder: (_, _) => Divider(height: 1, indent: 52, color: isDark ? const Color(0xFF12605D) : const Color(0xFFD7EEE5)),
+                itemBuilder: (_, index) => _recentTransactionRow(items[index]),
+              )),
+        ]),
+      ),
+    );
+  }
 
   Widget _compactExpenseOverview() {
     final isDark = Theme.of(context).brightness == Brightness.dark;

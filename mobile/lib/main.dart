@@ -1526,9 +1526,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ])));
     }
     return Row(children: [
-      summaryCard(title: 'এই মাসের আয়', amount: monthIncome, subtitle: '', icon: Icons.south_rounded, accent: const Color(0xFF00B982), tint: const Color(0xFFE7FBF3), showTrend: true, change: incomeChange),
+      summaryCard(title: 'আয়', amount: monthIncome, subtitle: '', icon: Icons.south_rounded, accent: const Color(0xFF00B982), tint: const Color(0xFFE7FBF3), showTrend: true, change: incomeChange),
       const SizedBox(width: 5),
-      summaryCard(title: 'এই মাসের ব্যয়', amount: monthExpense, subtitle: '', icon: Icons.north_rounded, accent: const Color(0xFFFF625B), tint: const Color(0xFFFFEEEE), showTrend: true, change: expenseChange),
+      summaryCard(title: 'ব্যয়', amount: monthExpense, subtitle: '', icon: Icons.north_rounded, accent: const Color(0xFFFF625B), tint: const Color(0xFFFFEEEE), showTrend: true, change: expenseChange),
       const SizedBox(width: 5),
       summaryCard(title: 'দেনা', amount: debtTotal, subtitle: '${unpaidDebts.length} জন', icon: Icons.payments_rounded, accent: const Color(0xFFF29A16), tint: const Color(0xFFFFF6E8), showTrend: false),
       const SizedBox(width: 5),

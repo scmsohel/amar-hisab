@@ -1041,6 +1041,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   bool _loading = true;
   bool _hidden = false;
+  bool _compactCharts = false;
   String? _error;
   double _balance = 0;
   double? _monthChangePercent;
@@ -1435,9 +1436,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   ),
                   const SizedBox(height: 11),
-                  _incomeExpenseChart(),
-                  const SizedBox(height: 11),
-                  _incomeExpenseDonuts(),
+                  if (_compactCharts)
+                    _donutSummaryCard(isIncome: false, monthOffset: _expenseDonutMonthOffset)
+                  else ...[
+                    _incomeExpenseChart(),
+                    const SizedBox(height: 11),
+                    _incomeExpenseDonuts(),
+                  ],
                   if (_error != null) ...[
                     const SizedBox(height: 12),
                     OutlinedButton.icon(onPressed: _load, icon: const Icon(Icons.refresh_rounded), label: const Text('আবার চেষ্টা করুন')),
@@ -1876,6 +1881,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       showDragHandle: true,
       builder: (sheetContext) => SafeArea(
         child: Column(mainAxisSize: MainAxisSize.min, children: [
+          SwitchListTile(
+            secondary: const Icon(Icons.dashboard_customize_rounded),
+            title: const Text('Compact / Expand'),
+            subtitle: Text(_compactCharts ? 'Compact view চালু' : 'Expanded view চালু'),
+            value: _compactCharts,
+            onChanged: (value) => setState(() => _compactCharts = value),
+          ),
           SwitchListTile(
             secondary: Icon(isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded),
             title: Text(isDark ? 'Dark Future Mode' : 'Light Mode'),

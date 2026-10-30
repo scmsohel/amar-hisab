@@ -1452,7 +1452,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     _compactExpenseOverview()
                   else ...[
                     _incomeExpenseChart(),
-                    const SizedBox(height: 11),
+                    const SizedBox(height: 6),
                     _incomeExpenseDonuts(),
                   ],
                   if (_error != null) ...[

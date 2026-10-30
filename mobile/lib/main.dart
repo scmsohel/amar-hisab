@@ -1409,25 +1409,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     decoration: BoxDecoration(
                                       color: Theme.of(context).brightness == Brightness.dark
                                           ? const Color(0xFF00E7A0).withValues(alpha: .16)
-                                          : const Color(0xFFB5F2D9),
+                                          : const Color(0xFFE7F5EE),
                                       border: Border.all(
                                         color: Theme.of(context).brightness == Brightness.dark
                                             ? const Color(0xFF00E7A0).withValues(alpha: .62)
-                                            : const Color(0xFF72DDB5),
+                                            : const Color(0xFFC6E5D5),
                                       ),
                                       borderRadius: BorderRadius.circular(24),
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        Icon(Icons.trending_up_rounded, size: 15, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00F0A0) : const Color(0xFF008D62)),
+                                        Icon(Icons.trending_up_rounded, size: 15, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF00F0A0) : const Color(0xFF579779)),
                                         SizedBox(width: 3),
                                         Text(
                                           _monthChangePercent == null
                                               ? _monthChangeMessage
                                               : '${_monthChangePercent! >= 0 ? '+' : '-'}${_monthChangePercent!.abs().toStringAsFixed(1)}% গত মাসের তুলনায়',
                                           style: TextStyle(
-                                            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFBFFFF0) : const Color(0xFF17634A),
+                                            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFBFFFF0) : const Color(0xFF527D69),
                                             fontSize: 10.5,
                                             fontWeight: FontWeight.w800,
                                           ),

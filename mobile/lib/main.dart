@@ -1511,7 +1511,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final parts = key.split('-');
     final year = int.tryParse(parts.first) ?? DateTime.now().year;
     final month = parts.length > 1 ? int.tryParse(parts[1]) ?? 1 : 1;
-    return '${months[(month - 1).clamp(0, 11)]} ${_bengaliDigits(year.toString())}';
+    return '${months[(month - 1).clamp(0, 11).toInt()]} ${_bengaliDigits(year.toString())}';
   }
 
   List<String> _recentTransactionMonthOptions() {

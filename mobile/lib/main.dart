@@ -1187,9 +1187,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 children: [
                   Transform.translate(
                     offset: const Offset(0, -4),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
+                    child: SizedBox(
+                      height: 36,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.center,
+                        children: [
                         Center(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -1253,7 +1256,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             ),
                           ],
                         ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 0),

@@ -1537,7 +1537,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const SizedBox(height: 6),
                     _entranceAnimation(_incomeExpenseDonuts(), 6),
                   ],
-                  const SizedBox(height: 11),
+                  const SizedBox(height: 12),
 
                 if (_error != null) ...[
                     const SizedBox(height: 12),

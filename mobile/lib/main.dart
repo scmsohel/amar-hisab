@@ -1519,15 +1519,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     Widget metricCard({required String title, required double amount, required bool income, required double? change}) {
       final accent = income ? const Color(0xFF00B982) : const Color(0xFFFF625B);
-      return Container(
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(15),
+        child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 9),
           decoration: BoxDecoration(
-            color: accent.withValues(alpha: isDark ? .10 : .14),
+            color: accent.withValues(alpha: isDark ? .10 : .075),
             borderRadius: BorderRadius.circular(15),
             border: Border.all(color: accent.withValues(alpha: .18)),
           ),
-          child: Row(
+          child: Stack(
             children: [
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: CustomPaint(
+                    painter: _MetricCardWavePainter(
+                      color: accent,
+                      opacity: isDark ? .07 : .10,
+                    ),
+                  ),
+                ),
+              ),
+              Row(
+                children: [
               Container(
                 width: 27, height: 27,
                 decoration: BoxDecoration(color: accent.withValues(alpha: .16), shape: BoxShape.circle),
@@ -1565,9 +1579,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ],
                 ),
               ),
+                ],
+              ),
             ],
           ),
-        );
+        ),
+      );
     }
 
     final monthLabel = _expenseDonutMonthOffset == 0 ? 'এই মাস' : _expenseDonutMonthOffset == 1 ? 'গত মাস' : '$_expenseDonutMonthOffset মাস আগে';
@@ -2142,6 +2159,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
 }
 
 
+
+class _MetricCardWavePainter extends CustomPainter {
+  final Color color;
+  final double opacity;
+
+  const _MetricCardWavePainter({required this.color, required this.opacity});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path()
+      ..moveTo(size.width * .48, size.height)
+      ..cubicTo(size.width * .62, size.height * .88, size.width * .66, size.height * .78, size.width * .78, size.height * .70)
+      ..cubicTo(size.width * .88, size.height * .62, size.width * .91, size.height * .48, size.width, size.height * .43)
+      ..lineTo(size.width, size.height)
+      ..close();
+    canvas.drawPath(path, Paint()..color = color.withValues(alpha: opacity));
+  }
+
+  @override
+  bool shouldRepaint(covariant _MetricCardWavePainter oldDelegate) =>
+      oldDelegate.color != color || oldDelegate.opacity != opacity;
+}
 
 class _DonutSummaryPainter extends CustomPainter {
   final List<double> values;

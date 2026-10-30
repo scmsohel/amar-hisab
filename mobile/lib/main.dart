@@ -1540,39 +1540,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 9),
+                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
                 child: Row(
                   children: [
               Container(
-                width: 27, height: 27,
+                width: 23, height: 23,
                 decoration: BoxDecoration(color: accent.withValues(alpha: .16), shape: BoxShape.circle),
-                child: Icon(income ? Icons.south_rounded : Icons.north_rounded, color: accent, size: 17),
+                child: Icon(income ? Icons.south_rounded : Icons.north_rounded, color: accent, size: 15),
               ),
-              const SizedBox(width: 5),
+              const SizedBox(width: 4),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: mutedColor, fontSize: 9, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 4),
+                    Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: mutedColor, fontSize: 8, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 2),
                     FittedBox(
                       fit: BoxFit.scaleDown,
                       alignment: Alignment.centerLeft,
-                      child: Text(_hidden ? '৳ •••••' : _money(amount), style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w900)),
+                      child: Text(_hidden ? '৳ •••••' : _money(amount), style: TextStyle(color: textColor, fontSize: 11, fontWeight: FontWeight.w900)),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(height: 1),
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(change == null ? Icons.remove_rounded : change >= 0 ? Icons.trending_up_rounded : Icons.trending_down_rounded,
-                          size: 12, color: accent),
+                          size: 10, color: accent),
                         const SizedBox(width: 2),
                         Flexible(
                           child: Text(
                             change == null ? 'নতুন' : '${change >= 0 ? '+' : '-'}${change.abs().toStringAsFixed(1)}%',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(color: accent, fontSize: 10, fontWeight: FontWeight.w800),
+                            style: TextStyle(color: accent, fontSize: 9, fontWeight: FontWeight.w800),
                           ),
                         ),
                       ],

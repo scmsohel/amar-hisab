@@ -1079,6 +1079,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   int _incomeDonutMonthOffset = 0;
   int _expenseDonutMonthOffset = 0;
   String _recentTransactionsMonthKey = _monthKey(DateTime.now());
+  String _recentTransactionsCategory = 'সব';
   Map<String, double> _walletBalances = {'ক্যাশ': 0, 'ব্যাংক': 0, 'বিকাশ': 0, 'নগদ': 0};
 
   @override
@@ -1524,13 +1525,38 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return sorted;
   }
 
-  List<Map<String, dynamic>> _visibleRecentTransactions() {
+  String _transactionCategoryLabel(Map<String, dynamic> tx) {
+    final value = (tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? tx['categoryTitle'] ?? tx['category_title'] ?? tx['subcategory'] ?? '').toString().trim();
+    return value.isEmpty ? 'অন্যান্য' : value;
+  }
+
+  List<Map<String, dynamic>> _monthFilteredRecentTransactions() {
     final items = _sortedRecentTransactions();
     if (_recentTransactionsMonthKey == 'all') return items;
     return items.where((tx) {
       final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
       return date != null && _monthKey(date) == _recentTransactionsMonthKey;
     }).toList();
+  }
+
+  List<MapEntry<String, int>> _recentTransactionCategoryCounts() {
+    final counts = <String, int>{};
+    for (final tx in _monthFilteredRecentTransactions()) {
+      final category = _transactionCategoryLabel(tx);
+      counts[category] = (counts[category] ?? 0) + 1;
+    }
+    final entries = counts.entries.toList()
+      ..sort((a, b) {
+        final byCount = b.value.compareTo(a.value);
+        return byCount != 0 ? byCount : a.key.compareTo(b.key);
+      });
+    return entries;
+  }
+
+  List<Map<String, dynamic>> _visibleRecentTransactions() {
+    final items = _monthFilteredRecentTransactions();
+    if (_recentTransactionsCategory == 'সব') return items;
+    return items.where((tx) => _transactionCategoryLabel(tx) == _recentTransactionsCategory).toList();
   }
 
   List<Map<String, dynamic>> _sortedRecentTransactions() {
@@ -1722,6 +1748,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Widget _recentTransactionsCard() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final items = _visibleRecentTransactions();
+    final categoryCounts = _recentTransactionCategoryCounts();
     final monthOptions = _recentTransactionMonthOptions();
     final selectedMonthLabel = _recentTransactionsMonthKey == 'all'
         ? 'সব মাস'
@@ -1800,7 +1827,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ]),
           ),
-          const SizedBox(height: 3),
+          const SizedBox(height: 7),
+          SizedBox(
+            height: 36,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Row(
+                children: [
+                  _recentCategoryFilterChip(
+                    label: 'সব',
+                    count: _monthFilteredRecentTransactions().length,
+                    selected: _recentTransactionsCategory == 'সব',
+                    isDark: isDark,
+                    onTap: () => setState(() => _recentTransactionsCategory = 'সব'),
+                  ),
+                  for (final entry in categoryCounts) ...[
+                    const SizedBox(width: 6),
+                    _recentCategoryFilterChip(
+                      label: entry.key,
+                      count: entry.value,
+                      selected: _recentTransactionsCategory == entry.key,
+                      isDark: isDark,
+                      onTap: () => setState(() => _recentTransactionsCategory = entry.key),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 5),
           Expanded(
             child: RefreshIndicator(
               onRefresh: _load,
@@ -1824,6 +1880,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _recentCategoryFilterChip({
+    required String label,
+    required int count,
+    required bool selected,
+    required bool isDark,
+    required VoidCallback onTap,
+  }) {
+    final selectedColor = const Color(0xFF087FF5);
+    final foreground = selected
+        ? Colors.white
+        : isDark ? const Color(0xFFB7C9C2) : const Color(0xFF738292);
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          decoration: BoxDecoration(
+            color: selected
+                ? selectedColor
+                : isDark ? const Color(0xFF102B27) : Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: selected
+                  ? selectedColor
+                  : isDark ? const Color(0xFF29483F) : const Color(0xFFE1E8EF),
+            ),
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text(label, style: TextStyle(color: foreground, fontSize: 11, fontWeight: FontWeight.w700)),
+            const SizedBox(width: 5),
+            Text(_bengaliDigits(count.toString()), style: TextStyle(color: foreground, fontSize: 10, fontWeight: FontWeight.w600)),
+          ]),
+        ),
       ),
     );
   }

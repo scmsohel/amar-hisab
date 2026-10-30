@@ -1047,7 +1047,7 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   bool _loading = true;
   bool _hidden = false;
-  bool _compactCharts = false;
+  bool _compactCharts = true;
   String? _error;
   double _balance = 0;
   double? _monthChangePercent;

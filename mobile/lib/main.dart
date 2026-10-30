@@ -2682,10 +2682,918 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
               ]),
             ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: () => _showCustomAccentDialog(context),
+                icon: const Icon(Icons.colorize_rounded, size: 17),
+                label: const Text('Custom HEX'),
+              ),
+            ),
           ]),
         ),
       ),
     );
+  }
+
+  void _showCustomAccentDialog(BuildContext context) {
+    final controller = TextEditingController(
+      text: _appAccentColor.value.toARGB32().toRadixString(16).substring(2).toUpperCase(),
+    );
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Custom Accent Color'),
+        content: TextField(
+          controller: controller,
+          textCapitalization: TextCapitalization.characters,
+          maxLength: 6,
+          decoration: const InputDecoration(prefixText: '#', hintText: '287FCB', counterText: ''),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('বাতিল')),
+          FilledButton(
+            onPressed: () async {
+              final hex = controller.text.trim().replaceFirst('#', '');
+              if (!RegExp(r'^[0-9A-Fa-f]{6}(BuildContext context) {
+    final isDark = _appThemeMode.value == ThemeMode.dark;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: isDark ? const Color(0xFF10243A) : Colors.white,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          SwitchListTile(
+            secondary: const Icon(Icons.dashboard_customize_rounded),
+            title: const Text('Compact / Expand'),
+            subtitle: Text(_compactCharts ? 'Compact view চালু' : 'Expanded view চালু'),
+            value: _compactCharts,
+            onChanged: (value) => setState(() => _compactCharts = value),
+          ),
+          SwitchListTile(
+            secondary: Icon(isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded),
+            title: Text(isDark ? 'Dark Future Mode' : 'Light Mode'),
+            subtitle: Text(isDark ? 'Premium dark theme চালু' : 'Light theme চালু'),
+            value: isDark,
+            onChanged: (value) async {
+              await _setAppThemeMode(value ? ThemeMode.dark : ThemeMode.light);
+              if (sheetContext.mounted) Navigator.pop(sheetContext);
+            },
+          ),
+          ListTile(leading: Icon(Icons.palette_outlined, color: _appAccentColor.value), title: const Text('Theme Color'), subtitle: const Text('Accent color পরিবর্তন করুন'), onTap: () { Navigator.pop(sheetContext); _showAccentColorPicker(context); }),
+          ListTile(leading: const Icon(Icons.refresh_rounded), title: const Text('ডেটা রিফ্রেশ'), onTap: () { Navigator.pop(sheetContext); _load(); }),
+          ListTile(leading: const Icon(Icons.dns_outlined), title: const Text('Server Settings'), onTap: () { Navigator.pop(sheetContext); Navigator.of(context).push(_route(const ServerSettingsScreen())); }),
+          ListTile(leading: const Icon(Icons.logout_rounded), title: const Text('লগআউট'), onTap: () async { Navigator.pop(sheetContext); await _AuthApi.clearSession(); if (context.mounted) Navigator.of(context).pushAndRemoveUntil(_route(const LoginScreen()), (route) => false); }),
+        ]),
+      ),
+    );
+  }
+}
+
+
+
+class _DonutSummaryPainter extends CustomPainter {
+  final List<double> values;
+  final List<Color> colors;
+  const _DonutSummaryPainter({required this.values, required this.colors});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.width <= 0 || size.height <= 0) return;
+    final side = size.width < size.height ? size.width : size.height;
+    final stroke = side * .14;
+    final rect = Rect.fromCenter(center: Offset(size.width / 2, size.height / 2), width: side - stroke, height: side - stroke);
+    final base = Paint()..color = const Color(0xFF8A9B9A).withValues(alpha: .12)..style = PaintingStyle.stroke..strokeWidth = stroke;
+    canvas.drawCircle(rect.center, rect.width / 2, base);
+    final total = values.fold<double>(0, (sum, value) => sum + value);
+    if (total <= 0) return;
+    var start = -1.57079632679;
+    for (var i = 0; i < values.length; i++) {
+      final sweep = values[i] / total * 6.28318530718;
+      final paint = Paint()
+        ..shader = SweepGradient(
+          startAngle: start,
+          endAngle: start + sweep,
+          colors: [colors[i].withValues(alpha: .72), colors[i], colors[i].withValues(alpha: .9)],
+        ).createShader(rect)
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.butt
+        ..strokeWidth = stroke;
+      canvas.drawArc(rect, start, sweep, false, paint);
+      start += sweep;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DonutSummaryPainter oldDelegate) =>
+      oldDelegate.values != values || oldDelegate.colors != colors;
+}
+
+class _IncomeExpenseChartPainter extends CustomPainter {
+  final List<double> income;
+  final List<double> expense;
+  final double maxValue;
+  final bool isDark;
+
+  const _IncomeExpenseChartPainter({
+    required this.income,
+    required this.expense,
+    required this.maxValue,
+    required this.isDark,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.width <= 0 || size.height <= 0) return;
+    final plot = Rect.fromLTWH(0, 4, size.width, size.height - 8);
+    final gridPaint = Paint()
+      ..color = (isDark ? const Color(0xFF1A5360) : const Color(0xFFDDEFE9)).withValues(alpha: .75)
+      ..strokeWidth = .7;
+    for (var i = 0; i <= 4; i++) {
+      final y = plot.top + plot.height * i / 4;
+      canvas.drawLine(Offset(plot.left, y), Offset(plot.right, y), gridPaint);
+    }
+    for (var i = 0; i <= 5; i++) {
+      final x = plot.left + plot.width * i / 5;
+      canvas.drawLine(Offset(x, plot.top), Offset(x, plot.bottom), gridPaint);
+    }
+    if (income.isEmpty || expense.isEmpty) return;
+    final incomePath = _makePath(income, plot, maxValue);
+    final expensePath = _makePath(expense, plot, maxValue);
+    final incomeFill = Path.from(incomePath)
+      ..lineTo(plot.right, plot.bottom)
+      ..lineTo(plot.left, plot.bottom)
+      ..close();
+    final expenseFill = Path.from(expensePath)
+      ..lineTo(plot.right, plot.bottom)
+      ..lineTo(plot.left, plot.bottom)
+      ..close();
+    final incomePaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          const Color(0xFF00D99A).withValues(alpha: .42),
+          const Color(0xFF00D99A).withValues(alpha: .035),
+        ],
+      ).createShader(plot);
+    final expensePaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          const Color(0xFFFF6262).withValues(alpha: .36),
+          const Color(0xFFFF6262).withValues(alpha: .025),
+        ],
+      ).createShader(plot);
+    canvas.drawPath(incomeFill, incomePaint);
+    canvas.drawPath(expenseFill, expensePaint);
+    canvas.drawPath(incomePath, Paint()
+      ..color = const Color(0xFF00D99A)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.7
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round);
+    canvas.drawPath(expensePath, Paint()
+      ..color = const Color(0xFFFF6262)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.7
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round);
+    if (income.any((value) => value > 0)) {
+      final peakIndex = income.indexOf(income.reduce((a, b) => a > b ? a : b));
+      final point = _pointAt(income, peakIndex, plot, maxValue);
+      canvas.drawCircle(point, 3, Paint()..color = const Color(0xFF00D99A));
+      canvas.drawCircle(point, 5, Paint()..color = const Color(0xFF00D99A).withValues(alpha: .18));
+    }
+    if (expense.any((value) => value > 0)) {
+      final peakIndex = expense.indexOf(expense.reduce((a, b) => a > b ? a : b));
+      final point = _pointAt(expense, peakIndex, plot, maxValue);
+      canvas.drawCircle(point, 2.5, Paint()..color = const Color(0xFFFF6262));
+    }
+  }
+
+  Path _makePath(List<double> values, Rect plot, double max) {
+    final path = Path();
+    if (values.isEmpty) return path;
+    for (var i = 0; i < values.length; i++) {
+      final point = _pointAt(values, i, plot, max);
+      if (i == 0) {
+        path.moveTo(point.dx, point.dy);
+      } else {
+        final previous = _pointAt(values, i - 1, plot, max);
+        final midX = (previous.dx + point.dx) / 2;
+        path.cubicTo(midX, previous.dy, midX, point.dy, point.dx, point.dy);
+      }
+    }
+    return path;
+  }
+
+  Offset _pointAt(List<double> values, int index, Rect plot, double max) {
+    final x = values.length <= 1 ? plot.left : plot.left + plot.width * index / (values.length - 1);
+    final y = plot.bottom - (values[index] / max).clamp(0.0, 1.0) * plot.height;
+    return Offset(x, y);
+  }
+
+  @override
+  bool shouldRepaint(covariant _IncomeExpenseChartPainter oldDelegate) =>
+      oldDelegate.income != income ||
+      oldDelegate.expense != expense ||
+      oldDelegate.maxValue != maxValue ||
+      oldDelegate.isDark != isDark;
+}
+
+class _BalanceNeonChartPainter extends CustomPainter {
+  const _BalanceNeonChartPainter({required this.isDark});
+
+  final bool isDark;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Wave follows the marked path: start low on the left, rise gradually
+    // to a modest peak, descend to a shallow valley, then lift slightly.
+    final path = Path()
+      ..moveTo(0, size.height * .96)
+      ..cubicTo(size.width * .14, size.height * .96, size.width * .23, size.height * .92, size.width * .34, size.height * .82)
+      ..cubicTo(size.width * .44, size.height * .71, size.width * .52, size.height * .48, size.width * .60, size.height * .46)
+      ..cubicTo(size.width * .68, size.height * .44, size.width * .74, size.height * .70, size.width * .82, size.height * .78)
+      ..cubicTo(size.width * .90, size.height * .85, size.width * .95, size.height * .72, size.width, size.height * .65);
+
+    final fillPath = Path.from(path)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(
+      fillPath,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: isDark
+              ? const [Color(0x3033FFD0), Color(0x0010AFC7)]
+              : const [Color(0x4533D9A0), Color(0x00FFFFFF)],
+        ).createShader(Offset.zero & size),
+    );
+
+    final secondary = Path()
+      ..moveTo(0, size.height * .99)
+      ..cubicTo(size.width * .18, size.height * .99, size.width * .28, size.height * .95, size.width * .39, size.height * .88)
+      ..cubicTo(size.width * .49, size.height * .80, size.width * .56, size.height * .57, size.width * .63, size.height * .56)
+      ..cubicTo(size.width * .72, size.height * .54, size.width * .78, size.height * .77, size.width * .85, size.height * .84)
+      ..cubicTo(size.width * .92, size.height * .89, size.width * .97, size.height * .80, size.width, size.height * .74);
+    canvas.drawPath(
+      secondary,
+      Paint()
+        ..color = (isDark ? const Color(0xFF3BADEB) : const Color(0xFF13C58B)).withValues(alpha: isDark ? .16 : .08)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 6
+        ..strokeCap = StrokeCap.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = (isDark ? const Color(0xFF4ABEFF) : const Color(0xFF00B981)).withValues(alpha: isDark ? .60 : .28)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = isDark ? const Color(0xFF9AD9FF) : const Color(0xFF00B981)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.6
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
+
+    // Bars begin at the marked lower baseline and rise only to the marked heights.
+    // Tall, clearly visible vertical bars across the marked lower-right area.
+    const bars = [12.0, 18.0, 27.0, 39.0, 31.0, 46.0, 34.0, 55.0, 40.0, 49.0, 35.0, 44.0, 24.0, 36.0, 29.0, 47.0, 33.0, 42.0, 28.0, 38.0];
+    const barWidth = 7.0;
+    const gap = 3.0;
+    final totalWidth = bars.length * barWidth + (bars.length - 1) * gap;
+    // Keep the expanded group left-shifted while adding six bars on its right.
+    final startX = size.width - totalWidth - 20.0;
+    for (var i = 0; i < bars.length; i++) {
+      final barHeight = bars[i];
+      final rect = RRect.fromRectAndRadius(
+        Rect.fromLTWH(startX + i * (barWidth + gap), size.height - barHeight, barWidth, barHeight),
+        const Radius.circular(3),
+      );
+      canvas.drawRRect(
+        rect,
+        Paint()..color = (isDark ? const Color(0xFF4ABEFF) : const Color(0xFF16B981)).withValues(alpha: isDark ? .38 : .30),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _BalanceNeonChartPainter oldDelegate) => true;
+}
+
+class InviteVerificationScreen extends StatefulWidget {
+  const InviteVerificationScreen({super.key});
+
+  @override
+  State<InviteVerificationScreen> createState() => _InviteVerificationScreenState();
+}
+
+class _InviteVerificationScreenState extends State<InviteVerificationScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _invite = TextEditingController();
+  bool _verifying = false;
+
+  @override
+  void dispose() {
+    _invite.dispose();
+    super.dispose();
+  }
+
+  Future<void> _verify() async {
+    FocusScope.of(context).unfocus();
+    if (_verifying || !(_formKey.currentState?.validate() ?? false)) return;
+    setState(() => _verifying = true);
+    try {
+      await _AuthApi.checkConfiguredServer();
+      await _AuthApi.verifyInvite(_invite.text);
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        _route(SignupScreen(verifiedInvite: _invite.text.trim())),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      _notice(context, error.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _verifying = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        body: Stack(children: [
+          Positioned.fill(child: Image.asset('assets/animations/Minimal Mint Leaf Wave Background.png', fit: BoxFit.cover)),
+          SafeArea(child: Column(children: [
+            const SizedBox(height: 32),
+            Transform.translate(offset: const Offset(-24, 10), child: SizedBox(width: 320, height: 165, child: ClipRect(child: Align(alignment: Alignment.topCenter, heightFactor: .30, child: Image.asset('assets/animations/logo.png', width: 320, fit: BoxFit.contain))))),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 2, 16, 0),
+              child: Row(children: [
+                IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back_rounded, color: _ink)),
+                const Spacer(),
+              ]),
+            ),
+            Expanded(child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(22, 12, 22, 22),
+              child: Center(child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 430),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: .95), borderRadius: BorderRadius.circular(30), border: Border.all(color: Colors.white, width: 1.5), boxShadow: [BoxShadow(color: const Color(0xFF244A88).withValues(alpha: .07), blurRadius: 30, offset: const Offset(0, 12))]),
+                  child: Form(key: _formKey, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                    const Icon(Icons.verified_user_outlined, size: 42, color: _blue),
+                    const SizedBox(height: 12),
+                    const Text('ইনভাইট কোড যাচাই', textAlign: TextAlign.center, style: TextStyle(fontSize: 23, fontWeight: FontWeight.w900, color: _ink)),
+                    const SizedBox(height: 8),
+                    const Text('আপনার পাওয়া ইনভাইট কোডটি লিখে যাচাই করুন। কোড সঠিক হলে পরের ধাপে অ্যাকাউন্ট তৈরি করতে পারবেন।', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, height: 1.6, color: _muted)),
+                    const SizedBox(height: 22),
+                    TextFormField(
+                      controller: _invite,
+                      textCapitalization: TextCapitalization.characters,
+                      decoration: const InputDecoration(prefixIcon: Icon(Icons.groups_2_outlined), hintText: 'ইনভাইট কোড লিখুন'),
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'ইনভাইট কোড দিন।' : null,
+                    ),
+                    const SizedBox(height: 18),
+                    _PrimaryButton(label: _verifying ? 'যাচাই হচ্ছে...' : 'Verify করুন', onPressed: _verifying ? null : _verify),
+                  ])),
+                ),
+              )),
+            )),
+          ])),
+        ]),
+      );
+}
+
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key, this.verifiedInvite = ''});
+  final String verifiedInvite;
+  @override
+  State<SignupScreen> createState() => _SignupScreenState();
+}
+
+class _SignupScreenState extends State<SignupScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _name = TextEditingController();
+  final _email = TextEditingController();
+  final _mobile = TextEditingController();
+  final _password = TextEditingController();
+  final _confirm = TextEditingController();
+  final _invite = TextEditingController();
+  int _step = 0;
+  bool _showPassword = false;
+  bool _showConfirm = false;
+  bool _acceptedTerms = false;
+  bool _submitting = false;
+  bool _marketing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _invite.text = widget.verifiedInvite;
+  }
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _email.dispose();
+    _mobile.dispose();
+    _password.dispose();
+    _confirm.dispose();
+    _invite.dispose();
+    super.dispose();
+  }
+
+  void _nextStep() {
+    FocusScope.of(context).unfocus();
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    setState(() => _step = 1);
+  }
+
+  void _previousStep() {
+    FocusScope.of(context).unfocus();
+    setState(() => _step = 0);
+  }
+
+  Future<void> _submit() async {
+    FocusScope.of(context).unfocus();
+    if (_submitting || !(_formKey.currentState?.validate() ?? false)) return;
+    if (!_acceptedTerms) {
+      _notice(context, 'চালিয়ে যেতে শর্তাবলি ও গোপনীয়তা নীতি গ্রহণ করুন।');
+      return;
+    }
+    setState(() => _submitting = true);
+    try {
+      await _AuthApi.register(
+        invite: _invite.text,
+        name: _name.text,
+        email: _email.text,
+        mobile: _mobile.text,
+        password: _password.text,
+      );
+      if (!mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('সাইন আপ সফল'),
+          content: const Text('অ্যাকাউন্ট তৈরি হয়েছে। এখন লগইন করতে পারবেন।'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('ঠিক আছে'),
+            ),
+          ],
+        ),
+      );
+      if (mounted) Navigator.of(context).pop();
+    } catch (error) {
+      if (!mounted) return;
+      _notice(context, error.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
+  }
+
+  Widget _buildAccountFields() => Column(children: [
+        TextFormField(
+          controller: _invite,
+          readOnly: widget.verifiedInvite.isNotEmpty,
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.groups_2_outlined),
+            hintText: 'ইনভাইট কোড',
+            suffixIcon: widget.verifiedInvite.isNotEmpty
+                ? const Icon(Icons.verified_rounded, color: _blue)
+                : null,
+          ),
+          validator: (v) =>
+              (v == null || v.trim().isEmpty) ? 'ইনভাইট কোড দিন।' : null,
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _name,
+          textCapitalization: TextCapitalization.words,
+          decoration: const InputDecoration(
+            prefixIcon: Icon(Icons.person_outline_rounded),
+            hintText: 'আপনার নাম লিখুন',
+          ),
+          validator: (v) =>
+              (v == null || v.trim().length < 2) ? 'সঠিক নাম লিখুন।' : null,
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _email,
+          keyboardType: TextInputType.emailAddress,
+          decoration: const InputDecoration(
+            prefixIcon: Icon(Icons.mail_outline_rounded),
+            hintText: 'ইমেইল লিখুন',
+          ),
+          validator: (v) {
+            final s = (v ?? '').trim();
+            return s.contains('@') && s.contains('.')
+                ? null
+                : 'সঠিক ইমেইল লিখুন।';
+          },
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _mobile,
+          keyboardType: TextInputType.phone,
+          decoration: const InputDecoration(
+            prefixIcon: Icon(Icons.phone_iphone_rounded),
+            hintText: 'মোবাইল নম্বর লিখুন',
+          ),
+          validator: (v) =>
+              (v ?? '').replaceAll(RegExp(r'\D'), '').length >= 10
+                  ? null
+                  : 'সঠিক মোবাইল নম্বর লিখুন।',
+        ),
+      ]);
+
+  Widget _buildSecurityFields() => Column(children: [
+        TextFormField(
+          controller: _password,
+          obscureText: !_showPassword,
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.lock_outline_rounded),
+            hintText: 'পাসওয়ার্ড লিখুন',
+            suffixIcon: IconButton(
+              onPressed: () =>
+                  setState(() => _showPassword = !_showPassword),
+              icon: Icon(_showPassword
+                  ? Icons.visibility_off_rounded
+                  : Icons.visibility_rounded),
+            ),
+          ),
+          validator: (v) => (v ?? '').length >= 8
+              ? null
+              : 'পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে।',
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _confirm,
+          obscureText: !_showConfirm,
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.lock_outline_rounded),
+            hintText: 'পাসওয়ার্ড আবার লিখুন',
+            suffixIcon: IconButton(
+              onPressed: () => setState(() => _showConfirm = !_showConfirm),
+              icon: Icon(_showConfirm
+                  ? Icons.visibility_off_rounded
+                  : Icons.visibility_rounded),
+            ),
+          ),
+          validator: (v) =>
+              v == _password.text ? null : 'পাসওয়ার্ড দুটি মিলছে না।',
+        ),
+        const SizedBox(height: 12),
+        CheckboxListTile(
+          value: _acceptedTerms,
+          onChanged: (v) => setState(() => _acceptedTerms = v ?? false),
+          contentPadding: EdgeInsets.zero,
+          controlAffinity: ListTileControlAffinity.leading,
+          dense: true,
+          title: const Text(
+            'আমি শর্তাবলি এবং গোপনীয়তা নীতি পড়েছি এবং সম্মত আছি',
+            style: TextStyle(fontSize: 11.5, color: _ink, height: 1.4),
+          ),
+        ),
+        CheckboxListTile(
+          value: _marketing,
+          onChanged: (v) => setState(() => _marketing = v ?? false),
+          contentPadding: EdgeInsets.zero,
+          controlAffinity: ListTileControlAffinity.leading,
+          dense: true,
+          title: const Text(
+            'আমাকে আপডেট ও গুরুত্বপূর্ণ তথ্য জানাবেন',
+            style: TextStyle(fontSize: 11.5, color: _muted),
+          ),
+        ),
+      ]);
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        body: Stack(children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/animations/Minimal Mint Leaf Wave Background.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          SafeArea(
+            child: Column(children: [
+              const SizedBox(height: 32),
+              Transform.translate(
+                offset: const Offset(-24, 10),
+                child: SizedBox(
+                  width: 320,
+                  height: 165,
+                  child: ClipRect(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      heightFactor: .30,
+                      child: Image.asset(
+                        'assets/animations/logo.png',
+                        width: 320,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 2, 16, 0),
+                child: Row(children: [
+                  IconButton(
+                    onPressed: _step == 1
+                        ? _previousStep
+                        : () => Navigator.of(context).maybePop(),
+                    icon: const Icon(Icons.arrow_back_rounded, color: _ink),
+                  ),
+                  const Spacer(),
+                  Text(
+                    'ধাপ ${_step + 1}/2',
+                    style: const TextStyle(
+                      color: _muted,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ]),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(22, 2, 22, 22),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 430),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            _step == 0
+                                ? 'অ্যাকাউন্ট তৈরি করুন'
+                                : 'অ্যাকাউন্ট সুরক্ষিত করুন',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF075B3A),
+                            ),
+                          ),
+                          const SizedBox(height: 7),
+                          Text(
+                            _step == 0
+                                ? 'ইনভাইট কোড ও আপনার তথ্য দিন'
+                                : 'পাসওয়ার্ড সেট করুন এবং সম্মতি দিন',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              height: 1.55,
+                              color: _muted,
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          Container(
+                            padding: const EdgeInsets.fromLTRB(16, 17, 16, 18),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: .95),
+                              borderRadius: BorderRadius.circular(28),
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 1.5,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF244A88)
+                                      .withValues(alpha: .06),
+                                  blurRadius: 26,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                children: [
+                                  if (_step == 0)
+                                    _buildAccountFields()
+                                  else
+                                    _buildSecurityFields(),
+                                  const SizedBox(height: 12),
+                                  _PrimaryButton(
+                                    label: _step == 0
+                                        ? 'পরবর্তী ধাপ'
+                                        : (_submitting
+                                            ? 'অ্যাকাউন্ট তৈরি হচ্ছে...'
+                                            : 'অ্যাকাউন্ট তৈরি করুন'),
+                                    onPressed: _submitting
+                                        ? null
+                                        : (_step == 0 ? _nextStep : _submit),
+                                  ),
+                                  const SizedBox(height: 14),
+                                  if (_step == 1)
+                                    TextButton.icon(
+                                      onPressed: _previousStep,
+                                      icon: const Icon(
+                                        Icons.arrow_back_rounded,
+                                        size: 17,
+                                      ),
+                                      label: const Text('আগের ধাপে ফিরে যান'),
+                                    ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Flexible(
+                                        child: Text(
+                                          'ইতিমধ্যে অ্যাকাউন্ট আছে? ',
+                                          style: TextStyle(
+                                            color: _muted,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () =>
+                                            Navigator.of(context).pop(),
+                                        child: const Text(
+                                          'লগইন করুন',
+                                          style: TextStyle(
+                                            color: _blue,
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ]),
+          ),
+        ]),
+      );
+}
+
+class LoadingScreen extends StatefulWidget {
+  const LoadingScreen({super.key, this.isSignup = false});
+  final bool isSignup;
+  @override
+  State<LoadingScreen> createState() => _LoadingScreenState();
+}
+
+class _LoadingScreenState extends State<LoadingScreen> {
+  int _step = 0;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(milliseconds: 850), (timer) {
+      if (!mounted) return;
+      if (_step < 3) {
+        setState(() => _step++);
+      } else {
+        timer.cancel();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        body: Stack(children: [
+          const _CloudBackground(),
+          SafeArea(child: Column(children: [
+            const Spacer(flex: 2),
+            const _BrandMark(size: 76),
+            const SizedBox(height: 15),
+            const Text('আমার হিসাব', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: _ink)),
+            const SizedBox(height: 6),
+            const Text('তথ্য প্রস্তুত করা হচ্ছে...', style: TextStyle(color: _muted, fontSize: 14)),
+            const SizedBox(height: 28),
+            SizedBox(width: 86, height: 86, child: CircularProgressIndicator(
+              strokeWidth: 7,
+              backgroundColor: const Color(0xFFD9E4FF),
+              valueColor: const AlwaysStoppedAnimation(_blue),
+            )),
+            const Spacer(),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.fromLTRB(24, 22, 24, 22),
+              decoration: BoxDecoration(color: Colors.white.withValues(alpha: .86), borderRadius: BorderRadius.circular(28), border: Border.all(color: Colors.white, width: 1.5)),
+              child: Column(children: [
+                _LoadingStep(label: widget.isSignup ? 'অ্যাকাউন্ট যাচাই করা হচ্ছে' : 'অ্যাকাউন্ট যাচাই করা হচ্ছে', done: _step >= 1),
+                const SizedBox(height: 18),
+                _LoadingStep(label: 'আপনার তথ্য লোড করা হচ্ছে', done: _step >= 2),
+                const SizedBox(height: 18),
+                _LoadingStep(label: 'ড্যাশবোর্ড প্রস্তুত করা হচ্ছে', done: _step >= 3),
+                const SizedBox(height: 18),
+                Row(children: [
+                  SizedBox(width: 21, height: 21, child: _step >= 3 ? const Icon(Icons.info_outline_rounded, color: _blue, size: 20) : const CircularProgressIndicator(strokeWidth: 2.5)),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(_step >= 3 ? 'API সংযুক্ত না থাকায় Login/Signup এখনো সম্পন্ন করা যায়নি।' : 'প্রস্তুত হচ্ছে...', style: const TextStyle(fontSize: 13, color: _muted))),
+                ]),
+                if (_step >= 3) ...[
+                  const SizedBox(height: 16),
+                  _PrimaryButton(label: 'লগইন স্ক্রিনে ফিরুন', onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst)),
+                ],
+              ]),
+            ),
+            const Spacer(flex: 2),
+          ])),
+        ]),
+      );
+}
+
+class _LoadingStep extends StatelessWidget {
+  const _LoadingStep({required this.label, required this.done});
+  final String label;
+  final bool done;
+  @override
+  Widget build(BuildContext context) => Row(children: [
+        Container(
+          width: 24, height: 24,
+          decoration: BoxDecoration(color: done ? _blue : const Color(0xFFE8EEFA), shape: BoxShape.circle),
+          child: Icon(done ? Icons.check_rounded : Icons.circle_outlined, size: done ? 17 : 13, color: done ? Colors.white : const Color(0xFF98A6BE)),
+        ),
+        const SizedBox(width: 12),
+        Expanded(child: Text(label, style: const TextStyle(fontSize: 13.5, color: _ink))),
+      ]);
+}
+
+class _PrimaryButton extends StatelessWidget {
+  const _PrimaryButton({required this.label, required this.onPressed});
+  final String label;
+  final VoidCallback? onPressed;
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        height: 52,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(colors: [_blue, _deepBlue]),
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: [BoxShadow(color: _blue.withValues(alpha: .18), blurRadius: 14, offset: const Offset(0, 6))],
+          ),
+          child: FilledButton(
+            onPressed: onPressed,
+            style: FilledButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18))),
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text(label, style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w800)),
+              const SizedBox(width: 9),
+              const Icon(Icons.arrow_forward_rounded, size: 19),
+            ]),
+          ),
+        ),
+      );
+}
+
+class _OrDivider extends StatelessWidget {
+  const _OrDivider();
+  @override
+  Widget build(BuildContext context) => Row(children: [
+        const Expanded(child: Divider(color: _line)),
+        Padding(padding: const EdgeInsets.symmetric(horizontal: 14), child: Text('অথবা', style: TextStyle(color: _muted.withValues(alpha: .9), fontSize: 12))),
+        const Expanded(child: Divider(color: _line)),
+      ]);
+}
+
+void _notice(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), behavior: SnackBarBehavior.floating));
+}).hasMatch(hex)) {
+                _notice(context, 'সঠিক ৬ ডিজিটের HEX Color দিন।');
+                return;
+              }
+              await _setAppAccentColor(Color(int.parse('FF$hex', radix: 16)));
+              if (dialogContext.mounted) Navigator.pop(dialogContext);
+            },
+            child: const Text('Apply'),
+          ),
+        ],
+      ),
+    ).whenComplete(controller.dispose);
   }
 
   void _showDashboardMenu(BuildContext context) {

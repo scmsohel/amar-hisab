@@ -1753,15 +1753,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final prefix = isIncome ? '+' : isTransfer ? '↔' : '−';
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
-      padding: const EdgeInsets.fromLTRB(10, 7, 3, 7),
+      padding: const EdgeInsets.fromLTRB(8, 5, 2, 5),
       decoration: BoxDecoration(
         color: isDark ? Color.lerp(const Color(0xFF14283A), style.accent, .10) : style.tint,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(15),
         border: Border.all(color: style.accent.withValues(alpha: isDark ? .24 : .05)),
+
       ),
       child: InkWell(
         onTap: () => _showTransactionDetails(tx),
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(15),
         child: Row(children: [
         Container(width: 42, height: 42, decoration: BoxDecoration(color: style.accent.withValues(alpha: .08), borderRadius: BorderRadius.circular(14)), child: Icon(style.icon, color: style.accent, size: 23)),
         const SizedBox(width: 10),

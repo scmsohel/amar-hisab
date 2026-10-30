@@ -1280,7 +1280,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   gradient: const LinearGradient(
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
-                                    colors: [Color(0xFF6CCBFF), Color(0xFF087A5B)],
+                                    colors: [Color(0xFF8AD8FF), Color(0xFF287FCB)],
                                   ),
                                   border: Border.all(color: const Color(0xFFE7FFF7), width: 1.5),
                                   boxShadow: [

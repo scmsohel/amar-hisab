@@ -29,7 +29,6 @@ const _deepBlue = Color(0xFF006B3D);
 const _ink = Color(0xFF075B3A);
 const _muted = Color(0xFF687C78);
 const _line = Color(0xFFDDEBE5);
-const _pale = Color(0xFFF2F7FF);
 
 const String _themePreferenceKey = 'amar_hisab_theme_mode';
 final ValueNotifier<ThemeMode> _appThemeMode = ValueNotifier<ThemeMode>(ThemeMode.dark);
@@ -185,7 +184,7 @@ class _AuthApi {
       on FormatException { data = {'error': 'সার্ভার থেকে সঠিক উত্তর পাওয়া যায়নি।'}; }
     }
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception(data['error']?.toString() ?? 'অনুরোধ ব্যর্থ হয়েছে (' + response.statusCode.toString() + ')।');
+      throw Exception(data['error']?.toString() ?? 'অনুরোধ ব্যর্থ হয়েছে (${response.statusCode})।');
     }
     return data;
   }
@@ -2012,7 +2011,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final note = TextEditingController(text: (tx['note'] ?? '').toString());
     final transferTo = TextEditingController(text: (tx['transferTo'] ?? '').toString());
     final parsed = DateTime.tryParse((tx['dateInput'] ?? tx['date_input'] ?? '').toString()) ?? _parseTransactionDate(tx['date']) ?? DateTime.now();
-    final date = TextEditingController(text: parsed.year.toString().padLeft(4, '0') + '-' + parsed.month.toString().padLeft(2, '0') + '-' + parsed.day.toString().padLeft(2, '0'));
+    final date = TextEditingController(text: '${parsed.year.toString().padLeft(4, '0')}-${parsed.month.toString().padLeft(2, '0')}-${parsed.day.toString().padLeft(2, '0')}');
     var kind = (tx['kind'] ?? 'ব্যয়').toString();
     var saving = false;
     final key = GlobalKey<FormState>();
@@ -2023,7 +2022,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           content: SizedBox(width: 420, child: SingleChildScrollView(child: Form(key: key, child: Column(mainAxisSize: MainAxisSize.min, children: [
             TextFormField(controller: title, decoration: const InputDecoration(labelText: 'বিবরণ'), validator: (v) => v == null || v.trim().isEmpty ? 'বিবরণ লিখুন' : null),
             DropdownButtonFormField<String>(
-              value: ['আয়', 'ব্যয়', 'ট্রান্সফার'].contains(kind) ? kind : 'ব্যয়',
+              initialValue: ['আয়', 'ব্যয়', 'ট্রান্সফার'].contains(kind) ? kind : 'ব্যয়',
               decoration: const InputDecoration(labelText: 'ধরন'),
               items: const ['আয়', 'ব্যয়', 'ট্রান্সফার'].map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
               onChanged: saving ? null : (v) => setDialogState(() => kind = v ?? kind),
@@ -2034,7 +2033,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             if (kind == 'ট্রান্সফার') TextFormField(controller: transferTo, decoration: const InputDecoration(labelText: 'গন্তব্য ওয়ালেট')),
             TextFormField(controller: date, readOnly: true, decoration: const InputDecoration(labelText: 'তারিখ', suffixIcon: Icon(Icons.calendar_month)), onTap: () async {
               final picked = await showDatePicker(context: context, initialDate: DateTime.tryParse(date.text) ?? DateTime.now(), firstDate: DateTime(2000), lastDate: DateTime(2100));
-              if (picked != null) date.text = picked.year.toString().padLeft(4, '0') + '-' + picked.month.toString().padLeft(2, '0') + '-' + picked.day.toString().padLeft(2, '0');
+              if (!context.mounted) return;
+              if (picked != null) date.text = '${picked.year.toString().padLeft(4, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
             }),
             TextFormField(controller: note, decoration: const InputDecoration(labelText: 'নোট (ঐচ্ছিক)')),
           ])))),
@@ -2082,7 +2082,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final label = (tx['title'] ?? tx['description'] ?? 'এই লেনদেন').toString();
     final ok = await showDialog<bool>(context: context, builder: (dialogContext) => AlertDialog(
       title: const Text('লেনদেন ডিলিট করবেন?'),
-      content: Text('"' + label + '" লেনদেনটি স্থায়ীভাবে মুছে যাবে।'),
+      content: Text('"$label" লেনদেনটি স্থায়ীভাবে মুছে যাবে।'),
       actions: [
         TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('বাতিল')),
         FilledButton(style: FilledButton.styleFrom(backgroundColor: const Color(0xFFE53935)), onPressed: () => Navigator.pop(dialogContext, true), child: const Text('ডিলিট করুন')),
@@ -2429,7 +2429,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _incomeExpenseDonuts() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2630,7 +2629,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 1),
           Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFE8FFF7) : const Color(0xFF155A45), fontSize: 12, fontWeight: FontWeight.w700)),
           const SizedBox(height: 1),
-          FittedBox(fit: BoxFit.scaleDown, child: Text(_hidden ? '৳ •••••' : '৳ ' + formattedBalance, maxLines: 1, style: TextStyle(color: isDark ? Colors.white : const Color(0xFF073F32), fontSize: 13, fontWeight: FontWeight.w900))),
+          FittedBox(fit: BoxFit.scaleDown, child: Text(_hidden ? '৳ •••••' : '৳ $formattedBalance', maxLines: 1, style: TextStyle(color: isDark ? Colors.white : const Color(0xFF073F32), fontSize: 13, fontWeight: FontWeight.w900))),
         ],
       ),
     );
@@ -2671,28 +2670,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
 }
 
 
-
-class _MetricCardWavePainter extends CustomPainter {
-  final Color color;
-  final double opacity;
-
-  const _MetricCardWavePainter({required this.color, required this.opacity});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final path = Path()
-      ..moveTo(size.width * .48, size.height)
-      ..cubicTo(size.width * .62, size.height * .88, size.width * .66, size.height * .78, size.width * .78, size.height * .70)
-      ..cubicTo(size.width * .88, size.height * .62, size.width * .91, size.height * .48, size.width, size.height * .43)
-      ..lineTo(size.width, size.height)
-      ..close();
-    canvas.drawPath(path, Paint()..color = color.withValues(alpha: opacity));
-  }
-
-  @override
-  bool shouldRepaint(covariant _MetricCardWavePainter oldDelegate) =>
-      oldDelegate.color != color || oldDelegate.opacity != opacity;
-}
 
 class _DonutSummaryPainter extends CustomPainter {
   final List<double> values;

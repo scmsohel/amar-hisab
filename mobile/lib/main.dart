@@ -1525,9 +1525,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final date = items.isEmpty
         ? null
         : _parseTransactionDate(items.first['dateInput'] ?? items.first['date_input'] ?? items.first['date'] ?? items.first['createdAt'] ?? items.first['created_at']);
+    const months = <String>[
+      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
+      'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর',
+    ];
     final dateLabel = date == null
         ? 'তারিখ পাওয়া যায়নি'
-        : '${_bengaliDigits(date.day.toString().padLeft(2, '0'))}/${_bengaliDigits(date.month.toString().padLeft(2, '0'))}/${_bengaliDigits(date.year.toString())}';
+        : '${_bengaliDigits(date.day.toString())} ${months[date.month - 1]}, ${_bengaliDigits(date.year.toString())}';
     final income = items.where((tx) => tx['kind'] == 'আয়')
         .fold<double>(0, (sum, tx) => sum + _amount(tx['amount']));
     final expense = items.where((tx) => tx['kind'] == 'ব্যয়')
@@ -1539,34 +1543,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
       padding: const EdgeInsets.fromLTRB(1, 12, 2, 8),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final compact = constraints.maxWidth < 350;
+          final compact = constraints.maxWidth < 370;
           final dateFont = compact ? 10.0 : 11.0;
           final infoFont = compact ? 8.5 : 9.5;
           final amountFont = compact ? 9.0 : 10.0;
 
           return Row(
             children: [
-              Flexible(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        dateLabel,
-                        maxLines: 1,
-                        softWrap: false,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: dateColor, fontSize: dateFont, fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      '${_bengaliDigits(items.length.toString())}টি',
-                      maxLines: 1,
-                      style: TextStyle(color: muted, fontSize: infoFont),
-                    ),
-                  ],
-                ),
+              Text(
+                dateLabel,
+                maxLines: 1,
+                softWrap: false,
+                style: TextStyle(color: dateColor, fontSize: dateFont, fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(width: 5),
+              Text(
+                '${_bengaliDigits(items.length.toString())}টি',
+                maxLines: 1,
+                style: TextStyle(color: muted, fontSize: infoFont),
               ),
               const SizedBox(width: 7),
               Expanded(
@@ -1576,17 +1570,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               const SizedBox(width: 7),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('আয়: ', style: TextStyle(color: muted, fontSize: infoFont)),
-                  Text(_bengaliDigits(_money(income)), maxLines: 1,
-                    style: TextStyle(color: const Color(0xFF00A653), fontSize: amountFont, fontWeight: FontWeight.w900)),
-                  const SizedBox(width: 5),
-                  Text('ব্যয়: ', style: TextStyle(color: muted, fontSize: infoFont)),
-                  Text(_bengaliDigits(_money(expense)), maxLines: 1,
-                    style: TextStyle(color: const Color(0xFFE92743), fontSize: amountFont, fontWeight: FontWeight.w900)),
-                ],
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerRight,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('আয়: ', style: TextStyle(color: muted, fontSize: infoFont)),
+                    Text(_bengaliDigits(_money(income)),
+                      style: TextStyle(color: const Color(0xFF00A653), fontSize: amountFont, fontWeight: FontWeight.w900)),
+                    const SizedBox(width: 5),
+                    Text('ব্যয়: ', style: TextStyle(color: muted, fontSize: infoFont)),
+                    Text(_bengaliDigits(_money(expense)),
+                      style: TextStyle(color: const Color(0xFFE92743), fontSize: amountFont, fontWeight: FontWeight.w900)),
+                  ],
+                ),
               ),
             ],
           );

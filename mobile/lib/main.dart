@@ -1522,7 +1522,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       return ClipRRect(
         borderRadius: BorderRadius.circular(15),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 9),
           decoration: BoxDecoration(
             color: accent.withValues(alpha: isDark ? .10 : .075),
             borderRadius: BorderRadius.circular(15),
@@ -1540,8 +1539,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
-              Row(
-                children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 9),
+                child: Row(
+                  children: [
               Container(
                 width: 27, height: 27,
                 decoration: BoxDecoration(color: accent.withValues(alpha: .16), shape: BoxShape.circle),
@@ -1579,7 +1580,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ],
                 ),
               ),
-                ],
+                  ],
+                ),
               ),
             ],
           ),

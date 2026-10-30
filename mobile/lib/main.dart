@@ -1463,6 +1463,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final nextMonth = DateTime(now.year, now.month + 1);
     var monthIncome = 0.0;
     var monthExpense = 0.0;
+    var previousMonthIncome = 0.0;
+    var previousMonthExpense = 0.0;
+    final previousMonthStart = DateTime(now.year, now.month - 1);
     for (final tx in _transactions) {
       final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
       if (date == null || date.isBefore(monthStart) || !date.isBefore(nextMonth)) continue;
@@ -1470,6 +1473,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (tx['kind'] == 'আয়') monthIncome += amount;
       if (tx['kind'] == 'ব্যয়') monthExpense += amount;
     }
+    for (final tx in _transactions) {
+      final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
+      if (date == null || date.isBefore(previousMonthStart) || !date.isBefore(monthStart)) continue;
+      final amount = _amount(tx['amount']);
+      if (tx['kind'] == 'আয়') previousMonthIncome += amount;
+      if (tx['kind'] == 'ব্যয়') previousMonthExpense += amount;
+    }
+    double? changePercent(double current, double previous) =>
+        previous == 0 ? null : ((current - previous) / previous.abs()) * 100;
+    final incomeChange = changePercent(monthIncome, previousMonthIncome);
+    final expenseChange = changePercent(monthExpense, previousMonthExpense);
 
     final selectedMonth = DateTime(now.year, now.month - _expenseDonutMonthOffset);
     final selectedNextMonth = DateTime(selectedMonth.year, selectedMonth.month + 1);
@@ -1503,7 +1517,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final textColor = isDark ? const Color(0xFFDDFBF1) : const Color(0xFF164F40);
     final mutedColor = isDark ? const Color(0xFF9ABBB4) : const Color(0xFF64877C);
 
-    Widget metricCard({required String title, required double amount, required bool income}) {
+    Widget metricCard({required String title, required double amount, required bool income, required double? change}) {
       final accent = income ? const Color(0xFF00B982) : const Color(0xFFFF625B);
       return Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 9),
@@ -1530,6 +1544,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       fit: BoxFit.scaleDown,
                       alignment: Alignment.centerLeft,
                       child: Text(_hidden ? '৳ •••••' : _money(amount), style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w900)),
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(change == null ? Icons.remove_rounded : change >= 0 ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                          size: 12, color: accent),
+                        const SizedBox(width: 2),
+                        Flexible(
+                          child: Text(
+                            change == null ? 'নতুন' : '${change >= 0 ? '+' : '-'}${change.abs().toStringAsFixed(1)}%',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(color: accent, fontSize: 10, fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -1647,9 +1678,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           flex: 4,
           child: Column(
             children: [
-              metricCard(title: 'এই মাসের আয়', amount: monthIncome, income: true),
+              metricCard(title: 'এই মাসের আয়', amount: monthIncome, income: true, change: incomeChange),
               const SizedBox(height: 8),
-              metricCard(title: 'এই মাসের ব্যয়', amount: monthExpense, income: false),
+              metricCard(title: 'এই মাসের ব্যয়', amount: monthExpense, income: false, change: expenseChange),
             ],
           ),
         ),

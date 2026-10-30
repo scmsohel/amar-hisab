@@ -1589,28 +1589,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
     }
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(
-          flex: 4,
-          child: Column(
-            children: [
-              Expanded(child: metricCard(title: 'এই মাসের আয়', amount: monthIncome, income: true, change: incomeChange)),
-              const SizedBox(height: 8),
-              Expanded(child: metricCard(title: 'এই মাসের ব্যয়', amount: monthExpense, income: false, change: expenseChange)),
-            ],
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            flex: 4,
+            child: Column(
+              children: [
+                Expanded(child: metricCard(title: 'এই মাসের আয়', amount: monthIncome, income: true, change: incomeChange)),
+                const SizedBox(height: 8),
+                Expanded(child: metricCard(title: 'এই মাসের ব্যয়', amount: monthExpense, income: false, change: expenseChange)),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          flex: 7,
-          child: _donutSummaryCard(
-            isIncome: false,
-            monthOffset: _expenseDonutMonthOffset,
+          const SizedBox(width: 8),
+          Expanded(
+            flex: 7,
+            child: _donutSummaryCard(
+              isIncome: false,
+              monthOffset: _expenseDonutMonthOffset,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

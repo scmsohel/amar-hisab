@@ -326,7 +326,7 @@ if(active==="ওয়ালেট"){const wallets=[{name:"ক্যাশ",base
    <div className="feature-heading"><div><h2>বিল</h2><p>আপনার নিয়মিত বিলের হিসাব রাখুন সহজ ও গোছানো।</p></div><button className="btn primary" onClick={()=>{reset();setShowForm(true)}}><Plus size={16}/> নতুন বিল</button></div>
    <div className="debt-metrics bill-debt-metrics">
     <article className="debt-metric debt-metric-in"><span className="debt-metric-icon"><ReceiptText size={26}/></span><div><small>মোট বিল</small><strong>{money(items.reduce((n,x)=>n+x.amount,0))}</strong><p>{items.length.toLocaleString("bn-BD")}টি বিল</p></div></article>
-    <article className="debt-metric debt-metric-out"><span className="debt-metric-icon"><Clock size={26}/></span><div><small>বকেয়া বিল</small><strong>{money(unpaidBills.reduce((n,x)=>n+x.amount,0))}</strong><p>{unpaidBills.length.toLocaleString("bn-BD")}টি পরিশোধ বাকি</p></div></article>
+    <article className="debt-metric debt-metric-out"><span className="debt-metric-icon"><Clock size={26}/></span><div><small>বকেয়া বিল</small><strong>{money(unpaidBills.reduce((n,x)=>n+Math.max(0,x.amount-billPaidAmount(x)),0))}</strong><p>{unpaidBills.length.toLocaleString("bn-BD")}টি পরিশোধ বাকি</p></div></article>
     <article className="debt-metric debt-metric-people"><span className="debt-metric-icon"><Check size={26}/></span><div><small>পরিশোধিত বিল</small><strong>{money(paidBills.reduce((n,x)=>n+x.amount,0))}</strong><p>{paidBills.length.toLocaleString("bn-BD")}টি সম্পন্ন</p></div></article>
     <article className="debt-metric debt-metric-due"><span className="debt-metric-icon"><CalendarDays size={26}/></span><div><small>আসন্ন বিল</small><strong>{upcomingBills.length.toLocaleString("bn-BD")}</strong><p>আগামী ৭ দিনের মধ্যে</p></div></article>
    </div>

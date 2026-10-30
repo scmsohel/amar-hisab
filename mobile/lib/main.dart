@@ -1589,119 +1589,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       );
     }
 
-    final monthLabel = _expenseDonutMonthOffset == 0 ? 'এই মাস' : _expenseDonutMonthOffset == 1 ? 'গত মাস' : '$_expenseDonutMonthOffset মাস আগে';
-
-    final expenseCard = Container(
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
-      decoration: BoxDecoration(
-        color: cardColor,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: borderColor),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(child: Text('খরচের বিভাগ', style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w800))),
-              PopupMenuButton<int>(
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 100, maxWidth: 120),
-                tooltip: 'মাস নির্বাচন করুন',
-                onSelected: (value) => setState(() => _expenseDonutMonthOffset = value),
-                color: isDark ? const Color(0xFF102A38) : Colors.white,
-                itemBuilder: (context) => [
-                  for (var offset = 0; offset < 6; offset++)
-                    PopupMenuItem<int>(
-                      value: offset,
-                      height: 34,
-                      child: Text(offset == 0 ? 'এই মাস' : offset == 1 ? 'গত মাস' : '$offset মাস আগে', style: TextStyle(color: textColor, fontSize: 11)),
-                    ),
-                ],
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: isDark ? const Color(0xFF00E7A0).withValues(alpha: .12) : const Color(0xFFDDF9EE),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Text(monthLabel, style: TextStyle(color: textColor, fontSize: 9.5, fontWeight: FontWeight.w700)),
-                    Icon(Icons.keyboard_arrow_down_rounded, size: 13, color: textColor),
-                  ]),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              const donutSize = 80.0;
-              return Row(
-                children: [
-                  SizedBox(
-                    width: donutSize,
-                    height: donutSize,
-                    child: CustomPaint(
-                      painter: _DonutSummaryPainter(
-                        values: shown.map((entry) => entry.value).toList(),
-                        colors: List<Color>.generate(shown.length, (i) => palette[i % palette.length]),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: donutSize * .55,
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                _hidden ? '৳ •••••' : _money(expenseTotal),
-                                maxLines: 1,
-                                softWrap: false,
-                                style: TextStyle(color: textColor, fontSize: 9, fontWeight: FontWeight.w900),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          SizedBox(
-                            width: donutSize * .55,
-                            child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text('মোট খরচ', maxLines: 1, softWrap: false, style: TextStyle(color: mutedColor, fontSize: 7.5)),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 7),
-                  Expanded(
-                    child: Column(
-                      children: [
-                        for (var i = 0; i < shown.length; i++)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 3),
-                            child: Row(
-                              children: [
-                                Container(width: 7, height: 7, decoration: BoxDecoration(color: palette[i % palette.length], shape: BoxShape.circle)),
-                                const SizedBox(width: 6),
-                                Expanded(child: Text(shown[i].key, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: mutedColor, fontSize: 10))),
-                                Text(expenseTotal > 0 ? '${(shown[i].value / expenseTotal * 100).round()}%' : '0%', style: TextStyle(color: textColor, fontSize: 10, fontWeight: FontWeight.w800)),
-                              ],
-                            ),
-                          ),
-                        if (shown.isEmpty)
-                          Text('এখনো কোনো খরচ নেই', style: TextStyle(color: mutedColor, fontSize: 10)),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-        ],
-      ),
-    );
-
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -1716,7 +1603,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ),
         const SizedBox(width: 8),
-        Expanded(flex: 7, child: expenseCard),
+        Expanded(
+          flex: 7,
+          child: _donutSummaryCard(
+            isIncome: false,
+            monthOffset: _expenseDonutMonthOffset,
+          ),
+        ),
       ],
     );
   }

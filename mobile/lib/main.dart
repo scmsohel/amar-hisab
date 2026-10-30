@@ -1752,8 +1752,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final amountColor = isIncome ? const Color(0xFF00A653) : isTransfer ? const Color(0xFF1688D4) : const Color(0xFFE92743);
     final prefix = isIncome ? '+' : isTransfer ? '↔' : '−';
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.fromLTRB(10, 10, 3, 10),
+      margin: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.fromLTRB(10, 7, 3, 7),
       decoration: BoxDecoration(
         color: isDark ? Color.lerp(const Color(0xFF14283A), style.accent, .10) : style.tint,
         borderRadius: BorderRadius.circular(18),
@@ -1763,20 +1763,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
         onTap: () => _showTransactionDetails(tx),
         borderRadius: BorderRadius.circular(18),
         child: Row(children: [
-        Container(width: 48, height: 48, decoration: BoxDecoration(color: style.accent.withValues(alpha: .08), borderRadius: BorderRadius.circular(15)), child: Icon(style.icon, color: style.accent, size: 25)),
+        Container(width: 42, height: 42, decoration: BoxDecoration(color: style.accent.withValues(alpha: .08), borderRadius: BorderRadius.circular(14)), child: Icon(style.icon, color: style.accent, size: 23)),
         const SizedBox(width: 10),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFF1FAF6) : const Color(0xFF111827), fontSize: 14, fontWeight: FontWeight.w900)),
+          Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFF1FAF6) : const Color(0xFF111827), fontSize: 13, fontWeight: FontWeight.w900)),
           if (subtitle.isNotEmpty) Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFAABBCD) : const Color(0xFF657481), fontSize: 11.5)),
           Row(children: [Icon(Icons.access_time_rounded, size: 13, color: isDark ? const Color(0xFF91A6BC) : const Color(0xFF7B8993)), const SizedBox(width: 4), Text(_transactionDateTimeLabel(tx).split(', ').last, style: TextStyle(color: isDark ? const Color(0xFF91A6BC) : const Color(0xFF71808C), fontSize: 10.5))]),
         ])),
         const SizedBox(width: 5),
         SizedBox(width: 98, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerRight, child: Text('$prefix ${_money(_amount(tx['amount']))}', maxLines: 1, style: TextStyle(color: amountColor, fontSize: 14, fontWeight: FontWeight.w900))),
+          FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerRight, child: Text('$prefix ${_money(_amount(tx['amount']))}', maxLines: 1, style: TextStyle(color: amountColor, fontSize: 13, fontWeight: FontWeight.w900))),
           const SizedBox(height: 5),
           if (category.isNotEmpty) Container(
             constraints: const BoxConstraints(maxWidth: 96),
-            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
             decoration: BoxDecoration(color: style.accent.withValues(alpha: .06), borderRadius: BorderRadius.circular(20), border: Border.all(color: style.accent.withValues(alpha: .10))),
             child: Text(category, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: style.accent, fontSize: 10, fontWeight: FontWeight.w800)),
           ),

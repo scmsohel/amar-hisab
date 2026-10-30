@@ -1071,7 +1071,35 @@ class _ServerSettingsScreenState extends State<ServerSettingsScreen> {
       );
 }
 
-class DashboardScreen extends StatefulWidget {
+class _CustomAccentHexField extends StatefulWidget {
+  @override
+  State<_CustomAccentHexField> createState() => _CustomAccentHexFieldState();
+}
+
+class _CustomAccentHexFieldState extends State<_CustomAccentHexField> {
+  late final TextEditingController _controller = TextEditingController(
+    text: _appAccentColor.value.toARGB32().toRadixString(16).substring(2).toUpperCase(),
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Row(children: [
+    Expanded(child: TextField(
+      controller: _controller,
+      textCapitalization: TextCapitalization.characters,
+      maxLength: 6,
+      decoration: const InputDecoration(labelText: 'Custom HEX', hintText: '287FCB', prefixText: '#', counterText: '', isDense: true),
+    )),
+    const SizedBox(width: 10),
+    FilledButton(
+      onPressed: () async {
+        final hex = _controller.text.trim().replaceFirst('#', '');
+        if (!RegExp(r'^[0-9A-Fa-f]{6}
   const DashboardScreen({super.key});
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -1247,7 +1275,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text('আমার হিসাব', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? _appAccentColor.value : const Color(0xFF087A5B), fontSize: 23, fontWeight: FontWeight.w900, height: 1.0)),
+                              Text('আমার হিসাব', style: TextStyle(color: _appAccentColor.value, fontSize: 23, fontWeight: FontWeight.w900, height: 1.0)),
                               Transform.translate(
                                 offset: const Offset(0, -2),
                                 child: Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFB9CADB) : const Color(0xFF587267), fontSize: 10.5, height: 1.0)),
@@ -1262,7 +1290,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               child: IconButton(
                                 tooltip: 'মেনু',
                                 onPressed: () => _showDashboardMenu(context),
-                                icon: Icon(Icons.menu_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : const Color(0xFF087A5B), size: 27),
+                                icon: Icon(Icons.menu_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : _appAccentColor.value, size: 27),
                               ),
                             ),
                             const Spacer(),
@@ -1274,7 +1302,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   IconButton(
                                     tooltip: 'নোটিফিকেশন',
                                     onPressed: () => _notice(context, 'এখন কোনো নতুন নোটিফিকেশন নেই।'),
-                                    icon: Icon(Icons.notifications_none_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : const Color(0xFF087A5B), size: 25),
+                                    icon: Icon(Icons.notifications_none_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : _appAccentColor.value, size: 25),
                                   ),
                                   Positioned(
                                     right: 9,
@@ -1294,7 +1322,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   gradient: const LinearGradient(
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
-                                    colors: [Color(0xFF8AD8FF), Color(0xFF287FCB)],
+                                    colors: [_appAccentColor.value.withValues(alpha: .72), _appAccentColor.value],
                                   ),
                                   border: Border.all(color: const Color(0xFFE7FFF7), width: 1.5),
                                   boxShadow: [
@@ -1332,12 +1360,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                         boxShadow: Theme.of(context).brightness == Brightness.dark
                             ? [
-                                BoxShadow(color: const Color(0xFF65C8FF).withValues(alpha: .08), blurRadius: 14, spreadRadius: 0, offset: const Offset(0, 3)),
+                                BoxShadow(color: _appAccentColor.value.withValues(alpha: .08), blurRadius: 14, spreadRadius: 0, offset: const Offset(0, 3)),
                                 BoxShadow(color: const Color(0xFF000F20).withValues(alpha: .14), blurRadius: 10, offset: const Offset(0, 4)),
                               ]
                             : [
-                                BoxShadow(color: const Color(0xFF39B98A).withValues(alpha: .10), blurRadius: 18, offset: const Offset(0, 7)),
-                                BoxShadow(color: const Color(0xFF0B5B43).withValues(alpha: .035), blurRadius: 6, offset: const Offset(0, 2)),
+                                BoxShadow(color: _appAccentColor.value.withValues(alpha: .08), blurRadius: 18, offset: const Offset(0, 7)),
+                                BoxShadow(color: _appAccentColor.value.withValues(alpha: .025), blurRadius: 6, offset: const Offset(0, 2)),
                               ],
                       ),
                       child: Stack(
@@ -1347,7 +1375,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             bottom: -16,
                             width: 330,
                             height: 150,
-                            child: ClipRect(child: IgnorePointer(child: CustomPaint(painter: _BalanceNeonChartPainter(isDark: Theme.of(context).brightness == Brightness.dark)))),
+                            child: ClipRect(child: IgnorePointer(child: CustomPaint(painter: _BalanceNeonChartPainter(isDark: Theme.of(context).brightness == Brightness.dark, accent: _appAccentColor.value)))),
                           ),
                           Transform.translate(
                             offset: const Offset(0, -3),
@@ -1395,7 +1423,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               if (_loading)
                                 Transform.translate(
                                   offset: const Offset(18, -19),
-                                  child: SizedBox(height: 30, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF4ABEFF) : const Color(0xFF00A875))))),
+                                  child: SizedBox(height: 30, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).brightness == Brightness.dark ? _appAccentColor.value : _appAccentColor.value)))),
                                 )
                               else if (_error != null)
                                 Text(_error!, style: const TextStyle(color: Color(0xFFFF6868), fontSize: 12))
@@ -2682,6 +2710,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
               ]),
             ),
+            const SizedBox(height: 18),
+            _CustomAccentHexField(),
           ]),
         ),
       ),
@@ -2877,9 +2907,10 @@ class _IncomeExpenseChartPainter extends CustomPainter {
 }
 
 class _BalanceNeonChartPainter extends CustomPainter {
-  const _BalanceNeonChartPainter({required this.isDark});
+  const _BalanceNeonChartPainter({required this.isDark, required this.accent});
 
   final bool isDark;
+  final Color accent;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -2926,7 +2957,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = (isDark ? const Color(0xFF4ABEFF) : const Color(0xFF00B981)).withValues(alpha: isDark ? .60 : .28)
+        ..color = (isDark ? accent : accent).withValues(alpha: isDark ? .60 : .28)
         ..style = PaintingStyle.stroke
         ..strokeWidth = 3
         ..strokeCap = StrokeCap.round
@@ -2936,7 +2967,7 @@ class _BalanceNeonChartPainter extends CustomPainter {
     canvas.drawPath(
       path,
       Paint()
-        ..color = isDark ? const Color(0xFF9AD9FF) : const Color(0xFF00B981)
+        ..color = isDark ? const Color(0xFF9AD9FF) : accent
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.6
         ..strokeCap = StrokeCap.round
@@ -2959,7 +2990,2505 @@ class _BalanceNeonChartPainter extends CustomPainter {
       );
       canvas.drawRRect(
         rect,
-        Paint()..color = (isDark ? const Color(0xFF4ABEFF) : const Color(0xFF16B981)).withValues(alpha: isDark ? .38 : .30),
+        Paint()..color = (isDark ? accent : accent).withValues(alpha: isDark ? .38 : .30),
+      );
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _BalanceNeonChartPainter oldDelegate) => true;
+}
+
+class InviteVerificationScreen extends StatefulWidget {
+  const InviteVerificationScreen({super.key});
+
+  @override
+  State<InviteVerificationScreen> createState() => _InviteVerificationScreenState();
+}
+
+class _InviteVerificationScreenState extends State<InviteVerificationScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _invite = TextEditingController();
+  bool _verifying = false;
+
+  @override
+  void dispose() {
+    _invite.dispose();
+    super.dispose();
+  }
+
+  Future<void> _verify() async {
+    FocusScope.of(context).unfocus();
+    if (_verifying || !(_formKey.currentState?.validate() ?? false)) return;
+    setState(() => _verifying = true);
+    try {
+      await _AuthApi.checkConfiguredServer();
+      await _AuthApi.verifyInvite(_invite.text);
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(
+        _route(SignupScreen(verifiedInvite: _invite.text.trim())),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      _notice(context, error.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _verifying = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        body: Stack(children: [
+          Positioned.fill(child: Image.asset('assets/animations/Minimal Mint Leaf Wave Background.png', fit: BoxFit.cover)),
+          SafeArea(child: Column(children: [
+            const SizedBox(height: 32),
+            Transform.translate(offset: const Offset(-24, 10), child: SizedBox(width: 320, height: 165, child: ClipRect(child: Align(alignment: Alignment.topCenter, heightFactor: .30, child: Image.asset('assets/animations/logo.png', width: 320, fit: BoxFit.contain))))),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(14, 2, 16, 0),
+              child: Row(children: [
+                IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: const Icon(Icons.arrow_back_rounded, color: _ink)),
+                const Spacer(),
+              ]),
+            ),
+            Expanded(child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(22, 12, 22, 22),
+              child: Center(child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 430),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: .95), borderRadius: BorderRadius.circular(30), border: Border.all(color: Colors.white, width: 1.5), boxShadow: [BoxShadow(color: const Color(0xFF244A88).withValues(alpha: .07), blurRadius: 30, offset: const Offset(0, 12))]),
+                  child: Form(key: _formKey, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                    const Icon(Icons.verified_user_outlined, size: 42, color: _blue),
+                    const SizedBox(height: 12),
+                    const Text('ইনভাইট কোড যাচাই', textAlign: TextAlign.center, style: TextStyle(fontSize: 23, fontWeight: FontWeight.w900, color: _ink)),
+                    const SizedBox(height: 8),
+                    const Text('আপনার পাওয়া ইনভাইট কোডটি লিখে যাচাই করুন। কোড সঠিক হলে পরের ধাপে অ্যাকাউন্ট তৈরি করতে পারবেন।', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, height: 1.6, color: _muted)),
+                    const SizedBox(height: 22),
+                    TextFormField(
+                      controller: _invite,
+                      textCapitalization: TextCapitalization.characters,
+                      decoration: const InputDecoration(prefixIcon: Icon(Icons.groups_2_outlined), hintText: 'ইনভাইট কোড লিখুন'),
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'ইনভাইট কোড দিন।' : null,
+                    ),
+                    const SizedBox(height: 18),
+                    _PrimaryButton(label: _verifying ? 'যাচাই হচ্ছে...' : 'Verify করুন', onPressed: _verifying ? null : _verify),
+                  ])),
+                ),
+              )),
+            )),
+          ])),
+        ]),
+      );
+}
+
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key, this.verifiedInvite = ''});
+  final String verifiedInvite;
+  @override
+  State<SignupScreen> createState() => _SignupScreenState();
+}
+
+class _SignupScreenState extends State<SignupScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _name = TextEditingController();
+  final _email = TextEditingController();
+  final _mobile = TextEditingController();
+  final _password = TextEditingController();
+  final _confirm = TextEditingController();
+  final _invite = TextEditingController();
+  int _step = 0;
+  bool _showPassword = false;
+  bool _showConfirm = false;
+  bool _acceptedTerms = false;
+  bool _submitting = false;
+  bool _marketing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _invite.text = widget.verifiedInvite;
+  }
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _email.dispose();
+    _mobile.dispose();
+    _password.dispose();
+    _confirm.dispose();
+    _invite.dispose();
+    super.dispose();
+  }
+
+  void _nextStep() {
+    FocusScope.of(context).unfocus();
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+    setState(() => _step = 1);
+  }
+
+  void _previousStep() {
+    FocusScope.of(context).unfocus();
+    setState(() => _step = 0);
+  }
+
+  Future<void> _submit() async {
+    FocusScope.of(context).unfocus();
+    if (_submitting || !(_formKey.currentState?.validate() ?? false)) return;
+    if (!_acceptedTerms) {
+      _notice(context, 'চালিয়ে যেতে শর্তাবলি ও গোপনীয়তা নীতি গ্রহণ করুন।');
+      return;
+    }
+    setState(() => _submitting = true);
+    try {
+      await _AuthApi.register(
+        invite: _invite.text,
+        name: _name.text,
+        email: _email.text,
+        mobile: _mobile.text,
+        password: _password.text,
+      );
+      if (!mounted) return;
+      await showDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('সাইন আপ সফল'),
+          content: const Text('অ্যাকাউন্ট তৈরি হয়েছে। এখন লগইন করতে পারবেন।'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('ঠিক আছে'),
+            ),
+          ],
+        ),
+      );
+      if (mounted) Navigator.of(context).pop();
+    } catch (error) {
+      if (!mounted) return;
+      _notice(context, error.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
+  }
+
+  Widget _buildAccountFields() => Column(children: [
+        TextFormField(
+          controller: _invite,
+          readOnly: widget.verifiedInvite.isNotEmpty,
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.groups_2_outlined),
+            hintText: 'ইনভাইট কোড',
+            suffixIcon: widget.verifiedInvite.isNotEmpty
+                ? const Icon(Icons.verified_rounded, color: _blue)
+                : null,
+          ),
+          validator: (v) =>
+              (v == null || v.trim().isEmpty) ? 'ইনভাইট কোড দিন।' : null,
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _name,
+          textCapitalization: TextCapitalization.words,
+          decoration: const InputDecoration(
+            prefixIcon: Icon(Icons.person_outline_rounded),
+            hintText: 'আপনার নাম লিখুন',
+          ),
+          validator: (v) =>
+              (v == null || v.trim().length < 2) ? 'সঠিক নাম লিখুন।' : null,
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _email,
+          keyboardType: TextInputType.emailAddress,
+          decoration: const InputDecoration(
+            prefixIcon: Icon(Icons.mail_outline_rounded),
+            hintText: 'ইমেইল লিখুন',
+          ),
+          validator: (v) {
+            final s = (v ?? '').trim();
+            return s.contains('@') && s.contains('.')
+                ? null
+                : 'সঠিক ইমেইল লিখুন।';
+          },
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _mobile,
+          keyboardType: TextInputType.phone,
+          decoration: const InputDecoration(
+            prefixIcon: Icon(Icons.phone_iphone_rounded),
+            hintText: 'মোবাইল নম্বর লিখুন',
+          ),
+          validator: (v) =>
+              (v ?? '').replaceAll(RegExp(r'\D'), '').length >= 10
+                  ? null
+                  : 'সঠিক মোবাইল নম্বর লিখুন।',
+        ),
+      ]);
+
+  Widget _buildSecurityFields() => Column(children: [
+        TextFormField(
+          controller: _password,
+          obscureText: !_showPassword,
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.lock_outline_rounded),
+            hintText: 'পাসওয়ার্ড লিখুন',
+            suffixIcon: IconButton(
+              onPressed: () =>
+                  setState(() => _showPassword = !_showPassword),
+              icon: Icon(_showPassword
+                  ? Icons.visibility_off_rounded
+                  : Icons.visibility_rounded),
+            ),
+          ),
+          validator: (v) => (v ?? '').length >= 8
+              ? null
+              : 'পাসওয়ার্ড কমপক্ষে ৮ অক্ষরের হতে হবে।',
+        ),
+        const SizedBox(height: 12),
+        TextFormField(
+          controller: _confirm,
+          obscureText: !_showConfirm,
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.lock_outline_rounded),
+            hintText: 'পাসওয়ার্ড আবার লিখুন',
+            suffixIcon: IconButton(
+              onPressed: () => setState(() => _showConfirm = !_showConfirm),
+              icon: Icon(_showConfirm
+                  ? Icons.visibility_off_rounded
+                  : Icons.visibility_rounded),
+            ),
+          ),
+          validator: (v) =>
+              v == _password.text ? null : 'পাসওয়ার্ড দুটি মিলছে না।',
+        ),
+        const SizedBox(height: 12),
+        CheckboxListTile(
+          value: _acceptedTerms,
+          onChanged: (v) => setState(() => _acceptedTerms = v ?? false),
+          contentPadding: EdgeInsets.zero,
+          controlAffinity: ListTileControlAffinity.leading,
+          dense: true,
+          title: const Text(
+            'আমি শর্তাবলি এবং গোপনীয়তা নীতি পড়েছি এবং সম্মত আছি',
+            style: TextStyle(fontSize: 11.5, color: _ink, height: 1.4),
+          ),
+        ),
+        CheckboxListTile(
+          value: _marketing,
+          onChanged: (v) => setState(() => _marketing = v ?? false),
+          contentPadding: EdgeInsets.zero,
+          controlAffinity: ListTileControlAffinity.leading,
+          dense: true,
+          title: const Text(
+            'আমাকে আপডেট ও গুরুত্বপূর্ণ তথ্য জানাবেন',
+            style: TextStyle(fontSize: 11.5, color: _muted),
+          ),
+        ),
+      ]);
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        body: Stack(children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/animations/Minimal Mint Leaf Wave Background.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          SafeArea(
+            child: Column(children: [
+              const SizedBox(height: 32),
+              Transform.translate(
+                offset: const Offset(-24, 10),
+                child: SizedBox(
+                  width: 320,
+                  height: 165,
+                  child: ClipRect(
+                    child: Align(
+                      alignment: Alignment.topCenter,
+                      heightFactor: .30,
+                      child: Image.asset(
+                        'assets/animations/logo.png',
+                        width: 320,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 2, 16, 0),
+                child: Row(children: [
+                  IconButton(
+                    onPressed: _step == 1
+                        ? _previousStep
+                        : () => Navigator.of(context).maybePop(),
+                    icon: const Icon(Icons.arrow_back_rounded, color: _ink),
+                  ),
+                  const Spacer(),
+                  Text(
+                    'ধাপ ${_step + 1}/2',
+                    style: const TextStyle(
+                      color: _muted,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ]),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(22, 2, 22, 22),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 430),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            _step == 0
+                                ? 'অ্যাকাউন্ট তৈরি করুন'
+                                : 'অ্যাকাউন্ট সুরক্ষিত করুন',
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w900,
+                              color: Color(0xFF075B3A),
+                            ),
+                          ),
+                          const SizedBox(height: 7),
+                          Text(
+                            _step == 0
+                                ? 'ইনভাইট কোড ও আপনার তথ্য দিন'
+                                : 'পাসওয়ার্ড সেট করুন এবং সম্মতি দিন',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              height: 1.55,
+                              color: _muted,
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          Container(
+                            padding: const EdgeInsets.fromLTRB(16, 17, 16, 18),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: .95),
+                              borderRadius: BorderRadius.circular(28),
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 1.5,
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color(0xFF244A88)
+                                      .withValues(alpha: .06),
+                                  blurRadius: 26,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
+                            ),
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                children: [
+                                  if (_step == 0)
+                                    _buildAccountFields()
+                                  else
+                                    _buildSecurityFields(),
+                                  const SizedBox(height: 12),
+                                  _PrimaryButton(
+                                    label: _step == 0
+                                        ? 'পরবর্তী ধাপ'
+                                        : (_submitting
+                                            ? 'অ্যাকাউন্ট তৈরি হচ্ছে...'
+                                            : 'অ্যাকাউন্ট তৈরি করুন'),
+                                    onPressed: _submitting
+                                        ? null
+                                        : (_step == 0 ? _nextStep : _submit),
+                                  ),
+                                  const SizedBox(height: 14),
+                                  if (_step == 1)
+                                    TextButton.icon(
+                                      onPressed: _previousStep,
+                                      icon: const Icon(
+                                        Icons.arrow_back_rounded,
+                                        size: 17,
+                                      ),
+                                      label: const Text('আগের ধাপে ফিরে যান'),
+                                    ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Flexible(
+                                        child: Text(
+                                          'ইতিমধ্যে অ্যাকাউন্ট আছে? ',
+                                          style: TextStyle(
+                                            color: _muted,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () =>
+                                            Navigator.of(context).pop(),
+                                        child: const Text(
+                                          'লগইন করুন',
+                                          style: TextStyle(
+                                            color: _blue,
+                                            fontWeight: FontWeight.w800,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ]),
+          ),
+        ]),
+      );
+}
+
+class LoadingScreen extends StatefulWidget {
+  const LoadingScreen({super.key, this.isSignup = false});
+  final bool isSignup;
+  @override
+  State<LoadingScreen> createState() => _LoadingScreenState();
+}
+
+class _LoadingScreenState extends State<LoadingScreen> {
+  int _step = 0;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(milliseconds: 850), (timer) {
+      if (!mounted) return;
+      if (_step < 3) {
+        setState(() => _step++);
+      } else {
+        timer.cancel();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        body: Stack(children: [
+          const _CloudBackground(),
+          SafeArea(child: Column(children: [
+            const Spacer(flex: 2),
+            const _BrandMark(size: 76),
+            const SizedBox(height: 15),
+            const Text('আমার হিসাব', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w900, color: _ink)),
+            const SizedBox(height: 6),
+            const Text('তথ্য প্রস্তুত করা হচ্ছে...', style: TextStyle(color: _muted, fontSize: 14)),
+            const SizedBox(height: 28),
+            SizedBox(width: 86, height: 86, child: CircularProgressIndicator(
+              strokeWidth: 7,
+              backgroundColor: const Color(0xFFD9E4FF),
+              valueColor: const AlwaysStoppedAnimation(_blue),
+            )),
+            const Spacer(),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.fromLTRB(24, 22, 24, 22),
+              decoration: BoxDecoration(color: Colors.white.withValues(alpha: .86), borderRadius: BorderRadius.circular(28), border: Border.all(color: Colors.white, width: 1.5)),
+              child: Column(children: [
+                _LoadingStep(label: widget.isSignup ? 'অ্যাকাউন্ট যাচাই করা হচ্ছে' : 'অ্যাকাউন্ট যাচাই করা হচ্ছে', done: _step >= 1),
+                const SizedBox(height: 18),
+                _LoadingStep(label: 'আপনার তথ্য লোড করা হচ্ছে', done: _step >= 2),
+                const SizedBox(height: 18),
+                _LoadingStep(label: 'ড্যাশবোর্ড প্রস্তুত করা হচ্ছে', done: _step >= 3),
+                const SizedBox(height: 18),
+                Row(children: [
+                  SizedBox(width: 21, height: 21, child: _step >= 3 ? const Icon(Icons.info_outline_rounded, color: _blue, size: 20) : const CircularProgressIndicator(strokeWidth: 2.5)),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(_step >= 3 ? 'API সংযুক্ত না থাকায় Login/Signup এখনো সম্পন্ন করা যায়নি।' : 'প্রস্তুত হচ্ছে...', style: const TextStyle(fontSize: 13, color: _muted))),
+                ]),
+                if (_step >= 3) ...[
+                  const SizedBox(height: 16),
+                  _PrimaryButton(label: 'লগইন স্ক্রিনে ফিরুন', onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst)),
+                ],
+              ]),
+            ),
+            const Spacer(flex: 2),
+          ])),
+        ]),
+      );
+}
+
+class _LoadingStep extends StatelessWidget {
+  const _LoadingStep({required this.label, required this.done});
+  final String label;
+  final bool done;
+  @override
+  Widget build(BuildContext context) => Row(children: [
+        Container(
+          width: 24, height: 24,
+          decoration: BoxDecoration(color: done ? _blue : const Color(0xFFE8EEFA), shape: BoxShape.circle),
+          child: Icon(done ? Icons.check_rounded : Icons.circle_outlined, size: done ? 17 : 13, color: done ? Colors.white : const Color(0xFF98A6BE)),
+        ),
+        const SizedBox(width: 12),
+        Expanded(child: Text(label, style: const TextStyle(fontSize: 13.5, color: _ink))),
+      ]);
+}
+
+class _PrimaryButton extends StatelessWidget {
+  const _PrimaryButton({required this.label, required this.onPressed});
+  final String label;
+  final VoidCallback? onPressed;
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        height: 52,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(colors: [_blue, _deepBlue]),
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: [BoxShadow(color: _blue.withValues(alpha: .18), blurRadius: 14, offset: const Offset(0, 6))],
+          ),
+          child: FilledButton(
+            onPressed: onPressed,
+            style: FilledButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18))),
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Text(label, style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w800)),
+              const SizedBox(width: 9),
+              const Icon(Icons.arrow_forward_rounded, size: 19),
+            ]),
+          ),
+        ),
+      );
+}
+
+class _OrDivider extends StatelessWidget {
+  const _OrDivider();
+  @override
+  Widget build(BuildContext context) => Row(children: [
+        const Expanded(child: Divider(color: _line)),
+        Padding(padding: const EdgeInsets.symmetric(horizontal: 14), child: Text('অথবা', style: TextStyle(color: _muted.withValues(alpha: .9), fontSize: 12))),
+        const Expanded(child: Divider(color: _line)),
+      ]);
+}
+
+void _notice(BuildContext context, String message) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), behavior: SnackBarBehavior.floating));
+}).hasMatch(hex)) {
+          _notice(context, 'সঠিক ৬ ডিজিটের HEX Color দিন।');
+          return;
+        }
+        await _setAppAccentColor(Color(int.parse('FF$hex', radix: 16)));
+      },
+      child: const Text('Apply'),
+    ),
+  ]);
+}
+
+class DashboardScreen extends StatefulWidget {
+  const DashboardScreen({super.key});
+  @override
+  State<DashboardScreen> createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  bool _loading = true;
+  bool _hidden = false;
+  bool _compactCharts = true;
+  String? _error;
+  double _balance = 0;
+  double? _monthChangePercent;
+  String _monthChangeMessage = 'গত মাসের তুলনার ডেটা নেই';
+  List<Map<String, dynamic>> _transactions = <Map<String, dynamic>>[];
+  List<Map<String, dynamic>> _debts = <Map<String, dynamic>>[];
+  List<Map<String, dynamic>> _bills = <Map<String, dynamic>>[];
+  int _chartRangeDays = 30;
+  int _incomeDonutMonthOffset = 0;
+  int _expenseDonutMonthOffset = 0;
+  String _recentTransactionsMonthKey = _monthKey(DateTime.now());
+  String _recentTransactionsCategory = 'সব';
+  Map<String, double> _walletBalances = {'ক্যাশ': 0, 'ব্যাংক': 0, 'বিকাশ': 0, 'নগদ': 0};
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  double _amount(dynamic value) => value is num ? value.toDouble() : double.tryParse(value?.toString() ?? '') ?? 0;
+
+  DateTime? _parseTransactionDate(dynamic value) {
+    if (value == null) return null;
+    final raw = value.toString().trim();
+    if (raw.isEmpty) return null;
+    final direct = DateTime.tryParse(raw);
+    if (direct != null) return direct;
+    final normalized = raw
+        .replaceAll('০', '0').replaceAll('১', '1').replaceAll('২', '2')
+        .replaceAll('৩', '3').replaceAll('৪', '4').replaceAll('৫', '5')
+        .replaceAll('৬', '6').replaceAll('৭', '7').replaceAll('৮', '8')
+        .replaceAll('৯', '9').replaceAll('.', '').trim();
+    final match = RegExp(r'(\d{1,2})\s+([^,\s]+)[, ]+\s*(\d{4})').firstMatch(normalized);
+    if (match == null) return null;
+    const months = <String>[
+      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
+      'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর',
+    ];
+    final token = match.group(2)!;
+    final month = months.indexWhere((name) => name.startsWith(token) || token.startsWith(name));
+    if (month < 0) return null;
+    return DateTime.tryParse('${match.group(3)}-${(month + 1).toString().padLeft(2, '0')}-${match.group(1)!.padLeft(2, '0')}');
+  }
+
+  Future<void> _load() async {
+    setState(() { _loading = true; _error = null; });
+    try {
+      final data = await _AuthApi.loadDashboardData();
+      final wallets = data['wallets'] is List ? data['wallets'] as List : <dynamic>[];
+      final transactions = data['transactions'] is List ? data['transactions'] as List : <dynamic>[];
+      final debts = data['debts'] is List ? data['debts'] as List : <dynamic>[];
+      final bills = data['bills'] is List ? data['bills'] as List : <dynamic>[];
+      final opening = <String, double>{'ক্যাশ': 0, 'ব্যাংক': 0, 'বিকাশ': 0, 'নগদ': 0};
+      for (final item in wallets) {
+        if (item is Map) opening[(item['name'] ?? '').toString()] = _amount(item['base']);
+      }
+      final walletBalances = Map<String, double>.from(opening);
+      final openingTotal = opening.values.fold<double>(0, (sum, value) => sum + value);
+      final now = DateTime.now();
+      final currentMonthStart = DateTime(now.year, now.month);
+      final nextMonthStart = DateTime(now.year, now.month + 1);
+      final previousMonthStart = DateTime(now.year, now.month - 1);
+      final previousMonthEnd = currentMonthStart;
+      var total = openingTotal;
+      var currentMonthIncome = 0.0;
+      var currentMonthExpense = 0.0;
+      var previousMonthIncome = 0.0;
+      var previousMonthExpense = 0.0;
+      for (final item in transactions) {
+        if (item is! Map) continue;
+        final amount = _amount(item['amount']);
+        final kind = (item['kind'] ?? '').toString();
+        final rawDate = item['dateInput'] ?? item['date_input'] ?? item['date'] ?? item['createdAt'] ?? item['created_at'];
+        final transactionDate = _parseTransactionDate(rawDate);
+        if (transactionDate != null) {
+          if (transactionDate.isBefore(nextMonthStart)) {
+            if (kind == 'আয়') total += amount;
+            if (kind == 'ব্যয়') total -= amount;
+          }
+          if (!transactionDate.isBefore(currentMonthStart) && transactionDate.isBefore(nextMonthStart)) {
+            if (kind == 'আয়') currentMonthIncome += amount;
+            if (kind == 'ব্যয়') currentMonthExpense += amount;
+          } else if (!transactionDate.isBefore(previousMonthStart) && transactionDate.isBefore(previousMonthEnd)) {
+            if (kind == 'আয়') previousMonthIncome += amount;
+            if (kind == 'ব্যয়') previousMonthExpense += amount;
+          }
+        }
+        final walletName = (item['wallet'] ?? item['walletName'] ?? item['wallet_name'] ?? item['accountName'] ?? item['account'] ?? '').toString();
+        if (walletBalances.containsKey(walletName)) {
+          if (kind == 'আয়') walletBalances[walletName] = walletBalances[walletName]! + amount;
+          if (kind == 'ব্যয়') walletBalances[walletName] = walletBalances[walletName]! - amount;
+        }
+      }
+      final currentNet = currentMonthIncome - currentMonthExpense;
+      final previousNet = previousMonthIncome - previousMonthExpense;
+      final double? monthChangePercent = previousNet == 0 ? null : ((currentNet - previousNet) / previousNet.abs()) * 100;
+      final monthChangeMessage = currentNet == 0 && previousNet == 0
+          ? 'এখনো কোনো লেনদেন নেই'
+          : previousNet == 0
+              ? 'এই মাসে নতুন লেনদেন'
+              : '${monthChangePercent!.abs().toStringAsFixed(1)}% গত মাসের তুলনায়';
+      if (!mounted) return;
+      setState(() {
+        _balance = total;
+        _walletBalances = walletBalances;
+        _monthChangePercent = monthChangePercent;
+        _monthChangeMessage = monthChangeMessage;
+        _transactions = transactions.whereType<Map>().map((item) => Map<String, dynamic>.from(item)).toList();
+        _debts = debts.whereType<Map>().map((item) => Map<String, dynamic>.from(item)).toList();
+        _bills = bills.whereType<Map>().map((item) => Map<String, dynamic>.from(item)).toList();
+        _loading = false;
+      });
+    } catch (error) {
+      if (!mounted) return;
+      setState(() { _error = error.toString().replaceFirst('Exception: ', ''); _loading = false; });
+    }
+  }
+
+  String _money(double value) => '৳ ${value.round().toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',')}';
+
+  @override
+  Widget build(BuildContext context) => AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle(
+          statusBarColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF071827) : const Color(0xFFF3F8F5),
+          statusBarIconBrightness: Theme.of(context).brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+          statusBarBrightness: Theme.of(context).brightness == Brightness.dark ? Brightness.dark : Brightness.light,
+          systemNavigationBarColor: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF071827) : const Color(0xFFF3F8F5),
+          systemNavigationBarIconBrightness: Theme.of(context).brightness == Brightness.dark ? Brightness.light : Brightness.dark,
+        ),
+        child: Scaffold(
+        body: Stack(children: [
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: Theme.of(context).brightness == Brightness.dark
+                      ? const [Color(0xFF071827), Color(0xFF081B2D), Color(0xFF0A1E32), Color(0xFF071827)]
+                      : const [Color(0xFFF3F8F5), Color(0xFFEAF5EF), Color(0xFFF7FBF8), Color(0xFFF3F8F5)],
+                  stops: const [0.0, 0.34, 0.72, 1.0],
+                ),
+              ),
+            ),
+          ),
+          SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                  Transform.translate(
+                    offset: const Offset(0, -4),
+                    child: SizedBox(
+                      height: 36,
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.center,
+                        children: [
+                        Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text('আমার হিসাব', style: TextStyle(color: _appAccentColor.value, fontSize: 23, fontWeight: FontWeight.w900, height: 1.0)),
+                              Transform.translate(
+                                offset: const Offset(0, -2),
+                                child: Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFB9CADB) : const Color(0xFF587267), fontSize: 10.5, height: 1.0)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Transform.translate(
+                              offset: const Offset(0, -2),
+                              child: IconButton(
+                                tooltip: 'মেনু',
+                                onPressed: () => _showDashboardMenu(context),
+                                icon: Icon(Icons.menu_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : _appAccentColor.value, size: 27),
+                              ),
+                            ),
+                            const Spacer(),
+                            Transform.translate(
+                              offset: const Offset(0, -5),
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  IconButton(
+                                    tooltip: 'নোটিফিকেশন',
+                                    onPressed: () => _notice(context, 'এখন কোনো নতুন নোটিফিকেশন নেই।'),
+                                    icon: Icon(Icons.notifications_none_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : _appAccentColor.value, size: 25),
+                                  ),
+                                  Positioned(
+                                    right: 9,
+                                    top: 8,
+                                    child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: Color(0xFFE53935), shape: BoxShape.circle)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Transform.translate(
+                              offset: const Offset(0, -5),
+                              child: Container(
+                                width: 38,
+                                height: 38,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  gradient: const LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [_appAccentColor.value.withValues(alpha: .72), _appAccentColor.value],
+                                  ),
+                                  border: Border.all(color: const Color(0xFFE7FFF7), width: 1.5),
+                                  boxShadow: [
+                                    BoxShadow(color: _appAccentColor.value.withValues(alpha: .14), blurRadius: 8),
+                                  ],
+                                ),
+                                child: const Icon(Icons.person_rounded, color: Colors.white, size: 26),
+                              ),
+                            ),
+                          ],
+                        ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 0),
+                  Transform.translate(
+                    offset: const Offset(0, 3),
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(15, 0, 8, 2),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        border: Border.all(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? _appAccentColor.value.withValues(alpha: .72)
+                              : const Color(0xFF79DDB8),
+                          width: 1.25,
+                        ),
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: Theme.of(context).brightness == Brightness.dark
+                              ? const [Color(0xD9163048), Color(0xD910263C), Color(0xD9081B2D)]
+                              : const [Color(0xFFF9FFFC), Color(0xFFEAFBF3), Color(0xFFF5FFFA)],
+                        ),
+                        boxShadow: Theme.of(context).brightness == Brightness.dark
+                            ? [
+                                BoxShadow(color: _appAccentColor.value.withValues(alpha: .08), blurRadius: 14, spreadRadius: 0, offset: const Offset(0, 3)),
+                                BoxShadow(color: const Color(0xFF000F20).withValues(alpha: .14), blurRadius: 10, offset: const Offset(0, 4)),
+                              ]
+                            : [
+                                BoxShadow(color: _appAccentColor.value.withValues(alpha: .08), blurRadius: 18, offset: const Offset(0, 7)),
+                                BoxShadow(color: _appAccentColor.value.withValues(alpha: .025), blurRadius: 6, offset: const Offset(0, 2)),
+                              ],
+                      ),
+                      child: Stack(
+                        children: [
+                          Positioned(
+                            right: -18,
+                            bottom: -16,
+                            width: 330,
+                            height: 150,
+                            child: ClipRect(child: IgnorePointer(child: CustomPaint(painter: _BalanceNeonChartPainter(isDark: Theme.of(context).brightness == Brightness.dark, accent: _appAccentColor.value)))),
+                          ),
+                          Transform.translate(
+                            offset: const Offset(0, -3),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                              Row(
+                                children: [
+                                  Text('মোট ব্যালেন্স', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF0FFF9) : const Color(0xFF155A45), fontSize: 13, height: 1, fontWeight: FontWeight.w700)),
+                                  const SizedBox(width: 0),
+                                  IconButton(
+                                    constraints: const BoxConstraints.tightFor(width: 24, height: 28),
+                                    padding: EdgeInsets.zero,
+                                    tooltip: _hidden ? 'ব্যালেন্স দেখান' : 'ব্যালেন্স লুকান',
+                                    onPressed: () => setState(() => _hidden = !_hidden),
+                                    icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFB8E3FF) : const Color(0xFF168565), size: 18),
+                                  ),
+                                  const Spacer(),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).brightness == Brightness.dark
+                                          ? const Color(0xFF55BFFF).withValues(alpha: .12)
+                                          : const Color(0xFFBDF5DF).withValues(alpha: .48),
+                                      border: Border.all(
+                                        color: Theme.of(context).brightness == Brightness.dark
+                                            ? const Color(0xFF67C7FF).withValues(alpha: .34)
+                                            : const Color(0xFF6FD9B2).withValues(alpha: .58),
+                                      ),
+                                      borderRadius: BorderRadius.circular(28),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text('এই মাস', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : const Color(0xFF155A45), fontSize: 12, fontWeight: FontWeight.w700)),
+                                        SizedBox(width: 5),
+                                        Icon(Icons.keyboard_arrow_down_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : const Color(0xFF155A45), size: 17),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 0),
+                              if (_loading)
+                                Transform.translate(
+                                  offset: const Offset(18, -19),
+                                  child: SizedBox(height: 30, child: Align(alignment: Alignment.centerLeft, child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).brightness == Brightness.dark ? _appAccentColor.value : _appAccentColor.value)))),
+                                )
+                              else if (_error != null)
+                                Text(_error!, style: const TextStyle(color: Color(0xFFFF6868), fontSize: 12))
+                              else
+                                Transform.translate(
+                                  offset: const Offset(0, -19),
+                                  child: Text(
+                                    _hidden ? '৳ ••••••' : _money(_balance),
+                                    style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : const Color(0xFF075B45), fontSize: 29, fontWeight: FontWeight.w900, letterSpacing: .2),
+                                  ),
+                                ),
+                              const SizedBox(height: 0),
+                              SizedBox(
+                                height: 4,
+                                child: OverflowBox(
+                                  alignment: Alignment.topCenter,
+                                  minHeight: 28,
+                                  maxHeight: 28,
+                                  child: Transform.translate(
+                                    offset: const Offset(0, -24),
+                                    child: Row(
+                                      children: [
+                                    Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).brightness == Brightness.dark
+                                          ? _appAccentColor.value.withValues(alpha: .16)
+                                          : const Color(0xFFE7F5EE),
+                                      border: Border.all(
+                                        color: Theme.of(context).brightness == Brightness.dark
+                                            ? _appAccentColor.value.withValues(alpha: .62)
+                                            : const Color(0xFFC6E5D5),
+                                      ),
+                                      borderRadius: BorderRadius.circular(24),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.trending_up_rounded, size: 15, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF65C8FF) : const Color(0xFF579779)),
+                                        SizedBox(width: 3),
+                                        Text(
+                                          _monthChangePercent == null
+                                              ? _monthChangeMessage
+                                              : '${_monthChangePercent! >= 0 ? '+' : '-'}${_monthChangePercent!.abs().toStringAsFixed(1)}% গত মাসের তুলনায়',
+                                          style: TextStyle(
+                                            color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD6EEFF) : const Color(0xFF527D69),
+                                            fontSize: 10.5,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 9),
+                                  Expanded(
+                                    child: Text(
+                                      _loading ? 'ব্যালেন্স লোড হচ্ছে...' : _error != null ? 'সার্ভার থেকে ডেটা পাওয়া যায়নি' : '',
+                                      style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFB9CADB) : const Color(0xFF55796B), fontSize: 11),
+                                    ),
+                                  ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 11),
+                  SizedBox(
+                    height: 86,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(child: _walletCard('ব্যাংক', Icons.account_balance_rounded, const Color(0xFF1688D4))),
+                        const SizedBox(width: 7),
+                        Expanded(child: _walletCard('ক্যাশ', Icons.account_balance_wallet_rounded, const Color(0xFF16B981))),
+                        const SizedBox(width: 7),
+                        Expanded(child: _walletCard('বিকাশ', Icons.payments_rounded, const Color(0xFFE83E8C))),
+                        const SizedBox(width: 7),
+                        Expanded(child: _walletCard('নগদ', Icons.account_balance_wallet_rounded, const Color(0xFFFF8A00))),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 7),
+                  if (_compactCharts)
+                    _compactExpenseOverview()
+                  else ...[
+                    _incomeExpenseChart(),
+                    const SizedBox(height: 6),
+                    _incomeExpenseDonuts(),
+                  ],
+                  const SizedBox(height: 12),
+
+                if (_error != null) ...[
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(onPressed: _load, icon: const Icon(Icons.refresh_rounded), label: const Text('আবার চেষ্টা করুন')),
+                  ],
+                      ],
+                    ),
+                  ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                    child: _recentTransactionsCard(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ]),
+        ),
+      );
+
+
+  static String _monthKey(DateTime date) => '${date.year}-${date.month.toString().padLeft(2, '0')}';
+
+  String _monthLabel(String key) {
+    const months = <String>[
+      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
+      'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর',
+    ];
+    final parts = key.split('-');
+    final year = int.tryParse(parts.first) ?? DateTime.now().year;
+    final month = parts.length > 1 ? int.tryParse(parts[1]) ?? 1 : 1;
+    return '${months[(month - 1).clamp(0, 11).toInt()]} ${_bengaliDigits(year.toString())}';
+  }
+
+  List<String> _recentTransactionMonthOptions() {
+    final keys = <String>{_monthKey(DateTime.now())};
+    for (final tx in _transactions) {
+      final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
+      if (date != null) keys.add(_monthKey(date));
+    }
+    final sorted = keys.toList()..sort((a, b) => b.compareTo(a));
+    return sorted;
+  }
+
+  String _transactionCategoryLabel(Map<String, dynamic> tx) {
+    final value = (tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? tx['categoryTitle'] ?? tx['category_title'] ?? tx['subcategory'] ?? '').toString().trim();
+    return value.isEmpty ? 'অন্যান্য' : value;
+  }
+
+  List<Map<String, dynamic>> _monthFilteredRecentTransactions() {
+    final items = _sortedRecentTransactions();
+    if (_recentTransactionsMonthKey == 'all') return items;
+    return items.where((tx) {
+      final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
+      return date != null && _monthKey(date) == _recentTransactionsMonthKey;
+    }).toList();
+  }
+
+  List<MapEntry<String, int>> _recentTransactionCategoryCounts() {
+    final counts = <String, int>{};
+    for (final tx in _monthFilteredRecentTransactions()) {
+      final category = _transactionCategoryLabel(tx);
+      counts[category] = (counts[category] ?? 0) + 1;
+    }
+    final entries = counts.entries.toList()
+      ..sort((a, b) {
+        final byCount = b.value.compareTo(a.value);
+        return byCount != 0 ? byCount : a.key.compareTo(b.key);
+      });
+    return entries;
+  }
+
+  List<Map<String, dynamic>> _visibleRecentTransactions() {
+    final items = _monthFilteredRecentTransactions();
+    if (_recentTransactionsCategory == 'সব') return items;
+    return items.where((tx) => _transactionCategoryLabel(tx) == _recentTransactionsCategory).toList();
+  }
+
+  List<Map<String, dynamic>> _sortedRecentTransactions() {
+    final items = List<Map<String, dynamic>>.from(_transactions);
+    items.sort((a, b) {
+      final aDate = _parseTransactionDate(a['dateInput'] ?? a['date_input'] ?? a['date'] ?? a['createdAt'] ?? a['created_at']);
+      final bDate = _parseTransactionDate(b['dateInput'] ?? b['date_input'] ?? b['date'] ?? b['createdAt'] ?? b['created_at']);
+      if (aDate == null && bDate == null) return 0;
+      if (aDate == null) return 1;
+      if (bDate == null) return -1;
+      return bDate.compareTo(aDate);
+    });
+    return items;
+  }
+
+  String _transactionDateTimeLabel(Map<String, dynamic> tx) {
+    final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
+    final time = (tx['timeInput'] ?? tx['time_input'] ?? tx['time'] ?? '').toString().trim();
+    if (date == null) return time.isEmpty ? '' : time;
+    final dateText = '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+    return time.isEmpty ? dateText : '$dateText, $time';
+  }
+
+  ({Color accent, Color tint, IconData icon}) _transactionStyle(Map<String, dynamic> tx) {
+    final kind = (tx['kind'] ?? '').toString();
+    final value = '${tx['title'] ?? tx['description'] ?? ''} ${tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? ''}'.toLowerCase();
+    if (kind == 'আয়') return (accent: const Color(0xFF00A653), tint: const Color(0xFFF3FBF6), icon: Icons.south_rounded);
+    if (kind == 'ট্রান্সফার' || kind.toLowerCase() == 'transfer') return (accent: const Color(0xFF1688D4), tint: const Color(0xFFEAF4FF), icon: Icons.swap_horiz_rounded);
+    if (value.contains('খাবার') || value.contains('food')) return (accent: const Color(0xFFE92743), tint: const Color(0xFFFFF7F8), icon: Icons.restaurant_rounded);
+    if (value.contains('বাসা') || value.contains('বাড়ি') || value.contains('লোন')) return (accent: const Color(0xFFD96A00), tint: const Color(0xFFFFF1E1), icon: Icons.home_rounded);
+    if (value.contains('ইন্টারনেট') || value.contains('বিল')) return (accent: const Color(0xFF00A653), tint: const Color(0xFFF3FBF6), icon: Icons.router_rounded);
+    if (value.contains('উপহার')) return (accent: const Color(0xFF8627D9), tint: const Color(0xFFF5EBFF), icon: Icons.card_giftcard_rounded);
+    if (value.contains('যাতায়াত') || value.contains('বাস')) return (accent: const Color(0xFF1688D4), tint: const Color(0xFFEAF4FF), icon: Icons.directions_bus_rounded);
+    return (accent: const Color(0xFFE92743), tint: const Color(0xFFFFF7F8), icon: Icons.shopping_cart_rounded);
+  }
+
+  Map<String, List<Map<String, dynamic>>> _groupTransactionsByDate(List<Map<String, dynamic>> items) {
+    final groups = <String, List<Map<String, dynamic>>>{};
+    for (final tx in items) {
+      final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
+      final key = date == null ? 'unknown' : '${date.year}-${date.month}-${date.day}';
+      groups.putIfAbsent(key, () => <Map<String, dynamic>>[]).add(tx);
+    }
+    return groups;
+  }
+
+  String _bengaliDigits(String value) => value
+      .replaceAll('0', '০').replaceAll('1', '১').replaceAll('2', '২')
+      .replaceAll('3', '৩').replaceAll('4', '৪').replaceAll('5', '৫')
+      .replaceAll('6', '৬').replaceAll('7', '৭').replaceAll('8', '৮')
+      .replaceAll('9', '৯');
+
+  Widget _transactionDateHeading(List<Map<String, dynamic>> items, bool isDark) {
+    final date = items.isEmpty
+        ? null
+        : _parseTransactionDate(items.first['dateInput'] ?? items.first['date_input'] ?? items.first['date'] ?? items.first['createdAt'] ?? items.first['created_at']);
+    const months = <String>[
+      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
+      'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর',
+    ];
+    final dateLabel = date == null
+        ? 'তারিখ পাওয়া যায়নি'
+        : '${_bengaliDigits(date.day.toString())} ${months[date.month - 1]}, ${_bengaliDigits(date.year.toString())}';
+    final income = items.where((tx) => tx['kind'] == 'আয়')
+        .fold<double>(0, (sum, tx) => sum + _amount(tx['amount']));
+    final expense = items.where((tx) => tx['kind'] == 'ব্যয়')
+        .fold<double>(0, (sum, tx) => sum + _amount(tx['amount']));
+    final muted = isDark ? const Color(0xFF9BAEAA) : const Color(0xFF71818C);
+    final dateColor = isDark ? const Color(0xFFC3D4D0) : const Color(0xFF526875);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(1, 12, 2, 8),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 370;
+          final dateFont = compact ? 11.0 : 12.0;
+          final infoFont = compact ? 10.0 : 11.0;
+          final amountFont = compact ? 10.0 : 11.0;
+
+          return Row(
+            children: [
+              Text(
+                dateLabel,
+                maxLines: 1,
+                softWrap: false,
+                style: TextStyle(color: dateColor, fontSize: dateFont, fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(width: 5),
+              Text(
+                '${_bengaliDigits(items.length.toString())}টি',
+                maxLines: 1,
+                style: TextStyle(color: muted, fontSize: infoFont),
+              ),
+              const SizedBox(width: 7),
+              Expanded(
+                child: Divider(
+                  height: 1,
+                  color: isDark ? const Color(0xFF29433E) : const Color(0xFFDCE4E8),
+                ),
+              ),
+              const SizedBox(width: 7),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerRight,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('আয়: ', style: TextStyle(color: muted, fontSize: infoFont)),
+                    Text(_bengaliDigits(_money(income)),
+                      style: TextStyle(color: const Color(0xFF00A653), fontSize: amountFont, fontWeight: FontWeight.w900)),
+                    const SizedBox(width: 5),
+                    Text('ব্যয়: ', style: TextStyle(color: muted, fontSize: infoFont)),
+                    Text(_bengaliDigits(_money(expense)),
+                      style: TextStyle(color: const Color(0xFFE92743), fontSize: amountFont, fontWeight: FontWeight.w900)),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _recentTransactionRow(Map<String, dynamic> tx) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final kind = (tx['kind'] ?? '').toString();
+    final isIncome = kind == 'আয়';
+    final isTransfer = kind == 'ট্রান্সফার' || kind.toLowerCase() == 'transfer';
+    final style = _transactionStyle(tx);
+    final title = (tx['title'] ?? tx['description'] ?? tx['note'] ?? tx['name'] ?? 'লেনদেন').toString();
+    final category = (tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? tx['categoryTitle'] ?? '').toString();
+    final wallet = (tx['wallet'] ?? tx['walletName'] ?? tx['wallet_name'] ?? tx['accountName'] ?? tx['account'] ?? '').toString();
+    final subtitle = [category, wallet].where((v) => v.trim().isNotEmpty).join(' • ');
+    final amountColor = isIncome ? const Color(0xFF00A653) : isTransfer ? const Color(0xFF1688D4) : const Color(0xFFE92743);
+    final prefix = isIncome ? '+' : isTransfer ? '↔' : '−';
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.fromLTRB(10, 10, 3, 10),
+      decoration: BoxDecoration(
+        color: isDark ? Color.lerp(const Color(0xFF14283A), style.accent, .10) : style.tint,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: style.accent.withValues(alpha: isDark ? .24 : .05)),
+      ),
+      child: InkWell(
+        onTap: () => _showTransactionDetails(tx),
+        borderRadius: BorderRadius.circular(18),
+        child: Row(children: [
+        Container(width: 48, height: 48, decoration: BoxDecoration(color: style.accent.withValues(alpha: .08), borderRadius: BorderRadius.circular(15)), child: Icon(style.icon, color: style.accent, size: 25)),
+        const SizedBox(width: 10),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFF1FAF6) : const Color(0xFF111827), fontSize: 14, fontWeight: FontWeight.w900)),
+          if (subtitle.isNotEmpty) Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFAABBCD) : const Color(0xFF657481), fontSize: 11.5)),
+          Row(children: [Icon(Icons.access_time_rounded, size: 13, color: isDark ? const Color(0xFF91A6BC) : const Color(0xFF7B8993)), const SizedBox(width: 4), Text(_transactionDateTimeLabel(tx).split(', ').last, style: TextStyle(color: isDark ? const Color(0xFF91A6BC) : const Color(0xFF71808C), fontSize: 10.5))]),
+        ])),
+        const SizedBox(width: 5),
+        SizedBox(width: 98, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+          FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerRight, child: Text('$prefix ${_money(_amount(tx['amount']))}', maxLines: 1, style: TextStyle(color: amountColor, fontSize: 14, fontWeight: FontWeight.w900))),
+          const SizedBox(height: 5),
+          if (category.isNotEmpty) Container(
+            constraints: const BoxConstraints(maxWidth: 96),
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+            decoration: BoxDecoration(color: style.accent.withValues(alpha: .06), borderRadius: BorderRadius.circular(20), border: Border.all(color: style.accent.withValues(alpha: .10))),
+            child: Text(category, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: style.accent, fontSize: 10, fontWeight: FontWeight.w800)),
+          ),
+        ])),
+        PopupMenuButton<String>(
+          padding: EdgeInsets.zero,
+          icon: Icon(Icons.more_vert_rounded, color: isDark ? const Color(0xFF9BA9B2) : const Color(0xFF7B8791), size: 20),
+          onSelected: (action) {
+            if (action == 'edit') _editTransaction(tx);
+            if (action == 'delete') _deleteTransaction(tx);
+          },
+          itemBuilder: (_) => const [
+            PopupMenuItem(value: 'edit', child: Row(children: [
+              Icon(Icons.edit_outlined, size: 18), SizedBox(width: 10), Text('এডিট করুন'),
+            ])),
+            PopupMenuItem(value: 'delete', child: Row(children: [
+              Icon(Icons.delete_outline_rounded, size: 18, color: Color(0xFFE53935)),
+              SizedBox(width: 10), Text('ডিলিট করুন', style: TextStyle(color: Color(0xFFE53935))),
+            ])),
+          ],
+        ),
+        ]),
+      ),
+    );
+  }
+
+  Widget _recentTransactionsCard() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final items = _visibleRecentTransactions();
+    final categoryCounts = _recentTransactionCategoryCounts();
+    final monthOptions = _recentTransactionMonthOptions();
+    final selectedMonthLabel = _recentTransactionsMonthKey == 'all'
+        ? 'সব মাস'
+        : _monthLabel(_recentTransactionsMonthKey);
+    final groups = _groupTransactionsByDate(items);
+    final titleColor = isDark ? const Color(0xFFE5F8F0) : const Color(0xFF164F40);
+    final listChildren = <Widget>[];
+    for (final entry in groups.entries) {
+      listChildren.add(_transactionDateHeading(entry.value, isDark));
+      for (final tx in entry.value) {
+        listChildren.add(_recentTransactionRow(tx));
+      }
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(11, 5, 11, 8),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF0D2033) : const Color(0xFFFCFEFD),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: isDark ? const Color(0xFF29445D) : const Color(0xFFE2ECE7)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(2, 7, 2, 3),
+            child: Row(children: [
+              Expanded(
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Flexible(child: Text('সাম্প্রতিক লেনদেন', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: titleColor, fontSize: 15, fontWeight: FontWeight.w900))),
+                  const SizedBox(width: 5),
+                  Text('${_bengaliDigits(items.length.toString())}টি', style: TextStyle(color: isDark ? const Color(0xFF94A9BF) : const Color(0xFF71818C), fontSize: 10.5)),
+                ]),
+              ),
+              PopupMenuButton<String>(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 112, maxWidth: 150),
+                tooltip: 'মাস নির্বাচন করুন',
+                onSelected: (value) => setState(() => _recentTransactionsMonthKey = value),
+                color: isDark ? const Color(0xFF102A38) : Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                itemBuilder: (context) => [
+                  PopupMenuItem<String>(
+                    value: 'all',
+                    height: 36,
+                    child: Text('সব মাস', style: TextStyle(color: titleColor, fontSize: 11)),
+                  ),
+                  for (final monthKey in monthOptions)
+                    PopupMenuItem<String>(
+                      value: monthKey,
+                      height: 36,
+                      child: Text(_monthLabel(monthKey), style: TextStyle(color: titleColor, fontSize: 11)),
+                    ),
+                ],
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: isDark ? _appAccentColor.value.withValues(alpha: .12) : const Color(0xFFF0F5F3),
+                    borderRadius: BorderRadius.circular(9),
+                    border: Border.all(color: isDark ? const Color(0xFF385A76) : const Color(0xFFE1EAE5)),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text(selectedMonthLabel, style: TextStyle(color: isDark ? const Color(0xFFDCEBFA) : const Color(0xFF526875), fontSize: 9.5, fontWeight: FontWeight.w700)),
+                    Icon(Icons.keyboard_arrow_down_rounded, size: 13, color: isDark ? const Color(0xFFDCEBFA) : const Color(0xFF526875)),
+                  ]),
+                ),
+              ),
+              const SizedBox(width: 3),
+              InkWell(
+                onTap: _showAllTransactions,
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Text('সব দেখুন  ›', style: TextStyle(color: isDark ? _appAccentColor.value : const Color(0xFF00A875), fontSize: 10.5, fontWeight: FontWeight.w800)),
+                ),
+              ),
+            ]),
+          ),
+          const SizedBox(height: 7),
+          SizedBox(
+            height: 36,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              child: Row(
+                children: [
+                  _recentCategoryFilterChip(
+                    label: 'সব',
+                    count: _monthFilteredRecentTransactions().length,
+                    selected: _recentTransactionsCategory == 'সব',
+                    isDark: isDark,
+                    onTap: () => setState(() => _recentTransactionsCategory = 'সব'),
+                  ),
+                  for (final entry in categoryCounts) ...[
+                    const SizedBox(width: 6),
+                    _recentCategoryFilterChip(
+                      label: entry.key,
+                      count: entry.value,
+                      selected: _recentTransactionsCategory == entry.key,
+                      isDark: isDark,
+                      onTap: () => setState(() => _recentTransactionsCategory = entry.key),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          if (_recentTransactionsCategory != 'সব')
+            _recentCategorySummary(items, isDark),
+          const SizedBox(height: 5),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: _load,
+              child: items.isEmpty
+                  ? ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(14),
+                      children: [
+                        Center(
+                          child: _loading
+                              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                              : Text('এখনো কোনো লেনদেন নেই', style: TextStyle(color: titleColor, fontSize: 11)),
+                        ),
+                      ],
+                    )
+                  : ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: EdgeInsets.zero,
+                      children: listChildren,
+                    ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _recentCategorySummary(List<Map<String, dynamic>> items, bool isDark) {
+    var income = 0.0;
+    var expense = 0.0;
+    for (final tx in items) {
+      final amount = _amount(tx['amount']);
+      final kind = (tx['kind'] ?? '').toString();
+      if (kind == 'আয়') income += amount;
+      if (kind == 'ব্যয়') expense += amount;
+    }
+    final remaining = income - expense;
+    final background = isDark ? const Color(0xFF102A38) : const Color(0xFFF0F5FA);
+    final muted = isDark ? const Color(0xFFB7C9D5) : const Color(0xFF647789);
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(top: 7, bottom: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 10),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _categorySummaryValue(
+              'অবশিষ্ট', remaining,
+              remaining >= 0 ? const Color(0xFF1688D4) : const Color(0xFFE27A21),
+              muted, TextAlign.left,
+            ),
+          ),
+          Expanded(
+            child: _categorySummaryValue(
+              'ব্যয়', expense, const Color(0xFFE92743), muted, TextAlign.center,
+            ),
+          ),
+          Expanded(
+            child: _categorySummaryValue(
+              'আয়', income, const Color(0xFF00A653), muted, TextAlign.right,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _categorySummaryValue(
+    String label,
+    double amount,
+    Color valueColor,
+    Color muted,
+    TextAlign alignment,
+  ) {
+    return Row(
+      mainAxisAlignment: alignment == TextAlign.left
+          ? MainAxisAlignment.start
+          : alignment == TextAlign.right
+              ? MainAxisAlignment.end
+              : MainAxisAlignment.center,
+      children: [
+        Text('$label: ', style: TextStyle(color: muted, fontSize: 9, fontWeight: FontWeight.w600)),
+        Flexible(
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: alignment == TextAlign.left
+                ? Alignment.centerLeft
+                : alignment == TextAlign.right
+                    ? Alignment.centerRight
+                    : Alignment.center,
+            child: Text(
+              _bengaliDigits(_money(amount)),
+              maxLines: 1,
+              softWrap: false,
+              style: TextStyle(color: valueColor, fontSize: 10.5, fontWeight: FontWeight.w900),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _recentCategoryFilterChip({
+    required String label,
+    required int count,
+    required bool selected,
+    required bool isDark,
+    required VoidCallback onTap,
+  }) {
+    final selectedColor = _appAccentColor.value;
+    final foreground = selected
+        ? Colors.white
+        : isDark ? const Color(0xFFB7C7D8) : const Color(0xFF738292);
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+          decoration: BoxDecoration(
+            color: selected
+                ? selectedColor
+                : isDark ? const Color(0xFF14283A) : Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: selected
+                  ? selectedColor
+                  : isDark ? const Color(0xFF344B62) : const Color(0xFFE1E8EF),
+            ),
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text(label, style: TextStyle(color: foreground, fontSize: 11, fontWeight: FontWeight.w700)),
+            const SizedBox(width: 5),
+            Text(_bengaliDigits(count.toString()), style: TextStyle(color: foreground, fontSize: 10, fontWeight: FontWeight.w600)),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _editTransaction(Map<String, dynamic> tx) async {
+    final title = TextEditingController(text: (tx['title'] ?? tx['description'] ?? tx['note'] ?? '').toString());
+    final amount = TextEditingController(text: _amount(tx['amount']).toString());
+    final category = TextEditingController(text: (tx['category'] ?? tx['categoryName'] ?? '').toString());
+    final wallet = TextEditingController(text: (tx['wallet'] ?? tx['walletName'] ?? tx['account'] ?? 'ক্যাশ').toString());
+    final note = TextEditingController(text: (tx['note'] ?? '').toString());
+    final transferTo = TextEditingController(text: (tx['transferTo'] ?? '').toString());
+    final parsed = DateTime.tryParse((tx['dateInput'] ?? tx['date_input'] ?? '').toString()) ?? _parseTransactionDate(tx['date']) ?? DateTime.now();
+    final date = TextEditingController(text: '${parsed.year.toString().padLeft(4, '0')}-${parsed.month.toString().padLeft(2, '0')}-${parsed.day.toString().padLeft(2, '0')}');
+    var kind = (tx['kind'] ?? 'ব্যয়').toString();
+    var saving = false;
+    final key = GlobalKey<FormState>();
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      await showDialog<void>(context: context, builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('লেনদেন এডিট করুন'),
+          content: SizedBox(width: 420, child: SingleChildScrollView(child: Form(key: key, child: Column(mainAxisSize: MainAxisSize.min, children: [
+            TextFormField(controller: title, decoration: const InputDecoration(labelText: 'বিবরণ'), validator: (v) => v == null || v.trim().isEmpty ? 'বিবরণ লিখুন' : null),
+            DropdownButtonFormField<String>(
+              initialValue: ['আয়', 'ব্যয়', 'ট্রান্সফার'].contains(kind) ? kind : 'ব্যয়',
+              decoration: const InputDecoration(labelText: 'ধরন'),
+              items: const ['আয়', 'ব্যয়', 'ট্রান্সফার'].map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+              onChanged: saving ? null : (v) => setDialogState(() => kind = v ?? kind),
+            ),
+            TextFormField(controller: amount, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(labelText: 'পরিমাণ (৳)'), validator: (v) { final n = double.tryParse(v ?? ''); return n == null || n <= 0 ? 'সঠিক পরিমাণ লিখুন' : null; }),
+            TextFormField(controller: category, decoration: const InputDecoration(labelText: 'ক্যাটাগরি')),
+            TextFormField(controller: wallet, decoration: const InputDecoration(labelText: 'ওয়ালেট')),
+            if (kind == 'ট্রান্সফার') TextFormField(controller: transferTo, decoration: const InputDecoration(labelText: 'গন্তব্য ওয়ালেট')),
+            TextFormField(controller: date, readOnly: true, decoration: const InputDecoration(labelText: 'তারিখ', suffixIcon: Icon(Icons.calendar_month)), onTap: () async {
+              final picked = await showDatePicker(context: context, initialDate: DateTime.tryParse(date.text) ?? DateTime.now(), firstDate: DateTime(2000), lastDate: DateTime(2100));
+              if (!context.mounted) return;
+              if (picked != null) date.text = '${picked.year.toString().padLeft(4, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
+            }),
+            TextFormField(controller: note, decoration: const InputDecoration(labelText: 'নোট (ঐচ্ছিক)')),
+          ])))),
+          actions: [
+            TextButton(onPressed: saving ? null : () => Navigator.pop(dialogContext), child: const Text('বাতিল')),
+            FilledButton(onPressed: saving ? null : () async {
+              if (!key.currentState!.validate()) return;
+              if (kind == 'ট্রান্সফার' && transferTo.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('গন্তব্য ওয়ালেট লিখুন।')));
+                return;
+              }
+              setDialogState(() => saving = true);
+              try {
+                final changed = Map<String, dynamic>.from(tx)
+                  ..['title'] = title.text.trim()
+                  ..['amount'] = double.parse(amount.text.trim())
+                  ..['kind'] = kind
+                  ..['category'] = category.text.trim()
+                  ..['wallet'] = wallet.text.trim()
+                  ..['date'] = date.text
+                  ..['dateInput'] = date.text
+                  ..['note'] = note.text.trim();
+                if (kind == 'ট্রান্সফার') { changed['transferTo'] = transferTo.text.trim(); }
+                else { changed.remove('transferTo'); changed.remove('transfer_to'); }
+                final next = _transactions.map((item) => item['id'].toString() == tx['id'].toString() ? changed : item).toList();
+                await _AuthApi._put('/data/transactions', {'data': next});
+                if (!mounted || !dialogContext.mounted) return;
+                Navigator.pop(dialogContext);
+                await _load();
+                if (!mounted) return;
+                messenger.showSnackBar(const SnackBar(content: Text('লেনদেন আপডেট হয়েছে।')));
+              } catch (e) {
+                if (dialogContext.mounted) setDialogState(() => saving = false);
+                if (mounted) messenger.showSnackBar(SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))));
+              }
+            }, child: saving ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('সংরক্ষণ করুন')),
+          ],
+        ),
+      ));
+    } finally {
+      title.dispose(); amount.dispose(); category.dispose(); wallet.dispose(); note.dispose(); transferTo.dispose(); date.dispose();
+    }
+  }
+
+  Future<void> _deleteTransaction(Map<String, dynamic> tx) async {
+    final label = (tx['title'] ?? tx['description'] ?? 'এই লেনদেন').toString();
+    final ok = await showDialog<bool>(context: context, builder: (dialogContext) => AlertDialog(
+      title: const Text('লেনদেন ডিলিট করবেন?'),
+      content: Text('"$label" লেনদেনটি স্থায়ীভাবে মুছে যাবে।'),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('বাতিল')),
+        FilledButton(style: FilledButton.styleFrom(backgroundColor: const Color(0xFFE53935)), onPressed: () => Navigator.pop(dialogContext, true), child: const Text('ডিলিট করুন')),
+      ],
+    ));
+    if (ok != true || !mounted) return;
+    try {
+      final next = _transactions.where((item) => item['id'].toString() != tx['id'].toString()).toList();
+      await _AuthApi._put('/data/transactions', {'data': next});
+      await _load();
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('লেনদেন ডিলিট হয়েছে।')));
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))));
+    }
+  }
+
+  void _showTransactionDetails(Map<String, dynamic> tx) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final title = (tx['title'] ?? tx['description'] ?? tx['note'] ?? 'লেনদেন').toString();
+    final category = (tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? '').toString();
+    final wallet = (tx['wallet'] ?? tx['walletName'] ?? tx['wallet_name'] ?? tx['accountName'] ?? '').toString();
+    showDialog<void>(context: context, builder: (dialogContext) => AlertDialog(
+      backgroundColor: isDark ? const Color(0xFF14283A) : Colors.white,
+      title: Text(title),
+      content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(_money(_amount(tx['amount'])), style: TextStyle(color: _transactionStyle(tx).accent, fontSize: 22, fontWeight: FontWeight.w900)),
+        if (category.isNotEmpty) Text('ক্যাটাগরি: $category'),
+        if (wallet.isNotEmpty) Text('ওয়ালেট: $wallet'),
+        Text('তারিখ: ${_transactionDateTimeLabel(tx)}'),
+      ]),
+      actions: [TextButton(onPressed: () => Navigator.of(dialogContext).pop(), child: const Text('বন্ধ করুন'))],
+    ));
+  }
+
+  void _showAllTransactions() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final items = _visibleRecentTransactions();
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: isDark ? const Color(0xFF071827) : const Color(0xFFF3F8F5),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (sheetContext) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: .88,
+        minChildSize: .5,
+        maxChildSize: .96,
+        builder: (context, controller) => Column(children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: Row(children: [
+              Expanded(child: Text('সব লেনদেন', style: TextStyle(color: isDark ? const Color(0xFFDCEBFA) : const Color(0xFF164F40), fontSize: 16, fontWeight: FontWeight.w900))),
+              Text('${items.length}টি', style: TextStyle(color: isDark ? const Color(0xFF94A9BF) : const Color(0xFF64877C), fontSize: 11)),
+            ]),
+          ),
+          Expanded(child: items.isEmpty
+            ? Center(child: Text('এখনো কোনো লেনদেন নেই', style: TextStyle(color: isDark ? Colors.white70 : const Color(0xFF64877C))))
+            : ListView.separated(
+                controller: controller,
+                padding: const EdgeInsets.fromLTRB(12, 4, 12, 20),
+                itemCount: items.length,
+                separatorBuilder: (_, _) => Divider(height: 1, indent: 52, color: isDark ? const Color(0xFF36536F) : const Color(0xFFD7EEE5)),
+                itemBuilder: (_, index) => _recentTransactionRow(items[index]),
+              )),
+        ]),
+      ),
+    );
+  }
+
+  Widget _compactExpenseOverview() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final now = DateTime.now();
+    final monthStart = DateTime(now.year, now.month);
+    final nextMonth = DateTime(now.year, now.month + 1);
+    var monthIncome = 0.0, monthExpense = 0.0, previousMonthIncome = 0.0, previousMonthExpense = 0.0;
+    final previousMonthStart = DateTime(now.year, now.month - 1);
+    for (final tx in _transactions) {
+      final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
+      if (date == null) continue;
+      final amount = _amount(tx['amount']);
+      if (!date.isBefore(monthStart) && date.isBefore(nextMonth)) {
+        if (tx['kind'] == 'আয়') monthIncome += amount;
+        if (tx['kind'] == 'ব্যয়') monthExpense += amount;
+      } else if (!date.isBefore(previousMonthStart) && date.isBefore(monthStart)) {
+        if (tx['kind'] == 'আয়') previousMonthIncome += amount;
+        if (tx['kind'] == 'ব্যয়') previousMonthExpense += amount;
+      }
+    }
+    double? changePercent(double current, double previous) => previous == 0 ? null : ((current - previous) / previous.abs()) * 100;
+    final incomeChange = changePercent(monthIncome, previousMonthIncome);
+    final expenseChange = changePercent(monthExpense, previousMonthExpense);
+    final unpaidDebts = _debts.where((item) {
+      final kind = (item['debtKind'] ?? item['status'] ?? '').toString();
+      final status = (item['status'] ?? '').toString();
+      return kind == 'দেনা' && status != 'পরিশোধিত' && status != 'সম্পন্ন';
+    }).toList();
+    final debtTotal = unpaidDebts.fold<double>(0, (sum, item) {
+      final payments = item['payments'] is List ? item['payments'] as List : <dynamic>[];
+      final paid = payments.whereType<Map>().fold<double>(0, (value, payment) => value + _amount(payment['amount']));
+      return sum + (_amount(item['amount']) - paid).clamp(0, double.infinity).toDouble();
+    });
+    final unpaidBills = _bills.where((item) {
+      final status = (item['status'] ?? '').toString();
+      return status != 'পরিশোধিত' && status != 'সম্পন্ন';
+    }).toList();
+    final billTotal = unpaidBills.fold<double>(0, (sum, item) => sum + _amount(item['amount']));
+    Widget summaryCard({required String title, required double amount, required String subtitle, required IconData icon, required Color accent, required Color tint, required bool showTrend, double? change}) {
+      final foreground = isDark ? const Color(0xFFEAF7F2) : const Color(0xFF183E35);
+      final muted = isDark ? const Color(0xFFA9C4BA) : const Color(0xFF617B73);
+      return Expanded(child: Container(height: 74, padding: const EdgeInsets.fromLTRB(5, 7, 4, 5),
+        decoration: BoxDecoration(color: isDark ? accent.withValues(alpha: .13) : tint, borderRadius: BorderRadius.circular(13), border: Border.all(color: accent.withValues(alpha: isDark ? .32 : .13)),
+          boxShadow: isDark ? [] : [BoxShadow(color: accent.withValues(alpha: .07), blurRadius: 9, offset: const Offset(0, 3))]),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [Container(width: 25, height: 25, decoration: BoxDecoration(color: accent.withValues(alpha: .16), shape: BoxShape.circle), child: Icon(icon, size: 15, color: accent)),
+            const SizedBox(width: 3), Expanded(child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 9, color: muted, fontWeight: FontWeight.w700)))]),
+          const Spacer(),
+          FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(_hidden ? '৳ •••••' : _money(amount), maxLines: 1, style: TextStyle(fontSize: 12, color: foreground, fontWeight: FontWeight.w900))),
+          const SizedBox(height: 1),
+          Row(children: [
+            if (showTrend) ...[Icon(change == null ? Icons.remove_rounded : change >= 0 ? Icons.trending_up_rounded : Icons.trending_down_rounded, size: 11, color: accent), const SizedBox(width: 2),
+              Expanded(child: Text(change == null ? 'নতুন' : '${change >= 0 ? '+' : '-'}${change.abs().toStringAsFixed(1)}%', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 8, color: accent, fontWeight: FontWeight.w800)))]
+            else ...[Icon(title == 'দেনা' ? Icons.people_alt_rounded : Icons.receipt_long_rounded, size: 10, color: muted), const SizedBox(width: 3),
+              Expanded(child: Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 8, color: muted, fontWeight: FontWeight.w700)))]
+          ])
+        ])));
+    }
+    return Row(children: [
+      summaryCard(title: 'আয়', amount: monthIncome, subtitle: '', icon: Icons.south_rounded, accent: const Color(0xFF39BDF8), tint: const Color(0xFFE7FBF3), showTrend: true, change: incomeChange),
+      const SizedBox(width: 5),
+      summaryCard(title: 'ব্যয়', amount: monthExpense, subtitle: '', icon: Icons.north_rounded, accent: const Color(0xFFFF625B), tint: const Color(0xFFFFEEEE), showTrend: true, change: expenseChange),
+      const SizedBox(width: 5),
+      summaryCard(title: 'দেনা', amount: debtTotal, subtitle: '${unpaidDebts.length} জন', icon: Icons.payments_rounded, accent: const Color(0xFFF29A16), tint: const Color(0xFFFFF6E8), showTrend: false),
+      const SizedBox(width: 5),
+      summaryCard(title: 'বিল', amount: billTotal, subtitle: '${unpaidBills.length} টি বাকি', icon: Icons.calendar_month_rounded, accent: const Color(0xFF2588F5), tint: const Color(0xFFEEF6FF), showTrend: false),
+    ]);
+  }
+  Widget _incomeExpenseChart() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final now = DateTime.now();
+    final rangeEnd = DateTime(now.year, now.month, now.day + 1);
+    final rangeStart = rangeEnd.subtract(Duration(days: _chartRangeDays));
+    final days = _chartRangeDays;
+    final income = List<double>.filled(days, 0);
+    final expense = List<double>.filled(days, 0);
+    for (final tx in _transactions) {
+      final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
+      if (date == null || date.isBefore(rangeStart) || !date.isBefore(rangeEnd)) continue;
+      final index = date.difference(rangeStart).inDays;
+      if (index < 0 || index >= days) continue;
+      final amount = _amount(tx['amount']);
+      if (tx['kind'] == 'আয়') income[index] += amount;
+      if (tx['kind'] == 'ব্যয়') expense[index] += amount;
+    }
+    final totalIncome = income.fold<double>(0, (sum, value) => sum + value);
+    final totalExpense = expense.fold<double>(0, (sum, value) => sum + value);
+    final maximum = <double>[...income, ...expense].fold<double>(0, (maxValue, value) => value > maxValue ? value : maxValue);
+    final chartMax = maximum <= 0 ? 1.0 : maximum * 1.2;
+    final textColor = isDark ? const Color(0xFFDCEBFA) : const Color(0xFF164F40);
+    final mutedColor = isDark ? const Color(0xFF94A9BF) : const Color(0xFF64877C);
+    final cardColor = isDark ? const Color(0xFF0D2033) : const Color(0xFFF9FFFC);
+    final borderColor = isDark ? const Color(0xFF36536F) : const Color(0xFFD7EEE5);
+    return Container(
+      padding: const EdgeInsets.fromLTRB(7, 4, 7, 3),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor),
+        boxShadow: [
+          BoxShadow(
+            color: _appAccentColor.value.withValues(alpha: isDark ? .07 : .045),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.bar_chart_rounded, color: isDark ? const Color(0xFF68C5FF) : const Color(0xFF00A878), size: 21),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'আয় ও খরচের হিসাব',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w800),
+                ),
+              ),
+              PopupMenuButton<int>(
+                initialValue: _chartRangeDays,
+                tooltip: 'গ্রাফের সময় নির্বাচন করুন',
+                onSelected: (value) => setState(() => _chartRangeDays = value),
+                color: isDark ? const Color(0xFF102A38) : const Color(0xFFFFFFFF),
+                surfaceTintColor: Colors.transparent,
+                elevation: 10,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: isDark ? const Color(0xFF245363) : const Color(0xFFD9E9E4)),
+                ),
+                constraints: const BoxConstraints(maxHeight: 190, minWidth: 112, maxWidth: 112),
+                itemBuilder: (context) => [
+                  PopupMenuItem<int>(
+                    enabled: false,
+                    height: 112,
+                    padding: EdgeInsets.zero,
+                    child: SizedBox(
+                      height: 112,
+                      width: 112,
+                      child: Scrollbar(
+                        thumbVisibility: true,
+                        child: ListView(
+                          padding: EdgeInsets.zero,
+                          children: [
+                            for (final option in const <(int, String)>[
+                              (3, '৩ দিন'), (7, '৭ দিন'), (15, '১৫ দিন'),
+                              (30, '১ মাস'), (90, '৩ মাস'), (180, '৬ মাস'), (365, '১ বছর'),
+                            ])
+                              InkWell(
+                                onTap: () {
+                                  Navigator.of(context).pop();
+                                  setState(() => _chartRangeDays = option.$1);
+                                },
+                                child: Container(
+                                  height: 34,
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  color: _chartRangeDays == option.$1
+                                      ? (isDark ? const Color(0xFF284B6A) : const Color(0xFFE0F5ED))
+                                      : Colors.transparent,
+                                  child: Row(children: [
+                                    if (_chartRangeDays == option.$1)
+                                      const Icon(Icons.check_rounded, size: 13, color: Color(0xFF00B982))
+                                    else
+                                      const SizedBox(width: 13),
+                                    const SizedBox(width: 5),
+                                    Text(option.$2, style: TextStyle(
+                                      color: _chartRangeDays == option.$1 ? const Color(0xFF00B982) : textColor,
+                                      fontSize: 10.5,
+                                      fontWeight: _chartRangeDays == option.$1 ? FontWeight.w800 : FontWeight.w600,
+                                    )),
+                                  ]),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: isDark ? _appAccentColor.value.withValues(alpha: .12) : _appAccentColor.value.withValues(alpha: .10),
+                    border: Border.all(color: isDark ? _appAccentColor.value.withValues(alpha: .25) : _appAccentColor.value.withValues(alpha: .28)),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text(
+                      _chartRangeDays == 3 ? '৩ দিন' : _chartRangeDays == 7 ? '৭ দিন' : _chartRangeDays == 15 ? '১৫ দিন' : _chartRangeDays == 30 ? '১ মাস' : _chartRangeDays == 90 ? '৩ মাস' : _chartRangeDays == 180 ? '৬ মাস' : '১ বছর',
+                      style: TextStyle(color: textColor, fontSize: 10.5, fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(width: 3),
+                    Icon(Icons.keyboard_arrow_down_rounded, color: textColor, size: 15),
+                  ]),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          SizedBox(
+            height: 115,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 2),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: CustomPaint(
+                            painter: _IncomeExpenseChartPainter(
+                              income: income,
+                              expense: expense,
+                              maxValue: chartMax,
+                              isDark: isDark,
+                            ),
+                            child: const SizedBox.expand(),
+                          ),
+                        ),
+                        const SizedBox(height: 3),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: List.generate(6, (index) {
+                            final dayOffset = ((days - 1) * index / 5).round();
+                            final labelDate = rangeStart.add(Duration(days: dayOffset));
+                            return Text('${labelDate.day}', style: TextStyle(color: mutedColor, fontSize: 8.5));
+                          }),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 4,
+                  right: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(mainAxisSize: MainAxisSize.min, children: [
+                          Container(width: 7, height: 7, decoration: const BoxDecoration(color: Color(0xFF00C98B), shape: BoxShape.circle)),
+                          const SizedBox(width: 5),
+                          Text('আয়', style: TextStyle(color: mutedColor, fontSize: 10)),
+                          const SizedBox(width: 10),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(_money(totalIncome), style: TextStyle(color: textColor, fontSize: 10.5, fontWeight: FontWeight.w800)),
+                          ),
+                        ]),
+                        const SizedBox(height: 5),
+                        Row(mainAxisSize: MainAxisSize.min, children: [
+                          Container(width: 7, height: 7, decoration: const BoxDecoration(color: Color(0xFFFF5757), shape: BoxShape.circle)),
+                          const SizedBox(width: 5),
+                          Text('খরচ', style: TextStyle(color: mutedColor, fontSize: 10)),
+                          const SizedBox(width: 10),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(_money(totalExpense), style: TextStyle(color: textColor, fontSize: 10.5, fontWeight: FontWeight.w800)),
+                          ),
+                        ]),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _incomeExpenseDonuts() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(child: _donutSummaryCard(isIncome: true, monthOffset: _incomeDonutMonthOffset)),
+        const SizedBox(width: 8),
+        Expanded(child: _donutSummaryCard(isIncome: false, monthOffset: _expenseDonutMonthOffset)),
+      ],
+    );
+  }
+
+  Widget _donutSummaryCard({required bool isIncome, required int monthOffset}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final now = DateTime.now();
+    final selectedMonth = DateTime(now.year, now.month - monthOffset);
+    final nextMonth = DateTime(selectedMonth.year, selectedMonth.month + 1);
+    final totals = <String, double>{};
+    for (final tx in _transactions) {
+      final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
+      if (date == null || date.isBefore(DateTime(selectedMonth.year, selectedMonth.month)) || !date.isBefore(nextMonth)) continue;
+      if ((tx['kind'] ?? '').toString() != (isIncome ? 'আয়' : 'ব্যয়')) continue;
+      final category = (tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? tx['categoryTitle'] ?? tx['category_title'] ?? tx['subcategory'] ?? '').toString().trim();
+      final key = category.isEmpty ? 'অন্যান্য' : category;
+      totals[key] = (totals[key] ?? 0) + _amount(tx['amount']);
+    }
+    final entries = totals.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final shown = entries.take(5).toList();
+    final remainder = entries.skip(5).fold<double>(0, (sum, entry) => sum + entry.value);
+    if (remainder > 0) {
+      final otherIndex = shown.indexWhere((entry) => entry.key == 'অন্যান্য');
+      if (otherIndex >= 0) {
+        shown[otherIndex] = MapEntry('অন্যান্য', shown[otherIndex].value + remainder);
+      } else {
+        shown.add(MapEntry('অন্যান্য', remainder));
+      }
+    }
+    final total = entries.fold<double>(0, (sum, entry) => sum + entry.value);
+    const palette = <Color>[
+      Color(0xFF00B982), Color(0xFFFF625B), Color(0xFFFFA62B),
+      Color(0xFF1688D4), Color(0xFFC13EE8), Color(0xFF00C9A7),
+    ];
+    final title = isIncome ? 'আয়ের উৎস' : 'খরচের বিভাগ';
+    final cardColor = isDark ? const Color(0xFF0D2033) : const Color(0xFFF9FFFC);
+    final borderColor = isDark ? const Color(0xFF36536F) : const Color(0xFFD7EEE5);
+    final textColor = isDark ? const Color(0xFFDCEBFA) : const Color(0xFF164F40);
+    final mutedColor = isDark ? const Color(0xFF94A9BF) : const Color(0xFF64877C);
+    final monthLabel = monthOffset == 0 ? 'এই মাস' : monthOffset == 1 ? 'গত মাস' : '$monthOffset মাস আগে';
+    return Container(
+      padding: const EdgeInsets.fromLTRB(7, 3, 6, 2),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w800))),
+              PopupMenuButton<int>(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 90, maxWidth: 110),
+                tooltip: 'মাস নির্বাচন করুন',
+                onSelected: (value) => setState(() {
+                  if (isIncome) {
+                    _incomeDonutMonthOffset = value;
+                  } else {
+                    _expenseDonutMonthOffset = value;
+                  }
+                }),
+                color: isDark ? const Color(0xFF102A38) : Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                itemBuilder: (context) => [
+                  for (var offset = 0; offset < 6; offset++)
+                    PopupMenuItem<int>(
+                      value: offset,
+                      height: 34,
+                      child: Text(offset == 0 ? 'এই মাস' : offset == 1 ? 'গত মাস' : '$offset মাস আগে', style: TextStyle(color: textColor, fontSize: 10.5)),
+                    ),
+                ],
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: isDark ? _appAccentColor.value.withValues(alpha: .12) : _appAccentColor.value.withValues(alpha: .10),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text(monthLabel, style: TextStyle(color: textColor, fontSize: 9, fontWeight: FontWeight.w700)),
+                    Icon(Icons.keyboard_arrow_down_rounded, size: 12, color: textColor),
+                  ]),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          SizedBox(
+            height: 80,
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 4,
+                  child: SizedBox.expand(
+                    child: CustomPaint(
+                      painter: _DonutSummaryPainter(values: shown.map((entry) => entry.value).toList(), colors: List<Color>.generate(shown.length, (i) => palette[i % palette.length])),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 44,
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(_money(total), style: TextStyle(color: textColor, fontSize: 9, fontWeight: FontWeight.w900)),
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(isIncome ? 'মোট আয়' : 'মোট খরচ', style: TextStyle(color: mutedColor, fontSize: 7.5)),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Expanded(
+                  flex: 5,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (var i = 0; i < shown.length; i++)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 1),
+                          child: Row(
+                            children: [
+                              Container(width: 6, height: 6, decoration: BoxDecoration(color: palette[i % palette.length], shape: BoxShape.circle)),
+                              const SizedBox(width: 4),
+                              Expanded(child: Text(shown[i].key, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: mutedColor, fontSize: 8))),
+                              const SizedBox(width: 2),
+                              Text(total > 0 ? '${(shown[i].value / total * 100).round()}%' : '0%', style: TextStyle(color: textColor, fontSize: 8, fontWeight: FontWeight.w700)),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _walletCard(String name, IconData icon, Color accent) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final balance = _walletBalances[name] ?? 0;
+    final formattedBalance = balance.toStringAsFixed(0).replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',');
+    final isBikash = name == 'বিকাশ';
+    final isNagad = name == 'নগদ';
+    final lightGradientColors = isBikash
+        ? const [Color(0xFFFFD6E7), Color(0xFFFFF7FA)]
+        : isNagad
+            ? const [Color(0xFFFFE2C7), Color(0xFFFFFBF6)]
+            : name == 'ক্যাশ'
+                ? const [Color(0xFFCCF7E7), Color(0xFFF7FFFB)]
+                : const [Color(0xFFD7E7FF), Color(0xFFF8FBFF)];
+    return Container(
+      padding: const EdgeInsets.fromLTRB(2, 4, 2, 4),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xB8072638) : null,
+        gradient: isDark
+            ? null
+            : LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: lightGradientColors,
+              ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? accent.withValues(alpha: .48) : lightGradientColors.first.withValues(alpha: .75),
+        ),
+        boxShadow: isDark
+            ? [BoxShadow(color: accent.withValues(alpha: .06), blurRadius: 9, offset: const Offset(0, 3))]
+            : [BoxShadow(color: accent.withValues(alpha: .12), blurRadius: 8, offset: const Offset(0, 3))],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          SizedBox(
+            width: 34,
+            height: 34,
+            child: isBikash
+                ? SvgPicture.asset('assets/wallets/bkash-mark.svg', fit: BoxFit.contain)
+                : isNagad
+                    ? SvgPicture.asset('assets/wallets/nagad-mark.svg', fit: BoxFit.contain)
+                    : Icon(icon, color: accent, size: 30),
+          ),
+          const SizedBox(height: 1),
+          Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFE8FFF7) : const Color(0xFF155A45), fontSize: 12, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 1),
+          FittedBox(fit: BoxFit.scaleDown, child: Text(_hidden ? '৳ •••••' : '৳ $formattedBalance', maxLines: 1, style: TextStyle(color: isDark ? Colors.white : const Color(0xFF073F32), fontSize: 13, fontWeight: FontWeight.w900))),
+        ],
+      ),
+    );
+  }
+
+  void _showAccentColorPicker(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: _appThemeMode.value == ThemeMode.dark ? const Color(0xFF10243A) : Colors.white,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text('Theme Color', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+            const SizedBox(height: 6),
+            const Text('পছন্দের Accent Color বেছে নিন', style: TextStyle(fontSize: 12)),
+            const SizedBox(height: 16),
+            ValueListenableBuilder<Color>(
+              valueListenable: _appAccentColor,
+              builder: (context, selected, _) => Wrap(spacing: 14, runSpacing: 14, children: [
+                for (final color in _accentPalette)
+                  InkWell(
+                    onTap: () => _setAppAccentColor(color),
+                    borderRadius: BorderRadius.circular(30),
+                    child: Container(
+                      width: 42, height: 42,
+                      decoration: BoxDecoration(
+                        color: color, shape: BoxShape.circle,
+                        border: Border.all(color: selected.toARGB32() == color.toARGB32() ? Colors.white : Colors.transparent, width: 3),
+                      ),
+                      child: selected.toARGB32() == color.toARGB32() ? const Icon(Icons.check_rounded, color: Colors.white, size: 21) : null,
+                    ),
+                  ),
+              ]),
+            ),
+            const SizedBox(height: 18),
+            _CustomAccentHexField(),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  void _showDashboardMenu(BuildContext context) {
+    final isDark = _appThemeMode.value == ThemeMode.dark;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: isDark ? const Color(0xFF10243A) : Colors.white,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          SwitchListTile(
+            secondary: const Icon(Icons.dashboard_customize_rounded),
+            title: const Text('Compact / Expand'),
+            subtitle: Text(_compactCharts ? 'Compact view চালু' : 'Expanded view চালু'),
+            value: _compactCharts,
+            onChanged: (value) => setState(() => _compactCharts = value),
+          ),
+          SwitchListTile(
+            secondary: Icon(isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded),
+            title: Text(isDark ? 'Dark Future Mode' : 'Light Mode'),
+            subtitle: Text(isDark ? 'Premium dark theme চালু' : 'Light theme চালু'),
+            value: isDark,
+            onChanged: (value) async {
+              await _setAppThemeMode(value ? ThemeMode.dark : ThemeMode.light);
+              if (sheetContext.mounted) Navigator.pop(sheetContext);
+            },
+          ),
+          ListTile(leading: Icon(Icons.palette_outlined, color: _appAccentColor.value), title: const Text('Theme Color'), subtitle: const Text('Accent color পরিবর্তন করুন'), onTap: () { Navigator.pop(sheetContext); _showAccentColorPicker(context); }),
+          ListTile(leading: const Icon(Icons.refresh_rounded), title: const Text('ডেটা রিফ্রেশ'), onTap: () { Navigator.pop(sheetContext); _load(); }),
+          ListTile(leading: const Icon(Icons.dns_outlined), title: const Text('Server Settings'), onTap: () { Navigator.pop(sheetContext); Navigator.of(context).push(_route(const ServerSettingsScreen())); }),
+          ListTile(leading: const Icon(Icons.logout_rounded), title: const Text('লগআউট'), onTap: () async { Navigator.pop(sheetContext); await _AuthApi.clearSession(); if (context.mounted) Navigator.of(context).pushAndRemoveUntil(_route(const LoginScreen()), (route) => false); }),
+        ]),
+      ),
+    );
+  }
+}
+
+
+
+class _DonutSummaryPainter extends CustomPainter {
+  final List<double> values;
+  final List<Color> colors;
+  const _DonutSummaryPainter({required this.values, required this.colors});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.width <= 0 || size.height <= 0) return;
+    final side = size.width < size.height ? size.width : size.height;
+    final stroke = side * .14;
+    final rect = Rect.fromCenter(center: Offset(size.width / 2, size.height / 2), width: side - stroke, height: side - stroke);
+    final base = Paint()..color = const Color(0xFF8A9B9A).withValues(alpha: .12)..style = PaintingStyle.stroke..strokeWidth = stroke;
+    canvas.drawCircle(rect.center, rect.width / 2, base);
+    final total = values.fold<double>(0, (sum, value) => sum + value);
+    if (total <= 0) return;
+    var start = -1.57079632679;
+    for (var i = 0; i < values.length; i++) {
+      final sweep = values[i] / total * 6.28318530718;
+      final paint = Paint()
+        ..shader = SweepGradient(
+          startAngle: start,
+          endAngle: start + sweep,
+          colors: [colors[i].withValues(alpha: .72), colors[i], colors[i].withValues(alpha: .9)],
+        ).createShader(rect)
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.butt
+        ..strokeWidth = stroke;
+      canvas.drawArc(rect, start, sweep, false, paint);
+      start += sweep;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DonutSummaryPainter oldDelegate) =>
+      oldDelegate.values != values || oldDelegate.colors != colors;
+}
+
+class _IncomeExpenseChartPainter extends CustomPainter {
+  final List<double> income;
+  final List<double> expense;
+  final double maxValue;
+  final bool isDark;
+
+  const _IncomeExpenseChartPainter({
+    required this.income,
+    required this.expense,
+    required this.maxValue,
+    required this.isDark,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    if (size.width <= 0 || size.height <= 0) return;
+    final plot = Rect.fromLTWH(0, 4, size.width, size.height - 8);
+    final gridPaint = Paint()
+      ..color = (isDark ? const Color(0xFF1A5360) : const Color(0xFFDDEFE9)).withValues(alpha: .75)
+      ..strokeWidth = .7;
+    for (var i = 0; i <= 4; i++) {
+      final y = plot.top + plot.height * i / 4;
+      canvas.drawLine(Offset(plot.left, y), Offset(plot.right, y), gridPaint);
+    }
+    for (var i = 0; i <= 5; i++) {
+      final x = plot.left + plot.width * i / 5;
+      canvas.drawLine(Offset(x, plot.top), Offset(x, plot.bottom), gridPaint);
+    }
+    if (income.isEmpty || expense.isEmpty) return;
+    final incomePath = _makePath(income, plot, maxValue);
+    final expensePath = _makePath(expense, plot, maxValue);
+    final incomeFill = Path.from(incomePath)
+      ..lineTo(plot.right, plot.bottom)
+      ..lineTo(plot.left, plot.bottom)
+      ..close();
+    final expenseFill = Path.from(expensePath)
+      ..lineTo(plot.right, plot.bottom)
+      ..lineTo(plot.left, plot.bottom)
+      ..close();
+    final incomePaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          const Color(0xFF00D99A).withValues(alpha: .42),
+          const Color(0xFF00D99A).withValues(alpha: .035),
+        ],
+      ).createShader(plot);
+    final expensePaint = Paint()
+      ..shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          const Color(0xFFFF6262).withValues(alpha: .36),
+          const Color(0xFFFF6262).withValues(alpha: .025),
+        ],
+      ).createShader(plot);
+    canvas.drawPath(incomeFill, incomePaint);
+    canvas.drawPath(expenseFill, expensePaint);
+    canvas.drawPath(incomePath, Paint()
+      ..color = const Color(0xFF00D99A)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.7
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round);
+    canvas.drawPath(expensePath, Paint()
+      ..color = const Color(0xFFFF6262)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.7
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round);
+    if (income.any((value) => value > 0)) {
+      final peakIndex = income.indexOf(income.reduce((a, b) => a > b ? a : b));
+      final point = _pointAt(income, peakIndex, plot, maxValue);
+      canvas.drawCircle(point, 3, Paint()..color = const Color(0xFF00D99A));
+      canvas.drawCircle(point, 5, Paint()..color = const Color(0xFF00D99A).withValues(alpha: .18));
+    }
+    if (expense.any((value) => value > 0)) {
+      final peakIndex = expense.indexOf(expense.reduce((a, b) => a > b ? a : b));
+      final point = _pointAt(expense, peakIndex, plot, maxValue);
+      canvas.drawCircle(point, 2.5, Paint()..color = const Color(0xFFFF6262));
+    }
+  }
+
+  Path _makePath(List<double> values, Rect plot, double max) {
+    final path = Path();
+    if (values.isEmpty) return path;
+    for (var i = 0; i < values.length; i++) {
+      final point = _pointAt(values, i, plot, max);
+      if (i == 0) {
+        path.moveTo(point.dx, point.dy);
+      } else {
+        final previous = _pointAt(values, i - 1, plot, max);
+        final midX = (previous.dx + point.dx) / 2;
+        path.cubicTo(midX, previous.dy, midX, point.dy, point.dx, point.dy);
+      }
+    }
+    return path;
+  }
+
+  Offset _pointAt(List<double> values, int index, Rect plot, double max) {
+    final x = values.length <= 1 ? plot.left : plot.left + plot.width * index / (values.length - 1);
+    final y = plot.bottom - (values[index] / max).clamp(0.0, 1.0) * plot.height;
+    return Offset(x, y);
+  }
+
+  @override
+  bool shouldRepaint(covariant _IncomeExpenseChartPainter oldDelegate) =>
+      oldDelegate.income != income ||
+      oldDelegate.expense != expense ||
+      oldDelegate.maxValue != maxValue ||
+      oldDelegate.isDark != isDark;
+}
+
+class _BalanceNeonChartPainter extends CustomPainter {
+  const _BalanceNeonChartPainter({required this.isDark, required this.accent});
+
+  final bool isDark;
+  final Color accent;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Wave follows the marked path: start low on the left, rise gradually
+    // to a modest peak, descend to a shallow valley, then lift slightly.
+    final path = Path()
+      ..moveTo(0, size.height * .96)
+      ..cubicTo(size.width * .14, size.height * .96, size.width * .23, size.height * .92, size.width * .34, size.height * .82)
+      ..cubicTo(size.width * .44, size.height * .71, size.width * .52, size.height * .48, size.width * .60, size.height * .46)
+      ..cubicTo(size.width * .68, size.height * .44, size.width * .74, size.height * .70, size.width * .82, size.height * .78)
+      ..cubicTo(size.width * .90, size.height * .85, size.width * .95, size.height * .72, size.width, size.height * .65);
+
+    final fillPath = Path.from(path)
+      ..lineTo(size.width, size.height)
+      ..lineTo(0, size.height)
+      ..close();
+    canvas.drawPath(
+      fillPath,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: isDark
+              ? const [Color(0x3033FFD0), Color(0x0010AFC7)]
+              : const [Color(0x4533D9A0), Color(0x00FFFFFF)],
+        ).createShader(Offset.zero & size),
+    );
+
+    final secondary = Path()
+      ..moveTo(0, size.height * .99)
+      ..cubicTo(size.width * .18, size.height * .99, size.width * .28, size.height * .95, size.width * .39, size.height * .88)
+      ..cubicTo(size.width * .49, size.height * .80, size.width * .56, size.height * .57, size.width * .63, size.height * .56)
+      ..cubicTo(size.width * .72, size.height * .54, size.width * .78, size.height * .77, size.width * .85, size.height * .84)
+      ..cubicTo(size.width * .92, size.height * .89, size.width * .97, size.height * .80, size.width, size.height * .74);
+    canvas.drawPath(
+      secondary,
+      Paint()
+        ..color = (isDark ? const Color(0xFF3BADEB) : const Color(0xFF13C58B)).withValues(alpha: isDark ? .16 : .08)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 6
+        ..strokeCap = StrokeCap.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = (isDark ? accent : accent).withValues(alpha: isDark ? .60 : .28)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+    );
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = isDark ? const Color(0xFF9AD9FF) : accent
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.6
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
+
+    // Bars begin at the marked lower baseline and rise only to the marked heights.
+    // Tall, clearly visible vertical bars across the marked lower-right area.
+    const bars = [12.0, 18.0, 27.0, 39.0, 31.0, 46.0, 34.0, 55.0, 40.0, 49.0, 35.0, 44.0, 24.0, 36.0, 29.0, 47.0, 33.0, 42.0, 28.0, 38.0];
+    const barWidth = 7.0;
+    const gap = 3.0;
+    final totalWidth = bars.length * barWidth + (bars.length - 1) * gap;
+    // Keep the expanded group left-shifted while adding six bars on its right.
+    final startX = size.width - totalWidth - 20.0;
+    for (var i = 0; i < bars.length; i++) {
+      final barHeight = bars[i];
+      final rect = RRect.fromRectAndRadius(
+        Rect.fromLTWH(startX + i * (barWidth + gap), size.height - barHeight, barWidth, barHeight),
+        const Radius.circular(3),
+      );
+      canvas.drawRRect(
+        rect,
+        Paint()..color = (isDark ? accent : accent).withValues(alpha: isDark ? .38 : .30),
       );
     }
   }

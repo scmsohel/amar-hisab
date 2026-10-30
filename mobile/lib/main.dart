@@ -1193,11 +1193,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
           SafeArea(
-            child: RefreshIndicator(
-              onRefresh: _load,
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
-                children: [
+            child: Column(
+              children: [
+                Expanded(
+                  flex: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
                   Transform.translate(
                     offset: const Offset(0, -4),
                     child: SizedBox(
@@ -1456,15 +1460,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     _incomeExpenseDonuts(),
                   ],
                   const SizedBox(height: 12),
-                  _recentTransactionsCard(),
-                  if (_error != null) ...[
+
+                      ],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                    child: _recentTransactionsCard(),
+                  ),
+                ),
+                if (_error != null) ...[
                     const SizedBox(height: 12),
                     OutlinedButton.icon(onPressed: _load, icon: const Icon(Icons.refresh_rounded), label: const Text('আবার চেষ্টা করুন')),
                   ],
-                ],
-              ),
+              ],
             ),
-          ),
+
 
         ]),
         ),
@@ -1647,23 +1660,65 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final items = _sortedRecentTransactions();
     final groups = _groupTransactionsByDate(items);
     final titleColor = isDark ? const Color(0xFFE5F8F0) : const Color(0xFF164F40);
+    final listChildren = <Widget>[];
+    for (final entry in groups.entries) {
+      listChildren.add(_transactionDateHeading(entry.value, isDark));
+      for (final tx in entry.value) {
+        listChildren.add(_recentTransactionRow(tx));
+      }
+    }
+
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.fromLTRB(11, 5, 11, 8),
-      decoration: BoxDecoration(color: isDark ? const Color(0xFF071F1B) : const Color(0xFFFCFEFD), borderRadius: BorderRadius.circular(20), border: Border.all(color: isDark ? const Color(0xFF21483D) : const Color(0xFFE2ECE7))),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Padding(padding: const EdgeInsets.fromLTRB(2, 7, 2, 3), child: Row(children: [
-          Expanded(child: Text('সাম্প্রতিক লেনদেন', style: TextStyle(color: titleColor, fontSize: 15, fontWeight: FontWeight.w900))),
-          Text('${items.length}টি', style: TextStyle(color: isDark ? const Color(0xFF9ABBB4) : const Color(0xFF71818C), fontSize: 11)),
-          const SizedBox(width: 8),
-          InkWell(onTap: _showAllTransactions, child: Padding(padding: const EdgeInsets.all(5), child: Text('সব দেখুন  ›', style: TextStyle(color: isDark ? const Color(0xFF4DE2B2) : const Color(0xFF00A875), fontSize: 11, fontWeight: FontWeight.w800)))),
-        ])),
-        if (_loading && items.isEmpty) const Padding(padding: EdgeInsets.all(16), child: Center(child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))))
-        else if (items.isEmpty) Padding(padding: const EdgeInsets.all(14), child: Center(child: Text('এখনো কোনো লেনদেন নেই', style: TextStyle(color: titleColor, fontSize: 11))))
-        else for (final entry in groups.entries) ...[
-          _transactionDateHeading(entry.value, isDark),
-          for (final tx in entry.value) _recentTransactionRow(tx),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF071F1B) : const Color(0xFFFCFEFD),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: isDark ? const Color(0xFF21483D) : const Color(0xFFE2ECE7)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(2, 7, 2, 3),
+            child: Row(children: [
+              Expanded(child: Text('সাম্প্রতিক লেনদেন', style: TextStyle(color: titleColor, fontSize: 15, fontWeight: FontWeight.w900))),
+              Text('${items.length}টি', style: TextStyle(color: isDark ? const Color(0xFF9ABBB4) : const Color(0xFF71818C), fontSize: 11)),
+              const SizedBox(width: 8),
+              InkWell(
+                onTap: _showAllTransactions,
+                child: Padding(
+                  padding: const EdgeInsets.all(5),
+                  child: Text('সব দেখুন  ›', style: TextStyle(color: isDark ? const Color(0xFF4DE2B2) : const Color(0xFF00A875), fontSize: 11, fontWeight: FontWeight.w800)),
+                ),
+              ),
+            ]),
+          ),
+          const SizedBox(height: 3),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: _load,
+              child: items.isEmpty
+                  ? ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.all(14),
+                      children: [
+                        Center(
+                          child: _loading
+                              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+                              : Text('এখনো কোনো লেনদেন নেই', style: TextStyle(color: titleColor, fontSize: 11)),
+                        ),
+                      ],
+                    )
+                  : ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: EdgeInsets.zero,
+                      children: listChildren,
+                    ),
+            ),
+          ),
         ],
-      ]),
+      ),
     );
   }
 

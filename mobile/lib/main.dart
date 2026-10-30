@@ -1709,7 +1709,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final mutedColor = isDark ? const Color(0xFF9ABBB4) : const Color(0xFF64877C);
     final monthLabel = monthOffset == 0 ? 'এই মাস' : monthOffset == 1 ? 'গত মাস' : '$monthOffset মাস আগে';
     return Container(
-      padding: const EdgeInsets.fromLTRB(7, 5, 6, 4),
+      padding: const EdgeInsets.fromLTRB(7, 3, 6, 2),
       decoration: BoxDecoration(
         color: cardColor,
         borderRadius: BorderRadius.circular(16),
@@ -1756,9 +1756,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 3),
+          const SizedBox(height: 2),
           SizedBox(
-            height: 96,
+            height: 80,
             child: Row(
               children: [
                 Expanded(

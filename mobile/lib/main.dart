@@ -1540,25 +1540,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
                 child: Row(
                   children: [
               Container(
-                width: 23, height: 23,
+                width: 20, height: 20,
                 decoration: BoxDecoration(color: accent.withValues(alpha: .16), shape: BoxShape.circle),
-                child: Icon(income ? Icons.south_rounded : Icons.north_rounded, color: accent, size: 15),
+                child: Icon(income ? Icons.south_rounded : Icons.north_rounded, color: accent, size: 13),
               ),
               const SizedBox(width: 4),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: mutedColor, fontSize: 8, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 2),
+                    Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: mutedColor, fontSize: 7.5, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 1),
                     FittedBox(
                       fit: BoxFit.scaleDown,
                       alignment: Alignment.centerLeft,
-                      child: Text(_hidden ? '৳ •••••' : _money(amount), style: TextStyle(color: textColor, fontSize: 11, fontWeight: FontWeight.w900)),
+                      child: Text(_hidden ? '৳ •••••' : _money(amount), style: TextStyle(color: textColor, fontSize: 10, fontWeight: FontWeight.w900)),
                     ),
                     const SizedBox(height: 1),
                     Row(
@@ -1572,7 +1572,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             change == null ? 'নতুন' : '${change >= 0 ? '+' : '-'}${change.abs().toStringAsFixed(1)}%',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(color: accent, fontSize: 9, fontWeight: FontWeight.w800),
+                            style: TextStyle(color: accent, fontSize: 8, fontWeight: FontWeight.w800),
                           ),
                         ),
                       ],

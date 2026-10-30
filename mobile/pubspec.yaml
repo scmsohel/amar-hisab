@@ -32,13 +32,13 @@ flutter_launcher_icons:
 
 flutter_native_splash:
   color: "#F5FFF9"
-  image: "assets/ic_launcher_foreground_large.png"
+  image: "assets/ic_launcher_foreground.png"
   android: true
   ios: false
   web: false
   android_12:
     color: "#F5FFF9"
-    image: "assets/ic_launcher_foreground_large.png"
+    image: "assets/ic_launcher_foreground.png"
 
 flutter:
   uses-material-design: true

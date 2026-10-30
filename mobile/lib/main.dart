@@ -1256,7 +1256,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 0),
                   Transform.translate(
                     offset: const Offset(0, 3),
                     child: Container(

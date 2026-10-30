@@ -217,8 +217,14 @@ class _AuthApi {
       _get('/auth/me'),
       _get('/data/wallets'),
       _get('/data/transactions'),
+      _get('/data/debts'),
+      _get('/data/bills'),
     ]);
-    return {'user': results[0]['user'], 'wallets': results[1]['data'], 'transactions': results[2]['data']};
+    return {
+      'user': results[0]['user'], 'wallets': results[1]['data'],
+      'transactions': results[2]['data'], 'debts': results[3]['data'],
+      'bills': results[4]['data'],
+    };
   }
 
   static Future<Map<String, dynamic>> login({
@@ -1047,6 +1053,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   double? _monthChangePercent;
   String _monthChangeMessage = 'গত মাসের তুলনার ডেটা নেই';
   List<Map<String, dynamic>> _transactions = <Map<String, dynamic>>[];
+  List<Map<String, dynamic>> _debts = <Map<String, dynamic>>[];
+  List<Map<String, dynamic>> _bills = <Map<String, dynamic>>[];
   int _chartRangeDays = 30;
   int _incomeDonutMonthOffset = 0;
   int _expenseDonutMonthOffset = 0;
@@ -1089,6 +1097,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final data = await _AuthApi.loadDashboardData();
       final wallets = data['wallets'] is List ? data['wallets'] as List : <dynamic>[];
       final transactions = data['transactions'] is List ? data['transactions'] as List : <dynamic>[];
+      final debts = data['debts'] is List ? data['debts'] as List : <dynamic>[];
+      final bills = data['bills'] is List ? data['bills'] as List : <dynamic>[];
       final opening = <String, double>{'ক্যাশ': 0, 'ব্যাংক': 0, 'বিকাশ': 0, 'নগদ': 0};
       for (final item in wallets) {
         if (item is Map) opening[(item['name'] ?? '').toString()] = _amount(item['base']);
@@ -1145,6 +1155,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _monthChangePercent = monthChangePercent;
         _monthChangeMessage = monthChangeMessage;
         _transactions = transactions.whereType<Map>().map((item) => Map<String, dynamic>.from(item)).toList();
+        _debts = debts.whereType<Map>().map((item) => Map<String, dynamic>.from(item)).toList();
+        _bills = bills.whereType<Map>().map((item) => Map<String, dynamic>.from(item)).toList();
         _loading = false;
       });
     } catch (error) {
@@ -1461,161 +1473,64 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final now = DateTime.now();
     final monthStart = DateTime(now.year, now.month);
     final nextMonth = DateTime(now.year, now.month + 1);
-    var monthIncome = 0.0;
-    var monthExpense = 0.0;
-    var previousMonthIncome = 0.0;
-    var previousMonthExpense = 0.0;
+    var monthIncome = 0.0, monthExpense = 0.0, previousMonthIncome = 0.0, previousMonthExpense = 0.0;
     final previousMonthStart = DateTime(now.year, now.month - 1);
     for (final tx in _transactions) {
       final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
-      if (date == null || date.isBefore(monthStart) || !date.isBefore(nextMonth)) continue;
+      if (date == null) continue;
       final amount = _amount(tx['amount']);
-      if (tx['kind'] == 'আয়') monthIncome += amount;
-      if (tx['kind'] == 'ব্যয়') monthExpense += amount;
-    }
-    for (final tx in _transactions) {
-      final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
-      if (date == null || date.isBefore(previousMonthStart) || !date.isBefore(monthStart)) continue;
-      final amount = _amount(tx['amount']);
-      if (tx['kind'] == 'আয়') previousMonthIncome += amount;
-      if (tx['kind'] == 'ব্যয়') previousMonthExpense += amount;
-    }
-    double? changePercent(double current, double previous) =>
-        previous == 0 ? null : ((current - previous) / previous.abs()) * 100;
-    final incomeChange = changePercent(monthIncome, previousMonthIncome);
-    final expenseChange = changePercent(monthExpense, previousMonthExpense);
-
-    final selectedMonth = DateTime(now.year, now.month - _expenseDonutMonthOffset);
-    final selectedNextMonth = DateTime(selectedMonth.year, selectedMonth.month + 1);
-    final totals = <String, double>{};
-    for (final tx in _transactions) {
-      final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
-      if (date == null || date.isBefore(DateTime(selectedMonth.year, selectedMonth.month)) || !date.isBefore(selectedNextMonth)) continue;
-      if ((tx['kind'] ?? '').toString() != 'ব্যয়') continue;
-      final category = (tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? tx['categoryTitle'] ?? tx['category_title'] ?? tx['subcategory'] ?? '').toString().trim();
-      final key = category.isEmpty ? 'অন্যান্য' : category;
-      totals[key] = (totals[key] ?? 0) + _amount(tx['amount']);
-    }
-    final entries = totals.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
-    final shown = entries.take(5).toList();
-    final remainder = entries.skip(5).fold<double>(0, (sum, entry) => sum + entry.value);
-    if (remainder > 0) {
-      final otherIndex = shown.indexWhere((entry) => entry.key == 'অন্যান্য');
-      if (otherIndex >= 0) {
-        shown[otherIndex] = MapEntry('অন্যান্য', shown[otherIndex].value + remainder);
-      } else {
-        shown.add(MapEntry('অন্যান্য', remainder));
+      if (!date.isBefore(monthStart) && date.isBefore(nextMonth)) {
+        if (tx['kind'] == 'আয়') monthIncome += amount;
+        if (tx['kind'] == 'ব্যয়') monthExpense += amount;
+      } else if (!date.isBefore(previousMonthStart) && date.isBefore(monthStart)) {
+        if (tx['kind'] == 'আয়') previousMonthIncome += amount;
+        if (tx['kind'] == 'ব্যয়') previousMonthExpense += amount;
       }
     }
-    final expenseTotal = entries.fold<double>(0, (sum, entry) => sum + entry.value);
-    const palette = <Color>[
-      Color(0xFF00B982), Color(0xFFFF625B), Color(0xFFFFA62B),
-      Color(0xFF1688D4), Color(0xFFC13EE8), Color(0xFF8A9B9A),
-    ];
-    final cardColor = isDark ? const Color(0xFF062537) : const Color(0xFFF9FFFC);
-    final borderColor = isDark ? const Color(0xFF12605D) : const Color(0xFFD7EEE5);
-    final textColor = isDark ? const Color(0xFFDDFBF1) : const Color(0xFF164F40);
-    final mutedColor = isDark ? const Color(0xFF9ABBB4) : const Color(0xFF64877C);
-
-    Widget metricCard({required String title, required double amount, required bool income, required double? change}) {
-      final accent = income ? const Color(0xFF00B982) : const Color(0xFFFF625B);
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(15),
-        child: Container(
-          decoration: BoxDecoration(
-            color: accent.withValues(alpha: isDark ? .10 : .075),
-            borderRadius: BorderRadius.circular(15),
-            border: Border.all(color: accent.withValues(alpha: .18)),
-          ),
-          child: Stack(
-            children: [
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: CustomPaint(
-                    painter: _MetricCardWavePainter(
-                      color: accent,
-                      opacity: isDark ? .07 : .10,
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
-                child: Row(
-                  children: [
-              Container(
-                width: 20, height: 20,
-                decoration: BoxDecoration(color: accent.withValues(alpha: .16), shape: BoxShape.circle),
-                child: Icon(income ? Icons.south_rounded : Icons.north_rounded, color: accent, size: 13),
-              ),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: mutedColor, fontSize: 7.5, fontWeight: FontWeight.w600)),
-                    const SizedBox(height: 1),
-                    FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Text(_hidden ? '৳ •••••' : _money(amount), style: TextStyle(color: textColor, fontSize: 10, fontWeight: FontWeight.w900)),
-                    ),
-                    const SizedBox(height: 1),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(change == null ? Icons.remove_rounded : change >= 0 ? Icons.trending_up_rounded : Icons.trending_down_rounded,
-                          size: 10, color: accent),
-                        const SizedBox(width: 2),
-                        Flexible(
-                          child: Text(
-                            change == null ? 'নতুন' : '${change >= 0 ? '+' : '-'}${change.abs().toStringAsFixed(1)}%',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(color: accent, fontSize: 8, fontWeight: FontWeight.w800),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
+    double? changePercent(double current, double previous) => previous == 0 ? null : ((current - previous) / previous.abs()) * 100;
+    final incomeChange = changePercent(monthIncome, previousMonthIncome);
+    final expenseChange = changePercent(monthExpense, previousMonthExpense);
+    final unpaidDebts = _debts.where((item) {
+      final kind = (item['debtKind'] ?? item['status'] ?? '').toString();
+      final status = (item['status'] ?? '').toString();
+      return kind == 'দেনা' && status != 'পরিশোধিত' && status != 'সম্পন্ন';
+    }).toList();
+    final debtTotal = unpaidDebts.fold<double>(0, (sum, item) {
+      final payments = item['payments'] is List ? item['payments'] as List : <dynamic>[];
+      final paid = payments.whereType<Map>().fold<double>(0, (value, payment) => value + _amount(payment['amount']));
+      return sum + (_amount(item['amount']) - paid).clamp(0, double.infinity);
+    });
+    final billTotal = _bills.fold<double>(0, (sum, item) => sum + _amount(item['amount']));
+    Widget summaryCard({required String title, required double amount, required String subtitle, required IconData icon, required Color accent, required Color tint, required bool showTrend, double? change}) {
+      final foreground = isDark ? const Color(0xFFEAF7F2) : const Color(0xFF183E35);
+      final muted = isDark ? const Color(0xFFA9C4BA) : const Color(0xFF617B73);
+      return Expanded(child: Container(height: 74, padding: const EdgeInsets.fromLTRB(5, 7, 4, 5),
+        decoration: BoxDecoration(color: isDark ? accent.withValues(alpha: .13) : tint, borderRadius: BorderRadius.circular(13), border: Border.all(color: accent.withValues(alpha: isDark ? .32 : .13)),
+          boxShadow: isDark ? [] : [BoxShadow(color: accent.withValues(alpha: .07), blurRadius: 9, offset: const Offset(0, 3))]),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [Container(width: 25, height: 25, decoration: BoxDecoration(color: accent.withValues(alpha: .16), shape: BoxShape.circle), child: Icon(icon, size: 15, color: accent)),
+            const SizedBox(width: 3), Expanded(child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 9, color: muted, fontWeight: FontWeight.w700)))]),
+          const Spacer(),
+          FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(_hidden ? '৳ •••••' : _money(amount), maxLines: 1, style: TextStyle(fontSize: 12, color: foreground, fontWeight: FontWeight.w900))),
+          const SizedBox(height: 1),
+          Row(children: [
+            if (showTrend) ...[Icon(change == null ? Icons.remove_rounded : change >= 0 ? Icons.trending_up_rounded : Icons.trending_down_rounded, size: 11, color: accent), const SizedBox(width: 2),
+              Expanded(child: Text(change == null ? 'নতুন' : '${change >= 0 ? '+' : '-'}${change.abs().toStringAsFixed(1)}%', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 8, color: accent, fontWeight: FontWeight.w800)))]
+            else ...[Icon(title == 'দেনা' ? Icons.people_alt_rounded : Icons.receipt_long_rounded, size: 10, color: muted), const SizedBox(width: 3),
+              Expanded(child: Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 8, color: muted, fontWeight: FontWeight.w700)))]
+          ])
+        ])));
     }
-
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(
-            flex: 4,
-            child: Column(
-              children: [
-                Expanded(child: metricCard(title: 'এই মাসের আয়', amount: monthIncome, income: true, change: incomeChange)),
-                const SizedBox(height: 8),
-                Expanded(child: metricCard(title: 'এই মাসের ব্যয়', amount: monthExpense, income: false, change: expenseChange)),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            flex: 7,
-            child: _donutSummaryCard(
-              isIncome: false,
-              monthOffset: _expenseDonutMonthOffset,
-            ),
-          ),
-        ],
-      ),
-    );
+    return Row(children: [
+      summaryCard(title: 'এই মাসের আয়', amount: monthIncome, subtitle: '', icon: Icons.south_rounded, accent: const Color(0xFF00B982), tint: const Color(0xFFE7FBF3), showTrend: true, change: incomeChange),
+      const SizedBox(width: 5),
+      summaryCard(title: 'এই মাসের ব্যয়', amount: monthExpense, subtitle: '', icon: Icons.north_rounded, accent: const Color(0xFFFF625B), tint: const Color(0xFFFFEEEE), showTrend: true, change: expenseChange),
+      const SizedBox(width: 5),
+      summaryCard(title: 'দেনা', amount: debtTotal, subtitle: '${unpaidDebts.length} জন', icon: Icons.payments_rounded, accent: const Color(0xFFF29A16), tint: const Color(0xFFFFF6E8), showTrend: false),
+      const SizedBox(width: 5),
+      summaryCard(title: 'বিল', amount: billTotal, subtitle: '${_bills.length} টি', icon: Icons.calendar_month_rounded, accent: const Color(0xFF2588F5), tint: const Color(0xFFEEF6FF), showTrend: false),
+    ]);
   }
-
   Widget _incomeExpenseChart() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final now = DateTime.now();

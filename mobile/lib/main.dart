@@ -1752,7 +1752,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final amountColor = isIncome ? const Color(0xFF00A653) : isTransfer ? const Color(0xFF1688D4) : const Color(0xFFE92743);
     final prefix = isIncome ? '+' : isTransfer ? '↔' : '−';
     return Container(
-      margin: const EdgeInsets.only(bottom: 4),
+      margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.fromLTRB(8, 3, 2, 3),
       decoration: BoxDecoration(
         color: isDark ? Color.lerp(const Color(0xFF14283A), style.accent, .10) : style.tint,

@@ -1553,9 +1553,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final compact = constraints.maxWidth < 370;
-          final dateFont = compact ? 10.0 : 11.0;
-          final infoFont = compact ? 8.5 : 9.5;
-          final amountFont = compact ? 9.0 : 10.0;
+          final dateFont = compact ? 11.0 : 12.0;
+          final infoFont = compact ? 10.0 : 11.0;
+          final amountFont = compact ? 10.0 : 11.0;
 
           return Row(
             children: [

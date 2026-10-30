@@ -15,8 +15,6 @@ Future<void> main() async {
   _appThemeMode.value = preferences.getString(_themePreferenceKey) == 'light'
       ? ThemeMode.light
       : ThemeMode.dark;
-  final savedAccent = preferences.getInt(_accentPreferenceKey);
-  if (savedAccent != null) _appAccentColor.value = Color(savedAccent);
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: _appThemeMode.value == ThemeMode.dark ? const Color(0xFF071827) : const Color(0xFFF3F8F5),
     statusBarIconBrightness: _appThemeMode.value == ThemeMode.dark ? Brightness.light : Brightness.dark,
@@ -33,16 +31,7 @@ const _muted = Color(0xFF687C78);
 const _line = Color(0xFFDCE6F0);
 
 const String _themePreferenceKey = 'amar_hisab_theme_mode';
-const String _accentPreferenceKey = 'amar_hisab_accent_color';
 final ValueNotifier<ThemeMode> _appThemeMode = ValueNotifier<ThemeMode>(ThemeMode.dark);
-final ValueNotifier<Color> _appAccentColor = ValueNotifier<Color>(const Color(0xFF287FCB));
-const List<Color> _accentPalette = [Color(0xFF287FCB), Color(0xFF16A6A1), Color(0xFF8B5CF6), Color(0xFFE85D8E), Color(0xFFD99A27), Color(0xFF16A36A), Color(0xFFE45B4F), Color(0xFF64748B)];
-
-Future<void> _setAppAccentColor(Color color) async {
-  _appAccentColor.value = color;
-  final preferences = await SharedPreferences.getInstance();
-  await preferences.setInt(_accentPreferenceKey, color.toARGB32());
-}
 
 Future<void> _setAppThemeMode(ThemeMode mode) async {
   _appThemeMode.value = mode;
@@ -288,9 +277,7 @@ class AmarHisabApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ValueListenableBuilder<ThemeMode>(
         valueListenable: _appThemeMode,
-        builder: (context, mode, _) => ValueListenableBuilder<Color>(
-          valueListenable: _appAccentColor,
-          builder: (context, accent, _) => MaterialApp(
+        builder: (context, mode, _) => MaterialApp(
           title: 'আমার হিসাব',
           debugShowCheckedModeBanner: false,
           themeMode: mode,
@@ -299,7 +286,7 @@ class AmarHisabApp extends StatelessWidget {
             brightness: Brightness.light,
             fontFamily: 'Roboto',
             scaffoldBackgroundColor: const Color(0xFFF3F8F5),
-            colorScheme: ColorScheme.fromSeed(seedColor: accent, brightness: Brightness.light),
+            colorScheme: ColorScheme.fromSeed(seedColor: _blue, brightness: Brightness.light),
             inputDecorationTheme: InputDecorationTheme(
               filled: true,
               fillColor: const Color(0xFFF9FBFF),
@@ -315,7 +302,7 @@ class AmarHisabApp extends StatelessWidget {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(18),
-                borderSide: BorderSide(color: accent, width: 1.4),
+                borderSide: const BorderSide(color: _blue, width: 1.4),
               ),
             ),
           ),
@@ -324,10 +311,9 @@ class AmarHisabApp extends StatelessWidget {
             brightness: Brightness.dark,
             fontFamily: 'Roboto',
             scaffoldBackgroundColor: const Color(0xFF071827),
-            colorScheme: ColorScheme.fromSeed(seedColor: accent, brightness: Brightness.dark),
+            colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF6CCBFF), brightness: Brightness.dark),
           ),
           home: const SplashScreen(),
-          ),
         ),
       );
 }
@@ -1247,7 +1233,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text('আমার হিসাব', style: TextStyle(color: _appAccentColor.value, fontSize: 23, fontWeight: FontWeight.w900, height: 1.0)),
+                              Text('আমার হিসাব', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF6CCBFF) : const Color(0xFF087A5B), fontSize: 23, fontWeight: FontWeight.w900, height: 1.0)),
                               Transform.translate(
                                 offset: const Offset(0, -2),
                                 child: Text('আপনার আয়-ব্যয়ের সহজ সঙ্গী', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFB9CADB) : const Color(0xFF587267), fontSize: 10.5, height: 1.0)),
@@ -1262,7 +1248,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               child: IconButton(
                                 tooltip: 'মেনু',
                                 onPressed: () => _showDashboardMenu(context),
-                                icon: Icon(Icons.menu_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : _appAccentColor.value, size: 27),
+                                icon: Icon(Icons.menu_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : const Color(0xFF087A5B), size: 27),
                               ),
                             ),
                             const Spacer(),
@@ -1274,7 +1260,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   IconButton(
                                     tooltip: 'নোটিফিকেশন',
                                     onPressed: () => _notice(context, 'এখন কোনো নতুন নোটিফিকেশন নেই।'),
-                                    icon: Icon(Icons.notifications_none_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : _appAccentColor.value, size: 25),
+                                    icon: Icon(Icons.notifications_none_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : const Color(0xFF087A5B), size: 25),
                                   ),
                                   Positioned(
                                     right: 9,
@@ -1291,14 +1277,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 height: 38,
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  gradient: LinearGradient(
+                                  gradient: const LinearGradient(
                                     begin: Alignment.topLeft,
                                     end: Alignment.bottomRight,
-                                    colors: [_appAccentColor.value.withValues(alpha: .72), _appAccentColor.value],
+                                    colors: [Color(0xFF8AD8FF), Color(0xFF287FCB)],
                                   ),
                                   border: Border.all(color: const Color(0xFFE7FFF7), width: 1.5),
                                   boxShadow: [
-                                    BoxShadow(color: _appAccentColor.value.withValues(alpha: .14), blurRadius: 8),
+                                    BoxShadow(color: const Color(0xFF4ABEFF).withValues(alpha: .14), blurRadius: 8),
                                   ],
                                 ),
                                 child: const Icon(Icons.person_rounded, color: Colors.white, size: 26),
@@ -1319,7 +1305,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         borderRadius: BorderRadius.circular(25),
                         border: Border.all(
                           color: Theme.of(context).brightness == Brightness.dark
-                              ? _appAccentColor.value.withValues(alpha: .72)
+                              ? const Color(0xFF4ABEFF).withValues(alpha: .78)
                               : const Color(0xFF79DDB8),
                           width: 1.25,
                         ),
@@ -1332,12 +1318,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                         boxShadow: Theme.of(context).brightness == Brightness.dark
                             ? [
-                                BoxShadow(color: _appAccentColor.value.withValues(alpha: .08), blurRadius: 14, spreadRadius: 0, offset: const Offset(0, 3)),
+                                BoxShadow(color: const Color(0xFF65C8FF).withValues(alpha: .08), blurRadius: 14, spreadRadius: 0, offset: const Offset(0, 3)),
                                 BoxShadow(color: const Color(0xFF000F20).withValues(alpha: .14), blurRadius: 10, offset: const Offset(0, 4)),
                               ]
                             : [
-                                BoxShadow(color: _appAccentColor.value.withValues(alpha: .08), blurRadius: 18, offset: const Offset(0, 7)),
-                                BoxShadow(color: _appAccentColor.value.withValues(alpha: .025), blurRadius: 6, offset: const Offset(0, 2)),
+                                BoxShadow(color: const Color(0xFF39B98A).withValues(alpha: .10), blurRadius: 18, offset: const Offset(0, 7)),
+                                BoxShadow(color: const Color(0xFF0B5B43).withValues(alpha: .035), blurRadius: 6, offset: const Offset(0, 2)),
                               ],
                       ),
                       child: Stack(
@@ -1422,11 +1408,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                     decoration: BoxDecoration(
                                       color: Theme.of(context).brightness == Brightness.dark
-                                          ? _appAccentColor.value.withValues(alpha: .16)
+                                          ? const Color(0xFF4ABEFF).withValues(alpha: .16)
                                           : const Color(0xFFE7F5EE),
                                       border: Border.all(
                                         color: Theme.of(context).brightness == Brightness.dark
-                                            ? _appAccentColor.value.withValues(alpha: .62)
+                                            ? const Color(0xFF4ABEFF).withValues(alpha: .62)
                                             : const Color(0xFFC6E5D5),
                                       ),
                                       borderRadius: BorderRadius.circular(24),
@@ -1820,7 +1806,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
                   decoration: BoxDecoration(
-                    color: isDark ? _appAccentColor.value.withValues(alpha: .12) : const Color(0xFFF0F5F3),
+                    color: isDark ? const Color(0xFF4ABEFF).withValues(alpha: .12) : const Color(0xFFF0F5F3),
                     borderRadius: BorderRadius.circular(9),
                     border: Border.all(color: isDark ? const Color(0xFF385A76) : const Color(0xFFE1EAE5)),
                   ),
@@ -1835,7 +1821,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 onTap: _showAllTransactions,
                 child: Padding(
                   padding: const EdgeInsets.all(4),
-                  child: Text('সব দেখুন  ›', style: TextStyle(color: isDark ? _appAccentColor.value : const Color(0xFF00A875), fontSize: 10.5, fontWeight: FontWeight.w800)),
+                  child: Text('সব দেখুন  ›', style: TextStyle(color: isDark ? const Color(0xFF6CCBFF) : const Color(0xFF00A875), fontSize: 10.5, fontWeight: FontWeight.w800)),
                 ),
               ),
             ]),
@@ -1985,7 +1971,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     required bool isDark,
     required VoidCallback onTap,
   }) {
-    final selectedColor = _appAccentColor.value;
+    final selectedColor = const Color(0xFF087FF5);
     final foreground = selected
         ? Colors.white
         : isDark ? const Color(0xFFB7C7D8) : const Color(0xFF738292);
@@ -2268,7 +2254,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         border: Border.all(color: borderColor),
         boxShadow: [
           BoxShadow(
-            color: _appAccentColor.value.withValues(alpha: isDark ? .07 : .045),
+            color: (isDark ? const Color(0xFF4ABEFF) : const Color(0xFF168565)).withValues(alpha: isDark ? .07 : .045),
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),
@@ -2352,8 +2338,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
                   decoration: BoxDecoration(
-                    color: isDark ? _appAccentColor.value.withValues(alpha: .12) : _appAccentColor.value.withValues(alpha: .10),
-                    border: Border.all(color: isDark ? _appAccentColor.value.withValues(alpha: .25) : _appAccentColor.value.withValues(alpha: .28)),
+                    color: isDark ? const Color(0xFF4ABEFF).withValues(alpha: .12) : const Color(0xFFDDF9EE),
+                    border: Border.all(color: isDark ? const Color(0xFF4ABEFF).withValues(alpha: .25) : const Color(0xFFB9EBDD)),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -2528,7 +2514,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 5),
                   decoration: BoxDecoration(
-                    color: isDark ? _appAccentColor.value.withValues(alpha: .12) : _appAccentColor.value.withValues(alpha: .10),
+                    color: isDark ? const Color(0xFF4ABEFF).withValues(alpha: .12) : const Color(0xFFDDF9EE),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -2651,43 +2637,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  void _showAccentColorPicker(BuildContext context) {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: _appThemeMode.value == ThemeMode.dark ? const Color(0xFF10243A) : Colors.white,
-      showDragHandle: true,
-      builder: (sheetContext) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-          child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const Text('Theme Color', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
-            const SizedBox(height: 6),
-            const Text('পছন্দের Accent Color বেছে নিন', style: TextStyle(fontSize: 12)),
-            const SizedBox(height: 16),
-            ValueListenableBuilder<Color>(
-              valueListenable: _appAccentColor,
-              builder: (context, selected, _) => Wrap(spacing: 14, runSpacing: 14, children: [
-                for (final color in _accentPalette)
-                  InkWell(
-                    onTap: () => _setAppAccentColor(color),
-                    borderRadius: BorderRadius.circular(30),
-                    child: Container(
-                      width: 42, height: 42,
-                      decoration: BoxDecoration(
-                        color: color, shape: BoxShape.circle,
-                        border: Border.all(color: selected.toARGB32() == color.toARGB32() ? Colors.white : Colors.transparent, width: 3),
-                      ),
-                      child: selected.toARGB32() == color.toARGB32() ? const Icon(Icons.check_rounded, color: Colors.white, size: 21) : null,
-                    ),
-                  ),
-              ]),
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
-
   void _showDashboardMenu(BuildContext context) {
     final isDark = _appThemeMode.value == ThemeMode.dark;
     showModalBottomSheet<void>(
@@ -2713,7 +2662,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
               if (sheetContext.mounted) Navigator.pop(sheetContext);
             },
           ),
-          ListTile(leading: Icon(Icons.palette_outlined, color: _appAccentColor.value), title: const Text('Theme Color'), subtitle: const Text('Accent color পরিবর্তন করুন'), onTap: () { Navigator.pop(sheetContext); _showAccentColorPicker(context); }),
           ListTile(leading: const Icon(Icons.refresh_rounded), title: const Text('ডেটা রিফ্রেশ'), onTap: () { Navigator.pop(sheetContext); _load(); }),
           ListTile(leading: const Icon(Icons.dns_outlined), title: const Text('Server Settings'), onTap: () { Navigator.pop(sheetContext); Navigator.of(context).push(_route(const ServerSettingsScreen())); }),
           ListTile(leading: const Icon(Icons.logout_rounded), title: const Text('লগআউট'), onTap: () async { Navigator.pop(sheetContext); await _AuthApi.clearSession(); if (context.mounted) Navigator.of(context).pushAndRemoveUntil(_route(const LoginScreen()), (route) => false); }),

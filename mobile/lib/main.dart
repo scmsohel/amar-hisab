@@ -1195,9 +1195,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           SafeArea(
             child: Column(
               children: [
-                Expanded(
-                  flex: 0,
-                  child: Padding(
+                Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -1461,20 +1459,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ],
                   const SizedBox(height: 12),
 
+                if (_error != null) ...[
+                    const SizedBox(height: 12),
+                    OutlinedButton.icon(onPressed: _load, icon: const Icon(Icons.refresh_rounded), label: const Text('আবার চেষ্টা করুন')),
+                  ],
                       ],
                     ),
                   ),
-                ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                     child: _recentTransactionsCard(),
                   ),
                 ),
-                if (_error != null) ...[
-                    const SizedBox(height: 12),
-                    OutlinedButton.icon(onPressed: _load, icon: const Icon(Icons.refresh_rounded), label: const Text('আবার চেষ্টা করুন')),
-                  ],
               ],
             ),
 

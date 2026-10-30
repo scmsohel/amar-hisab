@@ -997,8 +997,7 @@ class _ServerSettingsScreenState extends State<ServerSettingsScreen> {
                     const SizedBox(height: 12),
                     const Text('আপনার Server Address', textAlign: TextAlign.center, style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: _ink)),
                     const SizedBox(height: 8),
-                    const Text('Cloudflare Tunnel দিয়ে প্রকাশ করা HTTPS API URL দিন। প্রথমবার কোনো server আগে থেকে নির্বাচন করা নেই।', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, height: 1.6, color: _muted)),
-                    const SizedBox(height: 22),
+                    const Text('Cloudflare Tunnel দিয়ে প্রকাশ করা HTTPS API URL দিন। প্রথমবার কোনো server আগে থেকে নির্বাচন করা নেই।', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, height: 1.6, color: _muted)),                    const SizedBox(height: 22),
                     TextFormField(
                       controller: _serverUrl,
                       keyboardType: TextInputType.url,
@@ -1492,86 +1491,137 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return time.isEmpty ? dateText : '$dateText, $time';
   }
 
+  ({Color accent, Color tint, IconData icon}) _transactionStyle(Map<String, dynamic> tx) {
+    final kind = (tx['kind'] ?? '').toString();
+    final value = '\${tx['title'] ?? tx['description'] ?? ''} \${tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? ''}'.toLowerCase();
+    if (kind == 'আয়') return (accent: const Color(0xFF00A653), tint: const Color(0xFFE8F9F0), icon: Icons.south_rounded);
+    if (kind == 'ট্রান্সফার' || kind.toLowerCase() == 'transfer') return (accent: const Color(0xFF1688D4), tint: const Color(0xFFEAF4FF), icon: Icons.swap_horiz_rounded);
+    if (value.contains('খাবার') || value.contains('food')) return (accent: const Color(0xFFE92743), tint: const Color(0xFFFFEDF0), icon: Icons.restaurant_rounded);
+    if (value.contains('বাসা') || value.contains('বাড়ি') || value.contains('লোন')) return (accent: const Color(0xFFD96A00), tint: const Color(0xFFFFF1E1), icon: Icons.home_rounded);
+    if (value.contains('ইন্টারনেট') || value.contains('বিল')) return (accent: const Color(0xFF00A653), tint: const Color(0xFFE8F9F0), icon: Icons.router_rounded);
+    if (value.contains('উপহার')) return (accent: const Color(0xFF8627D9), tint: const Color(0xFFF5EBFF), icon: Icons.card_giftcard_rounded);
+    if (value.contains('যাতায়াত') || value.contains('বাস')) return (accent: const Color(0xFF1688D4), tint: const Color(0xFFEAF4FF), icon: Icons.directions_bus_rounded);
+    return (accent: const Color(0xFFE92743), tint: const Color(0xFFFFEDF0), icon: Icons.shopping_cart_rounded);
+  }
+
+  Map<String, List<Map<String, dynamic>>> _groupTransactionsByDate(List<Map<String, dynamic>> items) {
+    final groups = <String, List<Map<String, dynamic>>>{};
+    for (final tx in items) {
+      final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
+      final key = date == null ? 'unknown' : '\${date.year}-\${date.month}-\${date.day}';
+      groups.putIfAbsent(key, () => <Map<String, dynamic>>[]).add(tx);
+    }
+    return groups;
+  }
+
+  Widget _transactionDateHeading(List<Map<String, dynamic>> items, bool isDark) {
+    final label = items.isEmpty ? 'তারিখ পাওয়া যায়নি' : _transactionDateTimeLabel(items.first).split(',').first;
+    final total = items.fold<double>(0, (sum, tx) => sum + (tx['kind'] == 'ট্রান্সফার' ? 0 : _amount(tx['amount'])));
+    final color = items.any((tx) => tx['kind'] == 'ব্যয়') ? const Color(0xFFE92743) : const Color(0xFF00A653);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(1, 12, 2, 8),
+      child: Row(children: [
+        Text(label, style: TextStyle(color: isDark ? const Color(0xFFC3D4D0) : const Color(0xFF526875), fontSize: 12, fontWeight: FontWeight.w700)),
+        const SizedBox(width: 9),
+        Expanded(child: Divider(height: 1, color: isDark ? const Color(0xFF29433E) : const Color(0xFFDCE4E8))),
+        const SizedBox(width: 9),
+        Text('মোট', style: TextStyle(color: isDark ? const Color(0xFF9BAEAA) : const Color(0xFF71818C), fontSize: 11)),
+        const SizedBox(width: 5),
+        Text(_money(total), style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w900)),
+      ]),
+    );
+  }
+
   Widget _recentTransactionRow(Map<String, dynamic> tx) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final kind = (tx['kind'] ?? '').toString();
     final isIncome = kind == 'আয়';
     final isTransfer = kind == 'ট্রান্সফার' || kind.toLowerCase() == 'transfer';
-    final accent = isIncome ? const Color(0xFF00A875) : isTransfer ? const Color(0xFF1688D4) : const Color(0xFFFF5757);
-    final icon = isIncome ? Icons.south_rounded : isTransfer ? Icons.swap_horiz_rounded : Icons.north_rounded;
+    final style = _transactionStyle(tx);
     final title = (tx['title'] ?? tx['description'] ?? tx['note'] ?? tx['name'] ?? 'লেনদেন').toString();
-    final category = (tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? tx['categoryTitle'] ?? tx['category_title'] ?? '').toString();
+    final category = (tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? tx['categoryTitle'] ?? '').toString();
     final wallet = (tx['wallet'] ?? tx['walletName'] ?? tx['wallet_name'] ?? tx['accountName'] ?? tx['account'] ?? '').toString();
-    final transferTo = (tx['transferTo'] ?? tx['transfer_to'] ?? '').toString();
-    final subtitle = [category, wallet.isEmpty ? '' : (isTransfer && transferTo.isNotEmpty ? '$wallet → $transferTo' : wallet)].where((value) => value.trim().isNotEmpty).join(' • ');
-    final dateLabel = _transactionDateTimeLabel(tx);
-    final amount = _amount(tx['amount']);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      child: Row(
-        children: [
-          Container(
-            width: 34, height: 34,
-            decoration: BoxDecoration(color: accent.withValues(alpha: .13), shape: BoxShape.circle),
-            child: Icon(icon, color: accent, size: 19),
-          ),
-          const SizedBox(width: 9),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title, maxLines: 1, overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFE8FFF7) : const Color(0xFF183E35), fontSize: 11.5, fontWeight: FontWeight.w800)),
-              if (subtitle.isNotEmpty)
-                Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF9ABBB4) : const Color(0xFF789087), fontSize: 9)),
-              if (dateLabel.isNotEmpty)
-                Text(dateLabel, maxLines: 1, overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF789A92) : const Color(0xFF91A39B), fontSize: 8.5)),
-            ]),
-          ),
-          const SizedBox(width: 6),
-          Text('${isIncome ? '+' : isTransfer ? '↔' : '−'} ${_money(amount)}',
-            maxLines: 1, style: TextStyle(color: accent, fontSize: 11, fontWeight: FontWeight.w900)),
-        ],
+    final subtitle = [category, wallet].where((v) => v.trim().isNotEmpty).join(' • ');
+    final amountColor = isIncome ? const Color(0xFF00A653) : isTransfer ? const Color(0xFF1688D4) : const Color(0xFFE92743);
+    final prefix = isIncome ? '+' : isTransfer ? '↔' : '−';
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.fromLTRB(10, 10, 3, 10),
+      decoration: BoxDecoration(
+        color: isDark ? Color.lerp(const Color(0xFF102B27), style.accent, .10) : style.tint,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: style.accent.withValues(alpha: isDark ? .24 : .08)),
       ),
+      child: Row(children: [
+        Container(width: 48, height: 48, decoration: BoxDecoration(color: style.accent.withValues(alpha: .13), borderRadius: BorderRadius.circular(15)), child: Icon(style.icon, color: style.accent, size: 25)),
+        const SizedBox(width: 10),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFF1FAF6) : const Color(0xFF111827), fontSize: 14, fontWeight: FontWeight.w900)),
+          if (subtitle.isNotEmpty) Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFB1C5BE) : const Color(0xFF657481), fontSize: 11.5)),
+          Row(children: [Icon(Icons.access_time_rounded, size: 13, color: isDark ? const Color(0xFF9EB5AC) : const Color(0xFF7B8993)), const SizedBox(width: 4), Text(_transactionDateTimeLabel(tx).split(', ').last, style: TextStyle(color: isDark ? const Color(0xFF9EB5AC) : const Color(0xFF71808C), fontSize: 10.5))]),
+        ])),
+        const SizedBox(width: 5),
+        SizedBox(width: 98, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+          FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerRight, child: Text('$prefix \${_money(_amount(tx['amount']))}', maxLines: 1, style: TextStyle(color: amountColor, fontSize: 14, fontWeight: FontWeight.w900))),
+          const SizedBox(height: 5),
+          if (category.isNotEmpty) Container(
+            constraints: const BoxConstraints(maxWidth: 96),
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+            decoration: BoxDecoration(color: style.accent.withValues(alpha: .10), borderRadius: BorderRadius.circular(20), border: Border.all(color: style.accent.withValues(alpha: .15))),
+            child: Text(category, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: style.accent, fontSize: 10, fontWeight: FontWeight.w800)),
+          ),
+        ])),
+        PopupMenuButton<String>(
+          padding: EdgeInsets.zero,
+          icon: Icon(Icons.more_vert_rounded, color: isDark ? const Color(0xFF9BA9B2) : const Color(0xFF7B8791), size: 20),
+          onSelected: (_) => _showTransactionDetails(tx),
+          itemBuilder: (_) => const [PopupMenuItem(value: 'details', child: Text('বিস্তারিত দেখুন'))],
+        ),
+      ]),
     );
   }
 
   Widget _recentTransactionsCard() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final items = _sortedRecentTransactions();
-    final cardColor = isDark ? const Color(0xFF062537) : const Color(0xFFF9FFFC);
-    final borderColor = isDark ? const Color(0xFF12605D) : const Color(0xFFD7EEE5);
-    final titleColor = isDark ? const Color(0xFFDDFBF1) : const Color(0xFF164F40);
+    final groups = _groupTransactionsByDate(items);
+    final titleColor = isDark ? const Color(0xFFE5F8F0) : const Color(0xFF164F40);
     return Container(
-      decoration: BoxDecoration(color: cardColor, borderRadius: BorderRadius.circular(17), border: Border.all(color: borderColor)),
+      padding: const EdgeInsets.fromLTRB(11, 5, 11, 8),
+      decoration: BoxDecoration(color: isDark ? const Color(0xFF071F1B) : const Color(0xFFFCFEFD), borderRadius: BorderRadius.circular(20), border: Border.all(color: isDark ? const Color(0xFF21483D) : const Color(0xFFE2ECE7))),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(11, 9, 9, 5),
-          child: Row(children: [
-            Expanded(child: Text('সাম্প্রতিক লেনদেন', style: TextStyle(color: titleColor, fontSize: 13, fontWeight: FontWeight.w900))),
-            InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: () => _showAllTransactions(),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 3),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text('সব দেখুন', style: TextStyle(color: isDark ? const Color(0xFF4DE2B2) : const Color(0xFF00A875), fontSize: 10, fontWeight: FontWeight.w800)),
-                  Icon(Icons.chevron_right_rounded, size: 15, color: isDark ? const Color(0xFF4DE2B2) : const Color(0xFF00A875)),
-                ]),
-              ),
-            ),
-          ]),
-        ),
-        if (_loading && items.isEmpty)
-          const Padding(padding: EdgeInsets.all(16), child: Center(child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))))
-        else if (items.isEmpty)
-          Padding(padding: const EdgeInsets.all(14), child: Center(child: Text('এখনো কোনো লেনদেন নেই', style: TextStyle(color: titleColor, fontSize: 10))))
-        else
-          for (var i = 0; i < items.length; i++) ...[
-            if (i > 0) Divider(height: 1, thickness: .6, indent: 52, endIndent: 9, color: borderColor),
-            _recentTransactionRow(items[i]),
-          ],
+        Padding(padding: const EdgeInsets.fromLTRB(2, 7, 2, 3), child: Row(children: [
+          Expanded(child: Text('সাম্প্রতিক লেনদেন', style: TextStyle(color: titleColor, fontSize: 15, fontWeight: FontWeight.w900))),
+          Text('\${items.length}টি', style: TextStyle(color: isDark ? const Color(0xFF9ABBB4) : const Color(0xFF71818C), fontSize: 11)),
+          const SizedBox(width: 8),
+          InkWell(onTap: _showAllTransactions, child: Padding(padding: const EdgeInsets.all(5), child: Text('সব দেখুন  ›', style: TextStyle(color: isDark ? const Color(0xFF4DE2B2) : const Color(0xFF00A875), fontSize: 11, fontWeight: FontWeight.w800)))),
+        ])),
+        if (_loading && items.isEmpty) const Padding(padding: EdgeInsets.all(16), child: Center(child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))))
+        else if (items.isEmpty) Padding(padding: const EdgeInsets.all(14), child: Center(child: Text('এখনো কোনো লেনদেন নেই', style: TextStyle(color: titleColor, fontSize: 11))))
+        else for (final entry in groups.entries) ...[
+          _transactionDateHeading(entry.value, isDark),
+          for (final tx in entry.value) _recentTransactionRow(tx),
+        ],
       ]),
     );
+  }
+
+  void _showTransactionDetails(Map<String, dynamic> tx) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final title = (tx['title'] ?? tx['description'] ?? tx['note'] ?? 'লেনদেন').toString();
+    final category = (tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? '').toString();
+    final wallet = (tx['wallet'] ?? tx['walletName'] ?? tx['wallet_name'] ?? tx['accountName'] ?? '').toString();
+    showDialog<void>(context: context, builder: (dialogContext) => AlertDialog(
+      backgroundColor: isDark ? const Color(0xFF102B27) : Colors.white,
+      title: Text(title),
+      content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(_money(_amount(tx['amount'])), style: TextStyle(color: _transactionStyle(tx).accent, fontSize: 22, fontWeight: FontWeight.w900)),
+        if (category.isNotEmpty) Text('ক্যাটাগরি: $category'),
+        if (wallet.isNotEmpty) Text('ওয়ালেট: $wallet'),
+        Text('তারিখ: \${_transactionDateTimeLabel(tx)}'),
+      ]),
+      actions: [TextButton(onPressed: () => Navigator.of(dialogContext).pop(), child: const Text('বন্ধ করুন'))],
+    ));
   }
 
   void _showAllTransactions() {
@@ -1997,8 +2047,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           SizedBox(
                             width: 44,
                             child: FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(_money(total), style: TextStyle(color: textColor, fontSize: 9, fontWeight: FontWeight.w900)),
+                              fit: BoxFit.scaleDown,                              child: Text(_money(total), style: TextStyle(color: textColor, fontSize: 9, fontWeight: FontWeight.w900)),
                             ),
                           ),
                           const SizedBox(height: 2),

@@ -2015,6 +2015,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     var kind = (tx['kind'] ?? 'ব্যয়').toString();
     var saving = false;
     final key = GlobalKey<FormState>();
+    final messenger = ScaffoldMessenger.of(context);
     try {
       await showDialog<void>(context: context, builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
@@ -2061,13 +2062,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 else { changed.remove('transferTo'); changed.remove('transfer_to'); }
                 final next = _transactions.map((item) => item['id'].toString() == tx['id'].toString() ? changed : item).toList();
                 await _AuthApi._put('/data/transactions', {'data': next});
-                if (!mounted) return;
+                if (!mounted || !dialogContext.mounted) return;
                 Navigator.pop(dialogContext);
                 await _load();
-                if (mounted) ScaffoldMessenger.of(this.context).showSnackBar(const SnackBar(content: Text('লেনদেন আপডেট হয়েছে।')));
+                if (!mounted) return;
+                messenger.showSnackBar(const SnackBar(content: Text('লেনদেন আপডেট হয়েছে।')));
               } catch (e) {
-                setDialogState(() => saving = false);
-                if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))));
+                if (dialogContext.mounted) setDialogState(() => saving = false);
+                if (mounted) messenger.showSnackBar(SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))));
               }
             }, child: saving ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('সংরক্ষণ করুন')),
           ],

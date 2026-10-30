@@ -1856,6 +1856,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ),
           ),
+          if (_recentTransactionsCategory != 'সব')
+            _recentCategorySummary(items, isDark),
           const SizedBox(height: 5),
           Expanded(
             child: RefreshIndicator(
@@ -1881,6 +1883,53 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _recentCategorySummary(List<Map<String, dynamic>> items, bool isDark) {
+    var income = 0.0;
+    var expense = 0.0;
+    for (final tx in items) {
+      final amount = _amount(tx['amount']);
+      final kind = (tx['kind'] ?? '').toString();
+      if (kind == 'আয়') income += amount;
+      if (kind == 'ব্যয়') expense += amount;
+    }
+    final remaining = income - expense;
+    final background = isDark ? const Color(0xFF102A38) : const Color(0xFFF0F5FA);
+    final muted = isDark ? const Color(0xFFB7C9D5) : const Color(0xFF647789);
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(top: 7, bottom: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          Expanded(child: _categorySummaryValue('অবশিষ্ট', remaining, remaining >= 0 ? const Color(0xFF1688D4) : const Color(0xFFE27A21), muted)),
+          Expanded(child: _categorySummaryValue('ব্যয়', expense, const Color(0xFFE92743), muted)),
+          Expanded(child: _categorySummaryValue('আয়', income, const Color(0xFF00A653), muted)),
+        ],
+      ),
+    );
+  }
+
+  Widget _categorySummaryValue(String label, double amount, Color valueColor, Color muted) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text('$label: ', style: TextStyle(color: muted, fontSize: 9.5, fontWeight: FontWeight.w600)),
+        const SizedBox(height: 2),
+        Text(
+          _bengaliDigits(_money(amount)),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: valueColor, fontSize: 11, fontWeight: FontWeight.w900),
+        ),
+      ],
     );
   }
 

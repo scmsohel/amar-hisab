@@ -1522,7 +1522,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       return Container(
           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 9),
           decoration: BoxDecoration(
-            color: accent.withValues(alpha: isDark ? .10 : .075),
+            color: accent.withValues(alpha: isDark ? .10 : .14),
             borderRadius: BorderRadius.circular(15),
             border: Border.all(color: accent.withValues(alpha: .18)),
           ),

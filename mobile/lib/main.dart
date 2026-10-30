@@ -1506,7 +1506,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Widget metricCard({required String title, required double amount, required bool income}) {
       final accent = income ? const Color(0xFF00B982) : const Color(0xFFFF625B);
       return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 9),
           decoration: BoxDecoration(
             color: accent.withValues(alpha: isDark ? .10 : .075),
             borderRadius: BorderRadius.circular(15),
@@ -1515,21 +1515,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Row(
             children: [
               Container(
-                width: 34, height: 34,
+                width: 27, height: 27,
                 decoration: BoxDecoration(color: accent.withValues(alpha: .16), shape: BoxShape.circle),
-                child: Icon(income ? Icons.south_rounded : Icons.north_rounded, color: accent, size: 21),
+                child: Icon(income ? Icons.south_rounded : Icons.north_rounded, color: accent, size: 17),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 5),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: mutedColor, fontSize: 10, fontWeight: FontWeight.w600)),
+                    Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: mutedColor, fontSize: 9, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 4),
                     FittedBox(
                       fit: BoxFit.scaleDown,
                       alignment: Alignment.centerLeft,
-                      child: Text(_hidden ? '৳ •••••' : _money(amount), style: TextStyle(color: textColor, fontSize: 15, fontWeight: FontWeight.w900)),
+                      child: Text(_hidden ? '৳ •••••' : _money(amount), style: TextStyle(color: textColor, fontSize: 12, fontWeight: FontWeight.w900)),
                     ),
                   ],
                 ),
@@ -1585,7 +1585,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 8),
           LayoutBuilder(
             builder: (context, constraints) {
-              final donutSize = constraints.maxWidth < 330 ? 104.0 : 132.0;
+              final donutSize = constraints.maxWidth < 220 ? 82.0 : constraints.maxWidth < 330 ? 104.0 : 132.0;
               return Row(
                 children: [
                   SizedBox(
@@ -1611,7 +1611,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 7),
                   Expanded(
                     child: Column(
                       children: [
@@ -1640,41 +1640,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth >= 520) {
-          return Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          flex: 4,
+          child: Column(
             children: [
-              Expanded(
-                flex: 4,
-                child: Column(
-                  children: [
-                    metricCard(title: 'এই মাসের আয়', amount: monthIncome, income: true),
-                    const SizedBox(height: 10),
-                    metricCard(title: 'এই মাসের ব্যয়', amount: monthExpense, income: false),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 10),
-              Expanded(flex: 7, child: expenseCard),
+              metricCard(title: 'এই মাসের আয়', amount: monthIncome, income: true),
+              const SizedBox(height: 8),
+              metricCard(title: 'এই মাসের ব্যয়', amount: monthExpense, income: false),
             ],
-          );
-        }
-        return Column(
-          children: [
-            Row(
-              children: [
-                Expanded(child: metricCard(title: 'এই মাসের আয়', amount: monthIncome, income: true)),
-                const SizedBox(width: 8),
-                Expanded(child: metricCard(title: 'এই মাসের ব্যয়', amount: monthExpense, income: false)),
-              ],
-            ),
-            const SizedBox(height: 9),
-            expenseCard,
-          ],
-        );
-      },
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(flex: 7, child: expenseCard),
+      ],
     );
   }
 

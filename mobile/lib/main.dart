@@ -1437,7 +1437,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                   const SizedBox(height: 11),
                   if (_compactCharts)
-                    _donutSummaryCard(isIncome: false, monthOffset: _expenseDonutMonthOffset)
+                    _compactExpenseOverview()
                   else ...[
                     _incomeExpenseChart(),
                     const SizedBox(height: 11),
@@ -1455,6 +1455,230 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ]),
         ),
       );
+
+  Widget _compactExpenseOverview() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final now = DateTime.now();
+    final monthStart = DateTime(now.year, now.month);
+    final nextMonth = DateTime(now.year, now.month + 1);
+    var monthIncome = 0.0;
+    var monthExpense = 0.0;
+    for (final tx in _transactions) {
+      final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
+      if (date == null || date.isBefore(monthStart) || !date.isBefore(nextMonth)) continue;
+      final amount = _amount(tx['amount']);
+      if (tx['kind'] == 'আয়') monthIncome += amount;
+      if (tx['kind'] == 'ব্যয়') monthExpense += amount;
+    }
+
+    final selectedMonth = DateTime(now.year, now.month - _expenseDonutMonthOffset);
+    final selectedNextMonth = DateTime(selectedMonth.year, selectedMonth.month + 1);
+    final totals = <String, double>{};
+    for (final tx in _transactions) {
+      final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
+      if (date == null || date.isBefore(DateTime(selectedMonth.year, selectedMonth.month)) || !date.isBefore(selectedNextMonth)) continue;
+      if ((tx['kind'] ?? '').toString() != 'ব্যয়') continue;
+      final category = (tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? tx['categoryTitle'] ?? tx['category_title'] ?? tx['subcategory'] ?? '').toString().trim();
+      final key = category.isEmpty ? 'অন্যান্য' : category;
+      totals[key] = (totals[key] ?? 0) + _amount(tx['amount']);
+    }
+    final entries = totals.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
+    final shown = entries.take(5).toList();
+    final remainder = entries.skip(5).fold<double>(0, (sum, entry) => sum + entry.value);
+    if (remainder > 0) {
+      final otherIndex = shown.indexWhere((entry) => entry.key == 'অন্যান্য');
+      if (otherIndex >= 0) {
+        shown[otherIndex] = MapEntry('অন্যান্য', shown[otherIndex].value + remainder);
+      } else {
+        shown.add(MapEntry('অন্যান্য', remainder));
+      }
+    }
+    final expenseTotal = entries.fold<double>(0, (sum, entry) => sum + entry.value);
+    const palette = <Color>[
+      Color(0xFF00B982), Color(0xFFFF625B), Color(0xFFFFA62B),
+      Color(0xFF1688D4), Color(0xFFC13EE8), Color(0xFF8A9B9A),
+    ];
+    final cardColor = isDark ? const Color(0xFF062537) : const Color(0xFFF9FFFC);
+    final borderColor = isDark ? const Color(0xFF12605D) : const Color(0xFFD7EEE5);
+    final textColor = isDark ? const Color(0xFFDDFBF1) : const Color(0xFF164F40);
+    final mutedColor = isDark ? const Color(0xFF9ABBB4) : const Color(0xFF64877C);
+
+    Widget metricCard({required String title, required double amount, required bool income}) {
+      final accent = income ? const Color(0xFF00B982) : const Color(0xFFFF625B);
+      return Expanded(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+          decoration: BoxDecoration(
+            color: accent.withValues(alpha: isDark ? .10 : .075),
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(color: accent.withValues(alpha: .18)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 34, height: 34,
+                decoration: BoxDecoration(color: accent.withValues(alpha: .16), shape: BoxShape.circle),
+                child: Icon(income ? Icons.south_rounded : Icons.north_rounded, color: accent, size: 21),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: mutedColor, fontSize: 10, fontWeight: FontWeight.w600)),
+                    const SizedBox(height: 4),
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(_hidden ? '৳ •••••' : _money(amount), style: TextStyle(color: textColor, fontSize: 15, fontWeight: FontWeight.w900)),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final monthLabel = _expenseDonutMonthOffset == 0 ? 'এই মাস' : _expenseDonutMonthOffset == 1 ? 'গত মাস' : '$_expenseDonutMonthOffset মাস আগে';
+
+    final expenseCard = Container(
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(child: Text('খরচের বিভাগ', style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w800))),
+              PopupMenuButton<int>(
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 100, maxWidth: 120),
+                tooltip: 'মাস নির্বাচন করুন',
+                onSelected: (value) => setState(() => _expenseDonutMonthOffset = value),
+                color: isDark ? const Color(0xFF102A38) : Colors.white,
+                itemBuilder: (context) => [
+                  for (var offset = 0; offset < 6; offset++)
+                    PopupMenuItem<int>(
+                      value: offset,
+                      height: 34,
+                      child: Text(offset == 0 ? 'এই মাস' : offset == 1 ? 'গত মাস' : '$offset মাস আগে', style: TextStyle(color: textColor, fontSize: 11)),
+                    ),
+                ],
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF00E7A0).withValues(alpha: .12) : const Color(0xFFDDF9EE),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text(monthLabel, style: TextStyle(color: textColor, fontSize: 9.5, fontWeight: FontWeight.w700)),
+                    Icon(Icons.keyboard_arrow_down_rounded, size: 13, color: textColor),
+                  ]),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final donutSize = constraints.maxWidth < 330 ? 104.0 : 132.0;
+              return Row(
+                children: [
+                  SizedBox(
+                    width: donutSize,
+                    height: donutSize,
+                    child: CustomPaint(
+                      painter: _DonutSummaryPainter(
+                        values: shown.map((entry) => entry.value).toList(),
+                        colors: List<Color>.generate(shown.length, (i) => palette[i % palette.length]),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(_hidden ? '৳ •••••' : _money(expenseTotal), style: TextStyle(color: textColor, fontSize: 13, fontWeight: FontWeight.w900)),
+                            ),
+                          ),
+                          Text('মোট খরচ', style: TextStyle(color: mutedColor, fontSize: 9)),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        for (var i = 0; i < shown.length; i++)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 3),
+                            child: Row(
+                              children: [
+                                Container(width: 7, height: 7, decoration: BoxDecoration(color: palette[i % palette.length], shape: BoxShape.circle)),
+                                const SizedBox(width: 6),
+                                Expanded(child: Text(shown[i].key, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: mutedColor, fontSize: 10))),
+                                Text(expenseTotal > 0 ? '${(shown[i].value / expenseTotal * 100).round()}%' : '0%', style: TextStyle(color: textColor, fontSize: 10, fontWeight: FontWeight.w800)),
+                              ],
+                            ),
+                          ),
+                        if (shown.isEmpty)
+                          Text('এখনো কোনো খরচ নেই', style: TextStyle(color: mutedColor, fontSize: 10)),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth >= 520) {
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                flex: 4,
+                child: Column(
+                  children: [
+                    metricCard(title: 'এই মাসের আয়', amount: monthIncome, income: true),
+                    const SizedBox(height: 10),
+                    metricCard(title: 'এই মাসের ব্যয়', amount: monthExpense, income: false),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(flex: 7, child: expenseCard),
+            ],
+          );
+        }
+        return Column(
+          children: [
+            Row(
+              children: [
+                metricCard(title: 'এই মাসের আয়', amount: monthIncome, income: true),
+                const SizedBox(width: 8),
+                metricCard(title: 'এই মাসের ব্যয়', amount: monthExpense, income: false),
+              ],
+            ),
+            const SizedBox(height: 9),
+            expenseCard,
+          ],
+        );
+      },
+    );
+  }
 
   Widget _incomeExpenseChart() {
     final isDark = Theme.of(context).brightness == Brightness.dark;

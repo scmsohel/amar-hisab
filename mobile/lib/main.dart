@@ -1443,28 +1443,29 @@ class _DebtsScreenState extends State<_DebtsScreen> {
             final date=_date(e['date']??e['dateInput']??e['createdAt']);
             final overdue=!done&&due!=null&&due.isBefore(DateTime.now());
             final accent=debt?red:green;
-            return Container(padding:const EdgeInsets.all(11),decoration:BoxDecoration(color:surface,borderRadius:BorderRadius.circular(19),border:Border.all(color:line),boxShadow:dark?[]:[BoxShadow(color:const Color(0xFF1D3557).withValues(alpha:.05),blurRadius:10,offset:const Offset(0,3))]),
+            return Container(padding:const EdgeInsets.symmetric(horizontal:8,vertical:8),decoration:BoxDecoration(color:surface,borderRadius:BorderRadius.circular(18),border:Border.all(color:line),boxShadow:dark?[]:[BoxShadow(color:const Color(0xFF1D3557).withValues(alpha:.04),blurRadius:7,offset:const Offset(0,2))]),
               child:Row(children:[
-                Container(width:46,height:46,decoration:BoxDecoration(color:(debt?purple:blue).withValues(alpha:.12),shape:BoxShape.circle),child:Icon(Icons.account_balance_wallet_outlined,color:debt?purple:blue,size:24)),
-                const SizedBox(width:9),
-                Expanded(flex:5,child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-                  Text(_name(e),maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:15,fontWeight:FontWeight.w900)),
+                Container(width:40,height:40,decoration:BoxDecoration(color:(debt?purple:blue).withValues(alpha:.12),shape:BoxShape.circle),child:Icon(Icons.account_balance_wallet_outlined,color:debt?purple:blue,size:21)),
+                const SizedBox(width:6),
+                Expanded(flex:5,child:Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisSize:MainAxisSize.min,children:[
+                  Text(_name(e),maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:14,fontWeight:FontWeight.w900,height:1.1)),
+                  const SizedBox(height:2),
+                  Row(children:[Icon(Icons.calendar_today_outlined,size:11,color:muted),const SizedBox(width:3),Flexible(child:Text(_dateLabel(date),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,color:muted)))]),
                   const SizedBox(height:3),
-                  Row(children:[Icon(Icons.calendar_today_outlined,size:12,color:muted),const SizedBox(width:4),Text(_dateLabel(date),style:TextStyle(fontSize:10,color:muted))]),
-                  const SizedBox(height:5),
-                  Wrap(spacing:5,runSpacing:4,children:[_pill(_kindOf(e),accent,debt?const Color(0xFFFFE9EB):const Color(0xFFE1F8EC)),_pill((e['accountType']??e['debtType']??e['type']??'সহজ হিসাব').toString(),blue,const Color(0xFFEAF2FF))]),
+                  Wrap(spacing:4,runSpacing:3,children:[_pill(_kindOf(e),accent,debt?const Color(0xFFFFE9EB):const Color(0xFFE1F8EC)),_pill((e['accountType']??e['debtType']??e['type']??'সহজ হিসাব').toString(),blue,const Color(0xFFEAF2FF))]),
                 ])),
-                Container(width:1,height:65,color:line,margin:const EdgeInsets.symmetric(horizontal:7)),
-                Expanded(flex:4,child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-                  Text('৳ ${_left(e).round()}',style:TextStyle(fontSize:17,fontWeight:FontWeight.w900,color:done?muted:accent)),
-                  const SizedBox(height:4),
+                Container(width:1,height:54,color:line,margin:const EdgeInsets.symmetric(horizontal:5)),
+                Expanded(flex:4,child:Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisSize:MainAxisSize.min,children:[
+                  Text('৳ \${_left(e).round()}',style:TextStyle(fontSize:16,fontWeight:FontWeight.w900,color:done?muted:accent)),
+                  const SizedBox(height:3),
                   _pill(done?'সম্পন্ন':'●  চলমান',done?muted:green,const Color(0xFFE1F8EC)),
-                  if(due!=null)...[const SizedBox(height:4),_pill('${_dateLabel(due)}${overdue ? ' ওভারডিউ' : ''}',overdue?red:muted,overdue?const Color(0xFFFFE8EA):const Color(0xFFF0F3F7))],
+                  if(due!=null)...[const SizedBox(height:3),_pill('\${_dateLabel(due)}\${overdue ? ' ওভারডিউ' : ''}',overdue?red:muted,overdue?const Color(0xFFFFE8EA):const Color(0xFFF0F3F7))],
                 ])),
+                const SizedBox(width:2),
                 Row(mainAxisSize:MainAxisSize.min,children:[
-                  IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.tightFor(width:27,height:32),padding:EdgeInsets.zero,onPressed:()=>_todo('রিমাইন্ডার'),icon:const Icon(Icons.notifications_none_rounded,size:19,color:Color(0xFF8292A4))),
-                  IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.tightFor(width:27,height:32),padding:EdgeInsets.zero,onPressed:()=>_todo('এডিট'),icon:const Icon(Icons.edit_outlined,size:18,color:Color(0xFF8292A4))),
-                  PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints.tightFor(width:27,height:32),iconSize:20,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v)=>_todo(v=='edit'?'এডিট':'রিমাইন্ডার'),itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))]),
+                  IconButton(visualDensity:const VisualDensity(horizontal:-4,vertical:-4),style:IconButton.styleFrom(tapTargetSize:MaterialTapTargetSize.shrinkWrap,minimumSize:const Size(22,26),padding:EdgeInsets.zero),constraints:const BoxConstraints.tightFor(width:22,height:26),padding:EdgeInsets.zero,onPressed:()=>_todo('রিমাইন্ডার'),icon:const Icon(Icons.notifications_none_rounded,size:16,color:Color(0xFF8292A4))),
+                  IconButton(visualDensity:const VisualDensity(horizontal:-4,vertical:-4),style:IconButton.styleFrom(tapTargetSize:MaterialTapTargetSize.shrinkWrap,minimumSize:const Size(22,26),padding:EdgeInsets.zero),constraints:const BoxConstraints.tightFor(width:22,height:26),padding:EdgeInsets.zero,onPressed:()=>_todo('এডিট'),icon:const Icon(Icons.edit_outlined,size:16,color:Color(0xFF8292A4))),
+                  PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints.tightFor(width:22,height:26),iconSize:17,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v)=>_todo(v=='edit'?'এডিট':'রিমাইন্ডার'),itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))]),
                 ]),
               ]));
           })),

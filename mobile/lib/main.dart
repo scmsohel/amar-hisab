@@ -2393,10 +2393,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             backgroundColor: Colors.transparent,
             elevation: 0,
             insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-            child: Padding(
-              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-              child: Container(
-                constraints: BoxConstraints(maxWidth: 440, maxHeight: MediaQuery.of(context).size.height * .90),
+            child: Container(
+                constraints: BoxConstraints(
+                  maxWidth: 440,
+                  maxHeight: (MediaQuery.of(context).size.height -
+                      MediaQuery.of(context).viewInsets.bottom - 48)
+                      .clamp(240.0, MediaQuery.of(context).size.height),
+                ),
                 decoration: BoxDecoration(
                   color: surface,
                   borderRadius: BorderRadius.circular(22),
@@ -2619,7 +2622,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         : Text('${kind} সংরক্ষণ', style: const TextStyle(fontWeight: FontWeight.w800)))),
                   ]),
                 ]))),
-              ),
             ),
           );
         }),

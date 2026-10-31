@@ -2377,13 +2377,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
           final accent = kind == 'আয়' ? const Color(0xFF10B981) : const Color(0xFFEF4760);
           final defaults = kind == 'আয়' ? <String>['বেতন', 'ব্যবসার আয়', 'অন্যান্য'] : <String>['খাবার', 'বাসা ও ইউটিলিটি', 'যাতায়াত', 'বিল', 'স্বাস্থ্য', 'শিক্ষা', 'কেনাকাটা', 'অন্যান্য'];
           final categories = <String>{...defaults, ..._transactions.where((tx) => tx['kind'] == kind).map(_transactionCategoryLabel)}.toList();
-          InputDecoration deco(String label, {String? hint, Widget? suffix}) => InputDecoration(
-            labelText: label, hintText: hint, suffixIcon: suffix, filled: true,
+          InputDecoration deco({String? hint, Widget? suffix}) => InputDecoration(
+            hintText: hint, suffixIcon: suffix, filled: true,
+            hintStyle: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w600),
             fillColor: dark ? const Color(0xFF172F42) : const Color(0xFFF8FAFC),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 13, vertical: 12),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: line)),
-            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: line)),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: accent, width: 1.8)));
+            contentPadding: const EdgeInsets.symmetric(horizontal: 13, vertical: 13),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: line)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: line)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide(color: accent, width: 1.7)));
+          Widget fieldLabel(String label) => Padding(
+            padding: const EdgeInsets.only(bottom: 7),
+            child: Text(label, style: TextStyle(color: ink, fontSize: 12, fontWeight: FontWeight.w800)),
+          );
           return Dialog(
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -2422,12 +2427,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 borderRadius: BorderRadius.circular(11),
                                 border: Border.all(color: selected ? color : line),
                               ),
-                              child: Center(
-                                child: Text(value, style: TextStyle(
-                                  color: selected ? color : muted,
-                                  fontWeight: FontWeight.w800,
-                                )),
-                              ),
+                              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                Icon(value == 'আয়' ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                                  size: 17, color: selected ? color : muted),
+                                const SizedBox(width: 6),
+                                Text(value, style: TextStyle(color: selected ? color : muted,
+                                  fontWeight: FontWeight.w800, fontSize: 13)),
+                              ]),
                             ),
                           ),
                         ),
@@ -2435,9 +2441,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     }).toList(),
                   ),
                   const SizedBox(height: 13),
-                  TextFormField(controller: title, style: TextStyle(color: ink), decoration: deco('বিবরণ', hint: 'যেমন: বেতন, ব্যবসার আয়'),
+                  fieldLabel('বিবরণ'),
+                  TextFormField(controller: title, style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w600),
+                    decoration: deco(hint: kind == 'ব্যয়' ? 'যেমন: বাজার, বিদ্যুৎ বিল' : 'যেমন: বেতন, ব্যবসার আয়'),
                     validator: (v) => v == null || v.trim().isEmpty ? 'বিবরণ লিখুন' : null),
-                  const SizedBox(height: 12), Text('আইকন নির্বাচন', style: TextStyle(color: ink, fontSize: 12, fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 13), fieldLabel('আইকন নির্বাচন'),
                   const SizedBox(height: 6),
                   Builder(builder: (selectorContext) {
                     final iconOptions = <(String, IconData)>[
@@ -2550,28 +2558,36 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       )),
                     ]);
                   }),
+                  const SizedBox(height: 13), fieldLabel('পরিমাণ (৳)'),
+                  TextFormField(controller: amount, keyboardType: const TextInputType.numberWithOptions(decimal: true), style: TextStyle(color: ink, fontWeight: FontWeight.w800, fontSize: 13),
+                    decoration: deco(hint: '0.00'), validator: (v) { final n = double.tryParse(v?.trim() ?? ''); return n == null || n <= 0 ? 'সঠিক পরিমাণ লিখুন' : null; }),
                   const SizedBox(height: 12),
-                  TextFormField(controller: amount, keyboardType: const TextInputType.numberWithOptions(decimal: true), style: TextStyle(color: ink, fontWeight: FontWeight.w800),
-                    decoration: deco('পরিমাণ (৳)', hint: '0.00'), validator: (v) { final n = double.tryParse(v?.trim() ?? ''); return n == null || n <= 0 ? 'সঠিক পরিমাণ লিখুন' : null; }),
-                  const SizedBox(height: 12),
-                  Row(children: [
-                    Expanded(child: TextFormField(controller: date, readOnly: true, style: TextStyle(color: ink, fontSize: 12),
-                      decoration: deco('তারিখ', suffix: Icon(Icons.calendar_today_rounded, size: 17, color: muted)),
-                      onTap: () async { final picked = await showDatePicker(context: context, initialDate: DateTime.tryParse(date.text) ?? DateTime.now(), firstDate: DateTime(2000), lastDate: DateTime(2100));
-                        if (picked != null && sheetContext.mounted) setSheetState(() => date.text = '${picked.year.toString().padLeft(4, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}'); })),
-                    const SizedBox(width: 9),
-                    Expanded(child: TextFormField(controller: time, readOnly: true, style: TextStyle(color: ink, fontSize: 12),
-                      decoration: deco('সময়', suffix: Icon(Icons.access_time_rounded, size: 17, color: muted)),
-                      onTap: () async { final p = time.text.split(':'); final picked = await showTimePicker(context: context, initialTime: TimeOfDay(hour: int.tryParse(p.first) ?? 0, minute: int.tryParse(p.last) ?? 0));
-                        if (picked != null && sheetContext.mounted) setSheetState(() => time.text = '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}'); })),
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      fieldLabel('তারিখ'),
+                      TextFormField(controller: date, readOnly: true, style: TextStyle(color: ink, fontSize: 12, fontWeight: FontWeight.w700),
+                        decoration: deco(suffix: Icon(Icons.calendar_today_rounded, size: 17, color: muted)),
+                        onTap: () async { final picked = await showDatePicker(context: context, initialDate: DateTime.tryParse(date.text) ?? DateTime.now(), firstDate: DateTime(2000), lastDate: DateTime(2100));
+                          if (picked != null && sheetContext.mounted) setSheetState(() => date.text = '${picked.year.toString().padLeft(4, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}'); }),
+                    ])),
+                    const SizedBox(width: 10),
+                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      fieldLabel('সময়'),
+                      TextFormField(controller: time, readOnly: true, style: TextStyle(color: ink, fontSize: 12, fontWeight: FontWeight.w700),
+                        decoration: deco(suffix: Icon(Icons.access_time_rounded, size: 17, color: muted)),
+                        onTap: () async { final p = time.text.split(':'); final picked = await showTimePicker(context: context, initialTime: TimeOfDay(hour: int.tryParse(p.first) ?? 0, minute: int.tryParse(p.last) ?? 0));
+                          if (picked != null && sheetContext.mounted) setSheetState(() => time.text = '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}'); }),
+                    ])),
                   ]),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(key: ValueKey(kind), initialValue: categories.contains(category) ? category : 'অন্যান্য', decoration: deco('ক্যাটাগরি'), dropdownColor: surface,
-                    style: TextStyle(color: ink, fontSize: 13), items: categories.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+                  const SizedBox(height: 13), fieldLabel('ক্যাটাগরি'),
+                  DropdownButtonFormField<String>(key: ValueKey(kind), initialValue: categories.contains(category) ? category : 'অন্যান্য',
+                    decoration: deco(suffix: Icon(Icons.keyboard_arrow_down_rounded, color: muted)), dropdownColor: surface,
+                    style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w600), items: categories.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
                     onChanged: saving ? null : (v) => setSheetState(() => category = v ?? category)),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(initialValue: wallets.contains(wallet) ? wallet : wallets.first, decoration: deco('ওয়ালেট'), dropdownColor: surface,
-                    style: TextStyle(color: ink, fontSize: 13), items: wallets.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+                  const SizedBox(height: 13), fieldLabel('ওয়ালেট'),
+                  DropdownButtonFormField<String>(initialValue: wallets.contains(wallet) ? wallet : wallets.first,
+                    decoration: deco(suffix: Icon(Icons.keyboard_arrow_down_rounded, color: muted)), dropdownColor: surface,
+                    style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w600), items: wallets.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
                     onChanged: saving ? null : (v) => setSheetState(() => wallet = v ?? wallet)),
                   const SizedBox(height: 17),
                   Row(children: [

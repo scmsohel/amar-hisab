@@ -2369,7 +2369,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final wallets = <String>{'ক্যাশ', 'ব্যাংক', 'বিকাশ', 'নগদ', ..._walletBalances.keys,
       ..._transactions.map((tx) => (tx['wallet'] ?? tx['walletName'] ?? '').toString()).where((v) => v.isNotEmpty)}.toList();
     try {
-      await showModalBottomSheet<void>(context: context, isScrollControlled: true, useSafeArea: true, backgroundColor: Colors.transparent,
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: !saving,
+        barrierColor: Colors.black.withValues(alpha: dark ? .62 : .30),
         builder: (sheetContext) => StatefulBuilder(builder: (context, setSheetState) {
           final accent = kind == 'আয়' ? const Color(0xFF10B981) : const Color(0xFFEF4760);
           final defaults = kind == 'আয়' ? <String>['বেতন', 'ব্যবসার আয়', 'অন্যান্য'] : <String>['খাবার', 'বাসা ও ইউটিলিটি', 'যাতায়াত', 'বিল', 'স্বাস্থ্য', 'শিক্ষা', 'কেনাকাটা', 'অন্যান্য'];
@@ -2381,10 +2384,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: line)),
             enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: line)),
             focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: accent, width: 1.8)));
-          return Padding(padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-            child: Container(constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * .94),
-              decoration: BoxDecoration(color: surface, borderRadius: const BorderRadius.vertical(top: Radius.circular(24))),
-              child: Form(key: formKey, child: SingleChildScrollView(padding: const EdgeInsets.fromLTRB(18, 15, 18, 18),
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+            child: Padding(
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: Container(
+                constraints: BoxConstraints(maxWidth: 440, maxHeight: MediaQuery.of(context).size.height * .90),
+                decoration: BoxDecoration(
+                  color: surface,
+                  borderRadius: BorderRadius.circular(22),
+                  border: Border.all(color: line.withValues(alpha: .75)),
+                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: dark ? .24 : .10), blurRadius: 28, offset: const Offset(0, 12))],
+                ),
+                child: Form(key: formKey, child: SingleChildScrollView(padding: const EdgeInsets.fromLTRB(18, 15, 18, 18),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
                   Row(children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text('নতুন ${kind == 'আয়' ? 'আয়' : 'ব্যয়'} যোগ করুন', style: TextStyle(color: ink, fontSize: 19, fontWeight: FontWeight.w900)),
@@ -2486,6 +2500,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         : Text('${kind} সংরক্ষণ', style: const TextStyle(fontWeight: FontWeight.w800)))),
                   ]),
                 ]))),
+              ),
             ),
           );
         }),

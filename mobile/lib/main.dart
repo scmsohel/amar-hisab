@@ -1810,21 +1810,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
           AnimatedPositioned(
-            duration: const Duration(milliseconds: 520),
-            curve: Curves.easeOutBack,
+            duration: Duration(milliseconds: _showAddTransactionFab ? 560 : 420),
+            curve: _showAddTransactionFab ? Curves.easeOutBack : Curves.easeInCubic,
             right: 20,
             bottom: _showAddTransactionFab ? 22 : -82,
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 220),
-              opacity: _showAddTransactionFab ? 1 : 0,
-              child: IgnorePointer(
-                ignoring: !_showAddTransactionFab,
-                child: FloatingActionButton(
-                  heroTag: 'add-transaction-fab',
-                  backgroundColor: const Color(0xFF187BFA),
-                  foregroundColor: Colors.white,
-                  onPressed: _showAddTransaction,
-                  child: const Icon(Icons.add_rounded, size: 31),
+            child: AnimatedScale(
+              duration: Duration(milliseconds: _showAddTransactionFab ? 560 : 420),
+              curve: _showAddTransactionFab ? Curves.elasticOut : Curves.easeInCubic,
+              scale: _showAddTransactionFab ? 1 : 0.72,
+              child: AnimatedOpacity(
+                duration: Duration(milliseconds: _showAddTransactionFab ? 260 : 360),
+                curve: _showAddTransactionFab ? Curves.easeOut : Curves.easeInCubic,
+                opacity: _showAddTransactionFab ? 1 : 0,
+                child: IgnorePointer(
+                  ignoring: !_showAddTransactionFab,
+                  child: FloatingActionButton(
+                    heroTag: 'add-transaction-fab',
+                    backgroundColor: const Color(0xFF187BFA),
+                    foregroundColor: Colors.white,
+                    onPressed: _showAddTransaction,
+                    child: const Icon(Icons.add_rounded, size: 31),
+                  ),
                 ),
               ),
             ),

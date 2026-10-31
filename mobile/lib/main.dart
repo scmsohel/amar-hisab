@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -2384,12 +2385,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const SizedBox(height: 3), Text('আপনার হিসাবের তথ্য পূরণ করুন', style: TextStyle(color: muted, fontSize: 11)),
                   ])), IconButton(onPressed: saving ? null : () => Navigator.pop(sheetContext), icon: Icon(Icons.close_rounded, color: muted))]),
                   const SizedBox(height: 12),
-                  Row(children: [for (final value in ['আয়', 'ব্যয়']) Expanded(child: Padding(padding: EdgeInsets.only(right: value == 'আয়' ? 7 : 0),
-                    child: InkWell(onTap: () => setSheetState(() { kind = value; category = 'অন্যান্য'; }), borderRadius: BorderRadius.circular(11),
-                      child: Container(padding: const EdgeInsets.symmetric(vertical: 11),
-                        decoration: BoxDecoration(color: kind == value ? (value == 'আয়' ? const Color(0xFF10B981) : const Color(0xFFEF4760)).withValues(alpha: .12) : Colors.transparent,
-                          borderRadius: BorderRadius.circular(11), border: Border.all(color: kind == value ? accent : line)),
-                        child: Center(child: Text(value, style: TextStyle(color: kind == value ? accent : muted, fontWeight: FontWeight.w800))))))]),
+                  Row(
+                    children: ['আয়', 'ব্যয়'].map((value) {
+                      final selected = kind == value;
+                      final color = value == 'আয়' ? const Color(0xFF10B981) : const Color(0xFFEF4760);
+                      return Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.only(right: value == 'আয়' ? 7 : 0),
+                          child: InkWell(
+                            onTap: () => setSheetState(() { kind = value; category = 'অন্যান্য'; }),
+                            borderRadius: BorderRadius.circular(11),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 11),
+                              decoration: BoxDecoration(
+                                color: selected ? color.withValues(alpha: .12) : Colors.transparent,
+                                borderRadius: BorderRadius.circular(11),
+                                border: Border.all(color: selected ? color : line),
+                              ),
+                              child: Center(
+                                child: Text(value, style: TextStyle(
+                                  color: selected ? color : muted,
+                                  fontWeight: FontWeight.w800,
+                                )),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
                   const SizedBox(height: 13),
                   TextFormField(controller: title, style: TextStyle(color: ink), decoration: deco('বিবরণ', hint: 'যেমন: বেতন, ব্যবসার আয়'),
                     validator: (v) => v == null || v.trim().isEmpty ? 'বিবরণ লিখুন' : null),

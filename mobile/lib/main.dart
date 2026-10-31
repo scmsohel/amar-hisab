@@ -3482,15 +3482,78 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
       Padding(padding:const EdgeInsets.fromLTRB(12,4,12,7),child:Row(children:[summary('মোট আয়',income,const Color(0xFF00A875),Icons.trending_up_rounded),const SizedBox(width:7),summary('মোট ব্যয়',expense,const Color(0xFFEF4444),Icons.trending_down_rounded)])),
       Padding(padding:const EdgeInsets.fromLTRB(12,0,12,7),child:Row(children:[summary('নিট ব্যালেন্স',income-expense,const Color(0xFF2588F5),Icons.account_balance_wallet_outlined),const SizedBox(width:7),summary('মোট লেনদেন',items.length.toDouble(),const Color(0xFF8B5CF6),Icons.receipt_long_rounded)])),
       Padding(padding:const EdgeInsets.fromLTRB(12,0,12,7),child:TextField(controller:search,onChanged:(_)=>setState(()=>page=0),decoration:InputDecoration(prefixIcon:const Icon(Icons.search_rounded),hintText:'বিবরণ, ক্যাটাগরি, ওয়ালেট খুঁজুন...',filled:true,fillColor:dark?const Color(0xFF12283A):Colors.white,border:OutlineInputBorder(borderRadius:BorderRadius.circular(12))))),
-      SizedBox(height:42,child:ListView(scrollDirection:Axis.horizontal,padding:const EdgeInsets.symmetric(horizontal:12),children:[
-        for(final k in ['সব','আয়','ব্যয়','ট্রান্সফার'])Padding(padding:const EdgeInsets.only(right:5),child:ChoiceChip(label:Text(k),selected:kind==k,onSelected:(_)=>setState(() { kind=k; page=0; }))),
-        DropdownButton<String>(value:category,underline:const SizedBox(),items:['সব ক্যাটাগরি',...cats].map((v)=>DropdownMenuItem(value:v,child:Text(v))).toList(),onChanged:(v)=>setState(() { category=v??'সব ক্যাটাগরি'; page=0; })),
-        DropdownButton<String>(value:wallet,underline:const SizedBox(),items:['সব ওয়ালেট',...wallets].map((v)=>DropdownMenuItem(value:v,child:Text(v))).toList(),onChanged:(v)=>setState(() { wallet=v??'সব ওয়ালেট'; page=0; })),
-        TextButton.icon(onPressed:()async{final now=DateTime.now();final r=await showDateRangePicker(context:context,firstDate:DateTime(2000),lastDate:DateTime(2100),initialDateRange:range??DateTimeRange(start:DateTime(now.year,now.month,1),end:now));if(r!=null)setState(() { range=r; page=0; });},icon:const Icon(Icons.calendar_month_rounded,size:16),label:Text(range==null?'তারিখ':'নির্বাচিত')),
-        if(range!=null)IconButton(onPressed:()=>setState(()=>range=null),icon:const Icon(Icons.close_rounded)),
-      ])),
-      Padding(padding:const EdgeInsets.symmetric(horizontal:14),child:Row(children:[Text('${bn(items.length.toString())}টি লেনদেন',style:TextStyle(fontSize:10,color:dark?Colors.white60:const Color(0xFF718096))),const Spacer(),DropdownButton<String>(value:sort,underline:const SizedBox(),items:const ['সর্বশেষ আগে','পুরোনো আগে'].map((v)=>DropdownMenuItem(value:v,child:Text(v,style:const TextStyle(fontSize:10)))).toList(),onChanged:(v)=>setState(() { sort=v??sort; page=0; }))])),
-      Expanded(child:loading?const Center(child:CircularProgressIndicator()):shown.isEmpty?Center(child:Text('কোনো লেনদেন পাওয়া যায়নি',style:TextStyle(color:dark?Colors.white60:const Color(0xFF718096)))):ListView(padding:const EdgeInsets.fromLTRB(10,0,10,8),children:[
+      SizedBox(
+        height: 46,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+          children: [
+            for(final k in ['সব','আয়','ব্যয়','ট্রান্সফার'])
+              Padding(
+                padding: const EdgeInsets.only(right: 5),
+                child: ChoiceChip(
+                  label: Text(k),
+                  selected: kind==k,
+                  onSelected: (_) => setState(() { kind=k; page=0; }),
+                ),
+              ),
+            DropdownButton<String>(
+              value: category,
+              underline: const SizedBox(),
+              items: ['সব ক্যাটাগরি',...cats].map((v)=>DropdownMenuItem(value:v,child:Text(v))).toList(),
+              onChanged: (v) => setState(() { category=v??'সব ক্যাটাগরি'; page=0; }),
+            ),
+            DropdownButton<String>(
+              value: wallet,
+              underline: const SizedBox(),
+              items: ['সব ওয়ালেট',...wallets].map((v)=>DropdownMenuItem(value:v,child:Text(v))).toList(),
+              onChanged: (v) => setState(() { wallet=v??'সব ওয়ালেট'; page=0; }),
+            ),
+            TextButton.icon(
+              onPressed: () async {
+                final now=DateTime.now();
+                final r=await showDateRangePicker(
+                  context:context,
+                  firstDate:DateTime(2000),
+                  lastDate:DateTime(2100),
+                  initialDateRange:range??DateTimeRange(start:DateTime(now.year,now.month,1),end:now),
+                );
+                if(r!=null)setState(() { range=r; page=0; });
+              },
+              icon: const Icon(Icons.calendar_month_rounded,size:16),
+              label: Text(range==null?'তারিখ':'নির্বাচিত'),
+            ),
+            if(range!=null) IconButton(onPressed:()=>setState(() { range=null; page=0; }),icon:const Icon(Icons.close_rounded)),
+          ],
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.fromLTRB(14, 3, 14, 5),
+        child: SizedBox(
+          height: 34,
+          child: Row(
+            children: [
+              Text('${bn(items.length.toString())}টি লেনদেন',style:TextStyle(fontSize:10,color:dark?Colors.white60:const Color(0xFF718096))),
+              const Spacer(),
+              DropdownButton<String>(
+                value:sort,
+                underline:const SizedBox(),
+                items:const ['সর্বশেষ আগে','পুরোনো আগে'].map((v)=>DropdownMenuItem(value:v,child:Text(v,style:const TextStyle(fontSize:10)))).toList(),
+                onChanged:(v)=>setState(() { sort=v??sort; page=0; }),
+              ),
+            ],
+          ),
+        ),
+      ),
+      Expanded(
+        child: loading
+          ? const Center(child:CircularProgressIndicator())
+          : shown.isEmpty
+            ? Center(child:Text('কোনো লেনদেন পাওয়া যায়নি',style:TextStyle(color:dark?Colors.white60:const Color(0xFF718096))))
+            : ListView(
+                key: ValueKey('${kind}|${category}|${wallet}|${sort}|${range?.start}|${range?.end}|${page}|${search.text}'),
+                padding: const EdgeInsets.fromLTRB(10, 4, 10, 8),
+                children:[
         for(final g in groups.entries)...[
           Container(padding:const EdgeInsets.symmetric(horizontal:11,vertical:9),decoration:BoxDecoration(color:dark?const Color(0xFF18334B):const Color(0xFFEAF2FC),borderRadius:BorderRadius.circular(10)),child:Text(dateLabel(dateOf(g.value.first)),style:TextStyle(fontSize:11,fontWeight:FontWeight.w800,color:ink))),
           for(final x in g.value)row(x),const SizedBox(height:6),

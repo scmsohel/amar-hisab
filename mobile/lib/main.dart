@@ -1060,7 +1060,6 @@ class _ServerSettingsScreenState extends State<ServerSettingsScreen> {
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
-
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
 }
@@ -1069,9 +1068,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _loading = true;
   String? _error;
   Map<String, dynamic> _user = {};
-  int _walletCount = 0;
-  int _transactionCount = 0;
   DateTime? _joinedAt;
+  DateTime? _lastSyncAt;
 
   @override
   void initState() {
@@ -1087,250 +1085,177 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _AuthApi._get('/data/transactions'),
       ]);
       if (!mounted) return;
-      final userData = results[0]['user'];
-      final wallets = results[1]['data'];
-      final transactions = results[2]['data'];
-      final joinedRaw = userData is Map
-          ? (userData['createdAt'] ?? userData['created_at'] ?? userData['joinedAt'] ?? userData['joined_at'])
-          : null;
+      final data = results[0]['user'];
+      final joined = data is Map ? (data['createdAt'] ?? data['created_at'] ?? data['joinedAt'] ?? data['joined_at']) : null;
+      final synced = data is Map ? (data['lastSyncAt'] ?? data['last_sync_at'] ?? data['syncedAt'] ?? data['synced_at']) : null;
       setState(() {
-        _user = userData is Map ? Map<String, dynamic>.from(userData) : <String, dynamic>{};
-        _walletCount = wallets is List ? wallets.length : 0;
-        _transactionCount = transactions is List ? transactions.length : 0;
-        _joinedAt = joinedRaw == null ? null : DateTime.tryParse(joinedRaw.toString());
+        _user = data is Map ? Map<String, dynamic>.from(data) : <String, dynamic>{};
+        _joinedAt = joined == null ? null : DateTime.tryParse(joined.toString());
+        _lastSyncAt = synced == null ? null : DateTime.tryParse(synced.toString());
         _loading = false;
       });
-    } catch (error) {
+    } catch (e) {
       if (!mounted) return;
-      setState(() {
-        _error = error.toString().replaceFirst('Exception: ', '');
-        _loading = false;
-      });
+      setState(() { _error = e.toString().replaceFirst('Exception: ', ''); _loading = false; });
     }
   }
 
-  String _bengaliDigits(String value) => value
-      .replaceAll('0', '০').replaceAll('1', '১').replaceAll('2', '২')
-      .replaceAll('3', '৩').replaceAll('4', '৪').replaceAll('5', '৫')
-      .replaceAll('6', '৬').replaceAll('7', '৭').replaceAll('8', '৮')
-      .replaceAll('9', '৯');
+  String _bn(String value) => value
+      .replaceAll('0','০').replaceAll('1','১').replaceAll('2','২').replaceAll('3','৩')
+      .replaceAll('4','৪').replaceAll('5','৫').replaceAll('6','৬').replaceAll('7','৭')
+      .replaceAll('8','৮').replaceAll('9','৯');
 
-  String _membershipLabel() {
-    if (_joinedAt == null) return 'সদস্য';
-    final now = DateTime.now();
-    var years = now.year - _joinedAt!.year;
-    if (DateTime(now.year, _joinedAt!.month, _joinedAt!.day).isAfter(now)) years--;
-    if (years <= 0) return '১ বছরের কম';
-    return '${_bengaliDigits(years.toString())} বছর';
+  String get _memberSince {
+    if (_joinedAt == null) return 'তথ্য পাওয়া যায়নি';
+    var years = DateTime.now().year - _joinedAt!.year;
+    if (DateTime(DateTime.now().year, _joinedAt!.month, _joinedAt!.day).isAfter(DateTime.now())) years--;
+    return years <= 0 ? '১ বছরের কম আগে' : '\${_bn(years.toString())} বছর আগে';
   }
 
-  void _showMenuMessage(String title) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('$title — শীঘ্রই চালু হবে।')),
-    );
+  String get _lastSync {
+    if (_lastSyncAt == null) return 'তথ্য পাওয়া যায়নি';
+    final d = DateTime.now().difference(_lastSyncAt!);
+    if (d.inMinutes < 1) return 'এইমাত্র';
+    if (d.inHours < 1) return '\${_bn(d.inMinutes.toString())} মিনিট আগে';
+    if (d.inDays < 1) return '\${_bn(d.inHours.toString())} ঘণ্টা আগে';
+    return '\${_bn(d.inDays.toString())} দিন আগে';
   }
+
+  void _message(String label) => ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(content: Text('$label — শীঘ্রই চালু হবে।')),
+  );
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final page = isDark ? const Color(0xFF071827) : const Color(0xFFF3F8F5);
-    final card = isDark ? const Color(0xFF10243A) : const Color(0xFFFFFFFF);
-    final title = isDark ? const Color(0xFFEAF5FF) : const Color(0xFF17243A);
-    final muted = isDark ? const Color(0xFF9CB0C5) : const Color(0xFF718096);
-    final border = isDark ? const Color(0xFF263F57) : const Color(0xFFE8EEF4);
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final bg = dark ? const Color(0xFF071827) : const Color(0xFFF4FAF8);
+    final surface = dark ? const Color(0xFF12283A) : Colors.white;
+    final ink = dark ? const Color(0xFFEAF4FF) : const Color(0xFF111827);
+    final muted = dark ? const Color(0xFFB2C3D5) : const Color(0xFF405274);
+    final line = dark ? const Color(0xFF30485D) : const Color(0xFFE3EAF1);
     final name = (_user['name'] ?? _user['fullName'] ?? _user['full_name'] ?? 'ব্যবহারকারী').toString();
     final email = (_user['email'] ?? '').toString();
+    final photo = (_user['avatarUrl'] ?? _user['avatar_url'] ?? _user['photoUrl'] ?? _user['photo_url'] ?? '').toString();
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarColor: page,
-        statusBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
-        systemNavigationBarColor: page,
-        systemNavigationBarIconBrightness: isDark ? Brightness.light : Brightness.dark,
+        statusBarColor: bg,
+        statusBarIconBrightness: dark ? Brightness.light : Brightness.dark,
+        systemNavigationBarColor: bg,
+        systemNavigationBarIconBrightness: dark ? Brightness.light : Brightness.dark,
       ),
       child: Scaffold(
-        backgroundColor: page,
+        backgroundColor: bg,
         body: SafeArea(
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
-                child: Row(
-                  children: [
-                    IconButton(
-                      tooltip: 'ফিরে যান',
-                      onPressed: () => Navigator.of(context).maybePop(),
-                      icon: Icon(Icons.arrow_back_rounded, color: title),
-                    ),
-                    const SizedBox(width: 4),
-                    Expanded(child: Text('প্রোফাইল', style: TextStyle(color: title, fontSize: 20, fontWeight: FontWeight.w900))),
-                    IconButton(
-                      tooltip: isDark ? 'Light Mode' : 'Dark Mode',
-                      onPressed: () => _setAppThemeMode(isDark ? ThemeMode.light : ThemeMode.dark),
-                      icon: Icon(isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded, color: title),
-                    ),
-                    IconButton(
-                      tooltip: 'আরও',
-                      onPressed: () => showModalBottomSheet<void>(
-                        context: context,
-                        backgroundColor: card,
-                        builder: (sheetContext) => SafeArea(
-                          child: ListTile(
-                            leading: const Icon(Icons.refresh_rounded),
-                            title: const Text('প্রোফাইল রিফ্রেশ'),
-                            onTap: () {
-                              Navigator.pop(sheetContext);
-                              _loadProfile();
-                            },
-                          ),
-                        ),
-                      ),
-                      icon: Icon(Icons.more_vert_rounded, color: title),
-                    ),
-                  ],
-                ),
+                padding: const EdgeInsets.fromLTRB(12, 3, 12, 5),
+                child: Row(children: [
+                  IconButton(onPressed: () => Navigator.of(context).maybePop(), icon: Icon(Icons.arrow_back_rounded, color: ink, size: 29)),
+                  Expanded(child: Text('প্রোফাইল', style: TextStyle(color: ink, fontSize: 23, fontWeight: FontWeight.w900))),
+                  _actionIcon(dark ? Icons.wb_sunny_rounded : Icons.nightlight_round, muted, () => _setAppThemeMode(dark ? ThemeMode.light : ThemeMode.dark)),
+                  const SizedBox(width: 8),
+                  _actionIcon(Icons.settings_rounded, const Color(0xFF1688F8), () => _message('অ্যাপ সেটিংস')),
+                ]),
               ),
               Expanded(
-                child: RefreshIndicator(
-                  onRefresh: _loadProfile,
-                  child: ListView(
-                    padding: const EdgeInsets.fromLTRB(10, 0, 10, 18),
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.fromLTRB(15, 14, 12, 14),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(18),
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: isDark
-                                ? const [Color(0xFF173D61), Color(0xFF164D69), Color(0xFF24618A)]
-                                : const [Color(0xFFB9CFFF), Color(0xFFBDEBFA), Color(0xFFA7CBFF)],
+                child: Stack(children: [
+                  Positioned.fill(child: IgnorePointer(child: DecoratedBox(decoration: BoxDecoration(
+                    gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter,
+                      colors: dark ? const [Color(0xFF0B2534), Color(0xFF071827), Color(0xFF102A32)] : const [Color(0xFFEFFFF7), Color(0xFFFAFCFF), Color(0xFFF0FAF7)]),
+                  )))),
+                  RefreshIndicator(
+                    onRefresh: _loadProfile,
+                    child: ListView(
+                      padding: const EdgeInsets.fromLTRB(18, 14, 18, 20),
+                      children: [
+                        Center(child: Stack(clipBehavior: Clip.none, children: [
+                          Container(
+                            width: 144, height: 144, padding: const EdgeInsets.all(7),
+                            decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: const Color(0xFFB9EED5), width: 5),
+                              boxShadow: [BoxShadow(color: const Color(0xFF22B86B).withValues(alpha: .13), blurRadius: 18, spreadRadius: 2)]),
+                            child: Container(
+                              decoration: BoxDecoration(shape: BoxShape.circle, color: dark ? const Color(0xFF203B50) : const Color(0xFFE8F5EF),
+                                border: Border.all(color: surface, width: 4),
+                                image: photo.isNotEmpty ? DecorationImage(image: NetworkImage(photo), fit: BoxFit.cover) : null),
+                              child: photo.isEmpty ? Icon(Icons.person_rounded, size: 82, color: dark ? const Color(0xFF9CCDEB) : const Color(0xFF1688F8)) : null,
+                            ),
                           ),
-                          boxShadow: [BoxShadow(color: const Color(0xFF287FCB).withValues(alpha: .12), blurRadius: 14, offset: const Offset(0, 5))],
+                          Positioned(right: 0, bottom: 4, child: Material(
+                            color: const Color(0xFF08B83D), shape: const CircleBorder(side: BorderSide(color: Colors.white, width: 3)), elevation: 3,
+                            child: InkWell(customBorder: const CircleBorder(), onTap: () => _message('প্রোফাইল ছবি পরিবর্তন'),
+                              child: const SizedBox(width: 48, height: 48, child: Icon(Icons.edit_rounded, color: Colors.white, size: 25))),
+                          )),
+                        ])),
+                        const SizedBox(height: 10),
+                        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                          Flexible(child: Text(_loading ? 'লোড হচ্ছে...' : name, maxLines: 1, overflow: TextOverflow.ellipsis,
+                            style: TextStyle(color: ink, fontSize: 27, fontWeight: FontWeight.w900))),
+                          const SizedBox(width: 9),
+                          const Icon(Icons.verified_rounded, color: Color(0xFF0DBB39), size: 34),
+                        ]),
+                        const SizedBox(height: 2),
+                        Center(child: Text(email, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muted, fontSize: 17))),
+                        const SizedBox(height: 15),
+                        Center(child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 11),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(colors: [Color(0xFFFFF9D8), Color(0xFFFFE99A)]),
+                            borderRadius: BorderRadius.circular(40), border: Border.all(color: const Color(0xFFFFB300), width: 1.2),
+                            boxShadow: [BoxShadow(color: const Color(0xFFE9A21A).withValues(alpha: .2), blurRadius: 9, offset: const Offset(0, 4))]),
+                          child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                            Icon(Icons.workspace_premium_rounded, color: Color(0xFFB87900), size: 30), SizedBox(width: 12),
+                            Text('প্রিমিয়াম সদস্য', style: TextStyle(color: Color(0xFF9C5B00), fontSize: 20, fontWeight: FontWeight.w900)),
+                          ]),
+                        )),
+                        const SizedBox(height: 25),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 13),
+                          decoration: BoxDecoration(color: dark ? const Color(0xFF142C3D) : const Color(0xFFFFFCF9),
+                            borderRadius: BorderRadius.circular(25), border: Border.all(color: dark ? const Color(0xFF38556A) : const Color(0xFFE8C9DD)),
+                            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: .04), blurRadius: 12, offset: const Offset(0, 4))]),
+                          child: Row(children: [
+                            Expanded(child: _info(Icons.calendar_month_rounded, 'সদস্য হয়েছেন', _memberSince, dark)),
+                            _infoDivider(dark),
+                            Expanded(child: _info(Icons.cloud_done_rounded, 'সর্বশেষ Sync', _lastSync, dark)),
+                            _infoDivider(dark),
+                            Expanded(child: _info(Icons.check_circle_rounded, 'সব ডেটা', _loading ? 'যাচাই হচ্ছে' : 'Sync Status', dark)),
+                          ]),
                         ),
-                        child: Row(
-                          children: [
-                            Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                Container(
-                                  width: 76,
-                                  height: 76,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: isDark ? const Color(0xFF254D6C) : Colors.white,
-                                    border: Border.all(color: Colors.white, width: 3),
-                                  ),
-                                  child: Icon(Icons.person_rounded, size: 48, color: isDark ? const Color(0xFFB9E4FF) : const Color(0xFF287FCB)),
-                                ),
-                                Positioned(
-                                  right: -2,
-                                  bottom: -1,
-                                  child: Container(
-                                    width: 27,
-                                    height: 27,
-                                    decoration: const BoxDecoration(color: Color(0xFF1688F8), shape: BoxShape.circle, border: Border.fromBorderSide(BorderSide(color: Colors.white, width: 2))),
-                                    child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 15),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(width: 13),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(_loading ? 'লোড হচ্ছে...' : name, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? Colors.white : const Color(0xFF17243A), fontSize: 17, fontWeight: FontWeight.w900)),
-                                  const SizedBox(height: 3),
-                                  Text(email, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFBDD4E7) : const Color(0xFF5E7187), fontSize: 11.5)),
-                                  const SizedBox(height: 7),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                                    decoration: BoxDecoration(color: const Color(0xFFFFF2D6), borderRadius: BorderRadius.circular(20), border: Border.all(color: const Color(0xFFFFD98A))),
-                                    child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                                      Icon(Icons.workspace_premium_rounded, color: Color(0xFFE99A16), size: 14),
-                                      SizedBox(width: 4),
-                                      Text('প্রিমিয়াম সদস্য', style: TextStyle(color: Color(0xFF9A6412), fontSize: 10, fontWeight: FontWeight.w800)),
-                                    ]),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            OutlinedButton.icon(
-                              onPressed: () => _showMenuMessage('প্রোফাইল সম্পাদনা'),
-                              icon: const Icon(Icons.edit_rounded, size: 14),
-                              label: const Text('সম্পাদনা করুন', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800)),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: isDark ? const Color(0xFFD7EEFF) : const Color(0xFF1767A5),
-                                side: BorderSide(color: isDark ? const Color(0xFF6CA9D5) : const Color(0xFF8ABDEB)),
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 7),
-                                minimumSize: Size.zero,
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              ),
-                            ),
-                          ],
+                        if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 12))),
+                        const SizedBox(height: 25),
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(13, 5, 13, 5),
+                          decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(28),
+                            boxShadow: [BoxShadow(color: const Color(0xFF345A64).withValues(alpha: dark ? .10 : .12), blurRadius: 18, offset: const Offset(0, 8))]),
+                          child: Column(children: [
+                            _menuRow(Icons.person_rounded, const Color(0xFF1688F8), 'ব্যক্তিগত তথ্য', 'নাম, ইমেইল ও প্রোফাইল ছবি', () => _message('ব্যক্তিগত তথ্য'), dark, ink, muted, line),
+                            _menuRow(Icons.verified_user_rounded, const Color(0xFF10B83F), 'নিরাপত্তা', 'পাসওয়ার্ড ও ২-ধাপ যাচাইকরণ (2FA)', () => _message('নিরাপত্তা'), dark, ink, muted, line),
+                            _menuRow(Icons.notifications_active_rounded, const Color(0xFFFFB000), 'নোটিফিকেশন', 'লেনদেন, বিল ও অন্যান্য সতর্কতা', () => _message('নোটিফিকেশন'), dark, ink, muted, line),
+                            _menuRow(Icons.palette_rounded, const Color(0xFF9B35E8), 'থিম', 'লাইট, ডার্ক ও অ্যাপের রঙ পরিবর্তন', () => _message('থিম'), dark, ink, muted, line),
+                            _menuRow(Icons.info_rounded, const Color(0xFF1688F8), 'অ্যাপ সম্পর্কে', 'ভার্সন ১.০.০ • গোপনীয়তা নীতি', () => _message('অ্যাপ সম্পর্কে'), dark, ink, muted, line, last: true),
+                          ]),
                         ),
-                      ),
-                      const SizedBox(height: 9),
-                      Row(
-                        children: [
-                          _profileStat(card, border, title, muted, Icons.people_alt_rounded, const Color(0xFF1688F8), _loading ? '—' : _bengaliDigits(_walletCount.toString()), 'ওয়ালেট'),
-                          const SizedBox(width: 7),
-                          _profileStat(card, border, title, muted, Icons.receipt_long_rounded, const Color(0xFF16B981), _loading ? '—' : _bengaliDigits(_transactionCount.toString()), 'মোট লেনদেন'),
-                          const SizedBox(width: 7),
-                          _profileStat(card, border, title, muted, Icons.calendar_month_rounded, const Color(0xFF8B45E8), _membershipLabel(), 'সদস্যতা'),
-                        ],
-                      ),
-                      if (_error != null) ...[
-                        const SizedBox(height: 8),
-                        Text(_error!, style: const TextStyle(color: Color(0xFFE53935), fontSize: 12)),
                       ],
-                      const SizedBox(height: 9),
-                      _profileMenuTile(card, border, title, muted, Icons.person_rounded, const Color(0xFFFF5478), 'ব্যক্তিগত তথ্য', 'নাম, ইমেইল, প্রোফাইল ছবি', () => _showMenuMessage('ব্যক্তিগত তথ্য')),
-                      _profileMenuTile(card, border, title, muted, Icons.shield_rounded, const Color(0xFF287FF0), 'নিরাপত্তা', 'পাসওয়ার্ড, ২-ফ্যাক্টর অথেনটিকেশন', () => _showMenuMessage('নিরাপত্তা')),
-                      _profileMenuTile(card, border, title, muted, Icons.notifications_rounded, const Color(0xFF12B981), 'নোটিফিকেশন', 'লেনদেন, বিল, বাজেট, কিস্তি স্মরণ করিয়ে দিন', () => _showMenuMessage('নোটিফিকেশন')),
-                      Container(
-                        margin: const EdgeInsets.only(bottom: 6),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-                        decoration: BoxDecoration(color: card, borderRadius: BorderRadius.circular(15), border: Border.all(color: border)),
-                        child: Row(
-                          children: [
-                            _profileIcon(Icons.palette_rounded, const Color(0xFF9455E8)),
-                            const SizedBox(width: 12),
-                            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                              Text('অ্যাপ থিম', style: TextStyle(color: title, fontSize: 13, fontWeight: FontWeight.w800)),
-                              Text('লাইট / ডার্ক মোড এবং রঙের পছন্দ', style: TextStyle(color: muted, fontSize: 10.5)),
-                            ])),
-                            SegmentedButton<ThemeMode>(
-                              segments: const [
-                                ButtonSegment(value: ThemeMode.light, label: Text('লাইট'), icon: Icon(Icons.wb_sunny_outlined, size: 15)),
-                                ButtonSegment(value: ThemeMode.dark, label: Text('ডার্ক'), icon: Icon(Icons.nightlight_round, size: 15)),
-                              ],
-                              selected: {_appThemeMode.value},
-                              showSelectedIcon: false,
-                              onSelectionChanged: (values) => _setAppThemeMode(values.first),
-                              style: ButtonStyle(
-                                visualDensity: VisualDensity.compact,
-                                textStyle: const WidgetStatePropertyAll(TextStyle(fontSize: 10, fontWeight: FontWeight.w700)),
-                                padding: const WidgetStatePropertyAll(EdgeInsets.symmetric(horizontal: 7, vertical: 5)),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      _profileMenuTile(card, border, title, muted, Icons.language_rounded, const Color(0xFFFF922E), 'ভাষা', 'বাংলা (বাংলাদেশ)', () => _showMenuMessage('ভাষা')),
-                      _profileMenuTile(card, border, title, muted, Icons.storage_rounded, const Color(0xFF16A8B5), 'ডেটা ও ব্যাকআপ', 'ডেটা এক্সপোর্ট, ব্যাকআপ ও সিঙ্ক', () => _showMenuMessage('ডেটা ও ব্যাকআপ')),
-                      _profileMenuTile(card, border, title, muted, Icons.settings_rounded, const Color(0xFF64748B), 'অ্যাপ সেটিংস', 'মুদ্রা, তারিখ ফরম্যাট, অন্যান্য সেটিংস', () => _showMenuMessage('অ্যাপ সেটিংস')),
-                      _profileMenuTile(card, border, title, muted, Icons.logout_rounded, const Color(0xFFEF4444), 'লগ আউট', 'এই ডিভাইস থেকে লগ আউট করুন', () async {
-                        await _AuthApi.clearSession();
-                        if (!mounted) return;
-                        Navigator.of(context).pushAndRemoveUntil(_route(const LoginScreen()), (route) => false);
-                      }, danger: true),
-                    ],
+                    ),
                   ),
-                ),
+                ]),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 8, 18, 16),
+                child: SizedBox(width: double.infinity, height: 66, child: OutlinedButton.icon(
+                  onPressed: () async {
+                    await _AuthApi.clearSession();
+                    if (!mounted) return;
+                    Navigator.of(context).pushAndRemoveUntil(_route(const LoginScreen()), (route) => false);
+                  },
+                  icon: const Icon(Icons.logout_rounded, size: 30),
+                  label: const Text('লগ আউট', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+                  style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFFE91E35),
+                    backgroundColor: dark ? const Color(0xFF351D2A) : const Color(0xFFFFF0F2),
+                    side: const BorderSide(color: Color(0xFFFF5266), width: 1.2), shape: const StadiumBorder()),
+                )),
               ),
             ],
           ),
@@ -1339,47 +1264,47 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _profileStat(Color card, Color border, Color title, Color muted, IconData icon, Color accent, String value, String label) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-        decoration: BoxDecoration(color: card, borderRadius: BorderRadius.circular(15), border: Border.all(color: border)),
-        child: Row(children: [
-          _profileIcon(icon, accent),
-          const SizedBox(width: 7),
-          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(value, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: title, fontSize: 14, fontWeight: FontWeight.w900)),
-            Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muted, fontSize: 9.5)),
-          ])),
-        ]),
-      ),
-    );
-  }
-
-  Widget _profileIcon(IconData icon, Color accent) => Container(
-    width: 34,
-    height: 34,
-    decoration: BoxDecoration(color: accent.withValues(alpha: .12), borderRadius: BorderRadius.circular(11)),
-    child: Icon(icon, color: accent, size: 19),
+  Widget _actionIcon(IconData icon, Color color, VoidCallback onTap) => Material(
+    color: color.withValues(alpha: .08), shape: const CircleBorder(),
+    child: InkWell(customBorder: const CircleBorder(), onTap: onTap,
+      child: SizedBox(width: 48, height: 48, child: Icon(icon, color: color, size: 27))),
   );
 
-  Widget _profileMenuTile(Color card, Color border, Color title, Color muted, IconData icon, Color accent, String heading, String subtitle, VoidCallback onTap, {bool danger = false}) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 6),
-      decoration: BoxDecoration(color: card, borderRadius: BorderRadius.circular(15), border: Border.all(color: border)),
-      child: ListTile(
-        dense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 1),
-        leading: _profileIcon(icon, accent),
-        title: Text(heading, style: TextStyle(color: danger ? const Color(0xFFE53935) : title, fontSize: 13, fontWeight: FontWeight.w800)),
-        subtitle: Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muted, fontSize: 10)),
-        trailing: danger ? null : Icon(Icons.chevron_right_rounded, color: muted, size: 20),
-        onTap: onTap,
-      ),
-    );
-  }
-}
+  Widget _info(IconData icon, String heading, String value, bool dark) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 2),
+    child: Column(children: [
+      Icon(icon, color: const Color(0xFF1688F8), size: 30), const SizedBox(height: 5),
+      Text(heading, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis,
+        style: TextStyle(color: dark ? Colors.white : const Color(0xFF111827), fontSize: 10.5, fontWeight: FontWeight.w800)),
+      const SizedBox(height: 4),
+      Container(padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        decoration: BoxDecoration(color: const Color(0xFF1688F8).withValues(alpha: .10), borderRadius: BorderRadius.circular(18)),
+        child: Text(value, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis,
+          style: TextStyle(color: dark ? const Color(0xFFD7E9FF) : const Color(0xFF173B91), fontSize: 9.5, fontWeight: FontWeight.w800))),
+    ]),
+  );
 
+  Widget _infoDivider(bool dark) => Container(width: 1, height: 48, color: dark ? const Color(0xFF42617B) : const Color(0xFF55A9F2));
+
+  Widget _menuRow(IconData icon, Color accent, String heading, String subtitle, VoidCallback onTap,
+      bool dark, Color ink, Color muted, Color line, {bool last = false}) => Column(children: [
+    InkWell(onTap: onTap, borderRadius: BorderRadius.circular(18), child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 10),
+      child: Row(children: [
+        Container(width: 58, height: 58, decoration: BoxDecoration(color: accent.withValues(alpha: .13), shape: BoxShape.circle),
+          child: Icon(icon, color: accent, size: 34)),
+        const SizedBox(width: 17),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(heading, style: TextStyle(color: ink, fontSize: 17, fontWeight: FontWeight.w900)),
+          const SizedBox(height: 2),
+          Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muted, fontSize: 13)),
+        ])),
+        Icon(Icons.chevron_right_rounded, color: dark ? const Color(0xFFB7C9DA) : const Color(0xFF34466E), size: 30),
+      ]),
+    )),
+    if (!last) Padding(padding: const EdgeInsets.only(left: 75), child: Divider(height: 1, thickness: 1, color: line)),
+  ]);
+}
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
   @override

@@ -2812,7 +2812,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final status = (item['status'] ?? '').toString();
       return status != 'পরিশোধিত' && status != 'সম্পন্ন';
     }).toList();
-    final billTotal = unpaidBills.fold<double>(0, (sum, item) => sum + _amount(item['amount']));
+    final billTotal = unpaidBills.fold<double>(0, (sum, item) {
+      final payments = item['payments'] is List ? item['payments'] as List : <dynamic>[];
+      final currentPayments = payments.whereType<Map>().where((payment) {
+        final cycleDate = (payment['cycleDate'] ?? '').toString();
+        return cycleDate.isEmpty || cycleDate == (item['date'] ?? '').toString();
+      });
+      final paid = currentPayments.fold<double>(0, (value, payment) => value + _amount(payment['amount']));
+      if (currentPayments.isEmpty && payments.isEmpty && ['পরিশোধিত', 'সম্পন্ন'].contains((item['status'] ?? '').toString())) {
+        return sum;
+      }
+      return sum + (_amount(item['amount']) - paid).clamp(0, double.infinity).toDouble();
+    });
     Widget summaryCard({required String title, required double amount, required String subtitle, required IconData icon, required Color accent, required Color tint, required bool showTrend, double? change}) {
       final foreground = isDark ? const Color(0xFFEAF7F2) : const Color(0xFF183E35);
       final muted = isDark ? const Color(0xFFA9C4BA) : const Color(0xFF617B73);

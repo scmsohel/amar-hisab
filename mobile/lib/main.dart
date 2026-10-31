@@ -3510,7 +3510,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
   @override Widget build(BuildContext context){
     final dark=Theme.of(context).brightness==Brightness.dark,bg=dark?const Color(0xFF071827):const Color(0xFFF4F8FB),ink=dark?Colors.white:const Color(0xFF203446);
     final items=filtered,income=items.where((x)=>kindOf(x)=='আয়').fold<double>(0,(s,x)=>s+amount(x['amount'])),expense=items.where((x)=>kindOf(x)=='ব্যয়').fold<double>(0,(s,x)=>s+amount(x['amount']));
-    final pages=(items.length/pageSize).ceil(),current=page.clamp(0,(pages-1).clamp(0,999999)),start=current*pageSize,shown=items.skip(start).take(pageSize).toList();
+    final pages=(items.length/pageSize).ceil(),current=page.clamp(0,(pages-1).clamp(0,999999)).toInt(),start=current*pageSize,shown=items.skip(start).take(pageSize).toList();
     final cats=data.map(catOf).toSet().toList()..sort(),wallets=data.map(walletOf).where((x)=>x.isNotEmpty).toSet().toList()..sort();
     final groups=<String,List<Map<String,dynamic>>>{};for(final x in shown){final d=dateOf(x),key=d==null?'unknown':d.toString().substring(0,10);groups.putIfAbsent(key,()=>[]).add(x);}
     return Scaffold(backgroundColor:bg,appBar:AppBar(backgroundColor:bg,foregroundColor:ink,elevation:0,title:const Text('লেনদেন',style:TextStyle(fontWeight:FontWeight.w900)),actions:[IconButton(onPressed:loading?null:reload,icon:const Icon(Icons.refresh_rounded)),IconButton(onPressed:()async{await widget.onAdd();await reload();},icon:const Icon(Icons.add_rounded))]),body:SafeArea(child:Column(children:[

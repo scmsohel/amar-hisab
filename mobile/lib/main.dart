@@ -1455,20 +1455,21 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                   Wrap(spacing:4,runSpacing:3,children:[_pill(_kindOf(e),accent,debt?const Color(0xFFFFE9EB):const Color(0xFFE1F8EC)),_pill((e['accountType']??e['debtType']??e['type']??'সহজ হিসাব').toString(),blue,const Color(0xFFEAF2FF))]),
                 ])),
                 Container(width:1,height:54,color:line,margin:const EdgeInsets.symmetric(horizontal:5)),
-                Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisSize:MainAxisSize.min,children:[
-                  Text('৳ ${_left(e).round()}',style:TextStyle(fontSize:16,fontWeight:FontWeight.w900,color:done?muted:accent)),
-                  const SizedBox(height:3),
-                  _pill(done?'সম্পন্ন':'●  চলমান',done?muted:green,const Color(0xFFE1F8EC)),
-                  if(due!=null)...[const SizedBox(height:3),_pill('${_dateLabel(due)}${overdue ? ' ওভারডিউ' : ''}',overdue?red:muted,overdue?const Color(0xFFFFE8EA):const Color(0xFFF0F3F7))],
-                ]),
-                const SizedBox(width:1),
-                Row(mainAxisSize:MainAxisSize.min,children:[
-                  SizedBox(width:26,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_todo('রিমাইন্ডার'),icon:const Icon(Icons.notifications_none_rounded,size:16,color:Color(0xFF8292A4)))),
-                  const SizedBox(width:4),
-                  SizedBox(width:26,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_todo('এডিট'),icon:const Icon(Icons.edit_outlined,size:16,color:Color(0xFF8292A4)))),
-                  const SizedBox(width:4),
-                  SizedBox(width:26,height:28,child:PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints.expand(),iconSize:17,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v)=>_todo(v=='edit'?'এডিট':'রিমাইন্ডার'),itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))])),
-                ]),
+                Expanded(child:Row(mainAxisAlignment:MainAxisAlignment.spaceBetween,crossAxisAlignment:CrossAxisAlignment.center,children:[
+                  Flexible(child:Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisSize:MainAxisSize.min,children:[
+                    Text('৳ ${_left(e).round()}',style:TextStyle(fontSize:16,fontWeight:FontWeight.w900,color:done?muted:accent)),
+                    const SizedBox(height:3),
+                    _pill(done?'সম্পন্ন':'●  চলমান',done?muted:green,const Color(0xFFE1F8EC)),
+                    if(due!=null)...[const SizedBox(height:3),_pill('${_dateLabel(due)}${overdue ? ' ওভারডিউ' : ''}',overdue?red:muted,overdue?const Color(0xFFFFE8EA):const Color(0xFFF0F3F7))],
+                  ])),
+                  Row(mainAxisSize:MainAxisSize.min,children:[
+                    SizedBox(width:26,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_todo('রিমাইন্ডার'),icon:const Icon(Icons.notifications_none_rounded,size:16,color:Color(0xFF8292A4)))),
+                    const SizedBox(width:4),
+                    SizedBox(width:26,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_todo('এডিট'),icon:const Icon(Icons.edit_outlined,size:16,color:Color(0xFF8292A4)))),
+                    const SizedBox(width:4),
+                    SizedBox(width:26,height:28,child:PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints.expand(),iconSize:17,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v)=>_todo(v=='edit'?'এডিট':'রিমাইন্ডার'),itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))])),
+                  ]),
+                ])),
               ]));
           })),
       ])),

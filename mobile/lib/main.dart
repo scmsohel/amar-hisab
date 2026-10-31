@@ -1812,8 +1812,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           AnimatedPositioned(
             duration: Duration(milliseconds: _showAddTransactionFab ? 560 : 420),
             curve: _showAddTransactionFab ? Curves.easeOutBack : Curves.easeInCubic,
-            right: 20,
-            bottom: _showAddTransactionFab ? 22 : -82,
+            right: 28,
+            bottom: _showAddTransactionFab ? 30 : -82,
             child: AnimatedScale(
               duration: Duration(milliseconds: _showAddTransactionFab ? 560 : 420),
               curve: _showAddTransactionFab ? Curves.elasticOut : Curves.easeInCubic,

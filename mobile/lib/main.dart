@@ -1274,7 +1274,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: SizedBox(width: double.infinity, height: 46, child: OutlinedButton.icon(
                   onPressed: () async {
                     await _AuthApi.clearSession();
-                    if (!mounted) return;
+                    if (!context.mounted) return;
                     Navigator.of(context).pushAndRemoveUntil(_route(const LoginScreen()), (route) => false);
                   },
                   icon: const Icon(Icons.logout_rounded, size: 25),
@@ -1340,7 +1340,7 @@ class DashboardScreen extends StatefulWidget {
 
 
 class _DashboardEntrance extends StatefulWidget {
-  const _DashboardEntrance({required this.cycle, required this.order, required this.child, super.key});
+  const _DashboardEntrance({required this.cycle, required this.order, required this.child});
   final int cycle;
   final int order;
   final Widget child;
@@ -2672,7 +2672,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         }
                       },
                       child: saving ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : Text('${kind} সংরক্ষণ', style: const TextStyle(fontWeight: FontWeight.w800)))),
+                        : Text('$kind সংরক্ষণ', style: const TextStyle(fontWeight: FontWeight.w800)))),
                   ]),
                 ]))),
             ),

@@ -1332,6 +1332,142 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (!last) Padding(padding: const EdgeInsets.only(left: 55), child: Divider(height: 1, thickness: 1, color: line)),
   ]);
 }
+
+class _DebtsScreen extends StatefulWidget {
+  const _DebtsScreen({required this.debts, required this.onReload});
+  final List<Map<String, dynamic>> debts;
+  final Future<List<Map<String, dynamic>>> Function() onReload;
+  @override
+  State<_DebtsScreen> createState() => _DebtsScreenState();
+}
+
+class _DebtsScreenState extends State<_DebtsScreen> {
+  final TextEditingController _search = TextEditingController();
+  late List<Map<String, dynamic>> _items;
+  String _kind = 'সব ধরনের', _status = 'সব স্ট্যাটাস', _period = 'সব সময়', _sort = 'সর্বশেষ আগে';
+  bool _loading = false;
+  @override
+  void initState() { super.initState(); _items = List<Map<String, dynamic>>.from(widget.debts); }
+  @override
+  void dispose() { _search.dispose(); super.dispose(); }
+  double _num(dynamic v) => v is num ? v.toDouble() : double.tryParse((v ?? '').toString()) ?? 0;
+  DateTime? _date(dynamic v) => v == null ? null : DateTime.tryParse(v.toString());
+  String _kindOf(Map<String,dynamic> e) => (e['debtKind'] ?? e['kind'] ?? '').toString();
+  String _name(Map<String,dynamic> e) => (e['personName'] ?? e['name'] ?? e['person'] ?? e['title'] ?? 'নাম নেই').toString();
+  double _paid(Map<String,dynamic> e) {
+    final p = e['payments'] is List ? e['payments'] as List : <dynamic>[];
+    return p.whereType<Map>().fold<double>(0, (a,b) => a + _num(b['amount']));
+  }
+  double _left(Map<String,dynamic> e) => (_num(e['amount']) - _paid(e)).clamp(0,double.infinity).toDouble();
+  DateTime? _due(Map<String,dynamic> e) => _date(e['nextDate'] ?? e['dueDate'] ?? e['nextPaymentDate'] ?? e['due_date']);
+  bool _done(Map<String,dynamic> e) => ['পরিশোধিত','সম্পন্ন'].contains((e['status'] ?? '').toString());
+  String _dateLabel(DateTime? d) {
+    if (d == null) return 'তারিখ নেই';
+    const m = ['জানু','ফেব্রু','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টে','অক্টো','নভে','ডিসে'];
+    return d.day.toString().padLeft(2,'0') + ' ' + m[d.month-1] + ', ' + d.year.toString();
+  }
+  Future<void> _refresh() async {
+    setState(() => _loading = true);
+    try { final data = await widget.onReload(); if (!mounted) return; setState(() { _items = data; _loading = false; }); }
+    catch (e) { if (!mounted) return; setState(() => _loading = false); _notice(context,e.toString().replaceFirst('Exception: ','')); }
+  }
+  void _todo(String label) => _notice(context,label + ' সুবিধাটি API সংযোগসহ পরবর্তী ধাপে যুক্ত করতে হবে।');
+  Widget _pill(String label, Color fg, Color bg) => Container(
+    padding: const EdgeInsets.symmetric(horizontal:8,vertical:5),
+    decoration: BoxDecoration(color:bg,borderRadius:BorderRadius.circular(18)),
+    child: Text(label,maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(color:fg,fontSize:10,fontWeight:FontWeight.w800)));
+  Widget _filter(String value,List<String> values,ValueChanged<String> change) => Expanded(child: DropdownButtonFormField<String>(
+    value:value,isExpanded:true,decoration:const InputDecoration(contentPadding:EdgeInsets.symmetric(horizontal:8,vertical:9)),
+    items:values.map((v)=>DropdownMenuItem(value:v,child:Text(v,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:11)))).toList(),
+    onChanged:(v){if(v!=null)setState(()=>change(v));}));
+  @override
+  Widget build(BuildContext context) {
+    final dark=Theme.of(context).brightness==Brightness.dark;
+    final bg=dark?const Color(0xFF071827):const Color(0xFFF5F7FB);
+    final surface=dark?const Color(0xFF10283D):Colors.white;
+    final muted=dark?const Color(0xFFA4B8CA):const Color(0xFF8191A4);
+    final line=dark?const Color(0xFF294158):const Color(0xFFE4EAF1);
+    const green=Color(0xFF00A875), red=Color(0xFFFF4D55), blue=Color(0xFF287FF5), purple=Color(0xFF9657F5);
+    final q=_search.text.trim().toLowerCase();
+    final rows=_items.where((e){
+      final k=_kindOf(e), done=_done(e), due=_due(e);
+      if(q.isNotEmpty && !(_name(e)+' '+(e['note']??'').toString()).toLowerCase().contains(q)) return false;
+      if(_kind!='সব ধরনের' && k!=_kind) return false;
+      if(_status=='চলমান' && done || _status=='সম্পন্ন' && !done) return false;
+      if(_period=='বকেয়া' && (due==null || !due.isBefore(DateTime.now()))) return false;
+      if(_period=='আসন্ন' && (due==null || due.isBefore(DateTime.now()))) return false;
+      return true;
+    }).toList();
+    rows.sort((a,b){
+      final da=_date(a['date']??a['dateInput']??a['createdAt'])??DateTime(2000);
+      final db=_date(b['date']??b['dateInput']??b['createdAt'])??DateTime(2000);
+      if(_sort=='পুরনো আগে') return da.compareTo(db);
+      if(_sort=='বেশি টাকা আগে') return _left(b).compareTo(_left(a));
+      if(_sort=='কম টাকা আগে') return _left(a).compareTo(_left(b));
+      return db.compareTo(da);
+    });
+    final receivable=_items.where((e)=>_kindOf(e)=='পাওনা'&&!_done(e)).fold<double>(0,(a,e)=>a+_left(e));
+    final payable=_items.where((e)=>_kindOf(e)=='দেনা'&&!_done(e)).fold<double>(0,(a,e)=>a+_left(e));
+    final people=_items.map(_name).toSet().length;
+    final upcoming=_items.where((e){final d=_due(e);return !_done(e)&&d!=null&&!d.isBefore(DateTime.now())&&d.isBefore(DateTime.now().add(const Duration(days:7)));}).length;
+    Widget summary(String title,String value,String sub,IconData icon,Color accent,Color tint)=>Expanded(child:Container(
+      padding:const EdgeInsets.all(10),decoration:BoxDecoration(color:dark?accent.withValues(alpha:.12):tint,borderRadius:BorderRadius.circular(16),border:Border.all(color:accent.withValues(alpha:.24))),
+      child:Row(children:[Container(width:36,height:36,decoration:BoxDecoration(color:accent.withValues(alpha:.13),shape:BoxShape.circle),child:Icon(icon,color:accent,size:20)),const SizedBox(width:7),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+        Text(title,style:TextStyle(color:muted,fontSize:10,fontWeight:FontWeight.w700)),
+        FittedBox(fit:BoxFit.scaleDown,alignment:Alignment.centerLeft,child:Text(value,style:TextStyle(color:accent,fontSize:17,fontWeight:FontWeight.w900))),
+        Text(sub,maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(color:muted,fontSize:9)),
+      ]))])));
+    return Scaffold(
+      backgroundColor:bg,
+      appBar:AppBar(backgroundColor:bg,surfaceTintColor:Colors.transparent,
+        leading:IconButton(icon:const Icon(Icons.arrow_back_rounded),onPressed:()=>Navigator.pop(context)),
+        title:const Text('দেনা-পাওনা',style:TextStyle(fontWeight:FontWeight.w900)),
+        actions:[IconButton(onPressed:_refresh,icon:_loading?const SizedBox(width:18,height:18,child:CircularProgressIndicator(strokeWidth:2)):const Icon(Icons.refresh_rounded)),
+          IconButton(onPressed:()=>_todo('নতুন হিসাব যোগ'),icon:const Icon(Icons.add_rounded,size:28)),const SizedBox(width:5)]),
+      body:SafeArea(top:false,child:Column(children:[
+        Padding(padding:const EdgeInsets.fromLTRB(13,8,13,10),child:Column(children:[
+          Row(children:[summary('মোট পাওনা','৳ '+receivable.round().toString(), 'বাকি পাওনার পরিমাণ',Icons.south_west_rounded,green,const Color(0xFFEAF8F2)),const SizedBox(width:8),summary('মোট দেনা','৳ '+payable.round().toString(),'দিতে হবে',Icons.trending_down_rounded,red,const Color(0xFFFFEFF0))]),
+          const SizedBox(height:8),
+          Row(children:[summary('মোট ব্যক্তি',people.toString(),'সকল দেনা-পাওনার ব্যক্তি',Icons.people_outline_rounded,blue,const Color(0xFFEDF5FF)),const SizedBox(width:8),summary('আসন্ন তারিখ',upcoming.toString(),'আগামী ৭ দিনের মধ্যে',Icons.calendar_month_rounded,purple,const Color(0xFFF4EEFF))]),
+          const SizedBox(height:12),
+          TextField(controller:_search,onChanged:(_)=>setState((){}),decoration:InputDecoration(hintText:'নাম বা নোট খুঁজুন...',prefixIcon:const Icon(Icons.search_rounded),filled:true,fillColor:surface,contentPadding:const EdgeInsets.symmetric(vertical:13),border:OutlineInputBorder(borderRadius:BorderRadius.circular(18),borderSide:BorderSide(color:line)),enabledBorder:OutlineInputBorder(borderRadius:BorderRadius.circular(18),borderSide:BorderSide(color:line)))),
+          const SizedBox(height:9),
+          Row(children:[_filter(_kind,['সব ধরনের','দেনা','পাওনা'],(v)=>_kind=v),const SizedBox(width:6),_filter(_status,['সব স্ট্যাটাস','চলমান','সম্পন্ন'],(v)=>_status=v),const SizedBox(width:6),_filter(_period,['সব সময়','বকেয়া','আসন্ন'],(v)=>_period=v)]),
+          const SizedBox(height:10),
+          Row(children:[Expanded(child:Text('সকল দেনা-পাওনা',style:TextStyle(fontSize:17,fontWeight:FontWeight.w900,color:dark?Colors.white:const Color(0xFF172B43)))),DropdownButton<String>(value:_sort,underline:const SizedBox.shrink(),icon:const Icon(Icons.keyboard_arrow_down_rounded),items:const ['সর্বশেষ আগে','পুরনো আগে','বেশি টাকা আগে','কম টাকা আগে'].map((v)=>DropdownMenuItem(value:v,child:Text(v,style:const TextStyle(fontSize:11)))).toList(),onChanged:(v){if(v!=null)setState(()=>_sort=v);})]),
+        ])),
+        Expanded(child:rows.isEmpty?Center(child:Text('কোনো দেনা-পাওনা পাওয়া যায়নি',style:TextStyle(color:muted))):ListView.separated(
+          padding:const EdgeInsets.fromLTRB(13,0,13,18),itemCount:rows.length,separatorBuilder:(_,__)=>const SizedBox(height:9),
+          itemBuilder:(context,index){
+            final e=rows[index], debt=_kindOf(e)=='দেনা', done=_done(e), due=_due(e);
+            final date=_date(e['date']??e['dateInput']??e['createdAt']);
+            final overdue=!done&&due!=null&&due.isBefore(DateTime.now());
+            final accent=debt?red:green;
+            return Container(padding:const EdgeInsets.all(11),decoration:BoxDecoration(color:surface,borderRadius:BorderRadius.circular(19),border:Border.all(color:line),boxShadow:dark?[]:[BoxShadow(color:const Color(0xFF1D3557).withValues(alpha:.05),blurRadius:10,offset:const Offset(0,3))]),
+              child:Row(children:[
+                Container(width:46,height:46,decoration:BoxDecoration(color:(debt?purple:blue).withValues(alpha:.12),shape:BoxShape.circle),child:Icon(Icons.account_balance_wallet_outlined,color:debt?purple:blue,size:24)),
+                const SizedBox(width:9),
+                Expanded(flex:5,child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+                  Text(_name(e),maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:15,fontWeight:FontWeight.w900)),
+                  const SizedBox(height:3),
+                  Row(children:[Icon(Icons.calendar_today_outlined,size:12,color:muted),const SizedBox(width:4),Text(_dateLabel(date),style:TextStyle(fontSize:10,color:muted))]),
+                  const SizedBox(height:5),
+                  Wrap(spacing:5,runSpacing:4,children:[_pill(_kindOf(e),accent,debt?const Color(0xFFFFE9EB):const Color(0xFFE1F8EC)),_pill((e['accountType']??e['debtType']??e['type']??'সহজ হিসাব').toString(),blue,const Color(0xFFEAF2FF))]),
+                ])),
+                Container(width:1,height:65,color:line,margin:const EdgeInsets.symmetric(horizontal:7)),
+                Expanded(flex:4,child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+                  Text('৳ '+_left(e).round().toString(),style:TextStyle(fontSize:17,fontWeight:FontWeight.w900,color:done?muted:accent)),
+                  const SizedBox(height:4),
+                  _pill(done?'সম্পন্ন':'●  চলমান',done?muted:green,const Color(0xFFE1F8EC)),
+                  if(due!=null)...[const SizedBox(height:4),_pill(_dateLabel(due)+(overdue?' ওভারডিউ':''),overdue?red:muted,overdue?const Color(0xFFFFE8EA):const Color(0xFFF0F3F7))],
+                ])),
+                PopupMenuButton<String>(padding:EdgeInsets.zero,icon:const Icon(Icons.more_vert_rounded,color:Color(0xFF8292A4)),onSelected:(v)=>_todo(v=='edit'?'এডিট':'রিমাইন্ডার'),itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))]),
+              ]));
+          })),
+      ])),
+    );
+  }
+}
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
   @override
@@ -2929,10 +3065,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       }
       return sum + (_amount(item['amount']) - paid).clamp(0, double.infinity).toDouble();
     });
-    Widget summaryCard({required String title, required double amount, required String subtitle, required IconData icon, required Color accent, required Color tint, required bool showTrend, double? change}) {
+    Widget summaryCard({required String title, required double amount, required String subtitle, required IconData icon, required Color accent, required Color tint, required bool showTrend, double? change, VoidCallback? onTap}) {
       final foreground = isDark ? const Color(0xFFEAF7F2) : const Color(0xFF183E35);
       final muted = isDark ? const Color(0xFFA9C4BA) : const Color(0xFF617B73);
-      return Expanded(child: Container(height: 74, padding: const EdgeInsets.fromLTRB(5, 7, 4, 5),
+      return Expanded(child: InkWell(onTap: onTap, borderRadius: BorderRadius.circular(13), child: Container(height: 74, padding: const EdgeInsets.fromLTRB(5, 7, 4, 5),
         decoration: BoxDecoration(color: isDark ? accent.withValues(alpha: .13) : tint, borderRadius: BorderRadius.circular(13), border: Border.all(color: accent.withValues(alpha: isDark ? .32 : .13)),
           boxShadow: isDark ? [] : [BoxShadow(color: accent.withValues(alpha: .07), blurRadius: 9, offset: const Offset(0, 3))]),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -2947,14 +3083,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
             else ...[Icon(title == 'দেনা' ? Icons.people_alt_rounded : Icons.receipt_long_rounded, size: 10, color: muted), const SizedBox(width: 3),
               Expanded(child: Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 8, color: muted, fontWeight: FontWeight.w700)))]
           ])
-        ])));
+        ]))));
     }
     return Row(children: [
       summaryCard(title: 'আয়', amount: monthIncome, subtitle: '', icon: Icons.south_rounded, accent: isDark ? const Color(0xFF39BDF8) : const Color(0xFF00A875), tint: const Color(0xFFE7FBF3), showTrend: true, change: incomeChange),
       const SizedBox(width: 5),
       summaryCard(title: 'ব্যয়', amount: monthExpense, subtitle: '', icon: Icons.north_rounded, accent: const Color(0xFFFF625B), tint: const Color(0xFFFFEEEE), showTrend: true, change: expenseChange),
       const SizedBox(width: 5),
-      summaryCard(title: 'দেনা', amount: debtTotal, subtitle: '${unpaidDebts.length} জন', icon: Icons.payments_rounded, accent: const Color(0xFFF29A16), tint: const Color(0xFFFFF6E8), showTrend: false),
+      summaryCard(title: 'দেনা', amount: debtTotal, subtitle: '${unpaidDebts.length} জন', icon: Icons.payments_rounded, accent: const Color(0xFFF29A16), tint: const Color(0xFFFFF6E8), showTrend: false, onTap: () => Navigator.of(context).push(_route(_DebtsScreen(debts: _debts, onReload: () async { await _load(); return List<Map<String, dynamic>>.from(_debts); })))),
       const SizedBox(width: 5),
       summaryCard(title: 'বিল', amount: billTotal, subtitle: '${unpaidBills.length} টি বাকি', icon: Icons.calendar_month_rounded, accent: const Color(0xFF2588F5), tint: const Color(0xFFEEF6FF), showTrend: false),
     ]);

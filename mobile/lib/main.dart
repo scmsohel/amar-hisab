@@ -2283,7 +2283,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               const SizedBox(width: 3),
               InkWell(
-                onTap: _showAllTransactions,
+                onTap: _openTransactionsPage,
                 child: Padding(
                   padding: const EdgeInsets.all(4),
                   child: Text('সব দেখুন  ›', style: TextStyle(color: isDark ? const Color(0xFF6CCBFF) : const Color(0xFF00A875), fontSize: 10.5, fontWeight: FontWeight.w800)),
@@ -2870,6 +2870,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ));
   }
 
+
+  void _openTransactionsPage() {
+    Navigator.of(context).push(_route(TransactionsScreen(
+      initialTransactions: _transactions,
+      onAdd: _showAddTransaction,
+      onEdit: _editTransaction,
+      onDelete: _deleteTransaction,
+      onReload: () async { await _load(); return List<Map<String, dynamic>>.from(_transactions); },
+    )));
+  }
+
   void _showAllTransactions() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final items = _visibleRecentTransactions();
@@ -3424,6 +3435,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               if (sheetContext.mounted) Navigator.pop(sheetContext);
             },
           ),
+          ListTile(leading: const Icon(Icons.receipt_long_rounded), title: const Text('সব লেনদেন'), onTap: () { Navigator.pop(sheetContext); _openTransactionsPage(); }),
           ListTile(leading: const Icon(Icons.refresh_rounded), title: const Text('ডেটা রিফ্রেশ'), onTap: () { Navigator.pop(sheetContext); _load(); }),
           ListTile(leading: const Icon(Icons.dns_outlined), title: const Text('Server Settings'), onTap: () { Navigator.pop(sheetContext); Navigator.of(context).push(_route(const ServerSettingsScreen())); }),
           ListTile(leading: const Icon(Icons.logout_rounded), title: const Text('লগআউট'), onTap: () async { Navigator.pop(sheetContext); await _AuthApi.clearSession(); if (context.mounted) Navigator.of(context).pushAndRemoveUntil(_route(const LoginScreen()), (route) => false); }),
@@ -3433,6 +3445,100 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 }
 
+
+
+
+class TransactionsScreen extends StatefulWidget {
+  const TransactionsScreen({super.key,required this.initialTransactions,required this.onAdd,required this.onEdit,required this.onDelete,required this.onReload});
+  final List<Map<String,dynamic>> initialTransactions;
+  final Future<void> Function() onAdd;
+  final Future<void> Function(Map<String,dynamic>) onEdit;
+  final Future<void> Function(Map<String,dynamic>) onDelete;
+  final Future<List<Map<String,dynamic>>> Function() onReload;
+  @override State<TransactionsScreen> createState()=>_TransactionsScreenState();
+}
+class _TransactionsScreenState extends State<TransactionsScreen>{
+  late List<Map<String,dynamic>> data;
+  final search=TextEditingController();
+  String kind='সব',category='সব ক্যাটাগরি',wallet='সব ওয়ালেট',sort='সর্বশেষ আগে';
+  DateTimeRange? range;
+  int page=0,pageSize=20;
+  bool loading=false;
+  @override void initState(){super.initState();data=List.from(widget.initialTransactions);}
+  @override void dispose(){search.dispose();super.dispose();}
+  double amount(dynamic v)=>v is num?v.toDouble():double.tryParse(v?.toString()??'')??0;
+  String money(double v)=>'৳ '+v.round().toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'),(m)=>',');
+  String bn(String v)=>v.replaceAll('0','০').replaceAll('1','১').replaceAll('2','২').replaceAll('3','৩').replaceAll('4','৪').replaceAll('5','৫').replaceAll('6','৬').replaceAll('7','৭').replaceAll('8','৮').replaceAll('9','৯');
+  String titleOf(Map x)=>(x['title']??x['description']??x['note']??'লেনদেন').toString();
+  String catOf(Map x)=>(x['categoryName']??x['category_name']??x['category']??'অন্যান্য').toString();
+  String walletOf(Map x)=>(x['wallet']??x['walletName']??x['wallet_name']??x['accountName']??'').toString();
+  String kindOf(Map x)=>(x['kind']??'ব্যয়').toString();
+  DateTime? dateOf(Map x)=>DateTime.tryParse((x['dateInput']??x['date_input']??x['date']??x['createdAt']??x['created_at']??'').toString());
+  List<Map<String,dynamic>> get filtered{
+    final q=search.text.trim().toLowerCase();
+    final list=data.where((x){
+      final d=dateOf(x);
+      if(kind!='সব'&&kindOf(x)!=kind)return false;
+      if(category!='সব ক্যাটাগরি'&&catOf(x)!=category)return false;
+      if(wallet!='সব ওয়ালেট'&&walletOf(x)!=wallet)return false;
+      if(range!=null&&(d==null||d.isBefore(DateTime(range!.start.year,range!.start.month,range!.start.day))||!d.isBefore(DateTime(range!.end.year,range!.end.month,range!.end.day+1))))return false;
+      return q.isEmpty||(titleOf(x)+' '+catOf(x)+' '+walletOf(x)).toLowerCase().contains(q);
+    }).toList();
+    list.sort((a,b){final x=dateOf(a),y=dateOf(b);if(x==null)return 1;if(y==null)return -1;return sort=='সর্বশেষ আগে'?y.compareTo(x):x.compareTo(y);});
+    return list;
+  }
+  Future<void> reload()async{setState(()=>loading=true);try{final fresh=await widget.onReload();if(mounted)setState(()=>data=fresh);}finally{if(mounted)setState(()=>loading=false);}}
+  String dateLabel(DateTime? d){if(d==null)return 'তারিখ পাওয়া যায়নি';const m=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];return bn(d.day.toString())+' '+m[d.month-1]+', '+bn(d.year.toString());}
+  Widget summary(String label,double value,Color color,IconData icon)=>Expanded(child:Container(padding:const EdgeInsets.all(10),decoration:BoxDecoration(color:color.withValues(alpha:.07),borderRadius:BorderRadius.circular(14),border:Border.all(color:color.withValues(alpha:.2))),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Icon(icon,color:color,size:18),const SizedBox(height:4),Text(label,style:const TextStyle(fontSize:10)),FittedBox(child:Text(money(value),style:TextStyle(fontSize:14,fontWeight:FontWeight.w900,color:color)))])));
+  Widget row(Map<String,dynamic> x){
+    final dark=Theme.of(context).brightness==Brightness.dark,income=kindOf(x)=='আয়',transfer=kindOf(x)=='ট্রান্সফার';
+    final color=income?const Color(0xFF00A653):transfer?const Color(0xFF1688D4):const Color(0xFFE92743);
+    final name=(x['icon']??x['iconName']??'').toString();
+    const icons=<String,IconData>{'Banknote':Icons.payments_outlined,'Wallet':Icons.account_balance_wallet_outlined,'ShoppingCart':Icons.shopping_cart_outlined,'ShoppingBag':Icons.shopping_bag_outlined,'House':Icons.home_outlined,'Utensils':Icons.restaurant_outlined,'Car':Icons.directions_car_outlined,'Briefcase':Icons.work_outline_rounded,'CreditCard':Icons.credit_card_outlined,'Gift':Icons.card_giftcard_outlined};
+    final d=dateOf(x),time=(x['timeInput']??x['time_input']??x['time']??'').toString();
+    return Container(color:dark?const Color(0xFF12283A):Colors.white,padding:const EdgeInsets.symmetric(horizontal:8,vertical:9),child:Row(children:[
+      Container(width:38,height:38,decoration:BoxDecoration(color:color.withValues(alpha:.1),shape:BoxShape.circle),child:Icon(icons[name]??(income?Icons.trending_up_rounded:Icons.shopping_cart_outlined),color:color,size:20)),
+      const SizedBox(width:9),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+        Text(titleOf(x),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:12,fontWeight:FontWeight.w800,color:dark?Colors.white:const Color(0xFF1C2F42))),
+        Text(catOf(x)+' • '+walletOf(x),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:10,color:dark?Colors.white60:const Color(0xFF718096))),
+        Text(dateLabel(d)+(time.isEmpty?'':' • '+time),style:TextStyle(fontSize:9,color:dark?Colors.white54:const Color(0xFF8A98A8))),
+      ])),
+      Text((income?'+ ':transfer?'↔ ':'− ')+money(amount(x['amount'])),style:TextStyle(fontSize:12,fontWeight:FontWeight.w900,color:color)),
+      PopupMenuButton<String>(onSelected:(v)async{if(v=='edit'){await widget.onEdit(x);await reload();}else{await widget.onDelete(x);await reload();}},itemBuilder:(_)=>const[PopupMenuItem(value:'edit',child:Text('এডিট করুন')),PopupMenuItem(value:'delete',child:Text('ডিলিট করুন'))]),
+    ]));
+  }
+  @override Widget build(BuildContext context){
+    final dark=Theme.of(context).brightness==Brightness.dark,bg=dark?const Color(0xFF071827):const Color(0xFFF4F8FB),ink=dark?Colors.white:const Color(0xFF203446);
+    final items=filtered,income=items.where((x)=>kindOf(x)=='আয়').fold<double>(0,(s,x)=>s+amount(x['amount'])),expense=items.where((x)=>kindOf(x)=='ব্যয়').fold<double>(0,(s,x)=>s+amount(x['amount']));
+    final pages=(items.length/pageSize).ceil(),current=page.clamp(0,(pages-1).clamp(0,999999)),start=current*pageSize,shown=items.skip(start).take(pageSize).toList();
+    final cats=items.map(catOf).toSet().toList()..sort(),wallets=items.map(walletOf).where((x)=>x.isNotEmpty).toSet().toList()..sort();
+    final groups=<String,List<Map<String,dynamic>>>{};for(final x in shown){final d=dateOf(x),key=d==null?'unknown':d.toString().substring(0,10);groups.putIfAbsent(key,()=>[]).add(x);}
+    return Scaffold(backgroundColor:bg,appBar:AppBar(backgroundColor:bg,foregroundColor:ink,elevation:0,title:const Text('লেনদেন',style:TextStyle(fontWeight:FontWeight.w900)),actions:[IconButton(onPressed:loading?null:reload,icon:const Icon(Icons.refresh_rounded)),IconButton(onPressed:()async{await widget.onAdd();await reload();},icon:const Icon(Icons.add_rounded))]),body:SafeArea(child:Column(children:[
+      Padding(padding:const EdgeInsets.fromLTRB(12,4,12,7),child:Row(children:[summary('মোট আয়',income,const Color(0xFF00A875),Icons.trending_up_rounded),const SizedBox(width:7),summary('মোট ব্যয়',expense,const Color(0xFFEF4444),Icons.trending_down_rounded)])),
+      Padding(padding:const EdgeInsets.fromLTRB(12,0,12,7),child:Row(children:[summary('নিট ব্যালেন্স',income-expense,const Color(0xFF2588F5),Icons.account_balance_wallet_outlined),const SizedBox(width:7),summary('মোট লেনদেন',items.length.toDouble(),const Color(0xFF8B5CF6),Icons.receipt_long_rounded)])),
+      Padding(padding:const EdgeInsets.fromLTRB(12,0,12,7),child:TextField(controller:search,onChanged:(_)=>setState(()=>page=0),decoration:InputDecoration(prefixIcon:const Icon(Icons.search_rounded),hintText:'বিবরণ, ক্যাটাগরি, ওয়ালেট খুঁজুন...',filled:true,fillColor:dark?const Color(0xFF12283A):Colors.white,border:OutlineInputBorder(borderRadius:BorderRadius.circular(12))))),
+      SizedBox(height:42,child:ListView(scrollDirection:Axis.horizontal,padding:const EdgeInsets.symmetric(horizontal:12),children:[
+        for(final k in ['সব','আয়','ব্যয়','ট্রান্সফার'])Padding(padding:const EdgeInsets.only(right:5),child:ChoiceChip(label:Text(k),selected:kind==k,onSelected:(_)=>setState(()=>{kind=k,page=0}))),
+        DropdownButton<String>(value:category,underline:const SizedBox(),items:['সব ক্যাটাগরি',...cats].map((v)=>DropdownMenuItem(value:v,child:Text(v))).toList(),onChanged:(v)=>setState(()=>{category=v??'সব ক্যাটাগরি',page=0})),
+        DropdownButton<String>(value:wallet,underline:const SizedBox(),items:['সব ওয়ালেট',...wallets].map((v)=>DropdownMenuItem(value:v,child:Text(v))).toList(),onChanged:(v)=>setState(()=>{wallet=v??'সব ওয়ালেট',page=0})),
+        TextButton.icon(onPressed:()async{final now=DateTime.now();final r=await showDateRangePicker(context:context,firstDate:DateTime(2000),lastDate:DateTime(2100),initialDateRange:range??DateTimeRange(start:DateTime(now.year,now.month,1),end:now));if(r!=null)setState(()=>{range=r,page=0});},icon:const Icon(Icons.calendar_month_rounded,size:16),label:Text(range==null?'তারিখ':'নির্বাচিত')),
+        if(range!=null)IconButton(onPressed:()=>setState(()=>range=null),icon:const Icon(Icons.close_rounded)),
+      ])),
+      Padding(padding:const EdgeInsets.symmetric(horizontal:14),child:Row(children:[Text(bn(items.length.toString())+'টি লেনদেন',style:TextStyle(fontSize:10,color:dark?Colors.white60:const Color(0xFF718096))),const Spacer(),DropdownButton<String>(value:sort,underline:const SizedBox(),items:const ['সর্বশেষ আগে','পুরোনো আগে'].map((v)=>DropdownMenuItem(value:v,child:Text(v,style:const TextStyle(fontSize:10)))).toList(),onChanged:(v)=>setState(()=>{sort=v??sort,page=0}))])),
+      Expanded(child:loading?const Center(child:CircularProgressIndicator()):shown.isEmpty?Center(child:Text('কোনো লেনদেন পাওয়া যায়নি',style:TextStyle(color:dark?Colors.white60:const Color(0xFF718096)))):ListView(padding:const EdgeInsets.fromLTRB(10,0,10,8),children:[
+        for(final g in groups.entries)...[
+          Container(padding:const EdgeInsets.symmetric(horizontal:11,vertical:9),decoration:BoxDecoration(color:dark?const Color(0xFF18334B):const Color(0xFFEAF2FC),borderRadius:BorderRadius.circular(10)),child:Text(dateLabel(dateOf(g.value.first)),style:TextStyle(fontSize:11,fontWeight:FontWeight.w800,color:ink))),
+          for(final x in g.value)row(x),const SizedBox(height:6),
+        ],
+      ])),
+      Container(padding:const EdgeInsets.fromLTRB(12,5,12,9),decoration:BoxDecoration(color:dark?const Color(0xFF10243A):Colors.white,border:Border(top:BorderSide(color:dark?const Color(0xFF29445D):const Color(0xFFE4EAF0)))),child:Row(children:[
+        const Text('প্রতি পাতায়',style:TextStyle(fontSize:10)),DropdownButton<int>(value:pageSize,underline:const SizedBox(),items:const [10,20,50].map((v)=>DropdownMenuItem(value:v,child:Text('$v'))).toList(),onChanged:(v)=>setState(()=>{pageSize=v??20,page=0})),
+        const Spacer(),Text(pages==0?'০ / ০':bn((start+1).toString())+'–'+bn((start+shown.length).toString())+' / '+bn(items.length.toString()),style:TextStyle(fontSize:10,fontWeight:FontWeight.w700,color:ink)),
+        IconButton(onPressed:current>0?()=>setState(()=>page=current-1):null,icon:const Icon(Icons.chevron_left_rounded)),IconButton(onPressed:current+1<pages?()=>setState(()=>page=current+1):null,icon:const Icon(Icons.chevron_right_rounded)),
+      ])),
+    ])));
+  }
+}
 
 
 class _DonutSummaryPainter extends CustomPainter {

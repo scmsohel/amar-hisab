@@ -1463,9 +1463,11 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                 ]),
                 const SizedBox(width:6),
                 Row(mainAxisSize:MainAxisSize.min,children:[
-                  IconButton(visualDensity:const VisualDensity(horizontal:-4,vertical:-4),style:IconButton.styleFrom(tapTargetSize:MaterialTapTargetSize.shrinkWrap,minimumSize:const Size(22,26),padding:EdgeInsets.zero),constraints:const BoxConstraints.tightFor(width:22,height:26),padding:EdgeInsets.zero,onPressed:()=>_todo('রিমাইন্ডার'),icon:const Icon(Icons.notifications_none_rounded,size:16,color:Color(0xFF8292A4))),
-                  IconButton(visualDensity:const VisualDensity(horizontal:-4,vertical:-4),style:IconButton.styleFrom(tapTargetSize:MaterialTapTargetSize.shrinkWrap,minimumSize:const Size(22,26),padding:EdgeInsets.zero),constraints:const BoxConstraints.tightFor(width:22,height:26),padding:EdgeInsets.zero,onPressed:()=>_todo('এডিট'),icon:const Icon(Icons.edit_outlined,size:16,color:Color(0xFF8292A4))),
-                  PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints.tightFor(width:22,height:26),iconSize:17,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v)=>_todo(v=='edit'?'এডিট':'রিমাইন্ডার'),itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))]),
+                  SizedBox(width:26,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_todo('রিমাইন্ডার'),icon:const Icon(Icons.notifications_none_rounded,size:16,color:Color(0xFF8292A4)))),
+                  const SizedBox(width:4),
+                  SizedBox(width:26,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_todo('এডিট'),icon:const Icon(Icons.edit_outlined,size:16,color:Color(0xFF8292A4)))),
+                  const SizedBox(width:4),
+                  SizedBox(width:26,height:28,child:PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints.expand(),iconSize:17,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v)=>_todo(v=='edit'?'এডিট':'রিমাইন্ডার'),itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))])),
                 ]),
               ]));
           })),

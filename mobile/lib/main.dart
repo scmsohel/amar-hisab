@@ -2881,41 +2881,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     )));
   }
 
-  void _showAllTransactions() {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final items = _visibleRecentTransactions();
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: isDark ? const Color(0xFF071827) : const Color(0xFFF3F8F5),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (sheetContext) => DraggableScrollableSheet(
-        expand: false,
-        initialChildSize: .88,
-        minChildSize: .5,
-        maxChildSize: .96,
-        builder: (context, controller) => Column(children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: Row(children: [
-              Expanded(child: Text('সব লেনদেন', style: TextStyle(color: isDark ? const Color(0xFFDCEBFA) : const Color(0xFF164F40), fontSize: 16, fontWeight: FontWeight.w900))),
-              Text('${items.length}টি', style: TextStyle(color: isDark ? const Color(0xFF94A9BF) : const Color(0xFF64877C), fontSize: 11)),
-            ]),
-          ),
-          Expanded(child: items.isEmpty
-            ? Center(child: Text('এখনো কোনো লেনদেন নেই', style: TextStyle(color: isDark ? Colors.white70 : const Color(0xFF64877C))))
-            : ListView.separated(
-                controller: controller,
-                padding: const EdgeInsets.fromLTRB(12, 4, 12, 20),
-                itemCount: items.length,
-                separatorBuilder: (_, _) => Divider(height: 1, indent: 52, color: isDark ? const Color(0xFF36536F) : const Color(0xFFD7EEE5)),
-                itemBuilder: (_, index) => _recentTransactionRow(items[index]),
-              )),
-        ]),
-      ),
-    );
-  }
-
   Widget _compactExpenseOverview() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final now = DateTime.now();
@@ -3467,7 +3432,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
   @override void initState(){super.initState();data=List.from(widget.initialTransactions);}
   @override void dispose(){search.dispose();super.dispose();}
   double amount(dynamic v)=>v is num?v.toDouble():double.tryParse(v?.toString()??'')??0;
-  String money(double v)=>'৳ '+v.round().toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'),(m)=>',');
+  String money(double v)=>'৳ ${v.round().toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'),(m)=>',')}';
   String bn(String v)=>v.replaceAll('0','০').replaceAll('1','১').replaceAll('2','২').replaceAll('3','৩').replaceAll('4','৪').replaceAll('5','৫').replaceAll('6','৬').replaceAll('7','৭').replaceAll('8','৮').replaceAll('9','৯');
   String titleOf(Map x)=>(x['title']??x['description']??x['note']??'লেনদেন').toString();
   String catOf(Map x)=>(x['categoryName']??x['category_name']??x['category']??'অন্যান্য').toString();
@@ -3482,13 +3447,13 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
       if(category!='সব ক্যাটাগরি'&&catOf(x)!=category)return false;
       if(wallet!='সব ওয়ালেট'&&walletOf(x)!=wallet)return false;
       if(range!=null&&(d==null||d.isBefore(DateTime(range!.start.year,range!.start.month,range!.start.day))||!d.isBefore(DateTime(range!.end.year,range!.end.month,range!.end.day+1))))return false;
-      return q.isEmpty||(titleOf(x)+' '+catOf(x)+' '+walletOf(x)).toLowerCase().contains(q);
+      return q.isEmpty||'${titleOf(x)} ${catOf(x)} ${walletOf(x)}'.toLowerCase().contains(q);
     }).toList();
     list.sort((a,b){final x=dateOf(a),y=dateOf(b);if(x==null)return 1;if(y==null)return -1;return sort=='সর্বশেষ আগে'?y.compareTo(x):x.compareTo(y);});
     return list;
   }
   Future<void> reload()async{setState(()=>loading=true);try{final fresh=await widget.onReload();if(mounted)setState(()=>data=fresh);}finally{if(mounted)setState(()=>loading=false);}}
-  String dateLabel(DateTime? d){if(d==null)return 'তারিখ পাওয়া যায়নি';const m=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];return bn(d.day.toString())+' '+m[d.month-1]+', '+bn(d.year.toString());}
+  String dateLabel(DateTime? d){if(d==null)return 'তারিখ পাওয়া যায়নি';const m=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];return '${bn(d.day.toString())} ${m[d.month-1]}, ${bn(d.year.toString())}';}
   Widget summary(String label,double value,Color color,IconData icon)=>Expanded(child:Container(padding:const EdgeInsets.all(10),decoration:BoxDecoration(color:color.withValues(alpha:.07),borderRadius:BorderRadius.circular(14),border:Border.all(color:color.withValues(alpha:.2))),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Icon(icon,color:color,size:18),const SizedBox(height:4),Text(label,style:const TextStyle(fontSize:10)),FittedBox(child:Text(money(value),style:TextStyle(fontSize:14,fontWeight:FontWeight.w900,color:color)))])));
   Widget row(Map<String,dynamic> x){
     final dark=Theme.of(context).brightness==Brightness.dark,income=kindOf(x)=='আয়',transfer=kindOf(x)=='ট্রান্সফার';
@@ -3500,10 +3465,10 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
       Container(width:38,height:38,decoration:BoxDecoration(color:color.withValues(alpha:.1),shape:BoxShape.circle),child:Icon(icons[name]??(income?Icons.trending_up_rounded:Icons.shopping_cart_outlined),color:color,size:20)),
       const SizedBox(width:9),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
         Text(titleOf(x),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:12,fontWeight:FontWeight.w800,color:dark?Colors.white:const Color(0xFF1C2F42))),
-        Text(catOf(x)+' • '+walletOf(x),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:10,color:dark?Colors.white60:const Color(0xFF718096))),
-        Text(dateLabel(d)+(time.isEmpty?'':' • '+time),style:TextStyle(fontSize:9,color:dark?Colors.white54:const Color(0xFF8A98A8))),
+        Text('${catOf(x)} • ${walletOf(x)}',maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:10,color:dark?Colors.white60:const Color(0xFF718096))),
+        Text('${dateLabel(d)}${time.isEmpty?'':' • $time'}',style:TextStyle(fontSize:9,color:dark?Colors.white54:const Color(0xFF8A98A8))),
       ])),
-      Text((income?'+ ':transfer?'↔ ':'− ')+money(amount(x['amount'])),style:TextStyle(fontSize:12,fontWeight:FontWeight.w900,color:color)),
+      Text('${income?'+ ':transfer?'↔ ':'− '}${money(amount(x['amount']))}',style:TextStyle(fontSize:12,fontWeight:FontWeight.w900,color:color)),
       PopupMenuButton<String>(onSelected:(v)async{if(v=='edit'){await widget.onEdit(x);await reload();}else{await widget.onDelete(x);await reload();}},itemBuilder:(_)=>const[PopupMenuItem(value:'edit',child:Text('এডিট করুন')),PopupMenuItem(value:'delete',child:Text('ডিলিট করুন'))]),
     ]));
   }
@@ -3524,7 +3489,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
         TextButton.icon(onPressed:()async{final now=DateTime.now();final r=await showDateRangePicker(context:context,firstDate:DateTime(2000),lastDate:DateTime(2100),initialDateRange:range??DateTimeRange(start:DateTime(now.year,now.month,1),end:now));if(r!=null)setState(() { range=r; page=0; });},icon:const Icon(Icons.calendar_month_rounded,size:16),label:Text(range==null?'তারিখ':'নির্বাচিত')),
         if(range!=null)IconButton(onPressed:()=>setState(()=>range=null),icon:const Icon(Icons.close_rounded)),
       ])),
-      Padding(padding:const EdgeInsets.symmetric(horizontal:14),child:Row(children:[Text(bn(items.length.toString())+'টি লেনদেন',style:TextStyle(fontSize:10,color:dark?Colors.white60:const Color(0xFF718096))),const Spacer(),DropdownButton<String>(value:sort,underline:const SizedBox(),items:const ['সর্বশেষ আগে','পুরোনো আগে'].map((v)=>DropdownMenuItem(value:v,child:Text(v,style:const TextStyle(fontSize:10)))).toList(),onChanged:(v)=>setState(() { sort=v??sort; page=0; }))])),
+      Padding(padding:const EdgeInsets.symmetric(horizontal:14),child:Row(children:[Text('${bn(items.length.toString())}টি লেনদেন',style:TextStyle(fontSize:10,color:dark?Colors.white60:const Color(0xFF718096))),const Spacer(),DropdownButton<String>(value:sort,underline:const SizedBox(),items:const ['সর্বশেষ আগে','পুরোনো আগে'].map((v)=>DropdownMenuItem(value:v,child:Text(v,style:const TextStyle(fontSize:10)))).toList(),onChanged:(v)=>setState(() { sort=v??sort; page=0; }))])),
       Expanded(child:loading?const Center(child:CircularProgressIndicator()):shown.isEmpty?Center(child:Text('কোনো লেনদেন পাওয়া যায়নি',style:TextStyle(color:dark?Colors.white60:const Color(0xFF718096)))):ListView(padding:const EdgeInsets.fromLTRB(10,0,10,8),children:[
         for(final g in groups.entries)...[
           Container(padding:const EdgeInsets.symmetric(horizontal:11,vertical:9),decoration:BoxDecoration(color:dark?const Color(0xFF18334B):const Color(0xFFEAF2FC),borderRadius:BorderRadius.circular(10)),child:Text(dateLabel(dateOf(g.value.first)),style:TextStyle(fontSize:11,fontWeight:FontWeight.w800,color:ink))),
@@ -3533,7 +3498,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
       ])),
       Container(padding:const EdgeInsets.fromLTRB(12,5,12,9),decoration:BoxDecoration(color:dark?const Color(0xFF10243A):Colors.white,border:Border(top:BorderSide(color:dark?const Color(0xFF29445D):const Color(0xFFE4EAF0)))),child:Row(children:[
         const Text('প্রতি পাতায়',style:TextStyle(fontSize:10)),DropdownButton<int>(value:pageSize,underline:const SizedBox(),items:const [10,20,50].map((v)=>DropdownMenuItem(value:v,child:Text('$v'))).toList(),onChanged:(v)=>setState(() { pageSize=v??20; page=0; })),
-        const Spacer(),Text(pages==0?'০ / ০':bn((start+1).toString())+'–'+bn((start+shown.length).toString())+' / '+bn(items.length.toString()),style:TextStyle(fontSize:10,fontWeight:FontWeight.w700,color:ink)),
+        const Spacer(),Text(pages==0?'০ / ০':'${bn((start+1).toString())}–${bn((start+shown.length).toString())} / ${bn(items.length.toString())}',style:TextStyle(fontSize:10,fontWeight:FontWeight.w700,color:ink)),
         IconButton(onPressed:current>0?()=>setState(()=>page=current-1):null,icon:const Icon(Icons.chevron_left_rounded)),IconButton(onPressed:current+1<pages?()=>setState(()=>page=current+1):null,icon:const Icon(Icons.chevron_right_rounded)),
       ])),
     ])));

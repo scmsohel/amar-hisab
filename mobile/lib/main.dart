@@ -3472,6 +3472,45 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
       PopupMenuButton<String>(onSelected:(v)async{if(v=='edit'){await widget.onEdit(x);await reload();}else{await widget.onDelete(x);await reload();}},itemBuilder:(_)=>const[PopupMenuItem(value:'edit',child:Text('এডিট করুন')),PopupMenuItem(value:'delete',child:Text('ডিলিট করুন'))]),
     ]));
   }
+  Widget _buildFilterDropdown({
+    required String value,
+    required List<String> values,
+    required double width,
+    required bool dark,
+    required ValueChanged<String> onChanged,
+  }) {
+    final borderColor = dark ? const Color(0xFF35516A) : const Color(0xFFD7E0E9);
+    return Container(
+      width: width,
+      height: 38,
+      margin: const EdgeInsets.only(right: 6),
+      padding: const EdgeInsets.only(left: 10, right: 5),
+      decoration: BoxDecoration(
+        color: dark ? const Color(0xFF12283A) : Colors.white,
+        border: Border.all(color: borderColor),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: value,
+          isExpanded: true,
+          icon: Icon(Icons.keyboard_arrow_down_rounded, size: 18,
+              color: dark ? Colors.white70 : const Color(0xFF718096)),
+          style: TextStyle(
+            fontSize: 11,
+            color: dark ? Colors.white : const Color(0xFF26384A),
+            fontWeight: FontWeight.w500,
+          ),
+          items: values.map((v) => DropdownMenuItem<String>(
+            value: v,
+            child: Text(v, maxLines: 1, overflow: TextOverflow.ellipsis),
+          )).toList(),
+          onChanged: (v) { if (v != null) onChanged(v); },
+        ),
+      ),
+    );
+  }
+
   @override Widget build(BuildContext context){
     final dark=Theme.of(context).brightness==Brightness.dark,bg=dark?const Color(0xFF071827):const Color(0xFFF4F8FB),ink=dark?Colors.white:const Color(0xFF203446);
     final items=filtered,income=items.where((x)=>kindOf(x)=='আয়').fold<double>(0,(s,x)=>s+amount(x['amount'])),expense=items.where((x)=>kindOf(x)=='ব্যয়').fold<double>(0,(s,x)=>s+amount(x['amount']));
@@ -3497,17 +3536,19 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
                   onSelected: (_) => setState(() { kind=k; page=0; }),
                 ),
               ),
-            DropdownButton<String>(
+            _buildFilterDropdown(
               value: category,
-              underline: const SizedBox(),
-              items: ['সব ক্যাটাগরি',...cats].map((v)=>DropdownMenuItem(value:v,child:Text(v))).toList(),
-              onChanged: (v) => setState(() { category=v??'সব ক্যাটাগরি'; page=0; }),
+              values: ['সব ক্যাটাগরি', ...cats],
+              width: 142,
+              dark: dark,
+              onChanged: (v) => setState(() { category=v; page=0; }),
             ),
-            DropdownButton<String>(
+            _buildFilterDropdown(
               value: wallet,
-              underline: const SizedBox(),
-              items: ['সব ওয়ালেট',...wallets].map((v)=>DropdownMenuItem(value:v,child:Text(v))).toList(),
-              onChanged: (v) => setState(() { wallet=v??'সব ওয়ালেট'; page=0; }),
+              values: ['সব ওয়ালেট', ...wallets],
+              width: 130,
+              dark: dark,
+              onChanged: (v) => setState(() { wallet=v; page=0; }),
             ),
             TextButton.icon(
               onPressed: () async {

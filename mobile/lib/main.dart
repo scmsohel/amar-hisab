@@ -1168,50 +1168,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   RefreshIndicator(
                     onRefresh: _loadProfile,
                     child: ListView(
-                      padding: const EdgeInsets.fromLTRB(18, 14, 18, 20),
+                      padding: const EdgeInsets.fromLTRB(16, 7, 16, 12),
                       children: [
                         Center(child: Stack(clipBehavior: Clip.none, children: [
                           Container(
-                            width: 144, height: 144, padding: const EdgeInsets.all(7),
+                            width: 112, height: 112, padding: const EdgeInsets.all(5),
                             decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: const Color(0xFFB9EED5), width: 5),
                               boxShadow: [BoxShadow(color: const Color(0xFF22B86B).withValues(alpha: .13), blurRadius: 18, spreadRadius: 2)]),
                             child: Container(
                               decoration: BoxDecoration(shape: BoxShape.circle, color: dark ? const Color(0xFF203B50) : const Color(0xFFE8F5EF),
                                 border: Border.all(color: surface, width: 4),
                                 image: photo.isNotEmpty ? DecorationImage(image: NetworkImage(photo), fit: BoxFit.cover) : null),
-                              child: photo.isEmpty ? Icon(Icons.person_rounded, size: 82, color: dark ? const Color(0xFF9CCDEB) : const Color(0xFF1688F8)) : null,
+                              child: photo.isEmpty ? Icon(Icons.person_rounded, size: 64, color: dark ? const Color(0xFF9CCDEB) : const Color(0xFF1688F8)) : null,
                             ),
                           ),
                           Positioned(right: 0, bottom: 4, child: Material(
                             color: const Color(0xFF08B83D), shape: const CircleBorder(side: BorderSide(color: Colors.white, width: 3)), elevation: 3,
                             child: InkWell(customBorder: const CircleBorder(), onTap: () => _message('প্রোফাইল ছবি পরিবর্তন'),
-                              child: const SizedBox(width: 48, height: 48, child: Icon(Icons.edit_rounded, color: Colors.white, size: 25))),
+                              child: const SizedBox(width: 40, height: 40, child: Icon(Icons.edit_rounded, color: Colors.white, size: 21))),
                           )),
                         ])),
                         const SizedBox(height: 10),
                         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                           Flexible(child: Text(_loading ? 'লোড হচ্ছে...' : name, maxLines: 1, overflow: TextOverflow.ellipsis,
-                            style: TextStyle(color: ink, fontSize: 27, fontWeight: FontWeight.w900))),
+                            style: TextStyle(color: ink, fontSize: 23, fontWeight: FontWeight.w900))),
                           const SizedBox(width: 9),
                           const Icon(Icons.verified_rounded, color: Color(0xFF0DBB39), size: 34),
                         ]),
                         const SizedBox(height: 2),
                         Center(child: Text(email, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muted, fontSize: 17))),
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 10),
                         Center(child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 11),
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(colors: [Color(0xFFFFF9D8), Color(0xFFFFE99A)]),
                             borderRadius: BorderRadius.circular(40), border: Border.all(color: const Color(0xFFFFB300), width: 1.2),
                             boxShadow: [BoxShadow(color: const Color(0xFFE9A21A).withValues(alpha: .2), blurRadius: 9, offset: const Offset(0, 4))]),
                           child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                            Icon(Icons.workspace_premium_rounded, color: Color(0xFFB87900), size: 30), SizedBox(width: 12),
-                            Text('প্রিমিয়াম সদস্য', style: TextStyle(color: Color(0xFF9C5B00), fontSize: 20, fontWeight: FontWeight.w900)),
+                            Icon(Icons.workspace_premium_rounded, color: Color(0xFFB87900), size: 26), SizedBox(width: 12),
+                            Text('প্রিমিয়াম সদস্য', style: TextStyle(color: Color(0xFF9C5B00), fontSize: 16, fontWeight: FontWeight.w900)),
                           ]),
                         )),
-                        const SizedBox(height: 25),
+                        const SizedBox(height: 17),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 13),
+                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 9),
                           decoration: BoxDecoration(color: dark ? const Color(0xFF142C3D) : const Color(0xFFFFFCF9),
                             borderRadius: BorderRadius.circular(25), border: Border.all(color: dark ? const Color(0xFF38556A) : const Color(0xFFE8C9DD)),
                             boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: .04), blurRadius: 12, offset: const Offset(0, 4))]),
@@ -1226,7 +1226,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 12))),
                         const SizedBox(height: 25),
                         Container(
-                          padding: const EdgeInsets.fromLTRB(13, 5, 13, 5),
+                          padding: const EdgeInsets.fromLTRB(10, 4, 10, 4),
                           decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(28),
                             boxShadow: [BoxShadow(color: const Color(0xFF345A64).withValues(alpha: dark ? .10 : .12), blurRadius: 18, offset: const Offset(0, 8))]),
                           child: Column(children: [
@@ -1243,15 +1243,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ]),
               ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(18, 8, 18, 16),
-                child: SizedBox(width: double.infinity, height: 66, child: OutlinedButton.icon(
+                padding: const EdgeInsets.fromLTRB(16, 5, 16, 10),
+                child: SizedBox(width: double.infinity, height: 56, child: OutlinedButton.icon(
                   onPressed: () async {
                     await _AuthApi.clearSession();
                     if (!mounted) return;
                     Navigator.of(context).pushAndRemoveUntil(_route(const LoginScreen()), (route) => false);
                   },
-                  icon: const Icon(Icons.logout_rounded, size: 30),
-                  label: const Text('লগ আউট', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900)),
+                  icon: const Icon(Icons.logout_rounded, size: 25),
+                  label: const Text('লগ আউট', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900)),
                   style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFFE91E35),
                     backgroundColor: dark ? const Color(0xFF351D2A) : const Color(0xFFFFF0F2),
                     side: const BorderSide(color: Color(0xFFFF5266), width: 1.2), shape: const StadiumBorder()),
@@ -1267,7 +1267,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _actionIcon(IconData icon, Color color, VoidCallback onTap) => Material(
     color: color.withValues(alpha: .08), shape: const CircleBorder(),
     child: InkWell(customBorder: const CircleBorder(), onTap: onTap,
-      child: SizedBox(width: 48, height: 48, child: Icon(icon, color: color, size: 27))),
+      child: SizedBox(width: 42, height: 42, child: Icon(icon, color: color, size: 23))),
   );
 
   Widget _info(IconData icon, String heading, String value, bool dark) => Padding(
@@ -1289,15 +1289,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _menuRow(IconData icon, Color accent, String heading, String subtitle, VoidCallback onTap,
       bool dark, Color ink, Color muted, Color line, {bool last = false}) => Column(children: [
     InkWell(onTap: onTap, borderRadius: BorderRadius.circular(18), child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 7),
       child: Row(children: [
-        Container(width: 58, height: 58, decoration: BoxDecoration(color: accent.withValues(alpha: .13), shape: BoxShape.circle),
-          child: Icon(icon, color: accent, size: 34)),
+        Container(width: 48, height: 48, decoration: BoxDecoration(color: accent.withValues(alpha: .13), shape: BoxShape.circle),
+          child: Icon(icon, color: accent, size: 29)),
         const SizedBox(width: 17),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(heading, style: TextStyle(color: ink, fontSize: 17, fontWeight: FontWeight.w900)),
           const SizedBox(height: 2),
-          Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muted, fontSize: 13)),
+          Text(subtitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muted, fontSize: 12)),
         ])),
         Icon(Icons.chevron_right_rounded, color: dark ? const Color(0xFFB7C9DA) : const Color(0xFF34466E), size: 30),
       ]),

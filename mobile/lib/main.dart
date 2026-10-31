@@ -1425,7 +1425,7 @@ class _DebtsScreenState extends State<_DebtsScreen> {
         actions:[IconButton(onPressed:_refresh,icon:_loading?const SizedBox(width:18,height:18,child:CircularProgressIndicator(strokeWidth:2)):const Icon(Icons.refresh_rounded)),
           IconButton(onPressed:()=>_todo('নতুন হিসাব যোগ'),icon:const Icon(Icons.add_rounded,size:28)),const SizedBox(width:5)]),
       body:SafeArea(top:false,child:Column(children:[
-        Padding(padding:const EdgeInsets.fromLTRB(13,8,13,4),child:Column(children:[
+        Padding(padding:const EdgeInsets.fromLTRB(13,8,13,0),child:Column(children:[
           Row(children:[summary('মোট পাওনা','৳ ${receivable.round()}', 'বাকি পাওনার পরিমাণ',Icons.south_west_rounded,green,const Color(0xFFEAF8F2)),const SizedBox(width:8),summary('মোট দেনা','৳ ${payable.round()}','দিতে হবে',Icons.trending_down_rounded,red,const Color(0xFFFFEFF0))]),
           const SizedBox(height:8),
           Row(children:[summary('মোট ব্যক্তি',people.toString(),'সকল দেনা-পাওনার ব্যক্তি',Icons.people_outline_rounded,blue,const Color(0xFFEDF5FF)),const SizedBox(width:8),summary('আসন্ন তারিখ',upcoming.toString(),'আগামী ৭ দিনের মধ্যে',Icons.calendar_month_rounded,purple,const Color(0xFFF4EEFF))]),
@@ -1433,8 +1433,8 @@ class _DebtsScreenState extends State<_DebtsScreen> {
           TextField(controller:_search,onChanged:(_)=>setState((){}),decoration:InputDecoration(hintText:'নাম বা নোট খুঁজুন...',prefixIcon:const Icon(Icons.search_rounded),filled:true,fillColor:surface,contentPadding:const EdgeInsets.symmetric(vertical:13),border:OutlineInputBorder(borderRadius:BorderRadius.circular(18),borderSide:BorderSide(color:line)),enabledBorder:OutlineInputBorder(borderRadius:BorderRadius.circular(18),borderSide:BorderSide(color:line)))),
           const SizedBox(height:9),
           Row(children:[_filter(_kind,['সব ধরনের','দেনা','পাওনা'],(v)=>_kind=v),const SizedBox(width:6),_filter(_status,['সব স্ট্যাটাস','চলমান','সম্পন্ন'],(v)=>_status=v),const SizedBox(width:6),_filter(_period,['সব সময়','বকেয়া','আসন্ন'],(v)=>_period=v)]),
-          const SizedBox(height:4),
-          Row(children:[Expanded(child:Text('সকল দেনা-পাওনা',style:TextStyle(fontSize:17,fontWeight:FontWeight.w900,color:dark?Colors.white:const Color(0xFF172B43)))),DropdownButton<String>(value:_sort,underline:const SizedBox.shrink(),icon:const Icon(Icons.keyboard_arrow_down_rounded),items:const ['সর্বশেষ আগে','পুরনো আগে','বেশি টাকা আগে','কম টাকা আগে'].map((v)=>DropdownMenuItem(value:v,child:Text(v,style:const TextStyle(fontSize:11)))).toList(),onChanged:(v){if(v!=null)setState(()=>_sort=v);})]),
+          const SizedBox(height:0),
+          SizedBox(height:34,child:Row(children:[Expanded(child:Text('সকল দেনা-পাওনা',style:TextStyle(fontSize:17,fontWeight:FontWeight.w900,color:dark?Colors.white:const Color(0xFF172B43)))),DropdownButton<String>(value:_sort,underline:const SizedBox.shrink(),icon:const Icon(Icons.keyboard_arrow_down_rounded),items:const ['সর্বশেষ আগে','পুরনো আগে','বেশি টাকা আগে','কম টাকা আগে'].map((v)=>DropdownMenuItem(value:v,child:Text(v,style:const TextStyle(fontSize:11)))).toList(),onChanged:(v){if(v!=null)setState(()=>_sort=v);},isDense:true)])),
         ])),
         Expanded(child:rows.isEmpty?Center(child:Text('কোনো দেনা-পাওনা পাওয়া যায়নি',style:TextStyle(color:muted))):ListView.separated(
           padding:const EdgeInsets.fromLTRB(13,0,13,18),itemCount:rows.length,separatorBuilder:(_,_)=>const SizedBox(height:9),

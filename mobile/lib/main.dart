@@ -1384,6 +1384,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   String _recentTransactionsMonthKey = _monthKey(DateTime.now());
   String _recentTransactionsCategory = 'সব';
   Map<String, double> _walletBalances = {'ক্যাশ': 0, 'ব্যাংক': 0, 'বিকাশ': 0, 'নগদ': 0};
+  bool _showAddTransactionFab = true;
 
   @override
   void initState() {
@@ -1807,6 +1808,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ],
             ),
           ),
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 520),
+            curve: Curves.easeOutBack,
+            right: 20,
+            bottom: _showAddTransactionFab ? 22 : -82,
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 220),
+              opacity: _showAddTransactionFab ? 1 : 0,
+              child: IgnorePointer(
+                ignoring: !_showAddTransactionFab,
+                child: FloatingActionButton(
+                  heroTag: 'add-transaction-fab',
+                  backgroundColor: const Color(0xFF187BFA),
+                  foregroundColor: Colors.white,
+                  onPressed: _showAddTransaction,
+                  child: const Icon(Icons.add_rounded, size: 31),
+                ),
+              ),
+            ),
+          ),
         ]),
         ),
       );
@@ -2185,10 +2206,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                       ],
                     )
-                  : ListView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: EdgeInsets.zero,
-                      children: listChildren,
+                  : NotificationListener<ScrollNotification>(
+                      onNotification: (notification) {
+                        if (notification is UserScrollNotification && notification.depth == 0) {
+                          final visible = notification.direction == ScrollDirection.forward
+                              ? true
+                              : notification.direction == ScrollDirection.reverse
+                                  ? false
+                                  : _showAddTransactionFab;
+                          if (visible != _showAddTransactionFab && mounted) setState(() => _showAddTransactionFab = visible);
+                        }
+                        return false;
+                      },
+                      child: ListView(physics: const AlwaysScrollableScrollPhysics(), padding: EdgeInsets.zero, children: listChildren),
                     ),
             ),
           ),
@@ -2313,6 +2343,124 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
     );
+  }
+
+
+  Future<void> _showAddTransaction() async {
+    final title = TextEditingController();
+    final amount = TextEditingController();
+    final now = DateTime.now();
+    final date = TextEditingController(text: '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}');
+    final time = TextEditingController(text: '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}');
+    var kind = 'আয়'; var category = 'অন্যান্য'; var wallet = 'ক্যাশ'; var iconName = 'Banknote'; var saving = false;
+    final formKey = GlobalKey<FormState>();
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final surface = dark ? const Color(0xFF102638) : Colors.white;
+    final ink = dark ? const Color(0xFFEAF5FF) : const Color(0xFF203446);
+    final muted = dark ? const Color(0xFF9CB1C2) : const Color(0xFF8191A0);
+    final line = dark ? const Color(0xFF29465A) : const Color(0xFFE1EAF0);
+    final wallets = <String>{'ক্যাশ', 'ব্যাংক', 'বিকাশ', 'নগদ', ..._walletBalances.keys,
+      ..._transactions.map((tx) => (tx['wallet'] ?? tx['walletName'] ?? '').toString()).where((v) => v.isNotEmpty)}.toList();
+    try {
+      await showModalBottomSheet<void>(context: context, isScrollControlled: true, useSafeArea: true, backgroundColor: Colors.transparent,
+        builder: (sheetContext) => StatefulBuilder(builder: (context, setSheetState) {
+          final accent = kind == 'আয়' ? const Color(0xFF10B981) : const Color(0xFFEF4760);
+          final defaults = kind == 'আয়' ? <String>['বেতন', 'ব্যবসার আয়', 'অন্যান্য'] : <String>['খাবার', 'বাসা ও ইউটিলিটি', 'যাতায়াত', 'বিল', 'স্বাস্থ্য', 'শিক্ষা', 'কেনাকাটা', 'অন্যান্য'];
+          final categories = <String>{...defaults, ..._transactions.where((tx) => tx['kind'] == kind).map(_transactionCategoryLabel)}.toList();
+          InputDecoration deco(String label, {String? hint, Widget? suffix}) => InputDecoration(
+            labelText: label, hintText: hint, suffixIcon: suffix, filled: true,
+            fillColor: dark ? const Color(0xFF172F42) : const Color(0xFFF8FAFC),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 13, vertical: 12),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: line)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: line)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: accent, width: 1.8)));
+          return Padding(padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Container(constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * .94),
+              decoration: BoxDecoration(color: surface, borderRadius: const BorderRadius.vertical(top: Radius.circular(24))),
+              child: Form(key: formKey, child: SingleChildScrollView(padding: const EdgeInsets.fromLTRB(18, 15, 18, 18),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                  Row(children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('নতুন ${kind == 'আয়' ? 'আয়' : 'ব্যয়'} যোগ করুন', style: TextStyle(color: ink, fontSize: 19, fontWeight: FontWeight.w900)),
+                    const SizedBox(height: 3), Text('আপনার হিসাবের তথ্য পূরণ করুন', style: TextStyle(color: muted, fontSize: 11)),
+                  ])), IconButton(onPressed: saving ? null : () => Navigator.pop(sheetContext), icon: Icon(Icons.close_rounded, color: muted))]),
+                  const SizedBox(height: 12),
+                  Row(children: [for (final value in ['আয়', 'ব্যয়']) Expanded(child: Padding(padding: EdgeInsets.only(right: value == 'আয়' ? 7 : 0),
+                    child: InkWell(onTap: () => setSheetState(() { kind = value; category = 'অন্যান্য'; }), borderRadius: BorderRadius.circular(11),
+                      child: Container(padding: const EdgeInsets.symmetric(vertical: 11),
+                        decoration: BoxDecoration(color: kind == value ? (value == 'আয়' ? const Color(0xFF10B981) : const Color(0xFFEF4760)).withValues(alpha: .12) : Colors.transparent,
+                          borderRadius: BorderRadius.circular(11), border: Border.all(color: kind == value ? accent : line)),
+                        child: Center(child: Text(value, style: TextStyle(color: kind == value ? accent : muted, fontWeight: FontWeight.w800))))))]),
+                  const SizedBox(height: 13),
+                  TextFormField(controller: title, style: TextStyle(color: ink), decoration: deco('বিবরণ', hint: 'যেমন: বেতন, ব্যবসার আয়'),
+                    validator: (v) => v == null || v.trim().isEmpty ? 'বিবরণ লিখুন' : null),
+                  const SizedBox(height: 12), Text('আইকন নির্বাচন', style: TextStyle(color: ink, fontSize: 12, fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 6),
+                  Row(children: [for (final entry in <(String, IconData)>[
+                    ('Banknote', Icons.payments_outlined), ('Wallet', Icons.account_balance_wallet_outlined),
+                    ('Briefcase', Icons.work_outline_rounded), ('ShoppingCart', Icons.shopping_cart_outlined),
+                  ]) Expanded(child: Padding(padding: const EdgeInsets.only(right: 7), child: InkWell(onTap: () => setSheetState(() => iconName = entry.$1),
+                    borderRadius: BorderRadius.circular(10), child: Container(height: 42,
+                      decoration: BoxDecoration(color: iconName == entry.$1 ? accent.withValues(alpha: .12) : (dark ? const Color(0xFF172F42) : const Color(0xFFF8FAFC)),
+                        borderRadius: BorderRadius.circular(10), border: Border.all(color: iconName == entry.$1 ? accent : line)),
+                      child: Icon(entry.$2, color: iconName == entry.$1 ? accent : muted, size: 21))))) ]),
+                  const SizedBox(height: 12),
+                  TextFormField(controller: amount, keyboardType: const TextInputType.numberWithOptions(decimal: true), style: TextStyle(color: ink, fontWeight: FontWeight.w800),
+                    decoration: deco('পরিমাণ (৳)', hint: '0.00'), validator: (v) { final n = double.tryParse(v?.trim() ?? ''); return n == null || n <= 0 ? 'সঠিক পরিমাণ লিখুন' : null; }),
+                  const SizedBox(height: 12),
+                  Row(children: [
+                    Expanded(child: TextFormField(controller: date, readOnly: true, style: TextStyle(color: ink, fontSize: 12),
+                      decoration: deco('তারিখ', suffix: Icon(Icons.calendar_today_rounded, size: 17, color: muted)),
+                      onTap: () async { final picked = await showDatePicker(context: context, initialDate: DateTime.tryParse(date.text) ?? DateTime.now(), firstDate: DateTime(2000), lastDate: DateTime(2100));
+                        if (picked != null && sheetContext.mounted) setSheetState(() => date.text = '${picked.year.toString().padLeft(4, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}'); })),
+                    const SizedBox(width: 9),
+                    Expanded(child: TextFormField(controller: time, readOnly: true, style: TextStyle(color: ink, fontSize: 12),
+                      decoration: deco('সময়', suffix: Icon(Icons.access_time_rounded, size: 17, color: muted)),
+                      onTap: () async { final p = time.text.split(':'); final picked = await showTimePicker(context: context, initialTime: TimeOfDay(hour: int.tryParse(p.first) ?? 0, minute: int.tryParse(p.last) ?? 0));
+                        if (picked != null && sheetContext.mounted) setSheetState(() => time.text = '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}'); })),
+                  ]),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(initialValue: categories.contains(category) ? category : 'অন্যান্য', decoration: deco('ক্যাটাগরি'), dropdownColor: surface,
+                    style: TextStyle(color: ink, fontSize: 13), items: categories.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+                    onChanged: saving ? null : (v) => setSheetState(() => category = v ?? category)),
+                  const SizedBox(height: 12),
+                  DropdownButtonFormField<String>(initialValue: wallets.contains(wallet) ? wallet : wallets.first, decoration: deco('ওয়ালেট'), dropdownColor: surface,
+                    style: TextStyle(color: ink, fontSize: 13), items: wallets.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
+                    onChanged: saving ? null : (v) => setSheetState(() => wallet = v ?? wallet)),
+                  const SizedBox(height: 17),
+                  Row(children: [
+                    Expanded(child: OutlinedButton(onPressed: saving ? null : () => Navigator.pop(sheetContext), child: const Text('বাতিল'))),
+                    const SizedBox(width: 9),
+                    Expanded(flex: 2, child: FilledButton(style: FilledButton.styleFrom(backgroundColor: accent, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 13)),
+                      onPressed: saving ? null : () async {
+                        if (!formKey.currentState!.validate()) return;
+                        setSheetState(() => saving = true);
+                        try {
+                          final parsed = DateTime.tryParse(date.text) ?? DateTime.now();
+                          final month = _monthLabel(_monthKey(parsed)).split(' ').first;
+                          final dateLabel = '${parsed.day.toString().padLeft(2, '0')} $month, ${parsed.year}';
+                          final p = time.text.split(':'); final h = int.tryParse(p.first) ?? 0; final m = int.tryParse(p.last) ?? 0;
+                          final timeLabel = '${h % 12 == 0 ? 12 : h % 12}:${m.toString().padLeft(2, '0')} ${h < 12 ? 'AM' : 'PM'}';
+                          final item = <String, dynamic>{'id': DateTime.now().millisecondsSinceEpoch, 'title': title.text.trim(),
+                            'category': category, 'date': dateLabel, 'time': timeLabel, 'icon': iconName, 'dateInput': date.text,
+                            'timeInput': time.text, 'wallet': wallet, 'amount': double.parse(amount.text.trim()), 'kind': kind};
+                          await _AuthApi._put('/data/transactions', {'data': [item, ..._transactions]});
+                          if (!mounted || !sheetContext.mounted) return;
+                          Navigator.pop(sheetContext); await _load();
+                          if (mounted) ScaffoldMessenger.of(this.context).showSnackBar(const SnackBar(content: Text('নতুন লেনদেন যোগ হয়েছে।')));
+                        } catch (e) {
+                          if (sheetContext.mounted) setSheetState(() => saving = false);
+                          if (mounted) ScaffoldMessenger.of(this.context).showSnackBar(SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))));
+                        }
+                      },
+                      child: saving ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        : Text('${kind} সংরক্ষণ', style: const TextStyle(fontWeight: FontWeight.w800)))),
+                  ]),
+                ]))),
+            ),
+          );
+        }),
+      );
+    } finally { title.dispose(); amount.dispose(); date.dispose(); time.dispose(); }
   }
 
   Future<void> _editTransaction(Map<String, dynamic> tx) async {

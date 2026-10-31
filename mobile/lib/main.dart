@@ -3551,7 +3551,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
           : shown.isEmpty
             ? Center(child:Text('কোনো লেনদেন পাওয়া যায়নি',style:TextStyle(color:dark?Colors.white60:const Color(0xFF718096))))
             : ListView(
-                key: ValueKey('${kind}|${category}|${wallet}|${sort}|${range?.start}|${range?.end}|${page}|${search.text}'),
+                key: ValueKey('$kind|$category|$wallet|$sort|${range?.start}|${range?.end}|$page|${search.text}'),
                 padding: const EdgeInsets.fromLTRB(10, 4, 10, 8),
                 children:[
         for(final g in groups.entries)...[

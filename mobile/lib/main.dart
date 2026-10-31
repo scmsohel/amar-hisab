@@ -1942,14 +1942,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
     for (var i = 0; i < bengaliDigits.length; i++) {
       normalized = normalized.replaceAll(bengaliDigits[i], '$i');
     }
-    final match = RegExp(r'^(\d{1,2}):(\d{2})(?:\s*(AM|PM))?
+    final match = RegExp(r'^(\d{1,2}):(\d{2})(?:\s*(AM|PM))?$').firstMatch(normalized);
+    if (match == null) return value;
+    var hour = int.tryParse(match.group(1)!) ?? 0;
+    final minute = int.tryParse(match.group(2)!) ?? 0;
+    final suppliedPeriod = match.group(3)?.toUpperCase();
+    final period = suppliedPeriod ?? (hour >= 12 ? 'PM' : 'AM');
+    hour %= 12;
+    if (hour == 0) hour = 12;
+    return '${_bengaliDigits(hour.toString())}:${_bengaliDigits(minute.toString().padLeft(2, '0'))} $period';
+  }
+
+  String _transactionDateTimeLabel(Map<String, dynamic> tx) {
     final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
     final time = (tx['timeInput'] ?? tx['time_input'] ?? tx['time'] ?? '').toString().trim();
     if (date == null) return time.isEmpty ? '' : time;
     final dateText = '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
     return time.isEmpty ? dateText : '$dateText, $time';
   }
-
   ({Color accent, Color tint, IconData icon}) _transactionStyle(Map<String, dynamic> tx) {
     final kind = (tx['kind'] ?? '').toString();
     final value = '${tx['title'] ?? tx['description'] ?? ''} ${tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? ''}'.toLowerCase();

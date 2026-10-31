@@ -1456,10 +1456,10 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                 ])),
                 Container(width:1,height:54,color:line,margin:const EdgeInsets.symmetric(horizontal:5)),
                 Expanded(flex:4,child:Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisSize:MainAxisSize.min,children:[
-                  Text('৳ \${_left(e).round()}',style:TextStyle(fontSize:16,fontWeight:FontWeight.w900,color:done?muted:accent)),
+                  Text('৳ ${_left(e).round()}',style:TextStyle(fontSize:16,fontWeight:FontWeight.w900,color:done?muted:accent)),
                   const SizedBox(height:3),
                   _pill(done?'সম্পন্ন':'●  চলমান',done?muted:green,const Color(0xFFE1F8EC)),
-                  if(due!=null)...[const SizedBox(height:3),_pill('\${_dateLabel(due)}\${overdue ? ' ওভারডিউ' : ''}',overdue?red:muted,overdue?const Color(0xFFFFE8EA):const Color(0xFFF0F3F7))],
+                  if(due!=null)...[const SizedBox(height:3),_pill('${_dateLabel(due)}${overdue ? ' ওভারডিউ' : ''}',overdue?red:muted,overdue?const Color(0xFFFFE8EA):const Color(0xFFF0F3F7))],
                 ])),
                 const SizedBox(width:2),
                 Row(mainAxisSize:MainAxisSize.min,children:[

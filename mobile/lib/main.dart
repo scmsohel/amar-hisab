@@ -565,7 +565,7 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
-  int _
+  int _page = 0;
   final _slides = const [
     _IntroSlide(title: 'স্মার্টভাবে\nআপনার অর্থ ব্যবস্থাপনা', icon: Icons.account_balance_wallet_rounded),
     _IntroSlide(title: 'আয়-ব্যয় রাখুন\nএক জায়গায় গুছিয়ে', icon: Icons.query_stats_rounded),
@@ -3540,14 +3540,14 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
               values: ['সব ক্যাটাগরি', ...cats],
               width: 142,
               dark: dark,
-              onChanged: (v) => setState(() { category=v;  }),
+              onChanged: (v) => setState(() { category=v; }),
             ),
             _buildFilterDropdown(
               value: wallet,
               values: ['সব ওয়ালেট', ...wallets],
               width: 130,
               dark: dark,
-              onChanged: (v) => setState(() { wallet=v }),
+              onChanged: (v) => setState(() { wallet=v; }),
             ),
             TextButton.icon(
               onPressed: () async {
@@ -3558,12 +3558,12 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
                   lastDate:DateTime(2100),
                   initialDateRange:range??DateTimeRange(start:DateTime(now.year,now.month,1),end:now),
                 );
-                if(r!=null)setState(() { range=r });
+                if(r!=null)setState(() { range=r; });
               },
               icon: const Icon(Icons.calendar_month_rounded,size:16),
               label: Text(range==null?'তারিখ':'নির্বাচিত'),
             ),
-            if(range!=null) IconButton(onPressed:()=>setState(() { range=null }),icon:const Icon(Icons.close_rounded)),
+            if(range!=null) IconButton(onPressed:()=>setState(() { range=null; }),icon:const Icon(Icons.close_rounded)),
           ],
         ),
       ),
@@ -3579,7 +3579,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
                 value:sort,
                 underline:const SizedBox(),
                 items:const ['সর্বশেষ আগে','পুরোনো আগে'].map((v)=>DropdownMenuItem(value:v,child:Text(v,style:const TextStyle(fontSize:10)))).toList(),
-                onChanged:(v)=>setState(() { sort=v??sort }),
+                onChanged:(v)=>setState(() { sort=v??sort; }),
               ),
             ],
           ),

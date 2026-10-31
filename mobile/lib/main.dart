@@ -1352,7 +1352,7 @@ class _DebtsScreenState extends State<_DebtsScreen> {
   void dispose() { _search.dispose(); super.dispose(); }
   double _num(dynamic v) => v is num ? v.toDouble() : double.tryParse((v ?? '').toString()) ?? 0;
   DateTime? _date(dynamic v) => v == null ? null : DateTime.tryParse(v.toString());
-  String _kindOf(Map<String,dynamic> e) => (e['debtKind'] ?? e['kind'] ?? '').toString();
+  String _kindOf(Map<String,dynamic> e) => (e['debtKind'] ?? e['kind'] ?? e['status'] ?? '').toString();
   String _name(Map<String,dynamic> e) => (e['personName'] ?? e['name'] ?? e['person'] ?? e['title'] ?? 'নাম নেই').toString();
   double _paid(Map<String,dynamic> e) {
     final p = e['payments'] is List ? e['payments'] as List : <dynamic>[];
@@ -1461,7 +1461,7 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                   _pill(done?'সম্পন্ন':'●  চলমান',done?muted:green,const Color(0xFFE1F8EC)),
                   if(due!=null)...[const SizedBox(height:4),_pill(_dateLabel(due)+(overdue?' ওভারডিউ':''),overdue?red:muted,overdue?const Color(0xFFFFE8EA):const Color(0xFFF0F3F7))],
                 ])),
-                PopupMenuButton<String>(padding:EdgeInsets.zero,icon:const Icon(Icons.more_vert_rounded,color:Color(0xFF8292A4)),onSelected:(v)=>_todo(v=='edit'?'এডিট':'রিমাইন্ডার'),itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))]),
+                Column(mainAxisSize:MainAxisSize.min,children:[IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints(minWidth:30,minHeight:30),padding:EdgeInsets.zero,onPressed:()=>_todo('রিমাইন্ডার'),icon:const Icon(Icons.notifications_none_rounded,size:19,color:Color(0xFF8292A4))),IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints(minWidth:30,minHeight:30),padding:EdgeInsets.zero,onPressed:()=>_todo('এডিট'),icon:const Icon(Icons.edit_outlined,size:18,color:Color(0xFF8292A4))),PopupMenuButton<String>(padding:EdgeInsets.zero,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v)=>_todo(v=='edit'?'এডিট':'রিমাইন্ডার'),itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))])]),
               ]));
           })),
       ])),

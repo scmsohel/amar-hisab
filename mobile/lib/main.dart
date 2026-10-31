@@ -2419,7 +2419,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         if (picked != null && sheetContext.mounted) setSheetState(() => time.text = '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}'); })),
                   ]),
                   const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(initialValue: categories.contains(category) ? category : 'অন্যান্য', decoration: deco('ক্যাটাগরি'), dropdownColor: surface,
+                  DropdownButtonFormField<String>(key: ValueKey(kind), initialValue: categories.contains(category) ? category : 'অন্যান্য', decoration: deco('ক্যাটাগরি'), dropdownColor: surface,
                     style: TextStyle(color: ink, fontSize: 13), items: categories.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
                     onChanged: saving ? null : (v) => setSheetState(() => category = v ?? category)),
                   const SizedBox(height: 12),

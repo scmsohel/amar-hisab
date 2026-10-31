@@ -9,6 +9,32 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lottie/lottie.dart';
 
+class _ControllerDisposalScope extends StatefulWidget {
+  const _ControllerDisposalScope({
+    required this.controllers,
+    required this.child,
+  });
+
+  final List<TextEditingController> controllers;
+  final Widget child;
+
+  @override
+  State<_ControllerDisposalScope> createState() => _ControllerDisposalScopeState();
+}
+
+class _ControllerDisposalScopeState extends State<_ControllerDisposalScope> {
+  @override
+  Widget build(BuildContext context) => widget.child;
+
+  @override
+  void dispose() {
+    for (final controller in widget.controllers) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await _AuthApi.loadBaseUrl();
@@ -2368,8 +2394,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final line = dark ? const Color(0xFF29465A) : const Color(0xFFE1EAF0);
     final wallets = <String>{'ক্যাশ', 'ব্যাংক', 'বিকাশ', 'নগদ', ..._walletBalances.keys,
       ..._transactions.map((tx) => (tx['wallet'] ?? tx['walletName'] ?? '').toString()).where((v) => v.isNotEmpty)}.toList();
-    try {
-      await showDialog<void>(
+    await showDialog<void>(
         context: context,
         barrierDismissible: !saving,
         barrierColor: Colors.black.withValues(alpha: dark ? .62 : .30),
@@ -2389,7 +2414,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             padding: const EdgeInsets.only(bottom: 7),
             child: Text(label, style: TextStyle(color: ink, fontSize: 12, fontWeight: FontWeight.w800)),
           );
-          return Dialog(
+          return _ControllerDisposalScope(
+            controllers: [title, amount, date, time],
+            child: Dialog(
             backgroundColor: Colors.transparent,
             elevation: 0,
             insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
@@ -2623,10 +2650,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ]),
                 ]))),
             ),
-          );
+          ));
         }),
       );
-    } finally { title.dispose(); amount.dispose(); date.dispose(); time.dispose(); }
   }
 
   Future<void> _editTransaction(Map<String, dynamic> tx) async {

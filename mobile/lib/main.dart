@@ -3427,7 +3427,6 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
   final search=TextEditingController();
   String kind='সব',category='সব ক্যাটাগরি',wallet='সব ওয়ালেট',sort='সর্বশেষ আগে';
   DateTimeRange? range;
-  int page=0,pageSize=20;
   bool loading=false;
   @override void initState(){super.initState();data=List.from(widget.initialTransactions);}
   @override void dispose(){search.dispose();super.dispose();}
@@ -3514,7 +3513,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
   @override Widget build(BuildContext context){
     final dark=Theme.of(context).brightness==Brightness.dark,bg=dark?const Color(0xFF071827):const Color(0xFFF4F8FB),ink=dark?Colors.white:const Color(0xFF203446);
     final items=filtered,income=items.where((x)=>kindOf(x)=='আয়').fold<double>(0,(s,x)=>s+amount(x['amount'])),expense=items.where((x)=>kindOf(x)=='ব্যয়').fold<double>(0,(s,x)=>s+amount(x['amount']));
-    final pages=(items.length/pageSize).ceil(),current=page.clamp(0,(pages-1).clamp(0,999999)).toInt(),start=current*pageSize,shown=items.skip(start).take(pageSize).toList();
+    final shown=items;
     final cats=data.map(catOf).toSet().toList()..sort(),wallets=data.map(walletOf).where((x)=>x.isNotEmpty).toSet().toList()..sort();
     final groups=<String,List<Map<String,dynamic>>>{};for(final x in shown){final d=dateOf(x),key=d==null?'unknown':d.toString().substring(0,10);groups.putIfAbsent(key,()=>[]).add(x);}
     return Scaffold(backgroundColor:bg,appBar:AppBar(backgroundColor:bg,foregroundColor:ink,elevation:0,title:const Text('লেনদেন',style:TextStyle(fontWeight:FontWeight.w900)),actions:[IconButton(onPressed:loading?null:reload,icon:const Icon(Icons.refresh_rounded)),IconButton(onPressed:()async{await widget.onAdd();await reload();},icon:const Icon(Icons.add_rounded))]),body:SafeArea(child:Column(children:[
@@ -3533,7 +3532,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
                 child: ChoiceChip(
                   label: Text(k),
                   selected: kind==k,
-                  onSelected: (_) => setState(() { kind=k; page=0; }),
+                  onSelected: (_) => setState(() { kind=k; }),
                 ),
               ),
             _buildFilterDropdown(
@@ -3541,7 +3540,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
               values: ['সব ক্যাটাগরি', ...cats],
               width: 142,
               dark: dark,
-              onChanged: (v) => setState(() { category=v; page=0; }),
+              onChanged: (v) => setState(() { category=v;  }),
             ),
             _buildFilterDropdown(
               value: wallet,
@@ -3592,18 +3591,13 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
           : shown.isEmpty
             ? Center(child:Text('কোনো লেনদেন পাওয়া যায়নি',style:TextStyle(color:dark?Colors.white60:const Color(0xFF718096))))
             : ListView(
-                key: ValueKey('$kind|$category|$wallet|$sort|${range?.start}|${range?.end}|$page|${search.text}'),
+                key: ValueKey('$kind|$category|$wallet|$sort|${range?.start}|${range?.end}|${search.text}'),
                 padding: const EdgeInsets.fromLTRB(10, 4, 10, 8),
                 children:[
         for(final g in groups.entries)...[
           Container(padding:const EdgeInsets.symmetric(horizontal:11,vertical:9),decoration:BoxDecoration(color:dark?const Color(0xFF18334B):const Color(0xFFEAF2FC),borderRadius:BorderRadius.circular(10)),child:Text(dateLabel(dateOf(g.value.first)),style:TextStyle(fontSize:11,fontWeight:FontWeight.w800,color:ink))),
           for(final x in g.value)row(x),const SizedBox(height:6),
         ],
-      ])),
-      Container(padding:const EdgeInsets.fromLTRB(12,5,12,9),decoration:BoxDecoration(color:dark?const Color(0xFF10243A):Colors.white,border:Border(top:BorderSide(color:dark?const Color(0xFF29445D):const Color(0xFFE4EAF0)))),child:Row(children:[
-        const Text('প্রতি পাতায়',style:TextStyle(fontSize:10)),DropdownButton<int>(value:pageSize,underline:const SizedBox(),items:const [10,20,50].map((v)=>DropdownMenuItem(value:v,child:Text('$v'))).toList(),onChanged:(v)=>setState(() { pageSize=v??20; page=0; })),
-        const Spacer(),Text(pages==0?'০ / ০':'${bn((start+1).toString())}–${bn((start+shown.length).toString())} / ${bn(items.length.toString())}',style:TextStyle(fontSize:10,fontWeight:FontWeight.w700,color:ink)),
-        IconButton(onPressed:current>0?()=>setState(()=>page=current-1):null,icon:const Icon(Icons.chevron_left_rounded)),IconButton(onPressed:current+1<pages?()=>setState(()=>page=current+1):null,icon:const Icon(Icons.chevron_right_rounded)),
       ])),
     ])));
   }

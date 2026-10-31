@@ -1461,7 +1461,11 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                   _pill(done?'সম্পন্ন':'●  চলমান',done?muted:green,const Color(0xFFE1F8EC)),
                   if(due!=null)...[const SizedBox(height:4),_pill('${_dateLabel(due)}${overdue ? ' ওভারডিউ' : ''}',overdue?red:muted,overdue?const Color(0xFFFFE8EA):const Color(0xFFF0F3F7))],
                 ])),
-                Column(mainAxisSize:MainAxisSize.min,children:[IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints(minWidth:30,minHeight:30),padding:EdgeInsets.zero,onPressed:()=>_todo('রিমাইন্ডার'),icon:const Icon(Icons.notifications_none_rounded,size:19,color:Color(0xFF8292A4))),IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints(minWidth:30,minHeight:30),padding:EdgeInsets.zero,onPressed:()=>_todo('এডিট'),icon:const Icon(Icons.edit_outlined,size:18,color:Color(0xFF8292A4))),PopupMenuButton<String>(padding:EdgeInsets.zero,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v)=>_todo(v=='edit'?'এডিট':'রিমাইন্ডার'),itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))])]),
+                Row(mainAxisSize:MainAxisSize.min,children:[
+                  IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.tightFor(width:27,height:32),padding:EdgeInsets.zero,onPressed:()=>_todo('রিমাইন্ডার'),icon:const Icon(Icons.notifications_none_rounded,size:19,color:Color(0xFF8292A4))),
+                  IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.tightFor(width:27,height:32),padding:EdgeInsets.zero,onPressed:()=>_todo('এডিট'),icon:const Icon(Icons.edit_outlined,size:18,color:Color(0xFF8292A4))),
+                  PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints.tightFor(width:27,height:32),iconSize:20,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v)=>_todo(v=='edit'?'এডিট':'রিমাইন্ডার'),itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))]),
+                ]),
               ]));
           })),
       ])),

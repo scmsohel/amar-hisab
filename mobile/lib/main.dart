@@ -2439,14 +2439,69 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     validator: (v) => v == null || v.trim().isEmpty ? 'বিবরণ লিখুন' : null),
                   const SizedBox(height: 12), Text('আইকন নির্বাচন', style: TextStyle(color: ink, fontSize: 12, fontWeight: FontWeight.w800)),
                   const SizedBox(height: 6),
-                  Row(children: [for (final entry in <(String, IconData)>[
-                    ('Banknote', Icons.payments_outlined), ('Wallet', Icons.account_balance_wallet_outlined),
-                    ('Briefcase', Icons.work_outline_rounded), ('ShoppingCart', Icons.shopping_cart_outlined),
-                  ]) Expanded(child: Padding(padding: const EdgeInsets.only(right: 7), child: InkWell(onTap: () => setSheetState(() => iconName = entry.$1),
-                    borderRadius: BorderRadius.circular(10), child: Container(height: 42,
-                      decoration: BoxDecoration(color: iconName == entry.$1 ? accent.withValues(alpha: .12) : (dark ? const Color(0xFF172F42) : const Color(0xFFF8FAFC)),
-                        borderRadius: BorderRadius.circular(10), border: Border.all(color: iconName == entry.$1 ? accent : line)),
-                      child: Icon(entry.$2, color: iconName == entry.$1 ? accent : muted, size: 21))))) ]),
+                  Builder(builder: (selectorContext) {
+                    final iconOptions = <(String, IconData)>[
+                      ('Briefcase', Icons.work_outline_rounded), ('Banknote', Icons.payments_outlined),
+                      ('Wallet', Icons.account_balance_wallet_outlined), ('Savings', Icons.savings_outlined),
+                      ('CreditCard', Icons.credit_card_outlined), ('AccountBalance', Icons.account_balance_outlined),
+                      ('Receipt', Icons.receipt_long_outlined), ('HandCoins', Icons.volunteer_activism_outlined),
+                      ('Coins', Icons.monetization_on_outlined), ('Chart', Icons.bar_chart_rounded),
+                      ('TrendingUp', Icons.trending_up_rounded), ('TrendingDown', Icons.trending_down_rounded),
+                      ('ShoppingCart', Icons.shopping_cart_outlined), ('Store', Icons.storefront_outlined),
+                      ('Home', Icons.home_outlined), ('Gift', Icons.card_giftcard_outlined),
+                      ('Tag', Icons.sell_outlined), ('Package', Icons.inventory_2_outlined),
+                      ('Car', Icons.directions_car_outlined), ('Food', Icons.restaurant_outlined),
+                      ('Phone', Icons.phone_android_rounded), ('Health', Icons.medical_services_outlined),
+                      ('Education', Icons.school_outlined), ('Travel', Icons.flight_takeoff_rounded),
+                    ];
+                    final selectedIcon = iconOptions.firstWhere((e) => e.$1 == iconName, orElse: () => iconOptions[1]);
+                    return Row(children: [
+                      Container(width: 38, height: 38, decoration: BoxDecoration(
+                        color: accent.withValues(alpha: .10), borderRadius: BorderRadius.circular(10)),
+                        child: Icon(selectedIcon.$2, color: accent, size: 21)),
+                      const SizedBox(width: 9),
+                      Expanded(child: PopupMenuButton<String>(
+                        tooltip: 'আইকন বেছে নিন',
+                        onSelected: (value) => setSheetState(() => iconName = value),
+                        itemBuilder: (menuContext) => [
+                          PopupMenuItem<String>(
+                            enabled: false,
+                            padding: const EdgeInsets.all(8),
+                            child: Builder(builder: (popupContext) => SizedBox(
+                              width: 292, height: 214,
+                              child: GridView.builder(
+                                padding: EdgeInsets.zero,
+                                itemCount: iconOptions.length,
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 4, mainAxisSpacing: 5, crossAxisSpacing: 5,
+                                ),
+                                itemBuilder: (context, index) {
+                                  final entry = iconOptions[index];
+                                  final selected = iconName == entry.$1;
+                                  return InkWell(
+                                    borderRadius: BorderRadius.circular(10),
+                                    onTap: () => Navigator.of(popupContext).pop(entry.$1),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: selected ? accent.withValues(alpha: .12) : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(color: selected ? accent : Colors.transparent),
+                                      ),
+                                      child: Icon(entry.$2, size: 22, color: selected ? accent : ink),
+                                    ),
+                                  );
+                                },
+                              ),
+                            )),
+                          ),
+                        ],
+                        child: Container(height: 42, decoration: BoxDecoration(
+                          color: dark ? const Color(0xFF172F42) : const Color(0xFFF8FAFC),
+                          borderRadius: BorderRadius.circular(10), border: Border.all(color: line)),
+                          child: Center(child: Icon(Icons.grid_view_rounded, color: ink, size: 21))),
+                      )),
+                    ]);
+                  }),
                   const SizedBox(height: 12),
                   TextFormField(controller: amount, keyboardType: const TextInputType.numberWithOptions(decimal: true), style: TextStyle(color: ink, fontWeight: FontWeight.w800),
                     decoration: deco('পরিমাণ (৳)', hint: '0.00'), validator: (v) { final n = double.tryParse(v?.trim() ?? ''); return n == null || n <= 0 ? 'সঠিক পরিমাণ লিখুন' : null; }),

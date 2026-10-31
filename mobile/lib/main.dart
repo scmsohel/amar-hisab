@@ -1109,16 +1109,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (_joinedAt == null) return 'তথ্য পাওয়া যায়নি';
     var years = DateTime.now().year - _joinedAt!.year;
     if (DateTime(DateTime.now().year, _joinedAt!.month, _joinedAt!.day).isAfter(DateTime.now())) years--;
-    return years <= 0 ? '১ বছরের কম আগে' : '\${_bn(years.toString())} বছর আগে';
+    return years <= 0 ? '১ বছরের কম আগে' : '${_bn(years.toString())} বছর আগে';
   }
 
   String get _lastSync {
     if (_lastSyncAt == null) return 'তথ্য পাওয়া যায়নি';
     final d = DateTime.now().difference(_lastSyncAt!);
     if (d.inMinutes < 1) return 'এইমাত্র';
-    if (d.inHours < 1) return '\${_bn(d.inMinutes.toString())} মিনিট আগে';
-    if (d.inDays < 1) return '\${_bn(d.inHours.toString())} ঘণ্টা আগে';
-    return '\${_bn(d.inDays.toString())} দিন আগে';
+    if (d.inHours < 1) return '${_bn(d.inMinutes.toString())} মিনিট আগে';
+    if (d.inDays < 1) return '${_bn(d.inHours.toString())} ঘণ্টা আগে';
+    return '${_bn(d.inDays.toString())} দিন আগে';
   }
 
   void _message(String label) => ScaffoldMessenger.of(context).showSnackBar(

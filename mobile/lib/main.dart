@@ -565,7 +565,7 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
-  int _page = 0;
+  int _
   final _slides = const [
     _IntroSlide(title: 'স্মার্টভাবে\nআপনার অর্থ ব্যবস্থাপনা', icon: Icons.account_balance_wallet_rounded),
     _IntroSlide(title: 'আয়-ব্যয় রাখুন\nএক জায়গায় গুছিয়ে', icon: Icons.query_stats_rounded),
@@ -3519,7 +3519,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
     return Scaffold(backgroundColor:bg,appBar:AppBar(backgroundColor:bg,foregroundColor:ink,elevation:0,title:const Text('লেনদেন',style:TextStyle(fontWeight:FontWeight.w900)),actions:[IconButton(onPressed:loading?null:reload,icon:const Icon(Icons.refresh_rounded)),IconButton(onPressed:()async{await widget.onAdd();await reload();},icon:const Icon(Icons.add_rounded))]),body:SafeArea(child:Column(children:[
       Padding(padding:const EdgeInsets.fromLTRB(12,4,12,7),child:Row(children:[summary('মোট আয়',income,const Color(0xFF00A875),Icons.trending_up_rounded),const SizedBox(width:7),summary('মোট ব্যয়',expense,const Color(0xFFEF4444),Icons.trending_down_rounded)])),
       Padding(padding:const EdgeInsets.fromLTRB(12,0,12,7),child:Row(children:[summary('নিট ব্যালেন্স',income-expense,const Color(0xFF2588F5),Icons.account_balance_wallet_outlined),const SizedBox(width:7),summary('মোট লেনদেন',items.length.toDouble(),const Color(0xFF8B5CF6),Icons.receipt_long_rounded)])),
-      Padding(padding:const EdgeInsets.fromLTRB(12,0,12,7),child:TextField(controller:search,onChanged:(_)=>setState(()=>page=0),decoration:InputDecoration(prefixIcon:const Icon(Icons.search_rounded),hintText:'বিবরণ, ক্যাটাগরি, ওয়ালেট খুঁজুন...',filled:true,fillColor:dark?const Color(0xFF12283A):Colors.white,border:OutlineInputBorder(borderRadius:BorderRadius.circular(12))))),
+      Padding(padding:const EdgeInsets.fromLTRB(12,0,12,7),child:TextField(controller:search,onChanged:(_)=>setState(()=>),decoration:InputDecoration(prefixIcon:const Icon(Icons.search_rounded),hintText:'বিবরণ, ক্যাটাগরি, ওয়ালেট খুঁজুন...',filled:true,fillColor:dark?const Color(0xFF12283A):Colors.white,border:OutlineInputBorder(borderRadius:BorderRadius.circular(12))))),
       SizedBox(
         height: 46,
         child: ListView(
@@ -3547,7 +3547,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
               values: ['সব ওয়ালেট', ...wallets],
               width: 130,
               dark: dark,
-              onChanged: (v) => setState(() { wallet=v; page=0; }),
+              onChanged: (v) => setState(() { wallet=v }),
             ),
             TextButton.icon(
               onPressed: () async {
@@ -3558,12 +3558,12 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
                   lastDate:DateTime(2100),
                   initialDateRange:range??DateTimeRange(start:DateTime(now.year,now.month,1),end:now),
                 );
-                if(r!=null)setState(() { range=r; page=0; });
+                if(r!=null)setState(() { range=r });
               },
               icon: const Icon(Icons.calendar_month_rounded,size:16),
               label: Text(range==null?'তারিখ':'নির্বাচিত'),
             ),
-            if(range!=null) IconButton(onPressed:()=>setState(() { range=null; page=0; }),icon:const Icon(Icons.close_rounded)),
+            if(range!=null) IconButton(onPressed:()=>setState(() { range=null }),icon:const Icon(Icons.close_rounded)),
           ],
         ),
       ),
@@ -3579,7 +3579,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
                 value:sort,
                 underline:const SizedBox(),
                 items:const ['সর্বশেষ আগে','পুরোনো আগে'].map((v)=>DropdownMenuItem(value:v,child:Text(v,style:const TextStyle(fontSize:10)))).toList(),
-                onChanged:(v)=>setState(() { sort=v??sort; page=0; }),
+                onChanged:(v)=>setState(() { sort=v??sort }),
               ),
             ],
           ),

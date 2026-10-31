@@ -1339,65 +1339,10 @@ class DashboardScreen extends StatefulWidget {
 }
 
 
-class _DashboardEntrance extends StatefulWidget {
-  const _DashboardEntrance({required this.cycle, required this.order, required this.child});
-  final int cycle;
-  final int order;
-  final Widget child;
-
-  @override
-  State<_DashboardEntrance> createState() => _DashboardEntranceState();
-}
-
-class _DashboardEntranceState extends State<_DashboardEntrance> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 900),
-  )..forward();
-
-  late Animation<double> _opacity;
-  late Animation<Offset> _slide;
-
-  void _configureAnimations() {
-    final start = (widget.order * .10).clamp(0.0, .72);
-    final curve = CurvedAnimation(parent: _controller, curve: Interval(start, 1, curve: Curves.easeOutCubic));
-    _opacity = curve;
-    _slide = Tween<Offset>(begin: const Offset(0, .10), end: Offset.zero).animate(curve);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _configureAnimations();
-  }
-
-  @override
-  void didUpdateWidget(covariant _DashboardEntrance oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.cycle != widget.cycle) {
-      _controller.forward(from: 0);
-    }
-    if (oldWidget.order != widget.order) _configureAnimations();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => FadeTransition(
-        opacity: _opacity,
-        child: SlideTransition(position: _slide, child: widget.child),
-      );
-}
-
 class _DashboardScreenState extends State<DashboardScreen> {
   bool _loading = true;
   bool _hidden = false;
   bool _compactCharts = true;
-  int _animationCycle = 0;
   String? _error;
   double _balance = 0;
   double? _monthChangePercent;
@@ -1511,7 +1456,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _debts = debts.whereType<Map>().map((item) => Map<String, dynamic>.from(item)).toList();
         _bills = bills.whereType<Map>().map((item) => Map<String, dynamic>.from(item)).toList();
         _loading = false;
-        _animationCycle++;
       });
     } catch (error) {
       if (!mounted) return;
@@ -1519,7 +1463,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
-  Widget _entranceAnimation(Widget child, int order) => _DashboardEntrance(cycle: _animationCycle, order: order, child: child);
+  Widget _entranceAnimation(Widget child, int _) => child;
 
   String _money(double value) => '৳ ${value.round().toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',')}';
 

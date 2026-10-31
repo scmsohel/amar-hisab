@@ -1914,17 +1914,146 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return time.isEmpty ? dateText : '$dateText, $time';
   }
 
+  static const Map<String, IconData> _transactionIconOptions = {
+    'Briefcase': Icons.work_outline_rounded,
+    'Banknote': Icons.payments_outlined,
+    'CircleDollarSign': Icons.monetization_on_outlined,
+    'Coins': Icons.toll_outlined,
+    'CreditCard': Icons.credit_card_outlined,
+    'Wallet': Icons.account_balance_wallet_outlined,
+    'WalletCards': Icons.wallet_outlined,
+    'HandCoins': Icons.volunteer_activism_outlined,
+    'BadgeDollarSign': Icons.price_check_rounded,
+    'ReceiptText': Icons.receipt_long_outlined,
+    'ChartNoAxesCombined': Icons.query_stats_rounded,
+    'TrendingUp': Icons.trending_up_rounded,
+    'TrendingDown': Icons.trending_down_rounded,
+    'Calculator': Icons.calculate_outlined,
+    'Percent': Icons.percent_rounded,
+    'Store': Icons.storefront_outlined,
+    'ShoppingCart': Icons.shopping_cart_outlined,
+    'ShoppingBag': Icons.shopping_bag_outlined,
+    'ShoppingBasket': Icons.shopping_basket_outlined,
+    'Tag': Icons.sell_outlined,
+    'Gift': Icons.card_giftcard_outlined,
+    'Package': Icons.inventory_2_outlined,
+    'PackageOpen': Icons.unarchive_outlined,
+    'House': Icons.home_outlined,
+    'BedDouble': Icons.bed_outlined,
+    'Sofa': Icons.weekend_outlined,
+    'Lamp': Icons.light_outlined,
+    'Lightbulb': Icons.lightbulb_outline_rounded,
+    'Plug': Icons.power_outlined,
+    'HousePlug': Icons.electrical_services_outlined,
+    'Droplets': Icons.water_drop_outlined,
+    'Flame': Icons.local_fire_department_outlined,
+    'Wifi': Icons.wifi_rounded,
+    'Smartphone': Icons.smartphone_rounded,
+    'Laptop': Icons.laptop_outlined,
+    'Monitor': Icons.desktop_windows_outlined,
+    'Tv': Icons.tv_outlined,
+    'Router': Icons.router_outlined,
+    'Printer': Icons.print_outlined,
+    'Camera': Icons.camera_alt_outlined,
+    'Headphones': Icons.headphones_outlined,
+    'Gamepad2': Icons.sports_esports_outlined,
+    'Car': Icons.directions_car_outlined,
+    'CarFront': Icons.directions_car_filled_outlined,
+    'Bus': Icons.directions_bus_outlined,
+    'BusFront': Icons.directions_bus_filled_outlined,
+    'Train': Icons.train_outlined,
+    'Bike': Icons.pedal_bike_outlined,
+    'Plane': Icons.flight_outlined,
+    'PlaneTakeoff': Icons.flight_takeoff_rounded,
+    'Ship': Icons.directions_boat_outlined,
+    'Fuel': Icons.local_gas_station_outlined,
+    'MapPin': Icons.location_on_outlined,
+    'Route': Icons.alt_route_rounded,
+    'Utensils': Icons.restaurant_outlined,
+    'UtensilsCrossed': Icons.restaurant_menu_rounded,
+    'CookingPot': Icons.soup_kitchen_outlined,
+    'Coffee': Icons.coffee_outlined,
+    'Pizza': Icons.local_pizza_outlined,
+    'Salad': Icons.eco_outlined,
+    'Sandwich': Icons.lunch_dining_outlined,
+    'Cake': Icons.cake_outlined,
+    'IceCream': Icons.icecream_outlined,
+    'Apple': Icons.apple_rounded,
+    'Carrot': Icons.grass_rounded,
+    'Pill': Icons.medication_outlined,
+    'Stethoscope': Icons.medical_services_outlined,
+    'HeartPulse': Icons.monitor_heart_outlined,
+    'Cross': Icons.add_rounded,
+    'Syringe': Icons.vaccines_outlined,
+    'Hospital': Icons.local_hospital_outlined,
+    'Bandage': Icons.healing_outlined,
+    'Dumbbell': Icons.fitness_center_rounded,
+    'GraduationCap': Icons.school_outlined,
+    'BookOpen': Icons.menu_book_outlined,
+    'Book': Icons.book_outlined,
+    'School': Icons.cast_for_education_outlined,
+    'Notebook': Icons.note_alt_outlined,
+    'FileText': Icons.description_outlined,
+    'Music': Icons.music_note_rounded,
+    'Film': Icons.movie_outlined,
+    'Clapperboard': Icons.video_camera_back_outlined,
+    'Theater': Icons.theater_comedy_outlined,
+    'Popcorn': Icons.local_movies_outlined,
+    'PartyPopper': Icons.celebration_outlined,
+    'Ticket': Icons.confirmation_number_outlined,
+    'Trophy': Icons.emoji_events_outlined,
+    'Turtle': Icons.pets_outlined,
+    'Dog': Icons.pets_rounded,
+    'Cat': Icons.pets_rounded,
+    'PawPrint': Icons.pets_outlined,
+    'Bone': Icons.cruelty_free_outlined,
+    'Shirt': Icons.checkroom_outlined,
+    'Footprints': Icons.directions_walk_rounded,
+    'Watch': Icons.watch_outlined,
+    'Glasses': Icons.visibility_outlined,
+    'Gem': Icons.diamond_outlined,
+    'Users': Icons.groups_outlined,
+    'Baby': Icons.child_care_outlined,
+    'Heart': Icons.favorite_border_rounded,
+    'Flower2': Icons.local_florist_outlined,
+    'Sprout': Icons.grass_outlined,
+    'TreePine': Icons.park_outlined,
+    'Leaf': Icons.eco_outlined,
+    'Sun': Icons.wb_sunny_outlined,
+    'CloudRain': Icons.cloudy_snowing,
+    'Snowflake': Icons.ac_unit_rounded,
+    'Umbrella': Icons.umbrella_outlined,
+    'Wrench': Icons.build_outlined,
+    'Hammer': Icons.handyman_outlined,
+    'Paintbrush': Icons.brush_outlined,
+    'Scissors': Icons.content_cut_rounded,
+    'Trash2': Icons.delete_outline_rounded,
+    'Recycle': Icons.recycling_rounded,
+    'CalendarDays': Icons.calendar_month_outlined,
+    'Clock': Icons.schedule_rounded,
+    'Bell': Icons.notifications_none_rounded,
+    'ShieldCheck': Icons.verified_user_outlined,
+    'KeyRound': Icons.key_outlined,
+    'Ellipsis': Icons.more_horiz_rounded,
+  };
+
+  IconData? _savedTransactionIcon(Map<String, dynamic> tx) {
+    final name = (tx['icon'] ?? tx['iconName'] ?? tx['icon_name'] ?? '').toString();
+    return _transactionIconOptions[name];
+  }
+
   ({Color accent, Color tint, IconData icon}) _transactionStyle(Map<String, dynamic> tx) {
     final kind = (tx['kind'] ?? '').toString();
     final value = '${tx['title'] ?? tx['description'] ?? ''} ${tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? ''}'.toLowerCase();
-    if (kind == 'আয়') return (accent: const Color(0xFF00A653), tint: const Color(0xFFF3FBF6), icon: Icons.south_rounded);
-    if (kind == 'ট্রান্সফার' || kind.toLowerCase() == 'transfer') return (accent: const Color(0xFF1688D4), tint: const Color(0xFFEAF4FF), icon: Icons.swap_horiz_rounded);
-    if (value.contains('খাবার') || value.contains('food')) return (accent: const Color(0xFFE92743), tint: const Color(0xFFFFF7F8), icon: Icons.restaurant_rounded);
-    if (value.contains('বাসা') || value.contains('বাড়ি') || value.contains('লোন')) return (accent: const Color(0xFFD96A00), tint: const Color(0xFFFFF1E1), icon: Icons.home_rounded);
-    if (value.contains('ইন্টারনেট') || value.contains('বিল')) return (accent: const Color(0xFF00A653), tint: const Color(0xFFF3FBF6), icon: Icons.router_rounded);
-    if (value.contains('উপহার')) return (accent: const Color(0xFF8627D9), tint: const Color(0xFFF5EBFF), icon: Icons.card_giftcard_rounded);
-    if (value.contains('যাতায়াত') || value.contains('বাস')) return (accent: const Color(0xFF1688D4), tint: const Color(0xFFEAF4FF), icon: Icons.directions_bus_rounded);
-    return (accent: const Color(0xFFE92743), tint: const Color(0xFFFFF7F8), icon: Icons.shopping_cart_rounded);
+    final savedIcon = _savedTransactionIcon(tx);
+    if (kind == 'আয়') return (accent: const Color(0xFF00A653), tint: const Color(0xFFF3FBF6), icon: savedIcon ?? Icons.south_rounded);
+    if (kind == 'ট্রান্সফার' || kind.toLowerCase() == 'transfer') return (accent: const Color(0xFF1688D4), tint: const Color(0xFFEAF4FF), icon: savedIcon ?? Icons.swap_horiz_rounded);
+    if (value.contains('খাবার') || value.contains('food')) return (accent: const Color(0xFFE92743), tint: const Color(0xFFFFF7F8), icon: savedIcon ?? Icons.restaurant_rounded);
+    if (value.contains('বাসা') || value.contains('বাড়ি') || value.contains('লোন')) return (accent: const Color(0xFFD96A00), tint: const Color(0xFFFFF1E1), icon: savedIcon ?? Icons.home_rounded);
+    if (value.contains('ইন্টারনেট') || value.contains('বিল')) return (accent: const Color(0xFF00A653), tint: const Color(0xFFF3FBF6), icon: savedIcon ?? Icons.router_rounded);
+    if (value.contains('উপহার')) return (accent: const Color(0xFF8627D9), tint: const Color(0xFFF5EBFF), icon: savedIcon ?? Icons.card_giftcard_rounded);
+    if (value.contains('যাতায়াত') || value.contains('বাস')) return (accent: const Color(0xFF1688D4), tint: const Color(0xFFEAF4FF), icon: savedIcon ?? Icons.directions_bus_rounded);
+    return (accent: const Color(0xFFE92743), tint: const Color(0xFFFFF7F8), icon: savedIcon ?? Icons.shopping_cart_rounded);
   }
 
   Map<String, List<Map<String, dynamic>>> _groupTransactionsByDate(List<Map<String, dynamic>> items) {

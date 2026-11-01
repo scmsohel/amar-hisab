@@ -1621,7 +1621,7 @@ class _BillsScreenState extends State<_BillsScreen> {
           itemBuilder:(context,index){
             final e=rows[index],done=_done(e),late=_overdue(e),due=_due(e);
             final accent=done?green:late?red:blue;
-            final tint=done?const Color(0xFFF1FAF6):late?const Color(0xFFFFF4F4):const Color(0xFFEDF5FF);
+            final tint=done?const Color(0xFFF8FCFA):late?const Color(0xFFFFFAFA):const Color(0xFFEDF5FF);
             final category=_category(e).toLowerCase();
             final icon=category.contains('বিদ্যুৎ')?Icons.bolt_rounded:category.contains('ইন্টারনেট')?Icons.wifi_rounded:category.contains('ভাড়া')?Icons.home_work_outlined:Icons.receipt_long_rounded;
             final dueText=due==null?'তারিখ নেই':_dateLabel(due);
@@ -1630,13 +1630,13 @@ class _BillsScreenState extends State<_BillsScreen> {
               decoration:BoxDecoration(
                 color:dark?Color.lerp(surface,accent,.09):tint,
                 borderRadius:BorderRadius.circular(18),
-                border:Border.all(color:accent.withValues(alpha:dark ? .28 : .20)),
+                border:Border.all(color:accent.withValues(alpha:dark ? .24 : .15)),
                 boxShadow:dark?[]:[BoxShadow(color:accent.withValues(alpha:.045),blurRadius:7,offset:const Offset(0,2))],
               ),
               child:Row(children:[
                 Container(
                   width:40,height:40,
-                  decoration:BoxDecoration(color:accent.withValues(alpha:.12),shape:BoxShape.circle),
+                  decoration:BoxDecoration(color:accent.withValues(alpha:.09),shape:BoxShape.circle),
                   child:Icon(icon,color:accent,size:21),
                 ),
                 const SizedBox(width:6),
@@ -1667,7 +1667,7 @@ class _BillsScreenState extends State<_BillsScreen> {
                         const SizedBox(height:3),
                         Container(
                           padding:const EdgeInsets.symmetric(horizontal:8,vertical:4),
-                          decoration:BoxDecoration(color:accent.withValues(alpha:.11),borderRadius:BorderRadius.circular(18)),
+                          decoration:BoxDecoration(color:accent.withValues(alpha:.08),borderRadius:BorderRadius.circular(18)),
                           child:Text(done?'●  পরিশোধিত':late?'●  ওভারডিউ':'●  বাকি',maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,fontWeight:FontWeight.w800,color:accent)),
                         ),
                         const SizedBox(height:3),

@@ -2845,13 +2845,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
 
-  Future<void> _showAddTransaction() async {
+  Future<void> _showAddTransaction({String initialWallet = 'ক্যাশ', String initialKind = 'আয়'}) async {
     final title = TextEditingController();
     final amount = TextEditingController();
     final now = DateTime.now();
     final date = TextEditingController(text: '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}');
     final time = TextEditingController(text: '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}');
-    var kind = 'আয়'; var category = 'অন্যান্য'; var wallet = 'ক্যাশ'; var iconName = 'Banknote'; var saving = false;
+    var kind = initialKind; var category = 'অন্যান্য'; var wallet = initialWallet; var iconName = 'Banknote'; var saving = false;
     final formKey = GlobalKey<FormState>();
     final dark = Theme.of(context).brightness == Brightness.dark;
     final surface = dark ? const Color(0xFF102638) : Colors.white;
@@ -3247,6 +3247,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         return (balances: Map<String, double>.from(_walletBalances), transactions: List<Map<String, dynamic>>.from(_transactions));
       },
       onEditTransaction: _editTransaction,
+      onAddTransaction: (wallet, kind) => _showAddTransaction(initialWallet: wallet, initialKind: kind),
       onAddWallet: (name) async {
         final response = await _AuthApi._get('/data/wallets');
         final current = response['data'] is List ? (response['data'] as List).whereType<Map>().map((item) => Map<String, dynamic>.from(item)).toList() : <Map<String, dynamic>>[];

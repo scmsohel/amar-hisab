@@ -1597,7 +1597,7 @@ class _BillsScreenState extends State<_BillsScreen> {
         Padding(padding:const EdgeInsets.fromLTRB(13,8,13,0),child:Column(children:[
           Row(children:[summary('মোট বাকি',_money(remaining),'$unpaid.length টি বিল বাকি',Icons.receipt_long_rounded,red,const Color(0xFFFFEFF0)),const SizedBox(width:8),summary('পরিশোধিত',_money(paid),'পরিশোধ করা হয়েছে',Icons.check_circle_outline_rounded,green,const Color(0xFFEAF8F2))]),
           const SizedBox(height:8),
-          Row(children:[summary('মোট বিল',_items.length.toString(),'সকল বিলের হিসাব',Icons.calendar_month_rounded,blue,const Color(0xFFEDF5FF)),const SizedBox(width:8),summary('ওভারডিউ',overdue.toString(),'${upcoming} টি আসন্ন',Icons.notifications_active_outlined,purple,const Color(0xFFF4EEFF))]),
+          Row(children:[summary('মোট বিল',_items.length.toString(),'সকল বিলের হিসাব',Icons.calendar_month_rounded,blue,const Color(0xFFEDF5FF)),const SizedBox(width:8),summary('ওভারডিউ',overdue.toString(),'$upcoming টি আসন্ন',Icons.notifications_active_outlined,purple,const Color(0xFFF4EEFF))]),
           const SizedBox(height:12),
           TextField(controller:_search,onChanged:(_)=>setState((){}),decoration:InputDecoration(hintText:'বিলের নাম বা ক্যাটাগরি খুঁজুন...',prefixIcon:const Icon(Icons.search_rounded),filled:true,fillColor:surface,contentPadding:const EdgeInsets.symmetric(vertical:13),border:OutlineInputBorder(borderRadius:BorderRadius.circular(18),borderSide:BorderSide(color:line)),enabledBorder:OutlineInputBorder(borderRadius:BorderRadius.circular(18),borderSide:BorderSide(color:line)))),
           const SizedBox(height:9),
@@ -2689,10 +2689,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 4),
           Expanded(
             child: RefreshIndicator(
-              onRefresh: () async {
-        await _load();
-        return (balances: Map<String, double>.from(_walletBalances), transactions: List<Map<String, dynamic>>.from(_transactions));
-      },
+              onRefresh: _load,
               child: items.isEmpty
                   ? ListView(
                       physics: const AlwaysScrollableScrollPhysics(),

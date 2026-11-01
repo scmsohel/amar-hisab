@@ -8,6 +8,7 @@ class WalletManagementScreen extends StatefulWidget {
     required this.transactions,
     required this.onRefresh,
     required this.onEditTransaction,
+    required this.onAddTransaction,
     required this.onAddWallet,
   });
 
@@ -15,6 +16,7 @@ class WalletManagementScreen extends StatefulWidget {
   final List<Map<String, dynamic>> transactions;
   final Future<({Map<String, double> balances, List<Map<String, dynamic>> transactions})> Function() onRefresh;
   final Future<void> Function(Map<String, dynamic>) onEditTransaction;
+  final Future<void> Function(String wallet, String kind) onAddTransaction;
   final Future<void> Function(String) onAddWallet;
 
   @override
@@ -176,7 +178,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                     physics: const NeverScrollableScrollPhysics(),
                     mainAxisSpacing: 12,
                     crossAxisSpacing: 12,
-                    childAspectRatio: 1.52,
+                    childAspectRatio: 1.20,
                     children: [
                       for (final wallet in _wallets)
                         _walletCard(wallet.$1, wallet.$2, wallet.$3, _balances[wallet.$1] ?? 0, surface, ink, muted),
@@ -264,21 +266,41 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
     final isNagad = name == 'নগদ';
     final bg = isBikash ? const Color(0xFFFFF5F9) : isNagad ? const Color(0xFFFFF8F1) : name == 'ক্যাশ' ? const Color(0xFFF2FCF7) : const Color(0xFFF3F7FF);
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(color: surface == Colors.white ? bg : surface, borderRadius: BorderRadius.circular(19), border: Border.all(color: accent.withValues(alpha: .55)), boxShadow: [BoxShadow(color: accent.withValues(alpha: .07), blurRadius: 10, offset: const Offset(0, 3))]),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Container(width: 40, height: 40, decoration: BoxDecoration(color: accent.withValues(alpha: .10), shape: BoxShape.circle), child: Center(child: SizedBox(width: 24, height: 24, child: isBikash ? SvgPicture.asset('assets/wallets/bkash-mark.svg') : isNagad ? SvgPicture.asset('assets/wallets/nagad-mark.svg') : Icon(icon, color: accent, size: 24)))),
+          Container(width: 35, height: 35, decoration: BoxDecoration(color: accent.withValues(alpha: .10), shape: BoxShape.circle), child: Center(child: SizedBox(width: 22, height: 22, child: isBikash ? SvgPicture.asset('assets/wallets/bkash-mark.svg') : isNagad ? SvgPicture.asset('assets/wallets/nagad-mark.svg') : Icon(icon, color: accent, size: 22)))),
           const Spacer(),
-          Icon(Icons.more_horiz_rounded, color: muted),
+          Icon(Icons.more_horiz_rounded, color: muted, size: 20),
         ]),
+        const SizedBox(height: 3),
+        Text(name, style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w900)),
+        Text(_money(balance), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: accent, fontSize: 18, fontWeight: FontWeight.w900)),
         const Spacer(),
-        Text(name, style: TextStyle(color: ink, fontSize: 14, fontWeight: FontWeight.w900)),
-        Text(_money(balance), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: accent, fontSize: 19, fontWeight: FontWeight.w900)),
-        Text('বর্তমান ব্যালেন্স', style: TextStyle(color: muted, fontSize: 10.5)),
+        Row(children: [
+          Expanded(child: _walletAction('↙ আয়', const Color(0xFF008F50), const Color(0xFFE1F8EA), () async { await widget.onAddTransaction(name, 'আয়'); await _refresh(); })),
+          const SizedBox(width: 4),
+          Expanded(child: _walletAction('↗ ব্যয়', const Color(0xFFE32645), const Color(0xFFFFE8EC), () async { await widget.onAddTransaction(name, 'ব্যয়'); await _refresh(); })),
+          const SizedBox(width: 4),
+          Expanded(child: _walletAction('বিবরণ', const Color(0xFF1768D8), const Color(0xFFE5EEFF), () => setState(() => _filterWallet = name))),
+        ]),
       ]),
     );
   }
+
+  Widget _walletAction(String label, Color color, Color background, VoidCallback onTap) => Material(
+    color: background,
+    borderRadius: BorderRadius.circular(10),
+    child: InkWell(
+      borderRadius: BorderRadius.circular(10),
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 2),
+        child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Text(label, style: TextStyle(color: color, fontSize: 10.5, fontWeight: FontWeight.w800)))),
+      ),
+    ),
+  );
 
   Widget _transactionRow(Map<String, dynamic> tx, Color ink, Color muted, Color line) {
     final kind = (tx['kind'] ?? '').toString();

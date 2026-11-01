@@ -326,7 +326,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
           const SizedBox(width: 6),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: ink, fontSize: 11.5, fontWeight: FontWeight.w800)),
-            Text('${kind} • ${(tx['category'] ?? tx['categoryName'] ?? '').toString()}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muted, fontSize: 9.5)),
+            Text('$kind • ${(tx['category'] ?? tx['categoryName'] ?? '').toString()}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muted, fontSize: 9.5)),
           ])),
           const SizedBox(width: 4),
           SizedBox(width: 88, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [

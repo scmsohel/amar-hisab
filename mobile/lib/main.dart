@@ -3242,7 +3242,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Navigator.of(context).push(_route(WalletManagementScreen(
       walletBalances: Map<String, double>.from(_walletBalances),
       transactions: List<Map<String, dynamic>>.from(_transactions),
-      onRefresh: _load,
+      onRefresh: () async {
+        await _load();
+        return (balances: Map<String, double>.from(_walletBalances), transactions: List<Map<String, dynamic>>.from(_transactions));
+      },
       onEditTransaction: _editTransaction,
       onAddWallet: (name) async {
         final response = await _AuthApi._get('/data/wallets');

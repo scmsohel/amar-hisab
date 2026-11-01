@@ -290,7 +290,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
     final color = isIncome ? const Color(0xFF009447) : const Color(0xFFE52336);
     final accent = wallet == 'ব্যাংক' ? const Color(0xFF2478F5) : wallet == 'বিকাশ' ? const Color(0xFFEA398A) : wallet == 'নগদ' ? const Color(0xFFFF7900) : const Color(0xFF00A86B);
     return InkWell(
-      onTap: () => widget.onEditTransaction(tx),
+      onTap: () async { await widget.onEditTransaction(tx); await _refresh(); },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 9),
         decoration: BoxDecoration(border: Border(bottom: BorderSide(color: line))),

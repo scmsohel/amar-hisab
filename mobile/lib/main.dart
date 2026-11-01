@@ -3609,21 +3609,56 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
   String dateLabel(DateTime? d){if(d==null)return 'তারিখ পাওয়া যায়নি';const m=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];return '${bn(d.day.toString())} ${m[d.month-1]}, ${bn(d.year.toString())}';}
   Widget summary(String label,double value,Color color,IconData icon)=>Expanded(child:Container(padding:const EdgeInsets.all(10),decoration:BoxDecoration(color:color.withValues(alpha:.07),borderRadius:BorderRadius.circular(14),border:Border.all(color:color.withValues(alpha:.2))),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Icon(icon,color:color,size:18),const SizedBox(height:4),Text(label,style:const TextStyle(fontSize:10)),FittedBox(child:Text(money(value),style:TextStyle(fontSize:14,fontWeight:FontWeight.w900,color:color)))])));
   Widget row(Map<String,dynamic> x){
-    final dark=Theme.of(context).brightness==Brightness.dark,income=kindOf(x)=='আয়',transfer=kindOf(x)=='ট্রান্সফার';
-    final color=income?const Color(0xFF00A653):transfer?const Color(0xFF1688D4):const Color(0xFFE92743);
-    final name=(x['icon']??x['iconName']??'').toString();
-    const icons=<String,IconData>{'Banknote':Icons.payments_outlined,'Wallet':Icons.account_balance_wallet_outlined,'ShoppingCart':Icons.shopping_cart_outlined,'ShoppingBag':Icons.shopping_bag_outlined,'House':Icons.home_outlined,'Utensils':Icons.restaurant_outlined,'Car':Icons.directions_car_outlined,'Briefcase':Icons.work_outline_rounded,'CreditCard':Icons.credit_card_outlined,'Gift':Icons.card_giftcard_outlined};
+    final dark=Theme.of(context).brightness==Brightness.dark;
+    final txKind=kindOf(x),income=txKind=='আয়',transfer=txKind=='ট্রান্সফার'||txKind.toLowerCase()=='transfer';
+    final value='${titleOf(x)} ${catOf(x)}'.toLowerCase();
+    final name=(x['icon']??x['iconName']??x['icon_name']??'').toString();
+    const icons=<String,IconData>{
+      'Banknote':Icons.payments_outlined,'Wallet':Icons.account_balance_wallet_outlined,
+      'ShoppingCart':Icons.shopping_cart_outlined,'ShoppingBag':Icons.shopping_bag_outlined,
+      'House':Icons.home_outlined,'Utensils':Icons.restaurant_outlined,'Car':Icons.directions_car_outlined,
+      'Briefcase':Icons.work_outline_rounded,'CreditCard':Icons.credit_card_outlined,
+      'Gift':Icons.card_giftcard_outlined,'TrendingUp':Icons.trending_up_rounded,
+      'Router':Icons.router_rounded,'Receipt':Icons.receipt_long_rounded,
+      'Tag':Icons.sell_outlined,
+    };
+    var color=const Color(0xFFE92743),tint=const Color(0xFFFFF7F8);
+    var fallbackIcon=Icons.shopping_cart_outlined;
+    if(income){color=const Color(0xFF00A653);tint=const Color(0xFFF3FBF6);fallbackIcon=Icons.south_rounded;}
+    else if(transfer){color=const Color(0xFF1688D4);tint=const Color(0xFFEAF4FF);fallbackIcon=Icons.swap_horiz_rounded;}
+    else if(value.contains('খাবার')||value.contains('food')){fallbackIcon=Icons.restaurant_rounded;}
+    else if(value.contains('বাসা')||value.contains('বাড়ি')||value.contains('লোন')){color=const Color(0xFFD96A00);tint=const Color(0xFFFFF1E1);fallbackIcon=Icons.home_rounded;}
+    else if(value.contains('ইন্টারনেট')||value.contains('বিল')){color=const Color(0xFF00A653);tint=const Color(0xFFF3FBF6);fallbackIcon=Icons.router_rounded;}
+    else if(value.contains('উপহার')){color=const Color(0xFF8627D9);tint=const Color(0xFFF5EBFF);fallbackIcon=Icons.card_giftcard_rounded;}
+    else if(value.contains('যাতায়াত')||value.contains('বাস')){color=const Color(0xFF1688D4);tint=const Color(0xFFEAF4FF);fallbackIcon=Icons.directions_bus_rounded;}
+    final icon=icons[name]??fallbackIcon;
     final d=dateOf(x),time=(x['timeInput']??x['time_input']??x['time']??'').toString();
-    return Container(color:dark?const Color(0xFF12283A):Colors.white,padding:const EdgeInsets.symmetric(horizontal:8,vertical:9),child:Row(children:[
-      Container(width:38,height:38,decoration:BoxDecoration(color:color.withValues(alpha:.1),shape:BoxShape.circle),child:Icon(icons[name]??(income?Icons.trending_up_rounded:Icons.shopping_cart_outlined),color:color,size:20)),
-      const SizedBox(width:9),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-        Text(titleOf(x),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:12,fontWeight:FontWeight.w800,color:dark?Colors.white:const Color(0xFF1C2F42))),
-        Text('${catOf(x)} • ${walletOf(x)}',maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:10,color:dark?Colors.white60:const Color(0xFF718096))),
-        Text('${dateLabel(d)}${time.isEmpty?'':' • $time'}',style:TextStyle(fontSize:9,color:dark?Colors.white54:const Color(0xFF8A98A8))),
-      ])),
-      Text('${income?'+ ':transfer?'↔ ':'− '}${money(amount(x['amount']))}',style:TextStyle(fontSize:12,fontWeight:FontWeight.w900,color:color)),
-      PopupMenuButton<String>(onSelected:(v)async{if(v=='edit'){await widget.onEdit(x);await reload();}else{await widget.onDelete(x);await reload();}},itemBuilder:(_)=>const[PopupMenuItem(value:'edit',child:Text('এডিট করুন')),PopupMenuItem(value:'delete',child:Text('ডিলিট করুন'))]),
-    ]));
+    final borderColor=color.withValues(alpha:dark?.24:.16);
+    return Container(
+      margin:const EdgeInsets.only(bottom:7),
+      padding:const EdgeInsets.symmetric(horizontal:9,vertical:9),
+      decoration:BoxDecoration(
+        color:dark?Color.lerp(const Color(0xFF12283A),color,.10):tint,
+        borderRadius:BorderRadius.circular(16),
+        border:Border.all(color:borderColor),
+      ),
+      child:Row(children:[
+        Container(width:42,height:42,decoration:BoxDecoration(color:color.withValues(alpha:.10),shape:BoxShape.circle),child:Icon(icon,color:color,size:21)),
+        const SizedBox(width:10),
+        Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+          Text(titleOf(x),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:12,fontWeight:FontWeight.w800,color:dark?Colors.white:const Color(0xFF1C2F42))),
+          Text('${catOf(x)} • ${walletOf(x)}',maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:10,color:dark?Colors.white60:const Color(0xFF718096))),
+          Text('${dateLabel(d)}${time.isEmpty?'':' • $time'}',style:TextStyle(fontSize:9,color:dark?Colors.white54:const Color(0xFF8A98A8))),
+        ])),
+        const SizedBox(width:6),
+        Column(crossAxisAlignment:CrossAxisAlignment.end,mainAxisSize:MainAxisSize.min,children:[
+          Text('${income?'+ ':transfer?'↔ ':'− '}${money(amount(x['amount']))}',style:TextStyle(fontSize:12,fontWeight:FontWeight.w900,color:color)),
+          const SizedBox(height:4),
+          Container(padding:const EdgeInsets.symmetric(horizontal:9,vertical:4),decoration:BoxDecoration(color:color.withValues(alpha:.09),borderRadius:BorderRadius.circular(18),border:Border.all(color:color.withValues(alpha:.16))),child:Text(catOf(x),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,fontWeight:FontWeight.w800,color:color))),
+        ]),
+        PopupMenuButton<String>(padding:EdgeInsets.zero,onSelected:(v)async{if(v=='edit'){await widget.onEdit(x);await reload();}else{await widget.onDelete(x);await reload();}},itemBuilder:(_)=>const[PopupMenuItem(value:'edit',child:Text('এডিট করুন')),PopupMenuItem(value:'delete',child:Text('ডিলিট করুন'))]),
+      ]),
+    );
   }
   Widget _buildFilterDropdown({
     required String value,

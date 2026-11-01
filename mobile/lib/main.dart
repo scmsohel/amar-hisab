@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lottie/lottie.dart';
+import 'wallet_management_screen.dart';
 
 class _ControllerDisposalScope extends StatefulWidget {
   const _ControllerDisposalScope({
@@ -2106,13 +2107,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Expanded(child: _entranceAnimation(_walletCard('ব্যাংক', Icons.account_balance_rounded, const Color(0xFF1688D4)), 1)),
+                        Expanded(child: InkWell(onTap: _openWalletManagement, borderRadius: BorderRadius.circular(12), child: _entranceAnimation(_walletCard('ব্যাংক', Icons.account_balance_rounded, const Color(0xFF1688D4)), 1))),
                         const SizedBox(width: 7),
-                        Expanded(child: _entranceAnimation(_walletCard('ক্যাশ', Icons.account_balance_wallet_rounded, const Color(0xFF16B981)), 2)),
+                        Expanded(child: InkWell(onTap: _openWalletManagement, borderRadius: BorderRadius.circular(12), child: _entranceAnimation(_walletCard('ক্যাশ', Icons.account_balance_wallet_rounded, const Color(0xFF16B981)), 2))),
                         const SizedBox(width: 7),
-                        Expanded(child: _entranceAnimation(_walletCard('বিকাশ', Icons.payments_rounded, const Color(0xFFE83E8C)), 3)),
+                        Expanded(child: InkWell(onTap: _openWalletManagement, borderRadius: BorderRadius.circular(12), child: _entranceAnimation(_walletCard('বিকাশ', Icons.payments_rounded, const Color(0xFFE83E8C)), 3))),
                         const SizedBox(width: 7),
-                        Expanded(child: _entranceAnimation(_walletCard('নগদ', Icons.account_balance_wallet_rounded, const Color(0xFFFF8A00)), 4)),
+                        Expanded(child: InkWell(onTap: _openWalletManagement, borderRadius: BorderRadius.circular(12), child: _entranceAnimation(_walletCard('নগদ', Icons.account_balance_wallet_rounded, const Color(0xFFFF8A00)), 4))),
                       ],
                     ),
                   ),
@@ -3234,6 +3235,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
 
+  void _openWalletManagement() {
+    Navigator.of(context).push(_route(WalletManagementScreen(
+      walletBalances: Map<String, double>.from(_walletBalances),
+      transactions: List<Map<String, dynamic>>.from(_transactions),
+      onRefresh: _load,
+      onEditTransaction: _editTransaction,
+      onAddWallet: (name) async {
+        final response = await _AuthApi._get('/data/wallets');
+        final current = response['data'] is List ? (response['data'] as List).whereType<Map>().map((item) => Map<String, dynamic>.from(item)).toList() : <Map<String, dynamic>>[];
+        if (current.any((wallet) => (wallet['name'] ?? '').toString().trim().toLowerCase() == name.trim().toLowerCase())) {
+          throw Exception('এই নামে ওয়ালেট আগে থেকেই আছে।');
+        }
+        await _AuthApi._put('/data/wallets', {'data': [...current, {'name': name.trim(), 'base': 0}]});
+        await _load();
+      },
+    )));
+  }
+
   void _openTransactionsPage() {
     Navigator.of(context).push(_route(TransactionsScreen(
       initialTransactions: _transactions,
@@ -3763,6 +3782,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               if (sheetContext.mounted) Navigator.pop(sheetContext);
             },
           ),
+          ListTile(leading: const Icon(Icons.account_balance_wallet_rounded), title: const Text('ওয়ালেট ম্যানেজমেন্ট'), subtitle: const Text('সব ওয়ালেট ও ব্যালেন্স দেখুন'), onTap: () { Navigator.pop(sheetContext); _openWalletManagement(); }),
           ListTile(leading: const Icon(Icons.receipt_long_rounded), title: const Text('সব লেনদেন'), onTap: () { Navigator.pop(sheetContext); _openTransactionsPage(); }),
           ListTile(leading: const Icon(Icons.refresh_rounded), title: const Text('ডেটা রিফ্রেশ'), onTap: () { Navigator.pop(sheetContext); _load(); }),
           ListTile(leading: const Icon(Icons.dns_outlined), title: const Text('Server Settings'), onTap: () { Navigator.pop(sheetContext); Navigator.of(context).push(_route(const ServerSettingsScreen())); }),

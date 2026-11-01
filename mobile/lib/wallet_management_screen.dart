@@ -13,7 +13,7 @@ class WalletManagementScreen extends StatefulWidget {
 
   final Map<String, double> walletBalances;
   final List<Map<String, dynamic>> transactions;
-  final Future<void> Function() onRefresh;
+  final Future<({Map<String, double> balances, List<Map<String, dynamic>> transactions})> Function() onRefresh;
   final Future<void> Function(Map<String, dynamic>) onEditTransaction;
   final Future<void> Function(String) onAddWallet;
 

@@ -110,7 +110,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
     final muted = dark ? const Color(0xFF9CB1C3) : const Color(0xFF58708C);
     final line = dark ? const Color(0xFF29465A) : const Color(0xFFE2EAF1);
     final income = _transactions.where((e) => e['kind'] == 'আয়').fold<double>(0, (s, e) => s + _amount(e['amount']));
-    final expense = widget.transactions.where((e) => e['kind'] == 'ব্যয়').fold<double>(0, (s, e) => s + _amount(e['amount']));
+    final expense = _transactions.where((e) => e['kind'] == 'ব্যয়').fold<double>(0, (s, e) => s + _amount(e['amount']));
     final rows = _filteredTransactions;
     final knownWallets = <String>{..._balances.keys};
     for (final tx in _transactions) {
@@ -207,7 +207,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                               Row(children: [Container(width: 8, height: 8, decoration: BoxDecoration(color: palette[i], shape: BoxShape.circle)), const SizedBox(width: 6), Text(_wallets[i].$1, style: TextStyle(color: muted, fontSize: 12))]),
                               const SizedBox(height: 2),
                               Text(_money(_balances[_wallets[i].$1] ?? 0), style: TextStyle(color: ink, fontWeight: FontWeight.w900, fontSize: 13)),
-                              Text(_total > 0 ? '${((widget.walletBalances[_wallets[i].$1] ?? 0) / _total * 100).toStringAsFixed(1)}%' : '0.0%', style: TextStyle(color: muted, fontSize: 11)),
+                              Text(_total > 0 ? '${((_balances[_wallets[i].$1] ?? 0) / _total * 100).toStringAsFixed(1)}%' : '0.0%', style: TextStyle(color: muted, fontSize: 11)),
                             ])),
                         ])),
                       ]),

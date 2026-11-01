@@ -2689,7 +2689,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 4),
           Expanded(
             child: RefreshIndicator(
-              onRefresh: _load,
+              onRefresh: () async {
+        await _load();
+        return (balances: Map<String, double>.from(_walletBalances), transactions: List<Map<String, dynamic>>.from(_transactions));
+      },
               child: items.isEmpty
                   ? ListView(
                       physics: const AlwaysScrollableScrollPhysics(),

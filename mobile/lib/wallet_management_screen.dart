@@ -94,6 +94,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
     if (name == null || name.isEmpty) return;
     try {
       await widget.onAddWallet(name);
+      await _refresh();
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('ওয়ালেট যোগ হয়েছে।')));
     } catch (error) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString().replaceFirst('Exception: ', ''))));

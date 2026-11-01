@@ -1628,9 +1628,9 @@ class _BillsScreenState extends State<_BillsScreen> {
             return Container(
               padding:const EdgeInsets.symmetric(horizontal:8,vertical:8),
               decoration:BoxDecoration(
-                color:dark?Color.lerp(surface,accent,.09):surface,
+                color:dark?Color.lerp(surface,accent,.09):tint,
                 borderRadius:BorderRadius.circular(18),
-                border:Border.all(color:accent.withValues(alpha:dark?.28:.20)),
+                border:Border.all(color:accent.withValues(alpha:dark ? .28 : .20)),
                 boxShadow:dark?[]:[BoxShadow(color:accent.withValues(alpha:.045),blurRadius:7,offset:const Offset(0,2))],
               ),
               child:Row(children:[

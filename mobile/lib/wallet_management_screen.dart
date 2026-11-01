@@ -167,7 +167,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                         const SizedBox(width: 6),
                         Expanded(child: _summaryPill('⇄', 'লেনদেন', '${_transactions.length}', const Color(0xFF1768D8), const Color(0xFFE4EEFF))),
                       ]),
-                    ]),                    ]),
+                    ]),
                   ),
                   const SizedBox(height: 16),
                   GridView.count(

@@ -1527,9 +1527,9 @@ class _BillsScreenState extends State<_BillsScreen> {
   String _dateLabel(DateTime? d) {
     if (d == null) return 'তারিখ নির্ধারিত নয়';
     const m = ['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
-    return '\${d.day} \${m[d.month-1]}, \${d.year}';
+    return '${d.day} ${m[d.month-1]}, ${d.year}';
   }
-  String _money(double v) => '৳ \${v.round().toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',')}';
+  String _money(double v) => '৳ ${v.round().toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',')}';
 
   Future<void> _refresh() async {
     setState(() => _loading = true);
@@ -1555,7 +1555,7 @@ class _BillsScreenState extends State<_BillsScreen> {
     const green = Color(0xFF00A875), red = Color(0xFFFF4D55), blue = Color(0xFF287FF5), purple = Color(0xFF9657F5);
     final q = _search.text.trim().toLowerCase();
     final rows = _items.where((e) {
-      final text = '\${_name(e)} \${_category(e)} \${(e['note'] ?? '').toString()}'.toLowerCase();
+      final text = '${_name(e)} ${_category(e)} ${(e['note'] ?? '').toString()}'.toLowerCase();
       if (q.isNotEmpty && !text.contains(q)) return false;
       if (_status == 'বাকি' && _done(e)) return false;
       if (_status == 'পরিশোধিত' && !_done(e)) return false;
@@ -1594,9 +1594,9 @@ class _BillsScreenState extends State<_BillsScreen> {
       ]),
       body:SafeArea(top:false,child:Column(children:[
         Padding(padding:const EdgeInsets.fromLTRB(13,8,13,0),child:Column(children:[
-          Row(children:[summary('মোট বাকি',_money(remaining),'\${unpaid.length} টি বিল বাকি',Icons.receipt_long_rounded,red,const Color(0xFFFFEFF0)),const SizedBox(width:8),summary('পরিশোধিত',_money(paid),'পরিশোধ করা হয়েছে',Icons.check_circle_outline_rounded,green,const Color(0xFFEAF8F2))]),
+          Row(children:[summary('মোট বাকি',_money(remaining),'${unpaid.length} টি বিল বাকি',Icons.receipt_long_rounded,red,const Color(0xFFFFEFF0)),const SizedBox(width:8),summary('পরিশোধিত',_money(paid),'পরিশোধ করা হয়েছে',Icons.check_circle_outline_rounded,green,const Color(0xFFEAF8F2))]),
           const SizedBox(height:8),
-          Row(children:[summary('মোট বিল',_items.length.toString(),'সকল বিলের হিসাব',Icons.calendar_month_rounded,blue,const Color(0xFFEDF5FF)),const SizedBox(width:8),summary('ওভারডিউ',overdue.toString(),'\${upcoming} টি আসন্ন',Icons.notifications_active_outlined,purple,const Color(0xFFF4EEFF))]),
+          Row(children:[summary('মোট বিল',_items.length.toString(),'সকল বিলের হিসাব',Icons.calendar_month_rounded,blue,const Color(0xFFEDF5FF)),const SizedBox(width:8),summary('ওভারডিউ',overdue.toString(),'${upcoming} টি আসন্ন',Icons.notifications_active_outlined,purple,const Color(0xFFF4EEFF))]),
           const SizedBox(height:12),
           TextField(controller:_search,onChanged:(_)=>setState((){}),decoration:InputDecoration(hintText:'বিলের নাম বা ক্যাটাগরি খুঁজুন...',prefixIcon:const Icon(Icons.search_rounded),filled:true,fillColor:surface,contentPadding:const EdgeInsets.symmetric(vertical:13),border:OutlineInputBorder(borderRadius:BorderRadius.circular(18),borderSide:BorderSide(color:line)),enabledBorder:OutlineInputBorder(borderRadius:BorderRadius.circular(18),borderSide:BorderSide(color:line)))),
           const SizedBox(height:9),
@@ -1610,7 +1610,7 @@ class _BillsScreenState extends State<_BillsScreen> {
             final tint=done?const Color(0xFFF0FBF5):late?const Color(0xFFFFF3F4):const Color(0xFFF0F6FF);
             final category=_category(e).toLowerCase();
             final icon=category.contains('বিদ্যুৎ')?Icons.bolt_rounded:category.contains('ইন্টারনেট')?Icons.wifi_rounded:category.contains('ভাড়া')?Icons.home_work_outlined:Icons.receipt_long_rounded;
-            return Container(padding:const EdgeInsets.symmetric(horizontal:10,vertical:9),decoration:BoxDecoration(color:dark?Color.lerp(surface,accent,.09):tint,borderRadius:BorderRadius.circular(18),border:Border.all(color:accent.withValues(alpha:dark?.28:.17)),boxShadow:dark?[]:[BoxShadow(color:accent.withValues(alpha:.045),blurRadius:8,offset:const Offset(0,2))]),child:Row(children:[
+            return Container(padding:const EdgeInsets.symmetric(horizontal:10,vertical:9),decoration:BoxDecoration(color:dark?Color.lerp(surface,accent,.09):tint,borderRadius:BorderRadius.circular(18),border:Border.all(color:accent.withValues(alpha: dark ? .28 : .17)),boxShadow:dark?[]:[BoxShadow(color:accent.withValues(alpha:.045),blurRadius:8,offset:const Offset(0,2))]),child:Row(children:[
               Container(width:44,height:44,decoration:BoxDecoration(color:accent.withValues(alpha:.12),shape:BoxShape.circle),child:Icon(icon,color:accent,size:23)),
               const SizedBox(width:9),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisSize:MainAxisSize.min,children:[
                 Text(_name(e),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:13,fontWeight:FontWeight.w900,color:ink)),

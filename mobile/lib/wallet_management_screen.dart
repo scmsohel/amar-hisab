@@ -32,7 +32,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
   void initState() {
     super.initState();
     _balances = Map<String, double>.from(widget.walletBalances);
-    _transactions = List<Map<String, dynamic>>.from(_transactions);
+    _transactions = List<Map<String, dynamic>>.from(widget.transactions);
   }
 
   static const _wallets = <(String, IconData, Color)>[
@@ -109,11 +109,11 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
     final ink = dark ? const Color(0xFFEAF4FA) : const Color(0xFF101F33);
     final muted = dark ? const Color(0xFF9CB1C3) : const Color(0xFF58708C);
     final line = dark ? const Color(0xFF29465A) : const Color(0xFFE2EAF1);
-    final income = widget.transactions.where((e) => e['kind'] == 'আয়').fold<double>(0, (s, e) => s + _amount(e['amount']));
+    final income = _transactions.where((e) => e['kind'] == 'আয়').fold<double>(0, (s, e) => s + _amount(e['amount']));
     final expense = widget.transactions.where((e) => e['kind'] == 'ব্যয়').fold<double>(0, (s, e) => s + _amount(e['amount']));
     final rows = _filteredTransactions;
     final knownWallets = <String>{..._balances.keys};
-    for (final tx in widget.transactions) {
+    for (final tx in _transactions) {
       final name = (tx['wallet'] ?? tx['walletName'] ?? tx['wallet_name'] ?? '').toString();
       if (name.isNotEmpty) knownWallets.add(name);
     }
@@ -181,7 +181,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                       for (final wallet in _wallets)
                         _walletCard(wallet.$1, wallet.$2, wallet.$3, _balances[wallet.$1] ?? 0, surface, ink, muted),
                       for (final name in entries.where((e) => !_wallets.any((w) => w.$1 == e)))
-                        _walletCard(name, Icons.account_balance_wallet_rounded, const Color(0xFF64748B), widget.walletBalances[name] ?? 0, surface, ink, muted),
+                        _walletCard(name, Icons.account_balance_wallet_rounded, const Color(0xFF64748B), _balances[name] ?? 0, surface, ink, muted),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -194,7 +194,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                       const SizedBox(height: 12),
                       Row(children: [
                         SizedBox(width: 150, height: 150, child: CustomPaint(painter: _WalletDonutPainter(
-                          values: _wallets.map((w) => (widget.walletBalances[w.$1] ?? 0).abs()).toList(),
+                          values: _wallets.map((w) => (_balances[w.$1] ?? 0).abs()).toList(),
                           colors: palette,
                           centerText: _money(_total),
                           textColor: ink,
@@ -206,7 +206,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                             SizedBox(width: 115, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               Row(children: [Container(width: 8, height: 8, decoration: BoxDecoration(color: palette[i], shape: BoxShape.circle)), const SizedBox(width: 6), Text(_wallets[i].$1, style: TextStyle(color: muted, fontSize: 12))]),
                               const SizedBox(height: 2),
-                              Text(_money(widget.walletBalances[_wallets[i].$1] ?? 0), style: TextStyle(color: ink, fontWeight: FontWeight.w900, fontSize: 13)),
+                              Text(_money(_balances[_wallets[i].$1] ?? 0), style: TextStyle(color: ink, fontWeight: FontWeight.w900, fontSize: 13)),
                               Text(_total > 0 ? '${((widget.walletBalances[_wallets[i].$1] ?? 0) / _total * 100).toStringAsFixed(1)}%' : '0.0%', style: TextStyle(color: muted, fontSize: 11)),
                             ])),
                         ])),
@@ -311,7 +311,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
             FittedBox(fit: BoxFit.scaleDown, child: Text('${isIncome ? '+' : '−'} ${_money(amount)}', style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w900))),
             Icon(Icons.edit_outlined, color: muted, size: 15),
           ])),
-        ]),        ]),
+        ]),
       ),
     );
   }

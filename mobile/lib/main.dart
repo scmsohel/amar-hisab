@@ -1594,13 +1594,26 @@ class _BillsScreenState extends State<_BillsScreen> {
       ]),
       body:SafeArea(top:false,child:Column(children:[
         Padding(padding:const EdgeInsets.fromLTRB(13,8,13,0),child:Column(children:[
-          Row(children:[summary('মোট বাকি',_money(remaining),'${unpaid.length} টি বিল বাকি',Icons.receipt_long_rounded,red,const Color(0xFFFFEFF0)),const SizedBox(width:8),summary('পরিশোধিত',_money(paid),'পরিশোধ করা হয়েছে',Icons.check_circle_outline_rounded,green,const Color(0xFFEAF8F2))]),
+          Row(children:[summary('মোট বাকি',_money(remaining),'$unpaid.length টি বিল বাকি',Icons.receipt_long_rounded,red,const Color(0xFFFFEFF0)),const SizedBox(width:8),summary('পরিশোধিত',_money(paid),'পরিশোধ করা হয়েছে',Icons.check_circle_outline_rounded,green,const Color(0xFFEAF8F2))]),
           const SizedBox(height:8),
           Row(children:[summary('মোট বিল',_items.length.toString(),'সকল বিলের হিসাব',Icons.calendar_month_rounded,blue,const Color(0xFFEDF5FF)),const SizedBox(width:8),summary('ওভারডিউ',overdue.toString(),'${upcoming} টি আসন্ন',Icons.notifications_active_outlined,purple,const Color(0xFFF4EEFF))]),
           const SizedBox(height:12),
           TextField(controller:_search,onChanged:(_)=>setState((){}),decoration:InputDecoration(hintText:'বিলের নাম বা ক্যাটাগরি খুঁজুন...',prefixIcon:const Icon(Icons.search_rounded),filled:true,fillColor:surface,contentPadding:const EdgeInsets.symmetric(vertical:13),border:OutlineInputBorder(borderRadius:BorderRadius.circular(18),borderSide:BorderSide(color:line)),enabledBorder:OutlineInputBorder(borderRadius:BorderRadius.circular(18),borderSide:BorderSide(color:line)))),
           const SizedBox(height:9),
-          SizedBox(height:39,child:ListView(scrollDirection:Axis.horizontal,children:['সব','বাকি','পরিশোধিত','ওভারডিউ'].map((v)=>Padding(padding:const EdgeInsets.only(right:6),child:ChoiceChip(label:Text(v,style:const TextStyle(fontSize:11,fontWeight:FontWeight.w700)),selected:_status==v,onSelected:(_)=>setState(()=>_status=v))).toList())),
+          SizedBox(
+            height:39,
+            child:ListView(
+              scrollDirection:Axis.horizontal,
+              children:['সব','বাকি','পরিশোধিত','ওভারডিউ'].map((v)=>Padding(
+                padding:const EdgeInsets.only(right:6),
+                child:ChoiceChip(
+                  label:Text(v,style:const TextStyle(fontSize:11,fontWeight:FontWeight.w700)),
+                  selected:_status==v,
+                  onSelected:(_)=>setState(()=>_status=v),
+                ),
+              )).toList(),
+            ),
+          ),
           SizedBox(height:38,child:Row(children:[Expanded(child:Text('সকল বিল',style:TextStyle(fontSize:17,fontWeight:FontWeight.w900,color:ink))),DropdownButton<String>(value:_sort,underline:const SizedBox.shrink(),isDense:true,items:const ['সর্বশেষ আগে','পুরোনো আগে'].map((v)=>DropdownMenuItem(value:v,child:Text(v,style:const TextStyle(fontSize:11)))).toList(),onChanged:(v){if(v!=null)setState(()=>_sort=v);})])),
         ])),
         Expanded(child:_loading?const Center(child:CircularProgressIndicator()):rows.isEmpty?Center(child:Text('কোনো বিল পাওয়া যায়নি',style:TextStyle(color:muted))):ListView.separated(

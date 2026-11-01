@@ -3785,6 +3785,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
                 children:[
         for(final g in groups.entries)...[
           Container(padding:const EdgeInsets.symmetric(horizontal:11,vertical:9),decoration:BoxDecoration(color:dark?const Color(0xFF18334B):const Color(0xFFEAF2FC),borderRadius:BorderRadius.circular(10)),child:Text(dateLabel(dateOf(g.value.first)),style:TextStyle(fontSize:11,fontWeight:FontWeight.w800,color:ink))),
+          const SizedBox(height: 5),
           for(final x in g.value)row(x),const SizedBox(height:6),
         ],
       ])),

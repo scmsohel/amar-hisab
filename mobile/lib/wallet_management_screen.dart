@@ -44,7 +44,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
 
   double get _total => _balances.values.fold(0, (a, b) => a + b);
   double _amount(dynamic value) => value is num ? value.toDouble() : double.tryParse(value?.toString() ?? '') ?? 0;
-  String _money(double value) => '৳ ${value.round().toString().replaceAllMapped(RegExp(r'\\B(?=(\\d{3})+(?!\\d))'), (m) => ',')}';
+  String _money(double value) => '৳ ${value.round().toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',')}';
 
   List<Map<String, dynamic>> get _filteredTransactions {
     final rows = _transactions.where((tx) {

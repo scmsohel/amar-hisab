@@ -1437,7 +1437,7 @@ class _DebtsScreenState extends State<_DebtsScreen> {
           SizedBox(height:34,child:Row(children:[Expanded(child:Text('সকল দেনা-পাওনা',style:TextStyle(fontSize:17,fontWeight:FontWeight.w900,color:dark?Colors.white:const Color(0xFF172B43)))),DropdownButton<String>(value:_sort,underline:const SizedBox.shrink(),icon:const Icon(Icons.keyboard_arrow_down_rounded),items:const ['সর্বশেষ আগে','পুরনো আগে','বেশি টাকা আগে','কম টাকা আগে'].map((v)=>DropdownMenuItem(value:v,child:Text(v,style:const TextStyle(fontSize:11)))).toList(),onChanged:(v){if(v!=null)setState(()=>_sort=v);},isDense:true)])),
         ])),
         Expanded(child:rows.isEmpty?Center(child:Text('কোনো দেনা-পাওনা পাওয়া যায়নি',style:TextStyle(color:muted))):ListView.separated(
-          padding:const EdgeInsets.fromLTRB(13,0,13,18),itemCount:rows.length,separatorBuilder:(_,_)=>const SizedBox(height:9),
+          padding:const EdgeInsets.fromLTRB(13,0,13,18),itemCount:rows.length,separatorBuilder:(_,_)=>const SizedBox(height:4),
           itemBuilder:(context,index){
             final e=rows[index], debt=_kindOf(e)=='দেনা', done=_done(e), due=_due(e);
             final date=_date(e['date']??e['dateInput']??e['createdAt']);

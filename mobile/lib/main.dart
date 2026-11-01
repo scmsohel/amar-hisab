@@ -1619,23 +1619,75 @@ class _BillsScreenState extends State<_BillsScreen> {
         Expanded(child:_loading?const Center(child:CircularProgressIndicator()):rows.isEmpty?Center(child:Text('কোনো বিল পাওয়া যায়নি',style:TextStyle(color:muted))):ListView.separated(
           padding:const EdgeInsets.fromLTRB(13,2,13,18),itemCount:rows.length,separatorBuilder:(_,_)=>const SizedBox(height:7),
           itemBuilder:(context,index){
-            final e=rows[index],done=_done(e),late=_overdue(e),accent=done?green:late?red:blue,due=_due(e);
-            final tint=done?const Color(0xFFF0FBF5):late?const Color(0xFFFFF3F4):const Color(0xFFF0F6FF);
+            final e=rows[index],done=_done(e),late=_overdue(e),due=_due(e);
+            final accent=done?green:late?red:blue;
+            final tint=done?const Color(0xFFEAF8F2):late?const Color(0xFFFFEFF0):const Color(0xFFEDF5FF);
             final category=_category(e).toLowerCase();
             final icon=category.contains('বিদ্যুৎ')?Icons.bolt_rounded:category.contains('ইন্টারনেট')?Icons.wifi_rounded:category.contains('ভাড়া')?Icons.home_work_outlined:Icons.receipt_long_rounded;
-            return Container(padding:const EdgeInsets.symmetric(horizontal:10,vertical:9),decoration:BoxDecoration(color:dark?Color.lerp(surface,accent,.09):tint,borderRadius:BorderRadius.circular(18),border:Border.all(color:accent.withValues(alpha: dark ? .28 : .17)),boxShadow:dark?[]:[BoxShadow(color:accent.withValues(alpha:.045),blurRadius:8,offset:const Offset(0,2))]),child:Row(children:[
-              Container(width:44,height:44,decoration:BoxDecoration(color:accent.withValues(alpha:.12),shape:BoxShape.circle),child:Icon(icon,color:accent,size:23)),
-              const SizedBox(width:9),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisSize:MainAxisSize.min,children:[
-                Text(_name(e),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:13,fontWeight:FontWeight.w900,color:ink)),
-                const SizedBox(height:3),Text(_category(e),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:10,color:muted)),
-                const SizedBox(height:4),Row(children:[Icon(Icons.calendar_today_outlined,size:11,color:muted),const SizedBox(width:4),Flexible(child:Text(_dateLabel(due),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,color:muted)))]),
-              ])),
-              const SizedBox(width:8),Container(width:1,height:48,color:line),const SizedBox(width:9),
-              SizedBox(width:102,child:Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisSize:MainAxisSize.min,children:[
-                Text(_money(_left(e)),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:14,fontWeight:FontWeight.w900,color:accent)),
-                const SizedBox(height:5),Container(padding:const EdgeInsets.symmetric(horizontal:9,vertical:4),decoration:BoxDecoration(color:accent.withValues(alpha:.11),borderRadius:BorderRadius.circular(18)),child:Text(done?'●  পরিশোধিত':late?'●  ওভারডিউ':'●  বাকি',maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,fontWeight:FontWeight.w800,color:accent))),
-              ])),
-            ]));
+            final dueText=due==null?'তারিখ নেই':_dateLabel(due);
+            return Container(
+              padding:const EdgeInsets.symmetric(horizontal:8,vertical:8),
+              decoration:BoxDecoration(
+                color:dark?Color.lerp(surface,accent,.09):surface,
+                borderRadius:BorderRadius.circular(18),
+                border:Border.all(color:accent.withValues(alpha:dark?.28:.20)),
+                boxShadow:dark?[]:[BoxShadow(color:accent.withValues(alpha:.045),blurRadius:7,offset:const Offset(0,2))],
+              ),
+              child:Row(children:[
+                Container(
+                  width:40,height:40,
+                  decoration:BoxDecoration(color:accent.withValues(alpha:.12),shape:BoxShape.circle),
+                  child:Icon(icon,color:accent,size:21),
+                ),
+                const SizedBox(width:6),
+                Expanded(flex:5,child:Column(
+                  crossAxisAlignment:CrossAxisAlignment.start,
+                  mainAxisSize:MainAxisSize.min,
+                  children:[
+                    Text(_name(e),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:14,fontWeight:FontWeight.w900,color:ink,height:1.1)),
+                    const SizedBox(height:2),
+                    Text(_category(e),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:10,color:muted)),
+                    const SizedBox(height:3),
+                    Row(children:[
+                      Icon(Icons.calendar_today_outlined,size:11,color:muted),
+                      const SizedBox(width:3),
+                      Flexible(child:Text(_dateLabel(_date(e['date']??e['createdAt'])??due),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,color:muted))),
+                    ]),
+                  ],
+                )),
+                Container(width:1,height:54,color:line,margin:const EdgeInsets.symmetric(horizontal:5)),
+                Expanded(flex:5,child:Row(
+                  crossAxisAlignment:CrossAxisAlignment.center,
+                  children:[
+                    Expanded(child:Column(
+                      crossAxisAlignment:CrossAxisAlignment.start,
+                      mainAxisSize:MainAxisSize.min,
+                      children:[
+                        Text(_money(_left(e)),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:15,fontWeight:FontWeight.w900,color:done?muted:accent)),
+                        const SizedBox(height:3),
+                        Container(
+                          padding:const EdgeInsets.symmetric(horizontal:8,vertical:4),
+                          decoration:BoxDecoration(color:accent.withValues(alpha:.11),borderRadius:BorderRadius.circular(18)),
+                          child:Text(done?'●  পরিশোধিত':late?'●  ওভারডিউ':'●  বাকি',maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,fontWeight:FontWeight.w800,color:accent)),
+                        ),
+                        const SizedBox(height:3),
+                        Text(dueText,maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,color:muted)),
+                      ],
+                    )),
+                    const SizedBox(width:2),
+                    SizedBox(width:63,child:Row(
+                      mainAxisAlignment:MainAxisAlignment.spaceBetween,
+                      mainAxisSize:MainAxisSize.min,
+                      children:[
+                        SizedBox(width:19,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_notice(context,'বিল রিমাইন্ডার সুবিধাটি পরবর্তী ধাপে যুক্ত হবে।'),icon:const Icon(Icons.notifications_none_rounded,size:16,color:Color(0xFF8292A4)))),
+                        SizedBox(width:19,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_notice(context,'বিল সম্পাদনা সুবিধাটি পরবর্তী ধাপে যুক্ত হবে।'),icon:const Icon(Icons.edit_outlined,size:16,color:Color(0xFF8292A4)))),
+                        SizedBox(width:19,height:28,child:PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints.expand(),iconSize:17,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v)=>_notice(context,v=='edit'?'বিল সম্পাদনা সুবিধাটি পরবর্তী ধাপে যুক্ত হবে।':'বিল রিমাইন্ডার সুবিধাটি পরবর্তী ধাপে যুক্ত হবে।'),itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))])),
+                      ],
+                    )),
+                  ],
+                )),
+              ]),
+            );
           },
         )),
       ])),

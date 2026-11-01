@@ -3633,7 +3633,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
     else if(value.contains('যাতায়াত')||value.contains('বাস')){color=const Color(0xFF1688D4);tint=const Color(0xFFEAF4FF);fallbackIcon=Icons.directions_bus_rounded;}
     final icon=icons[name]??fallbackIcon;
     final d=dateOf(x),time=(x['timeInput']??x['time_input']??x['time']??'').toString();
-    final borderColor=color.withValues(alpha:dark?.24:.16);
+    final borderColor = color.withValues(alpha: dark ? 0.24 : 0.16);
     return Container(
       margin:const EdgeInsets.only(bottom:7),
       padding:const EdgeInsets.symmetric(horizontal:9,vertical:9),

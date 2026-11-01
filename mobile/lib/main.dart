@@ -3251,7 +3251,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           throw Exception('এই নামে ওয়ালেট আগে থেকেই আছে।');
         }
         await _AuthApi._put('/data/wallets', {'data': [...current, {'name': name.trim(), 'base': 0}]});
-        await _load();
       },
     )));
   }

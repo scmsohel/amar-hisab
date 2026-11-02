@@ -2105,7 +2105,7 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                       children:[
                         SizedBox(width:21,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_openPaymentModal(e),icon:const Icon(Icons.volunteer_activism_outlined,size:16,color:Color(0xFF00A875)))),
                         SizedBox(width:21,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_openEditDebtModal(e),icon:const Icon(Icons.edit_outlined,size:16,color:Color(0xFF8292A4)))),
-                        SizedBox(width:21,height:28,child:PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints.expand(),iconSize:17,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v){if(v=='edit'){_openEditDebtModal(e);}else{_todo('রিমাইন্ডার');}},itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))])),
+                        SizedBox(width:21,height:28,child:PopupMenuButton<String>(padding:EdgeInsets.zero,iconSize:17,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v){if(v=='edit'){_openEditDebtModal(e);}else{_todo('রিমাইন্ডার');}},itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))])),
                       ],
                     )),
                   ],

@@ -2181,12 +2181,9 @@ class _BillsScreenState extends State<_BillsScreen> {
     bool saving = false;
     String dateLabel(DateTime d) => '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
 
-    await showModalBottomSheet<void>(
+    await showDialog<void>(
       context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) => StatefulBuilder(
+      builder: (dialogContext) => StatefulBuilder(
         builder: (context, setModal) {
           final dark = Theme.of(context).brightness == Brightness.dark;
           final surface = dark ? const Color(0xFF10283D) : Colors.white;
@@ -2212,11 +2209,12 @@ class _BillsScreenState extends State<_BillsScreen> {
                 items: items, onChanged: saving ? null : changed,
               ),
             ]);
-          return Padding(
-            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-            child: Container(
-              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * .92),
-              decoration: BoxDecoration(color: surface, borderRadius: const BorderRadius.vertical(top: Radius.circular(22))),
+          return Dialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+            backgroundColor: surface,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 520, maxHeight: MediaQuery.of(context).size.height * .88),
               child: Column(mainAxisSize: MainAxisSize.min, children: [
                 Padding(
                   padding: const EdgeInsets.fromLTRB(18, 17, 12, 10),
@@ -2226,7 +2224,7 @@ class _BillsScreenState extends State<_BillsScreen> {
                       const SizedBox(height: 3),
                       Text('আপনার তথ্য অ্যাকাউন্টে সংরক্ষিত হবে।', style: TextStyle(fontSize: 11, color: muted)),
                     ])),
-                    IconButton(onPressed: saving ? null : () => Navigator.pop(sheetContext), icon: Icon(Icons.close_rounded, color: muted)),
+                    IconButton(onPressed: saving ? null : () => Navigator.pop(dialogContext), icon: Icon(Icons.close_rounded, color: muted)),
                   ]),
                 ),
                 Divider(height: 1, color: line),
@@ -2289,7 +2287,7 @@ class _BillsScreenState extends State<_BillsScreen> {
                     const SizedBox(height: 20),
                     Row(children: [
                       Expanded(child: OutlinedButton(
-                        onPressed: saving ? null : () => Navigator.pop(sheetContext),
+                        onPressed: saving ? null : () => Navigator.pop(dialogContext),
                         style: OutlinedButton.styleFrom(minimumSize: const Size(0, 46), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                         child: const Text('বাতিল'),
                       )),
@@ -2317,13 +2315,13 @@ class _BillsScreenState extends State<_BillsScreen> {
                             };
                             final updated = [bill, ..._items];
                             await _AuthApi._put('/data/bills', {'data': updated});
-                            if (!mounted || !sheetContext.mounted) return;
+                            if (!mounted || !dialogContext.mounted) return;
                             setState(() => _items = updated);
-                            Navigator.pop(sheetContext);
+                            Navigator.pop(dialogContext);
                             if (!mounted) return;
                             _notice(context, 'নতুন বিল সংরক্ষণ হয়েছে।');
                           } catch (e) {
-                            if (mounted && sheetContext.mounted) {
+                            if (mounted && dialogContext.mounted) {
                               setModal(() => saving = false);
                               _notice(context, e.toString().replaceFirst('Exception: ', ''));
                             }

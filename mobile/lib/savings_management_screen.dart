@@ -133,7 +133,7 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
       borderRadius:BorderRadius.circular(18),
       onTap:()=>detail(g),
       child:Container(
-        constraints:const BoxConstraints(minHeight:116),
+        constraints:const BoxConstraints(minHeight:108),
         padding:const EdgeInsets.fromLTRB(8,8,6,8),
         decoration:BoxDecoration(
           color:surface,
@@ -145,22 +145,22 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
           Container(width:36,height:36,decoration:BoxDecoration(color:accent.withValues(alpha:.13),shape:BoxShape.circle),child:Icon(Icons.account_balance_wallet_outlined,color:accent,size:20)),
           const SizedBox(width:8),
           Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisAlignment:MainAxisAlignment.center,children:[
-            Row(children:[
+            SizedBox(height:18,child:Row(children:[
               Expanded(child:Text(g['title'].toString(),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:14,fontWeight:FontWeight.w900,color:ink))),
-              Container(padding:const EdgeInsets.symmetric(horizontal:6,vertical:2),decoration:BoxDecoration(color:(isDone?green:late?red:green).withValues(alpha:.12),borderRadius:BorderRadius.circular(20)),child:Text(isDone?'সম্পন্ন':late?'দিন বাকি':'চলমান',style:TextStyle(fontSize:9,fontWeight:FontWeight.w800,color:isDone?green:late?red:green))),
-              PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints(minWidth:24,minHeight:24),icon:Icon(Icons.more_horiz,color:ink.withValues(alpha:.65),size:16),onSelected:(v){if(v=='edit'){goalForm(old:g);}else if(v=='delete'){deleteGoal(g);}},itemBuilder:(_)=>const [PopupMenuItem(value:'edit',child:Text('সম্পাদনা')),PopupMenuItem(value:'delete',child:Text('মুছে ফেলুন'))]),
-            ]),
-            const SizedBox(height:1),
-            Row(children:[
-              Icon(Icons.calendar_today_outlined,size:12,color:ink.withValues(alpha:.68)),
+              Container(padding:const EdgeInsets.symmetric(horizontal:5,vertical:1),decoration:BoxDecoration(color:(isDone?green:late?red:green).withValues(alpha:.12),borderRadius:BorderRadius.circular(20)),child:Text(isDone?'সম্পন্ন':late?'দিন বাকি':'চলমান',style:TextStyle(fontSize:8,fontWeight:FontWeight.w800,color:isDone?green:late?red:green))),
+              PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints(minWidth:20,minHeight:18),icon:Icon(Icons.more_horiz,color:ink.withValues(alpha:.65),size:14),onSelected:(v){if(v=='edit'){goalForm(old:g);}else if(v=='delete'){deleteGoal(g);}},itemBuilder:(_)=>const [PopupMenuItem(value:'edit',child:Text('সম্পাদনা')),PopupMenuItem(value:'delete',child:Text('মুছে ফেলুন'))]),
+            ])),
+            const SizedBox(height:0),
+            SizedBox(height:13,child:Row(children:[
+              Icon(Icons.calendar_today_outlined,size:10,color:ink.withValues(alpha:.68)),
               const SizedBox(width:4),
-              Flexible(child:Text(dateLabel(g['goalStartDate']??g['date']),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:10,color:ink.withValues(alpha:.82)))),
+              Flexible(child:Text(dateLabel(g['goalStartDate']??g['date']),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,color:ink.withValues(alpha:.82)))),
               const SizedBox(width:6),
-              Icon(Icons.layers_outlined,size:12,color:ink.withValues(alpha:.68)),
+              Icon(Icons.layers_outlined,size:10,color:ink.withValues(alpha:.68)),
               const SizedBox(width:3),
-              Text(freq,style:TextStyle(fontSize:11,color:ink.withValues(alpha:.82))),
-            ]),
-            const SizedBox(height:7),
+              Text(freq,style:TextStyle(fontSize:9,color:ink.withValues(alpha:.82))),
+            ])),
+            const SizedBox(height:4),
             Row(children:[
               Text(money(p),style:const TextStyle(fontSize:16,fontWeight:FontWeight.w900,color:green)),
               Text(' / ${money(target)}',style:TextStyle(fontSize:14,color:ink.withValues(alpha:.9))),

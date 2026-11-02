@@ -277,7 +277,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
         const SizedBox(height: 1),
         Text(name, style: TextStyle(color: ink, fontSize: 11, fontWeight: FontWeight.w900)),
         Text(_money(balance), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: accent, fontSize: 15.5, fontWeight: FontWeight.w900)),
-        const Spacer(),
+        const SizedBox(height: 4),
         Row(children: [
           Expanded(child: _walletAction('↙ আয়', const Color(0xFF008F50), const Color(0xFFE1F8EA), () async { await widget.onAddTransaction(name, 'আয়'); await _refresh(); })),
           const SizedBox(width: 4),

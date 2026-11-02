@@ -92,21 +92,21 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
   }
   Widget summary(String t,String v,String sub,IconData icon,Color color,Color tint)=>Expanded(
     child:Container(
-      constraints:const BoxConstraints(minHeight:92),
-      padding:const EdgeInsets.symmetric(horizontal:11,vertical:12),
+      constraints:const BoxConstraints(minHeight:116),
+      padding:const EdgeInsets.symmetric(horizontal:14,vertical:15),
       decoration:BoxDecoration(
         color:tint.withValues(alpha:.72),
         borderRadius:BorderRadius.circular(18),
         border:Border.all(color:color.withValues(alpha:.42)),
       ),
       child:Row(children:[
-        Container(width:42,height:42,decoration:BoxDecoration(color:color.withValues(alpha:.13),shape:BoxShape.circle),child:Icon(icon,color:color,size:24)),
+        Container(width:54,height:54,decoration:BoxDecoration(color:color.withValues(alpha:.13),shape:BoxShape.circle),child:Icon(icon,color:color,size:29)),
         const SizedBox(width:10),
         Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisAlignment:MainAxisAlignment.center,children:[
-          Text(t,maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:11,fontWeight:FontWeight.w700,color:color.withValues(alpha:.9))),
+          Text(t,maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:13,fontWeight:FontWeight.w700,color:color.withValues(alpha:.9))),
           const SizedBox(height:3),
-          FittedBox(alignment:Alignment.centerLeft,fit:BoxFit.scaleDown,child:Text(v,style:TextStyle(fontSize:21,fontWeight:FontWeight.w900,color:color))),
-          Text(sub,maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:9,color:Colors.blueGrey)),
+          FittedBox(alignment:Alignment.centerLeft,fit:BoxFit.scaleDown,child:Text(v,style:TextStyle(fontSize:25,fontWeight:FontWeight.w900,color:color))),
+          Text(sub,maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:10,color:Colors.blueGrey)),
         ])),
       ]),
     ),
@@ -128,59 +128,66 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
     final count=n(g['goalInstallmentCount']).toInt().clamp(0,100000);
     final per=n(g['goalInstallmentAmount']);
     final cycles=per>0?(p/per+1e-8).floor():payments(g).length;
+    final late=!isDone&&next!=null&&next.difference(DateTime.now()).inDays<0;
     return InkWell(
       borderRadius:BorderRadius.circular(22),
       onTap:()=>detail(g),
       child:Container(
-        padding:const EdgeInsets.fromLTRB(13,12,12,12),
-        decoration:BoxDecoration(color:surface,borderRadius:BorderRadius.circular(22),border:Border.all(color:line.withValues(alpha:.9)),boxShadow:[BoxShadow(color:Colors.black.withValues(alpha:.045),blurRadius:9,offset:const Offset(0,3))]),
+        constraints:const BoxConstraints(minHeight:166),
+        padding:const EdgeInsets.fromLTRB(16,15,13,15),
+        decoration:BoxDecoration(
+          color:surface,
+          borderRadius:BorderRadius.circular(22),
+          border:Border.all(color:line.withValues(alpha:.9)),
+          boxShadow:[BoxShadow(color:Colors.black.withValues(alpha:.055),blurRadius:12,offset:const Offset(0,4))],
+        ),
         child:Row(crossAxisAlignment:CrossAxisAlignment.center,children:[
-          Container(width:48,height:48,decoration:BoxDecoration(color:accent.withValues(alpha:.13),shape:BoxShape.circle),child:Icon(Icons.account_balance_wallet_outlined,color:accent,size:26)),
-          const SizedBox(width:12),
-          Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+          Container(width:58,height:58,decoration:BoxDecoration(color:accent.withValues(alpha:.13),shape:BoxShape.circle),child:Icon(Icons.account_balance_wallet_outlined,color:accent,size:31)),
+          const SizedBox(width:13),
+          Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisAlignment:MainAxisAlignment.center,children:[
             Row(children:[
-              Expanded(child:Text(g['title'].toString(),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:16,fontWeight:FontWeight.w900,color:ink))),
-              Container(padding:const EdgeInsets.symmetric(horizontal:10,vertical:5),decoration:BoxDecoration(color:(isDone?green:next!=null&&next.difference(DateTime.now()).inDays<0?red:green).withValues(alpha:.11),borderRadius:BorderRadius.circular(18)),child:Text(isDone?'সম্পন্ন':next!=null&&next.difference(DateTime.now()).inDays<0?'দিন বাকি':'চলমান',style:TextStyle(fontSize:10,fontWeight:FontWeight.w800,color:isDone?green:next!=null&&next.difference(DateTime.now()).inDays<0?red:green))),
-              PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints(minWidth:125),icon:Icon(Icons.more_horiz,color:ink.withValues(alpha:.65),size:21),onSelected:(v){if(v=='edit'){goalForm(old:g);}else if(v=='delete'){deleteGoal(g);}},itemBuilder:(_)=>const [PopupMenuItem(value:'edit',child:Text('সম্পাদনা')),PopupMenuItem(value:'delete',child:Text('মুছে ফেলুন'))]),
-            ]),
-            const SizedBox(height:3),
-            Row(children:[
-              Icon(Icons.calendar_today_outlined,size:14,color:ink.withValues(alpha:.65)),
-              const SizedBox(width:5),
-              Text(dateLabel(g['goalStartDate']??g['date']),style:TextStyle(fontSize:11,color:ink.withValues(alpha:.78))),
-              const SizedBox(width:10),
-              Icon(Icons.layers_outlined,size:14,color:ink.withValues(alpha:.65)),
-              const SizedBox(width:4),
-              Text(freq,style:TextStyle(fontSize:11,color:ink.withValues(alpha:.78))),
-            ]),
-            const SizedBox(height:8),
-            Row(children:[
-              Text(money(p),style:const TextStyle(fontSize:16,fontWeight:FontWeight.w900,color:green)),
-              Text(' / ${money(target)}',style:TextStyle(fontSize:13,color:ink.withValues(alpha:.85))),
+              Expanded(child:Text(g['title'].toString(),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:19,fontWeight:FontWeight.w900,color:ink))),
+              Container(padding:const EdgeInsets.symmetric(horizontal:12,vertical:7),decoration:BoxDecoration(color:(isDone?green:late?red:green).withValues(alpha:.12),borderRadius:BorderRadius.circular(20)),child:Text(isDone?'সম্পন্ন':late?'দিন বাকি':'চলমান',style:TextStyle(fontSize:12,fontWeight:FontWeight.w800,color:isDone?green:late?red:green))),
+              PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints(minWidth:130),icon:Icon(Icons.more_horiz,color:ink.withValues(alpha:.65),size:23),onSelected:(v){if(v=='edit'){goalForm(old:g);}else if(v=='delete'){deleteGoal(g);}},itemBuilder:(_)=>const [PopupMenuItem(value:'edit',child:Text('সম্পাদনা')),PopupMenuItem(value:'delete',child:Text('মুছে ফেলুন'))]),
             ]),
             const SizedBox(height:5),
             Row(children:[
-              Expanded(child:ClipRRect(borderRadius:BorderRadius.circular(8),child:LinearProgressIndicator(value:progress,minHeight:8,backgroundColor:const Color(0xFFD7E0EA),color:accent))),
-              const SizedBox(width:8),
-              SizedBox(width:38,child:Text('${(progress*100).toStringAsFixed(1)}%',textAlign:TextAlign.end,style:TextStyle(fontSize:11,fontWeight:FontWeight.w800,color:ink))),
+              Icon(Icons.calendar_today_outlined,size:17,color:ink.withValues(alpha:.68)),
+              const SizedBox(width:6),
+              Flexible(child:Text(dateLabel(g['goalStartDate']??g['date']),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:14,color:ink.withValues(alpha:.82)))),
+              const SizedBox(width:12),
+              Icon(Icons.layers_outlined,size:17,color:ink.withValues(alpha:.68)),
+              const SizedBox(width:5),
+              Text(freq,style:TextStyle(fontSize:14,color:ink.withValues(alpha:.82))),
             ]),
-            const SizedBox(height:3),
-            Text('${cycles.clamp(0,count)} / $count কিস্তি • বাকি ${money(left)}',style:const TextStyle(fontSize:9,color:Colors.blueGrey)),
+            const SizedBox(height:12),
+            Row(children:[
+              Text(money(p),style:const TextStyle(fontSize:20,fontWeight:FontWeight.w900,color:green)),
+              Text(' / ${money(target)}',style:TextStyle(fontSize:17,color:ink.withValues(alpha:.9))),
+            ]),
+            const SizedBox(height:6),
+            Row(children:[
+              Expanded(child:ClipRRect(borderRadius:BorderRadius.circular(9),child:LinearProgressIndicator(value:progress,minHeight:10,backgroundColor:const Color(0xFFD7E0EA),color:accent))),
+              const SizedBox(width:10),
+              SizedBox(width:45,child:Text('${(progress*100).toStringAsFixed(1)}%',textAlign:TextAlign.end,style:TextStyle(fontSize:13,fontWeight:FontWeight.w800,color:ink))),
+            ]),
+            const SizedBox(height:5),
+            Text('${cycles.clamp(0,count)} / $count কিস্তি • বাকি ${money(left)}',style:const TextStyle(fontSize:11,color:Colors.blueGrey)),
           ])),
-          const SizedBox(width:8),
+          const SizedBox(width:12),
           Container(
-            constraints:const BoxConstraints(minWidth:76,maxWidth:102),
-            padding:const EdgeInsets.symmetric(horizontal:8,vertical:10),
-            decoration:BoxDecoration(color:const Color(0xFFFFEEF2),borderRadius:BorderRadius.circular(15)),
-            child:Column(mainAxisSize:MainAxisSize.min,children:[
-              const Icon(Icons.calendar_month_outlined,color:red,size:20),
-              const SizedBox(height:3),
-              const Text('পরবর্তী জমা',style:TextStyle(fontSize:9,color:Color(0xFF475569))),
-              Text(dueLabel(next),textAlign:TextAlign.center,maxLines:2,style:const TextStyle(fontSize:11,fontWeight:FontWeight.w900,color:red)),
+            width:104,
+            constraints:const BoxConstraints(minHeight:92),
+            padding:const EdgeInsets.symmetric(horizontal:8,vertical:12),
+            decoration:BoxDecoration(color:const Color(0xFFFFEEF2),borderRadius:BorderRadius.circular(16)),
+            child:Column(mainAxisAlignment:MainAxisAlignment.center,children:[
+              const Icon(Icons.calendar_month_outlined,color:red,size:25),
+              const SizedBox(height:5),
+              const Text('পরবর্তী জমা',style:TextStyle(fontSize:11,color:Color(0xFF475569))),
+              Text(dueLabel(next),textAlign:TextAlign.center,maxLines:2,style:const TextStyle(fontSize:13,fontWeight:FontWeight.w900,color:red)),
             ]),
           ),
-          const SizedBox(width:2),
-          Icon(Icons.chevron_right,color:ink.withValues(alpha:.8),size:23),
+          Icon(Icons.chevron_right,color:ink.withValues(alpha:.8),size:26),
         ]),
       ),
     );
@@ -215,13 +222,13 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
     return Scaffold(
       backgroundColor:bg,
       appBar:PreferredSize(
-        preferredSize:const Size.fromHeight(91),
+        preferredSize:const Size.fromHeight(108),
         child:AppBar(
-          toolbarHeight:91,backgroundColor:bg,surfaceTintColor:Colors.transparent,elevation:0,
+          toolbarHeight:108,backgroundColor:bg,surfaceTintColor:Colors.transparent,elevation:0,
           leading:IconButton(onPressed:()=>Navigator.pop(context),icon:Icon(Icons.arrow_back,color:ink,size:25)),
           titleSpacing:0,
           title:Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisAlignment:MainAxisAlignment.center,children:[
-            Text('সঞ্চয়',style:TextStyle(fontSize:25,fontWeight:FontWeight.w900,color:ink)),
+            Text('সঞ্চয়',style:TextStyle(fontSize:29,fontWeight:FontWeight.w900,color:ink)),
             Text('আপনার সঞ্চয় পরিকল্পনা, সঞ্চয়ের অগ্রগতি ও লক্ষ্য',maxLines:2,style:TextStyle(fontSize:11,color:ink.withValues(alpha:.75))),
           ]),
           actions:[
@@ -234,7 +241,7 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
         ),
       ),
       body:SafeArea(top:false,child:Column(children:[
-        Padding(padding:const EdgeInsets.fromLTRB(12,5,12,10),child:Column(children:[
+        Padding(padding:const EdgeInsets.fromLTRB(16,8,16,14),child:Column(children:[
           Row(children:[
             summary('মোট সঞ্চয় পরিকল্পনা',goals.length.toString(),'সঞ্চয়ের লক্ষ্য রেকর্ড',Icons.track_changes,green,const Color(0xFFEAF8F2)),
             const SizedBox(width:9),
@@ -306,9 +313,9 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
         Expanded(child:rows.isEmpty
           ?Center(child:Text(goals.isEmpty?'এখনো কোনো সঞ্চয় যোগ করা হয়নি।':'কোনো রেকর্ড পাওয়া যায়নি।',style:TextStyle(color:ink)))
           :ListView.separated(
-            padding:const EdgeInsets.fromLTRB(12,0,12,18),
+            padding:const EdgeInsets.fromLTRB(16,0,16,22),
             itemCount:rows.length,
-            separatorBuilder:(_,_)=>const SizedBox(height:9),
+            separatorBuilder:(_,_)=>const SizedBox(height:12),
             itemBuilder:(context,index)=>_goalCard(rows[index],surface,line,ink),
           ),
         ),

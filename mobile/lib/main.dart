@@ -1375,6 +1375,47 @@ class _DebtsScreenState extends State<_DebtsScreen> {
     catch (e) { if (!mounted) return; setState(() => _loading = false); _notice(context,e.toString().replaceFirst('Exception: ','')); }
   }
   void _todo(String label) => _notice(context,'$label সুবিধাটি API সংযোগসহ পরবর্তী ধাপে যুক্ত করতে হবে।');
+
+  Future<void> _openPaymentModal(Map<String,dynamic> debt) async {
+    final amount=TextEditingController(), note=TextEditingController();
+    final payments=(debt['payments'] is List?(debt['payments'] as List).whereType<Map>().map((p)=>Map<String,dynamic>.from(p)).toList():<Map<String,dynamic>>[]);
+    final wallets=['ক্যাশ','ব্যাংক','বিকাশ','নগদ'];
+    var wallet='ক্যাশ', date=DateTime.now(), saving=false;
+    int? editing;
+    String dateLabel(DateTime d)=>'${d.day.toString().padLeft(2,'0')}/${d.month.toString().padLeft(2,'0')}/${d.year}';
+    double paid()=>payments.where((p)=>(p['eventType']??'')!='withdrawal').fold<double>(0,(s,p)=>s+_num(p['amount']));
+    await showDialog<void>(context:context,builder:(dialogContext)=>StatefulBuilder(builder:(ctx,setModal)=>Dialog(
+      insetPadding:const EdgeInsets.symmetric(horizontal:16,vertical:22),
+      child:ConstrainedBox(constraints:BoxConstraints(maxWidth:520,maxHeight:MediaQuery.of(ctx).size.height*.88),
+        child:Padding(padding:const EdgeInsets.all(16),child:Column(mainAxisSize:MainAxisSize.min,crossAxisAlignment:CrossAxisAlignment.start,children:[
+          Row(children:[Expanded(child:Text(_name(debt),style:const TextStyle(fontSize:18,fontWeight:FontWeight.w900))),IconButton(onPressed:()=>Navigator.pop(dialogContext),icon:const Icon(Icons.close))]),
+          Text(_kindOf(debt)=='দেনা'?'আপনার পরিশোধ করতে হবে':'আপনার পাওনা আদায় করতে হবে',style:TextStyle(fontSize:11,color:Colors.grey.shade600)),
+          const SizedBox(height:12),
+          Row(children:[
+            for(final entry in [('মূল হিসাব',_num(debt['amount']),const Color(0xFF172B43)),('পরিশোধিত',paid(),const Color(0xFF00A875)),('এখনো বাকি',(_num(debt['amount'])-paid()).clamp(0,double.infinity).toDouble(),const Color(0xFFFF625B))])
+              Expanded(child:Container(margin:const EdgeInsets.only(right:5),padding:const EdgeInsets.all(9),decoration:BoxDecoration(color:const Color(0xFFF6F8FA),borderRadius:BorderRadius.circular(11)),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text(entry.$1,style:const TextStyle(fontSize:10,color:Colors.blueGrey)),Text('৳ ${entry.$2.round()}',style:TextStyle(fontSize:14,fontWeight:FontWeight.w900,color:entry.$3))]))),
+          ]),
+          const SizedBox(height:12),
+          ClipRRect(borderRadius:BorderRadius.circular(8),child:LinearProgressIndicator(value:_num(debt['amount'])<=0?0:(paid()/_num(debt['amount'])).clamp(0,1),minHeight:6,color:const Color(0xFF00A875),backgroundColor:const Color(0xFFE6EBF0))),
+          const SizedBox(height:12),
+          Row(children:[const Expanded(child:Text('পরিশোধের ইতিহাস',style:TextStyle(fontSize:14,fontWeight:FontWeight.w900))),Text('${payments.length}টি লেনদেন',style:const TextStyle(fontSize:10,color:Colors.blueGrey))]),
+          const SizedBox(height:6),
+          Flexible(child:Container(constraints:const BoxConstraints(minHeight:60),padding:const EdgeInsets.all(8),decoration:BoxDecoration(color:const Color(0xFFEAF8F2),borderRadius:BorderRadius.circular(12)),child:payments.isEmpty?const Center(child:Text('এখনো কোনো লেনদেন যোগ করা হয়নি।',style:TextStyle(fontSize:11,color:Colors.blueGrey))):ListView.separated(shrinkWrap:true,itemCount:payments.length,separatorBuilder:(_,_)=>const Divider(height:8),itemBuilder:(context,i){final p=payments[i];return Row(children:[Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text('৳ ${_num(p['amount']).round()}',style:const TextStyle(fontWeight:FontWeight.w900)),Text('${p['date']??''} • ${p['wallet']??''}',style:const TextStyle(fontSize:10,color:Colors.blueGrey)),if((p['notes']??'').toString().isNotEmpty)Text(p['notes'].toString(),style:const TextStyle(fontSize:10))])),IconButton(visualDensity:VisualDensity.compact,onPressed:(){setModal((){editing=_num(p['id']).toInt();amount.text=_num(p['amount']).toString();note.text=(p['notes']??'').toString();wallet=(p['wallet']??'ক্যাশ').toString();date=DateTime.tryParse((p['dateInput']??'').toString())??date;});},icon:const Icon(Icons.edit_outlined,size:17)),IconButton(visualDensity:VisualDensity.compact,onPressed:()async{final yes=await showDialog<bool>(context:dialogContext,builder:(c)=>AlertDialog(title:const Text('পরিশোধ মুছুন'),content:const Text('এই পরিশোধের রেকর্ড মুছে ফেলবেন?'),actions:[TextButton(onPressed:()=>Navigator.pop(c,false),child:const Text('বাতিল')),FilledButton(onPressed:()=>Navigator.pop(c,true),child:const Text('মুছুন'))]));if(yes!=true)return;try{final dr=await _AuthApi._get('/data/debts'),tr=await _AuthApi._get('/data/transactions');final ds=(dr['data'] as List).map((x)=>Map<String,dynamic>.from(x as Map)).toList();final ts=(tr['data'] as List).map((x)=>Map<String,dynamic>.from(x as Map)).toList();final next=payments.where((x)=>x['id'].toString()!=p['id'].toString()).toList();final sum=next.fold<double>(0,(s,x)=>s+_num(x['amount']));final ix=ds.indexWhere((x)=>x['id'].toString()==debt['id'].toString());ds[ix]={...ds[ix],'payments':next,'status':sum>=_num(debt['amount'])?'পরিশোধিত':_kindOf(debt)};if(p['transactionId']!=null)ts.removeWhere((x)=>x['id'].toString()==p['transactionId'].toString());await _AuthApi._put('/data/debts',{'data':ds});await _AuthApi._put('/data/transactions',{'data':ts});payments.removeWhere((x)=>x['id'].toString()==p['id'].toString());setModal((){});await _refresh();}catch(e){_notice(context,e.toString());}},icon:const Icon(Icons.delete_outline,size:17,color:Colors.red))]);}))),
+          const SizedBox(height:10),
+          Text(editing==null?'পরিশোধ / জমা যোগ করুন':'পরিশোধের তথ্য এডিট করুন',style:const TextStyle(fontSize:14,fontWeight:FontWeight.w900)),
+          const SizedBox(height:6),
+          Flexible(child:SingleChildScrollView(child:Column(children:[
+            TextField(controller:amount,keyboardType:const TextInputType.numberWithOptions(decimal:true),decoration:const InputDecoration(labelText:'পরিমাণ (৳)',hintText:'0.00')),
+            Row(children:[Expanded(child:OutlinedButton.icon(onPressed:()async{final d=await showDatePicker(context:dialogContext,initialDate:date,firstDate:DateTime(2000),lastDate:DateTime(2100));if(d!=null)setModal(()=>date=d);},icon:const Icon(Icons.calendar_today_outlined,size:15),label:Text(dateLabel(date)))),const SizedBox(width:6),Expanded(child:DropdownButtonFormField<String>(initialValue:wallets.contains(wallet)?wallet:'ক্যাশ',decoration:const InputDecoration(labelText:'ওয়ালেট'),items:wallets.map((w)=>DropdownMenuItem(value:w,child:Text(w))).toList(),onChanged:(v){if(v!=null)setModal(()=>wallet=v);} ))]),
+            TextField(controller:note,maxLines:2,decoration:const InputDecoration(labelText:'নোট (ঐচ্ছিক)')),
+          ]))),
+          const SizedBox(height:10),
+          SizedBox(width:double.infinity,child:FilledButton.icon(onPressed:saving?null:()async{final value=double.tryParse(amount.text.trim());if(value==null||value<=0){_notice(context,'সঠিক পরিমাণ দিন।');return;}final old=editing==null?null:payments.where((p)=>p['id'].toString()==editing.toString()).firstOrNull;if(value>(_num(debt['amount'])-paid()+_num(old?['amount']))){_notice(context,'বাকি টাকার চেয়ে বেশি পরিশোধ করা যাবে না।');return;}setModal(()=>saving=true);try{final dr=await _AuthApi._get('/data/debts'),tr=await _AuthApi._get('/data/transactions');final ds=(dr['data'] as List).map((x)=>Map<String,dynamic>.from(x as Map)).toList();final ts=(tr['data'] as List).map((x)=>Map<String,dynamic>.from(x as Map)).toList();final id=editing??DateTime.now().millisecondsSinceEpoch;final txid=old?['transactionId']??(id+1);final item={'id':id,'amount':value,'date':dateLabel(date),'wallet':wallet,'notes':note.text.trim(),'transactionId':txid};final next=editing==null?[...payments,item]:payments.map((p)=>p['id'].toString()==editing.toString()?item:p).toList();final sum=next.fold<double>(0,(s,p)=>s+_num(p['amount']));final ix=ds.indexWhere((x)=>x['id'].toString()==debt['id'].toString());ds[ix]={...ds[ix],'payments':next,'status':sum>=_num(debt['amount'])?'পরিশোধিত':_kindOf(debt)};final kind=_kindOf(debt)=='দেনা'?'ব্যয়':'আয়';final tx={'id':txid,'title':'${kind=='ব্যয়'?'দেনা পরিশোধ — ':'পাওনা জমা — '}${_name(debt)}','category':'দেনা-পাওনা','date':dateLabel(date),'dateInput':'${date.year.toString().padLeft(4,'0')}-${date.month.toString().padLeft(2,'0')}-${date.day.toString().padLeft(2,'0')}','time':TimeOfDay.now().format(context),'wallet':wallet,'amount':value,'kind':kind,'debtId':debt['id'],'debtPaymentId':id,'note':note.text.trim()};final ti=ts.indexWhere((x)=>x['id'].toString()==txid.toString());if(ti<0)ts.insert(0,tx);else ts[ti]=tx;await _AuthApi._put('/data/debts',{'data':ds});await _AuthApi._put('/data/transactions',{'data':ts});if(!mounted)return;Navigator.pop(dialogContext);await _refresh();_notice(context,editing==null?'পরিশোধ যোগ হয়েছে।':'পরিশোধ আপডেট হয়েছে।');}catch(e){setModal(()=>saving=false);_notice(context,e.toString().replaceFirst('Exception: ',''));}},icon:saving?const SizedBox(width:16,height:16,child:CircularProgressIndicator(strokeWidth:2)):const Icon(Icons.check),label:Text(saving?'সংরক্ষণ হচ্ছে...':editing==null?'পরিশোধ সংরক্ষণ':'পরিবর্তন সংরক্ষণ করুন'))),
+        ]))),
+    )));
+    amount.dispose();note.dispose();
+  }
+
   Widget _pill(String label, Color fg, Color bg) => Container(
     padding: const EdgeInsets.symmetric(horizontal:8,vertical:5),
     decoration: BoxDecoration(color:bg,borderRadius:BorderRadius.circular(18)),
@@ -1476,7 +1517,7 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                       mainAxisAlignment:MainAxisAlignment.spaceBetween,
                       mainAxisSize:MainAxisSize.min,
                       children:[
-                        SizedBox(width:21,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_todo('রিমাইন্ডার'),icon:const Icon(Icons.notifications_none_rounded,size:16,color:Color(0xFF8292A4)))),
+                        SizedBox(width:21,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_openPaymentModal(e),icon:const Icon(Icons.volunteer_activism_outlined,size:16,color:Color(0xFF00A875)))),
                         SizedBox(width:21,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_todo('এডিট'),icon:const Icon(Icons.edit_outlined,size:16,color:Color(0xFF8292A4)))),
                         SizedBox(width:21,height:28,child:PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints.expand(),iconSize:17,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v)=>_todo(v=='edit'?'এডিট':'রিমাইন্ডার'),itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))])),
                       ],

@@ -1337,8 +1337,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 }
 
 class _DebtsScreen extends StatefulWidget {
-  const _DebtsScreen({required this.debts, required this.onReload});
+  const _DebtsScreen({required this.debts, required this.onReload, this.wallets = const ['ক্যাশ','ব্যাংক','বিকাশ','নগদ']});
   final List<Map<String, dynamic>> debts;
+  final List<String> wallets;
   final Future<List<Map<String, dynamic>>> Function() onReload;
   @override
   State<_DebtsScreen> createState() => _DebtsScreenState();
@@ -1379,7 +1380,7 @@ class _DebtsScreenState extends State<_DebtsScreen> {
   Future<void> _openPaymentModal(Map<String,dynamic> debt) async {
     final amount=TextEditingController(), note=TextEditingController();
     final payments=(debt['payments'] is List?(debt['payments'] as List).whereType<Map>().map((p)=>Map<String,dynamic>.from(p)).toList():<Map<String,dynamic>>[]);
-    final wallets=['ক্যাশ','ব্যাংক','বিকাশ','নগদ'];
+    final wallets=widget.wallets.isEmpty?['ক্যাশ','ব্যাংক','বিকাশ','নগদ']:widget.wallets;
     var wallet='ক্যাশ', date=DateTime.now(), saving=false;
     int? editing;
     String dateLabel(DateTime d)=>'${d.day.toString().padLeft(2,'0')}/${d.month.toString().padLeft(2,'0')}/${d.year}';
@@ -3365,7 +3366,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       const SizedBox(width: 5),
       summaryCard(title: 'ব্যয়', amount: monthExpense, subtitle: '', icon: Icons.north_rounded, accent: const Color(0xFFFF625B), tint: const Color(0xFFFFEEEE), showTrend: true, change: expenseChange),
       const SizedBox(width: 5),
-      summaryCard(title: 'দেনা', amount: debtTotal, subtitle: '${unpaidDebts.length} জন', icon: Icons.payments_rounded, accent: const Color(0xFFF29A16), tint: const Color(0xFFFFF6E8), showTrend: false, onTap: () => Navigator.of(context).push(_route(_DebtsScreen(debts: _debts, onReload: () async { await _load(); return List<Map<String, dynamic>>.from(_debts); })))),
+      summaryCard(title: 'দেনা', amount: debtTotal, subtitle: '${unpaidDebts.length} জন', icon: Icons.payments_rounded, accent: const Color(0xFFF29A16), tint: const Color(0xFFFFF6E8), showTrend: false, onTap: () => Navigator.of(context).push(_route(_DebtsScreen(debts: _debts, wallets: _walletBalances.keys.toList(), onReload: () async { await _load(); return List<Map<String, dynamic>>.from(_debts); })))),
       const SizedBox(width: 5),
       summaryCard(title: 'বিল', amount: billTotal, subtitle: '${unpaidBills.length} টি বাকি', icon: Icons.calendar_month_rounded, accent: const Color(0xFF2588F5), tint: const Color(0xFFEEF6FF), showTrend: false, onTap: () => Navigator.of(context).push(_route(_BillsScreen(bills: _bills, onReload: () async { await _load(); return List<Map<String, dynamic>>.from(_bills); })))),
     ]);

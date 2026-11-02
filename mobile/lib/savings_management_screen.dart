@@ -114,10 +114,10 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
   String dueLabel(DateTime? d){
     if(d==null)return 'জমা সম্পন্ন';
     final days=d.difference(DateTime.now()).inDays;
-    if(days<0)return '${days.abs()} দিন পেরিয়েছে';
+    if(days<0)return 'জমা বাকি';
     if(days==0)return 'আজ জমা';
     if(days==1)return '১ দিন পরে';
-    return '\$days দিন পরে';
+    return '$days দিন পরে';
   }
   Widget _goalCard(Map<String,dynamic> g,Color surface,Color line,Color ink) {
     final p=paid(g),target=n(g['amount']),left=remaining(g);

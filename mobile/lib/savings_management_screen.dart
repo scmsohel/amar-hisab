@@ -53,7 +53,7 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
   }
   Future<void> paymentForm(Map<String,dynamic> g,{Map<String,dynamic>? old})async{
     final amount=TextEditingController(text:old==null?(n(g['goalInstallmentAmount'])>0?n(g['goalInstallmentAmount']).clamp(0,remaining(g)).toString():remaining(g).toString()):n(old['amount']).toString()),note=TextEditingController(text:(old?['notes']??'').toString());
-    var day=(old?['date']??iso(DateTime.now())).toString(),wallet=(old?['wallet']??widget.walletNames.first).toString();final key=GlobalKey<FormState>();final max=remaining(g)+(old==null?0:n(old['amount']));
+    final linkedTx=old==null?null:transactions.where((t)=>t['id']==old['transactionId']).toList();var day=(linkedTx!=null&&linkedTx.isNotEmpty?linkedTx.first['dateInput']:old?['date'])?.toString()??iso(DateTime.now()),wallet=(old?['wallet']??widget.walletNames.first).toString();final key=GlobalKey<FormState>();final max=remaining(g)+(old==null?0:n(old['amount']));
     final ok=await showModalBottomSheet<bool>(context:context,isScrollControlled:true,showDragHandle:true,builder:(c)=>StatefulBuilder(builder:(c,set)=>Padding(padding:EdgeInsets.fromLTRB(16,8,16,MediaQuery.of(c).viewInsets.bottom+18),child:Form(key:key,child:Column(mainAxisSize:MainAxisSize.min,children:[
       Text(old==null?'সঞ্চয় জমা করুন':'জমা সম্পাদনা',style:const TextStyle(fontSize:18,fontWeight:FontWeight.w900)),
       Text('লক্ষ্য ${money(n(g['amount']))} • বাকি ${money(remaining(g))}',style:const TextStyle(fontSize:12)),

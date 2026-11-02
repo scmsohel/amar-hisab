@@ -100,10 +100,10 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
         border:Border.all(color:color.withValues(alpha:.42)),
       ),
       child:Row(children:[
-        Container(width:42,height:42,decoration:BoxDecoration(color:color.withValues(alpha:.13),shape:BoxShape.circle),child:Icon(icon,color:color,size:23)),
+        Container(width:38,height:38,decoration:BoxDecoration(color:color.withValues(alpha:.13),shape:BoxShape.circle),child:Icon(icon,color:color,size:21)),
         const SizedBox(width:10),
         Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisAlignment:MainAxisAlignment.center,children:[
-          Text(t,maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:10,fontWeight:FontWeight.w700,color:color.withValues(alpha:.9))),
+          Text(t,maxLines:2,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:10,fontWeight:FontWeight.w700,color:color.withValues(alpha:.9))),
           const SizedBox(height:3),
           FittedBox(alignment:Alignment.centerLeft,fit:BoxFit.scaleDown,child:Text(v,style:TextStyle(fontSize:20,fontWeight:FontWeight.w900,color:color))),
           Text(sub,maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:8,color:Colors.blueGrey)),

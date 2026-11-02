@@ -1377,13 +1377,13 @@ class _DebtsScreenState extends State<_DebtsScreen> {
   }
   void _todo(String label) => _notice(context,'$label সুবিধাটি API সংযোগসহ পরবর্তী ধাপে যুক্ত করতে হবে।');
 
-  Future<void> _openCreateDebtModal() async {
+  Future<void> _openCreateDebtModal({bool credit = false}) async {
     final nameController = TextEditingController();
     final amountController = TextEditingController();
     final installmentController = TextEditingController();
     final noteController = TextEditingController();
-    var kind = 'পাওনা';
-    var rule = 'one-time';
+    var kind = credit ? 'দেনা' : 'পাওনা';
+    var rule = credit ? 'installment' : 'one-time';
     var frequency = 'monthly';
     var iconName = 'Banknote';
     var entryDate = DateTime.now();
@@ -1403,7 +1403,7 @@ class _DebtsScreenState extends State<_DebtsScreen> {
               padding: const EdgeInsets.all(18),
               child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
-                  const Expanded(child: Text('নতুন হিসাব', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900))),
+                  Expanded(child: Text(credit ? 'নতুন ক্রেডিট হিসাব' : 'নতুন হিসাব', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900))),
                   IconButton(onPressed: () => Navigator.pop(dialogContext), icon: const Icon(Icons.close)),
                 ]),
                 const Text('আপনার তথ্য অ্যাকাউন্টে সংরক্ষিত হবে।', style: TextStyle(fontSize: 12, color: Colors.blueGrey)),
@@ -1522,10 +1522,12 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                     ]);
                   }),
                   const SizedBox(height: 12),
-                  const Text('মোট দেনা/পাওনা (৳)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 5),
-                  TextField(controller: amountController, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(hintText: '৳ 0')),
-                  const SizedBox(height: 12),
+                  if (!credit) ...[
+                    const Text('মোট দেনা/পাওনা (৳)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 5),
+                    TextField(controller: amountController, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(hintText: '৳ 0')),
+                    const SizedBox(height: 12),
+                  ],
                   const Text('হিসাবের নিয়ম', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 5),
                   DropdownButtonFormField<String>(
@@ -1537,10 +1539,12 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                     onChanged: (v) => setModal(() => rule = v ?? 'one-time'),
                   ),
                   if (rule == 'installment') ...[
-                    const SizedBox(height: 12),
-                    const Text('প্রতি কিস্তির পরিমাণ (৳)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
-                    const SizedBox(height: 5),
-                    TextField(controller: installmentController, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(hintText: '৳ 0')),
+                    if (!credit) ...[
+                      const SizedBox(height: 12),
+                      const Text('প্রতি কিস্তির পরিমাণ (৳)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 5),
+                      TextField(controller: installmentController, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(hintText: '৳ 0')),
+                    ],
                     const SizedBox(height: 12),
                     const Text('কিস্তির বিরতি', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                     const SizedBox(height: 5),
@@ -1595,11 +1599,11 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                       final name = nameController.text.trim();
                       final total = double.tryParse(amountController.text.trim());
                       final per = double.tryParse(installmentController.text.trim());
-                      if (name.isEmpty || total == null || !total.isFinite || total <= 0) {
+                      if (name.isEmpty || (!credit && (total == null || !total.isFinite || total <= 0))) {
                         setModal(() => error = 'সঠিক নাম ও টাকার পরিমাণ দিন।');
                         return;
                       }
-                      if (rule == 'installment' && (per == null || !per.isFinite || per <= 0 || per > total)) {
+                      if (!credit && rule == 'installment' && (per == null || !per.isFinite || per <= 0 || per > total!)) {
                         setModal(() => error = 'কিস্তির পরিমাণ মোট দেনা-পাওনার চেয়ে বেশি হতে পারবে না।');
                         return;
                       }
@@ -1614,20 +1618,21 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                           'title': name,
                           'personName': name,
                           'name': name,
-                          'amount': total,
+                          'amount': credit ? 0 : total,
                           'date': chosenDate,
                           'dateInput': chosenDate,
                           'icon': iconName,
                           'status': kind,
                           'debtKind': kind,
+                          if (credit) 'debtLabel': 'ক্রেডিট কার্ড',
                           'debtRule': rule,
                           'notes': noteController.text.trim(),
                           'updatedAt': dateLabel(DateTime.now()),
                           'payments': <Map<String,dynamic>>[],
-                          if (rule == 'installment') 'installmentAmount': per,
+                          if (!credit && rule == 'installment') 'installmentAmount': per,
                           if (rule == 'installment') 'installmentFrequency': frequency,
                           if (rule == 'installment') 'firstInstallmentDate': chosenDate,
-                          if (rule == 'installment') 'totalInstallments': (total / per!).ceil(),
+                          if (!credit && rule == 'installment') 'totalInstallments': (total! / per!).ceil(),
                         };
                         records.insert(0, item);
                         await _AuthApi._put('/data/debts', {'data': records});
@@ -2052,10 +2057,11 @@ class _DebtsScreenState extends State<_DebtsScreen> {
       appBar:AppBar(backgroundColor:bg,surfaceTintColor:Colors.transparent,
         leading:IconButton(icon:const Icon(Icons.arrow_back_rounded),onPressed:()=>Navigator.pop(context)),
         title:const Text('দেনা-পাওনা',style:TextStyle(fontWeight:FontWeight.w900)),
-        actions:[IconButton(onPressed:_refresh,icon:_loading?const SizedBox(width:18,height:18,child:CircularProgressIndicator(strokeWidth:2)):const Icon(Icons.refresh_rounded)),
-          IconButton(onPressed:_openCreateDebtModal,icon:const Icon(Icons.add_rounded,size:28)),const SizedBox(width:5)]),
+        actions:[IconButton(onPressed:_refresh,icon:_loading?const SizedBox(width:18,height:18,child:CircularProgressIndicator(strokeWidth:2)):const Icon(Icons.refresh_rounded)),const SizedBox(width:5)]),
       body:SafeArea(top:false,child:Column(children:[
         Padding(padding:const EdgeInsets.fromLTRB(13,8,13,0),child:Column(children:[
+          Row(children:[Expanded(child:OutlinedButton.icon(onPressed:()=>_openCreateDebtModal(credit:true),icon:const Icon(Icons.credit_card_rounded,size:17),label:const Text('নতুন ক্রেডিট হিসাব'),style:OutlinedButton.styleFrom(foregroundColor:const Color(0xFF287FF5),side:const BorderSide(color:Color(0xFF287FF5))))),const SizedBox(width:8),Expanded(child:FilledButton.icon(onPressed:()=>_openCreateDebtModal(),icon:const Icon(Icons.add_rounded,size:17),label:const Text('নতুন হিসাব'),style:FilledButton.styleFrom(backgroundColor:const Color(0xFF00A875))))]),
+          const SizedBox(height:10),
           Row(children:[summary('মোট পাওনা','৳ ${receivable.round()}', 'বাকি পাওনার পরিমাণ',Icons.south_west_rounded,green,const Color(0xFFEAF8F2)),const SizedBox(width:8),summary('মোট দেনা','৳ ${payable.round()}','দিতে হবে',Icons.trending_down_rounded,red,const Color(0xFFFFEFF0))]),
           const SizedBox(height:8),
           Row(children:[summary('মোট ব্যক্তি',people.toString(),'সকল দেনা-পাওনার ব্যক্তি',Icons.people_outline_rounded,blue,const Color(0xFFEDF5FF)),const SizedBox(width:8),summary('আসন্ন তারিখ',upcoming.toString(),'আগামী ৭ দিনের মধ্যে',Icons.calendar_month_rounded,purple,const Color(0xFFF4EEFF))]),

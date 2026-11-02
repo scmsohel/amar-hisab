@@ -1392,6 +1392,12 @@ class _DebtsScreenState extends State<_DebtsScreen> {
     String? error;
     String dateValue(DateTime d) => '${d.year.toString().padLeft(4,'0')}-${d.month.toString().padLeft(2,'0')}-${d.day.toString().padLeft(2,'0')}';
     String dateLabel(DateTime d) => '${d.day.toString().padLeft(2,'0')}/${d.month.toString().padLeft(2,'0')}/${d.year}';
+    if (!mounted) {
+      amountController.dispose();
+      noteController.dispose();
+      return;
+    }
+
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
@@ -2436,8 +2442,8 @@ class _BillsScreenState extends State<_BillsScreen> {
     String? message;
     final billCycle = (currentBill['date'] ?? '').toString();
 
-    String isoDate(DateTime d) => d.year.toString().padLeft(4, '0') + '-' + d.month.toString().padLeft(2, '0') + '-' + d.day.toString().padLeft(2, '0');
-    String displayDate(DateTime d) => d.day.toString().padLeft(2, '0') + '/' + d.month.toString().padLeft(2, '0') + '/' + d.year.toString();
+    String isoDate(DateTime d) => '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+    String displayDate(DateTime d) => '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
     double paid() => payments.where((p) {
       final cycle = (p['cycleDate'] ?? '').toString();
       return cycle.isEmpty || cycle == billCycle;
@@ -2512,7 +2518,7 @@ class _BillsScreenState extends State<_BillsScreen> {
                   const SizedBox(height: 12),
                   Row(children: [
                     Expanded(child: Text('পরিশোধের ইতিহাস', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: ink))),
-                    Text(payments.length.toString() + 'টি লেনদেন', style: TextStyle(fontSize: 10, color: muted)),
+                    Text('$payments.lengthটি লেনদেন', style: TextStyle(fontSize: 10, color: muted)),
                   ]),
                   const SizedBox(height: 7),
                   Expanded(child: Container(
@@ -2523,7 +2529,7 @@ class _BillsScreenState extends State<_BillsScreen> {
                       ? Center(child: Text('এখনো কোনো পেমেন্ট যোগ করা হয়নি।', style: TextStyle(fontSize: 11, color: muted)))
                       : ListView.separated(
                           itemCount: payments.length,
-                          separatorBuilder: (_, __) => Divider(height: 1, color: line),
+                          separatorBuilder: (_, _) => Divider(height: 1, color: line),
                           itemBuilder: (rowContext, index) {
                             final payment = payments[payments.length - 1 - index];
                             final paymentId = _num(payment['id']).toInt();
@@ -2535,7 +2541,7 @@ class _BillsScreenState extends State<_BillsScreen> {
                                 const SizedBox(width: 7),
                                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                   Text((payment['date'] ?? '').toString(), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ink)),
-                                  Text((payment['wallet'] ?? 'ক্যাশ').toString() + ((payment['notes'] ?? '').toString().trim().isEmpty ? '' : ' • ' + payment['notes'].toString()), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 9, color: muted)),
+                                  Text('${payment['wallet'] ?? 'ক্যাশ'}${(payment['notes'] ?? '').toString().trim().isEmpty ? '' : ' • ${payment['notes']}'}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 9, color: muted)),
                                 ])),
                                 Text(_money(_num(payment['amount'])), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: green)),
                                 IconButton(visualDensity: VisualDensity.compact, constraints: const BoxConstraints.tightFor(width: 30, height: 32), padding: EdgeInsets.zero, tooltip: 'এডিট',
@@ -2653,9 +2659,10 @@ class _BillsScreenState extends State<_BillsScreen> {
                                 if (nextDue != null) 'cycleKey': rule == 'weekly' ? isoDate(nextDue) : rule == 'yearly' ? nextDue.year.toString() : isoDate(nextDue).substring(0, 7),
                               };
                               bills[ix] = updated;
+                              if (!dialogContext.mounted) return;
                               final tx = <String, dynamic>{
-                                'id': txId, 'title': 'বিল পরিশোধ — ' + _name(currentBill), 'category': 'বিল',
-                                'date': displayDate(paymentDate), 'dateInput': date, 'time': TimeOfDay.now().format(context),
+                                'id': txId, 'title': 'বিল পরিশোধ — ${_name(currentBill)}', 'category': 'বিল',
+                                'date': displayDate(paymentDate), 'dateInput': date, 'time': TimeOfDay.now().format(dialogContext),
                                 'wallet': wallet, 'amount': value, 'kind': 'ব্যয়',
                                 'icon': (currentBill['icon'] ?? 'ReceiptText').toString(),
                                 'billId': currentBill['id'], 'billPaymentId': paymentId, 'note': noteController.text.trim(),

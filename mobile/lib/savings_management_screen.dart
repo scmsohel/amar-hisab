@@ -248,7 +248,7 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
                       const SizedBox(height:8),
                       Row(children:[filter(sort,const ['সর্বশেষ আগে','পুরোনো আগে','পরিমাণ বেশি আগে','পরিমাণ কম আগে'],(v)=>sort=v)]),
                     ]),
-                  )));
+                  ))));
                 },
                 icon:Icon(Icons.filter_list,color:ink),
               ),

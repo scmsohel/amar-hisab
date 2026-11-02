@@ -195,20 +195,5 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
       ])),
     );
   }
-  Future<void> _deleteGoal(Map<String,dynamic> g)async{
-    final yes=await showDialog<bool>(context:context,builder:(c)=>AlertDialog(
-      title:const Text('সঞ্চয় মুছবেন?'),
-      content:Text('${g['title']} পরিকল্পনাটি মুছে যাবে।'),
-      actions:[
-        TextButton(onPressed:()=>Navigator.pop(c,false),child:const Text('বাতিল')),
-        FilledButton(onPressed:()=>Navigator.pop(c,true),child:const Text('মুছুন')),
-      ],
-    ));
-    if(yes==true){
-      await persist(
-        goals.where((x)=>x['id']!=g['id']).toList(),
-        transactions.where((x)=>!(x['category']=='সঞ্চয়'&&x['title']=='সঞ্চয় জমা — ${g['title']}')).toList(),
-      );
-    }
-  }
+
 }

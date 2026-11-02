@@ -3790,8 +3790,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       context: context,
       backgroundColor: isDark ? const Color(0xFF10243A) : Colors.white,
       showDragHandle: true,
+      isScrollControlled: true,
       builder: (sheetContext) => SafeArea(
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(sheetContext).size.height * 0.8,
+          ),
+          child: SingleChildScrollView(
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
           SwitchListTile(
             secondary: const Icon(Icons.dashboard_customize_rounded),
             title: const Text('Compact / Expand'),
@@ -3815,7 +3821,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ListTile(leading: const Icon(Icons.refresh_rounded), title: const Text('ডেটা রিফ্রেশ'), onTap: () { Navigator.pop(sheetContext); _load(); }),
           ListTile(leading: const Icon(Icons.dns_outlined), title: const Text('Server Settings'), onTap: () { Navigator.pop(sheetContext); Navigator.of(context).push(_route(const ServerSettingsScreen())); }),
           ListTile(leading: const Icon(Icons.logout_rounded), title: const Text('লগআউট'), onTap: () async { Navigator.pop(sheetContext); await _AuthApi.clearSession(); if (context.mounted) Navigator.of(context).pushAndRemoveUntil(_route(const LoginScreen()), (route) => false); }),
-        ]),
+            ]),
+          ),
+        ),
       ),
     );
   }

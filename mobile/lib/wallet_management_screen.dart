@@ -140,7 +140,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                       Text('ওয়ালেট ম্যানেজমেন্ট', style: TextStyle(color: ink, fontSize: 17, fontWeight: FontWeight.w900)),
                       Text('আপনার সব ওয়ালেটের ব্যালেন্স ও লেনদেন', style: TextStyle(color: muted, fontSize: 8.5)),
                     ])),
-                    IconButton(visualDensity: VisualDensity.compact, constraints: const BoxConstraints.tightFor(width: 27, height: 27), padding: EdgeInsets.zero, onPressed: _loading ? null : _refresh, icon: Icon(Icons.refresh_rounded, color: ink, size: 19)),
+                    IconButton(visualDensity: VisualDensity.compact, constraints: const BoxConstraints.tightFor(width: 34, height: 34), padding: EdgeInsets.zero, onPressed: _loading ? null : _refresh, icon: Icon(Icons.refresh_rounded, color: ink, size: 19)),
                     FilledButton.icon(style: FilledButton.styleFrom(visualDensity: VisualDensity.compact, padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7), minimumSize: Size.zero), onPressed: _showAddWallet, icon: const Icon(Icons.add_rounded, size: 15), label: const Text('যোগ', style: TextStyle(fontSize: 10))),
                   ]),
                   const SizedBox(height: 8),
@@ -223,7 +223,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                       Row(children: [
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Text('লেনদেনের তালিকা', style: TextStyle(color: ink, fontSize: 14, fontWeight: FontWeight.w900)),
-                          Text('সকল ওয়ালেটের সাম্প্রতিক লেনদেন', style: TextStyle(color: muted, fontSize: 11.5)),
+                          Text('সকল ওয়ালেটের সাম্প্রতিক লেনদেন', style: TextStyle(color: muted, fontSize: 9.5)),
                         ])),
                         DropdownButtonHideUnderline(child: DropdownButton<String>(value: _filterWallet, items: ['সব ওয়ালেট', ...entries].map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 11)))).toList(), onChanged: (v) => setState(() => _filterWallet = v ?? 'সব ওয়ালেট'))),
                         const SizedBox(width: 8),
@@ -317,20 +317,20 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
         padding: const EdgeInsets.symmetric(vertical: 6),
         decoration: BoxDecoration(border: Border(bottom: BorderSide(color: line))),
         child: Row(children: [
-          Container(width: 34, height: 34, decoration: BoxDecoration(color: accent.withValues(alpha: .11), shape: BoxShape.circle), child: Icon(Icons.account_balance_wallet_rounded, color: accent, size: 15)),
+          Container(width: 27, height: 27, decoration: BoxDecoration(color: accent.withValues(alpha: .11), shape: BoxShape.circle), child: Icon(Icons.account_balance_wallet_rounded, color: accent, size: 15)),
           const SizedBox(width: 5),
           SizedBox(width: 66, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(date, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: ink, fontSize: 9.5, fontWeight: FontWeight.w700)),
-            Text(wallet, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muted, fontSize: 9.5)),
+            Text(date, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: ink, fontSize: 8.5, fontWeight: FontWeight.w700)),
+            Text(wallet, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muted, fontSize: 8.5)),
           ])),
           const SizedBox(width: 6),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: ink, fontSize: 10.5, fontWeight: FontWeight.w800)),
-            Text('$kind • ${(tx['category'] ?? tx['categoryName'] ?? '').toString()}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muted, fontSize: 9.5)),
+            Text('$kind • ${(tx['category'] ?? tx['categoryName'] ?? '').toString()}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muted, fontSize: 8.5)),
           ])),
           const SizedBox(width: 4),
-          SizedBox(width: 88, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            FittedBox(fit: BoxFit.scaleDown, child: Text('${isIncome ? '+' : '−'} ${_money(amount)}', style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w900))),
+          SizedBox(width: 76, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            FittedBox(fit: BoxFit.scaleDown, child: Text('${isIncome ? '+' : '−'} ${_money(amount)}', style: TextStyle(color: color, fontSize: 10.5, fontWeight: FontWeight.w900))),
             Icon(Icons.edit_outlined, color: muted, size: 15),
           ])),
         ]),

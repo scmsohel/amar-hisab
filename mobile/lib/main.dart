@@ -1660,6 +1660,299 @@ class _DebtsScreenState extends State<_DebtsScreen> {
     }
   }
 
+  Future<void> _openEditDebtModal(Map<String,dynamic> debt) async {
+    final nameController = TextEditingController(text: (debt['personName'] ?? debt['name'] ?? debt['person'] ?? debt['title'] ?? '').toString());
+    final amountController = TextEditingController(text: (debt['amount'] ?? '').toString());
+    final installmentController = TextEditingController(text: (debt['installmentAmount'] ?? debt['installment_amount'] ?? '').toString());
+    final noteController = TextEditingController(text: (debt['notes'] ?? debt['note'] ?? '').toString());
+    var kind = (debt['debtKind'] ?? debt['kind'] ?? debt['status'] ?? 'পাওনা').toString();
+    if (!['পাওনা','দেনা'].contains(kind)) kind = 'পাওনা';
+    var rule = (debt['debtRule'] ?? debt['accountType'] ?? 'one-time').toString();
+    if (!['one-time','installment'].contains(rule)) rule = rule.contains('কিস্তি') ? 'installment' : 'one-time';
+    var frequency = (debt['installmentFrequency'] ?? debt['installment_frequency'] ?? 'monthly').toString();
+    if (!['weekly','monthly'].contains(frequency)) frequency = 'monthly';
+    var iconName = (debt['icon'] ?? 'Banknote').toString();
+    var entryDate = DateTime.tryParse((debt['date'] ?? debt['dateInput'] ?? '').toString()) ?? DateTime.now();
+    var saving = false;
+    var saved = false;
+    String? error;
+    String dateValue(DateTime d) => '${d.year.toString().padLeft(4,'0')}-${d.month.toString().padLeft(2,'0')}-${d.day.toString().padLeft(2,'0')}';
+    String dateLabel(DateTime d) => '${d.day.toString().padLeft(2,'0')}/${d.month.toString().padLeft(2,'0')}/${d.year}';
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (ctx, setModal) => Dialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 520, maxHeight: MediaQuery.of(ctx).size.height * .88),
+            child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  const Expanded(child: Text('রেকর্ড সম্পাদনা', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900))),
+                  IconButton(onPressed: () => Navigator.pop(dialogContext), icon: const Icon(Icons.close)),
+                ]),
+                const Text('আপনার তথ্য অ্যাকাউন্টে সংরক্ষিত হবে।', style: TextStyle(fontSize: 12, color: Colors.blueGrey)),
+                const SizedBox(height: 12),
+                Flexible(child: SingleChildScrollView(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const Text('ব্যক্তি/বিবরণ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 5),
+                  TextField(controller: nameController, textCapitalization: TextCapitalization.sentences, decoration: const InputDecoration(hintText: 'নাম বা বিবরণ')),
+                  const SizedBox(height: 12),
+                  const Text('আইকন নির্বাচন', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 5),
+                  Builder(builder: (selectorContext) {
+                    final iconOptions = <(String, IconData)>[
+                      ('Briefcase', Icons.work_outline_rounded), ('Banknote', Icons.payments_outlined),
+                      ('CircleDollarSign', Icons.monetization_on_outlined), ('Coins', Icons.toll_outlined),
+                      ('CreditCard', Icons.credit_card_outlined), ('Wallet', Icons.account_balance_wallet_outlined),
+                      ('WalletCards', Icons.wallet_outlined), ('HandCoins', Icons.volunteer_activism_outlined),
+                      ('BadgeDollarSign', Icons.price_check_rounded), ('ReceiptText', Icons.receipt_long_outlined),
+                      ('ChartNoAxesCombined', Icons.query_stats_rounded), ('TrendingUp', Icons.trending_up_rounded),
+                      ('TrendingDown', Icons.trending_down_rounded), ('Calculator', Icons.calculate_outlined),
+                      ('Percent', Icons.percent_rounded), ('Store', Icons.storefront_outlined),
+                      ('ShoppingCart', Icons.shopping_cart_outlined), ('ShoppingBag', Icons.shopping_bag_outlined),
+                      ('ShoppingBasket', Icons.shopping_basket_outlined), ('Tag', Icons.sell_outlined),
+                      ('Gift', Icons.card_giftcard_outlined), ('Package', Icons.inventory_2_outlined),
+                      ('PackageOpen', Icons.unarchive_outlined), ('House', Icons.home_outlined),
+                      ('BedDouble', Icons.bed_outlined), ('Sofa', Icons.weekend_outlined),
+                      ('Lamp', Icons.light_outlined), ('Lightbulb', Icons.lightbulb_outline_rounded),
+                      ('Plug', Icons.power_outlined), ('HousePlug', Icons.electrical_services_outlined),
+                      ('Droplets', Icons.water_drop_outlined), ('Flame', Icons.local_fire_department_outlined),
+                      ('Wifi', Icons.wifi_rounded), ('Smartphone', Icons.smartphone_rounded),
+                      ('Laptop', Icons.laptop_outlined), ('Monitor', Icons.desktop_windows_outlined),
+                      ('Tv', Icons.tv_outlined), ('Router', Icons.router_outlined),
+                      ('Printer', Icons.print_outlined), ('Camera', Icons.camera_alt_outlined),
+                      ('Headphones', Icons.headphones_outlined), ('Gamepad2', Icons.sports_esports_outlined),
+                      ('Car', Icons.directions_car_outlined), ('CarFront', Icons.directions_car_filled_outlined),
+                      ('Bus', Icons.directions_bus_outlined), ('BusFront', Icons.directions_bus_filled_outlined),
+                      ('Train', Icons.train_outlined), ('Bike', Icons.pedal_bike_outlined),
+                      ('Plane', Icons.flight_outlined), ('PlaneTakeoff', Icons.flight_takeoff_rounded),
+                      ('Ship', Icons.directions_boat_outlined), ('Fuel', Icons.local_gas_station_outlined),
+                      ('MapPin', Icons.location_on_outlined), ('Route', Icons.alt_route_rounded),
+                      ('Utensils', Icons.restaurant_outlined), ('UtensilsCrossed', Icons.restaurant_menu_rounded),
+                      ('CookingPot', Icons.soup_kitchen_outlined), ('Coffee', Icons.coffee_outlined),
+                      ('Pizza', Icons.local_pizza_outlined), ('Salad', Icons.eco_outlined),
+                      ('Sandwich', Icons.lunch_dining_outlined), ('Cake', Icons.cake_outlined),
+                      ('IceCream', Icons.icecream_outlined), ('Apple', Icons.apple_rounded),
+                      ('Carrot', Icons.grass_rounded), ('Pill', Icons.medication_outlined),
+                      ('Stethoscope', Icons.medical_services_outlined), ('HeartPulse', Icons.monitor_heart_outlined),
+                      ('Cross', Icons.add_rounded), ('Syringe', Icons.vaccines_outlined),
+                      ('Hospital', Icons.local_hospital_outlined), ('Bandage', Icons.healing_outlined),
+                      ('Dumbbell', Icons.fitness_center_rounded), ('GraduationCap', Icons.school_outlined),
+                      ('BookOpen', Icons.menu_book_outlined), ('Book', Icons.book_outlined),
+                      ('School', Icons.cast_for_education_outlined), ('Notebook', Icons.note_alt_outlined),
+                      ('FileText', Icons.description_outlined), ('Music', Icons.music_note_rounded),
+                      ('Film', Icons.movie_outlined), ('Clapperboard', Icons.video_camera_back_outlined),
+                      ('Theater', Icons.theater_comedy_outlined), ('Popcorn', Icons.local_movies_outlined),
+                      ('PartyPopper', Icons.celebration_outlined), ('Ticket', Icons.confirmation_number_outlined),
+                      ('Trophy', Icons.emoji_events_outlined), ('Turtle', Icons.pets_outlined),
+                      ('Dog', Icons.pets_rounded), ('Cat', Icons.pets_rounded),
+                      ('PawPrint', Icons.pets_outlined), ('Bone', Icons.cruelty_free_outlined),
+                      ('Shirt', Icons.checkroom_outlined), ('Footprints', Icons.directions_walk_rounded),
+                      ('Watch', Icons.watch_outlined), ('Glasses', Icons.visibility_outlined),
+                      ('Gem', Icons.diamond_outlined), ('Users', Icons.groups_outlined),
+                      ('Baby', Icons.child_care_outlined), ('Heart', Icons.favorite_border_rounded),
+                      ('Flower2', Icons.local_florist_outlined), ('Sprout', Icons.grass_outlined),
+                      ('TreePine', Icons.park_outlined), ('Leaf', Icons.eco_outlined),
+                      ('Sun', Icons.wb_sunny_outlined), ('CloudRain', Icons.cloudy_snowing),
+                      ('Snowflake', Icons.ac_unit_rounded), ('Umbrella', Icons.umbrella_outlined),
+                      ('Wrench', Icons.build_outlined), ('Hammer', Icons.handyman_outlined),
+                      ('Paintbrush', Icons.brush_outlined), ('Scissors', Icons.content_cut_rounded),
+                      ('Trash2', Icons.delete_outline_rounded), ('Recycle', Icons.recycling_rounded),
+                      ('CalendarDays', Icons.calendar_month_outlined), ('Clock', Icons.schedule_rounded),
+                      ('Bell', Icons.notifications_none_rounded), ('ShieldCheck', Icons.verified_user_outlined),
+                      ('KeyRound', Icons.key_outlined), ('Ellipsis', Icons.more_horiz_rounded),
+                    ];
+                    final selected = iconOptions.firstWhere((e) => e.$1 == iconName, orElse: () => iconOptions[1]);
+                    return Row(children: [
+                      Container(width: 38, height: 38, decoration: BoxDecoration(
+                        color: const Color(0xFF059669).withValues(alpha: .10), borderRadius: BorderRadius.circular(10)),
+                        child: Icon(selected.$2, color: const Color(0xFF059669), size: 21)),
+                      const SizedBox(width: 9),
+                      Expanded(child: PopupMenuButton<String>(
+                        tooltip: 'আইকন বেছে নিন',
+                        onSelected: (value) => setModal(() => iconName = value),
+                        itemBuilder: (menuContext) => [
+                          PopupMenuItem<String>(
+                            enabled: false, padding: const EdgeInsets.all(8),
+                            child: Builder(builder: (popupContext) => SizedBox(
+                              width: 300, height: 220,
+                              child: GridView.builder(
+                                padding: EdgeInsets.zero, itemCount: iconOptions.length,
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 6, mainAxisSpacing: 5, crossAxisSpacing: 5),
+                                itemBuilder: (gridContext, index) {
+                                  final entry = iconOptions[index];
+                                  final isSelected = iconName == entry.$1;
+                                  return InkWell(
+                                    borderRadius: BorderRadius.circular(10),
+                                    onTap: () => Navigator.of(popupContext).pop(entry.$1),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: isSelected ? const Color(0xFF059669).withValues(alpha: .12) : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(color: isSelected ? const Color(0xFF059669) : Colors.transparent)),
+                                      child: Icon(entry.$2, size: 22, color: isSelected ? const Color(0xFF059669) : Colors.blueGrey)),
+                                  );
+                                },
+                              ),
+                            )),
+                          ),
+                        ],
+                        child: Container(height: 42, decoration: BoxDecoration(
+                          color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: const Color(0xFFE2E8F0))),
+                          child: const Center(child: Icon(Icons.grid_view_rounded, color: Color(0xFF1E293B), size: 21))),
+                      )),
+                    ]);
+                  }),
+                  const SizedBox(height: 12),
+                  const Text('মোট দেনা/পাওনা (৳)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 5),
+                  TextField(controller: amountController, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(hintText: '৳ 0')),
+                  const SizedBox(height: 12),
+                  const Text('হিসাবের নিয়ম', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 5),
+                  DropdownButtonFormField<String>(
+                    initialValue: rule,
+                    items: const [
+                      DropdownMenuItem(value: 'one-time', child: Text('সহজ হিসাব (একবার)')),
+                      DropdownMenuItem(value: 'installment', child: Text('কিস্তির হিসাব')),
+                    ],
+                    onChanged: (v) => setModal(() => rule = v ?? 'one-time'),
+                  ),
+                  if (rule == 'installment') ...[
+                    const SizedBox(height: 12),
+                    const Text('প্রতি কিস্তির পরিমাণ (৳)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 5),
+                    TextField(controller: installmentController, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(hintText: '৳ 0')),
+                    const SizedBox(height: 12),
+                    const Text('কিস্তির বিরতি', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 5),
+                    DropdownButtonFormField<String>(
+                      initialValue: frequency,
+                      items: const [
+                        DropdownMenuItem(value: 'weekly', child: Text('প্রতি সপ্তাহে')),
+                        DropdownMenuItem(value: 'monthly', child: Text('প্রতি মাসে')),
+                      ],
+                      onChanged: (v) => setModal(() => frequency = v ?? 'monthly'),
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                  Text(rule == 'installment' ? 'প্রথম কিস্তির তারিখ' : 'তারিখ (দিন/মাস/বছর)', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 5),
+                  OutlinedButton.icon(
+                    onPressed: () async {
+                      final selected = await showDatePicker(context: dialogContext, initialDate: entryDate, firstDate: DateTime(2000), lastDate: DateTime(2100));
+                      if (selected != null && ctx.mounted) setModal(() => entryDate = selected);
+                    },
+                    icon: const Icon(Icons.calendar_today_outlined, size: 16),
+                    label: Text(dateLabel(entryDate)),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text('তারিখ নির্বাচন করুন। Save করার আগে তারিখ যাচাই হবে।', style: TextStyle(fontSize: 10, color: Colors.blueGrey)),
+                  const SizedBox(height: 12),
+                  const Text('ধরন', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 5),
+                  DropdownButtonFormField<String>(
+                    initialValue: kind,
+                    items: const [
+                      DropdownMenuItem(value: 'পাওনা', child: Text('পাওনা')),
+                      DropdownMenuItem(value: 'দেনা', child: Text('দেনা')),
+                    ],
+                    onChanged: (v) => setModal(() => kind = v ?? 'পাওনা'),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text('নোট', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 5),
+                  TextField(controller: noteController, maxLines: 2, decoration: const InputDecoration(hintText: 'ঐচ্ছিক নোট')),
+                  if (error != null) ...[
+                    const SizedBox(height: 8),
+                    Text(error!, style: const TextStyle(color: Colors.red, fontSize: 12)),
+                  ],
+                ]))),
+                const SizedBox(height: 12),
+                Row(children: [
+                  Expanded(child: OutlinedButton(onPressed: saving ? null : () => Navigator.pop(dialogContext), child: const Text('বাতিল'))),
+                  const SizedBox(width: 8),
+                  Expanded(child: FilledButton.icon(
+                    onPressed: saving ? null : () async {
+                      final name = nameController.text.trim();
+                      final total = double.tryParse(amountController.text.trim());
+                      final per = double.tryParse(installmentController.text.trim());
+                      if (name.isEmpty || total == null || !total.isFinite || total <= 0) {
+                        setModal(() => error = 'সঠিক নাম ও টাকার পরিমাণ দিন।');
+                        return;
+                      }
+                      if (rule == 'installment' && (per == null || !per.isFinite || per <= 0 || per > total)) {
+                        setModal(() => error = 'কিস্তির পরিমাণ মোট দেনা-পাওনার চেয়ে বেশি হতে পারবে না।');
+                        return;
+                      }
+                      setModal(() { saving = true; error = null; });
+                      try {
+                        final response = await _AuthApi._get('/data/debts');
+                        final records = (response['data'] as List).map((x) => Map<String,dynamic>.from(x as Map)).toList();
+                        final chosenDate = dateValue(entryDate);
+                        final existingPayments = debt['payments'] is List ? List<dynamic>.from(debt['payments'] as List) : <dynamic>[];
+                        if (total < _paid(debt)) {
+                          setModal(() { saving = false; error = 'মোট টাকা ইতিমধ্যে পরিশোধিত টাকার চেয়ে কম হতে পারবে না।'; });
+                          return;
+                        }
+                        final item = <String,dynamic>{
+                          ...debt,
+                          'id': debt['id'],
+                          'title': name,
+                          'personName': name,
+                          'name': name,
+                          'amount': total,
+                          'date': chosenDate,
+                          'dateInput': chosenDate,
+                          'icon': iconName,
+                          'status': kind,
+                          'debtKind': kind,
+                          'debtRule': rule,
+                          'notes': noteController.text.trim(),
+                          'updatedAt': dateLabel(DateTime.now()),
+                          'payments': existingPayments,
+                          if (rule == 'installment') 'installmentAmount': per,
+                          if (rule == 'installment') 'installmentFrequency': frequency,
+                          if (rule == 'installment') 'firstInstallmentDate': chosenDate,
+                          if (rule == 'installment') 'totalInstallments': (total / per!).ceil(),
+                        };
+                        final recordIndex = records.indexWhere((record) => record['id'].toString() == debt['id'].toString());
+                        if (recordIndex < 0) throw Exception('রেকর্ডটি পাওয়া যায়নি। তালিকা Refresh করে আবার চেষ্টা করুন।');
+                        records[recordIndex] = item;
+                        await _AuthApi._put('/data/debts', {'data': records});
+                        if (!dialogContext.mounted) return;
+                        saved = true;
+                        Navigator.pop(dialogContext);
+                      } catch (e) {
+                        if (!dialogContext.mounted) return;
+                        setModal(() { saving = false; error = e.toString().replaceFirst('Exception: ', ''); });
+                      }
+                    },
+                    icon: saving ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.check, size: 16),
+                    label: Text(saving ? 'সংরক্ষণ হচ্ছে...' : 'পরিবর্তন সংরক্ষণ করুন'),
+                  )),
+                ]),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    );
+    await WidgetsBinding.instance.endOfFrame;
+    nameController.dispose();
+    amountController.dispose();
+    installmentController.dispose();
+    noteController.dispose();
+    if (saved && mounted) {
+      await _refresh();
+      if (mounted) _notice(context, 'দেনা-পাওনার তথ্য আপডেট হয়েছে।');
+    }
+  }
+
   Future<void> _openPaymentModal(Map<String,dynamic> debt) async {
     final amount=TextEditingController(), note=TextEditingController();
     final payments=(debt['payments'] is List?(debt['payments'] as List).whereType<Map>().map((p)=>Map<String,dynamic>.from(p)).toList():<Map<String,dynamic>>[]);
@@ -1811,8 +2104,8 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                       mainAxisSize:MainAxisSize.min,
                       children:[
                         SizedBox(width:21,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_openPaymentModal(e),icon:const Icon(Icons.volunteer_activism_outlined,size:16,color:Color(0xFF00A875)))),
-                        SizedBox(width:21,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_todo('এডিট'),icon:const Icon(Icons.edit_outlined,size:16,color:Color(0xFF8292A4)))),
-                        SizedBox(width:21,height:28,child:PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints.expand(),iconSize:17,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v)=>_todo(v=='edit'?'এডিট':'রিমাইন্ডার'),itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))])),
+                        SizedBox(width:21,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_openEditDebtModal(e),icon:const Icon(Icons.edit_outlined,size:16,color:Color(0xFF8292A4)))),
+                        SizedBox(width:21,height:28,child:PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints.expand(),iconSize:17,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v){if(v=='edit'){_openEditDebtModal(e);}else{_todo('রিমাইন্ডার');}},itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))])),
                       ],
                     )),
                   ],

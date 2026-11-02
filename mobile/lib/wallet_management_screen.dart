@@ -203,15 +203,15 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                           mutedColor: muted,
                         ))),
                         const SizedBox(width: 8),
-                        Expanded(child: Wrap(spacing: 8, runSpacing: 8, children: [
+                        Expanded(child: Center(child: Wrap(alignment: WrapAlignment.center, runAlignment: WrapAlignment.center, spacing: 8, runSpacing: 8, children: [
                           for (var i = 0; i < _wallets.length; i++)
-                            SizedBox(width: 96, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            SizedBox(width: 88, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               Row(children: [Container(width: 8, height: 8, decoration: BoxDecoration(color: palette[i], shape: BoxShape.circle)), const SizedBox(width: 6), Text(_wallets[i].$1, style: TextStyle(color: muted, fontSize: 10))]),
                               const SizedBox(height: 1),
                               Text(_money(_balances[_wallets[i].$1] ?? 0), style: TextStyle(color: ink, fontWeight: FontWeight.w900, fontSize: 10.5)),
                               Text(_total > 0 ? '${((_balances[_wallets[i].$1] ?? 0) / _total * 100).toStringAsFixed(1)}%' : '0.0%', style: TextStyle(color: muted, fontSize: 9)),
                             ])),
-                        ])),
+                        ]))),
                       ]),
                     ]),
                   ),

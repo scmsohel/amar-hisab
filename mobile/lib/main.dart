@@ -1382,7 +1382,6 @@ class _DebtsScreenState extends State<_DebtsScreen> {
     final amountController = TextEditingController();
     final installmentController = TextEditingController();
     final noteController = TextEditingController();
-    final wallets = widget.wallets.isEmpty ? ['ক্যাশ','ব্যাংক','বিকাশ','নগদ'] : widget.wallets;
     var kind = 'পাওনা';
     var rule = 'one-time';
     var frequency = 'monthly';
@@ -1417,7 +1416,7 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                   const Text('আইকন নির্বাচন', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 5),
                   DropdownButtonFormField<String>(
-                    value: iconName,
+                    initialValue: iconName,
                     decoration: const InputDecoration(),
                     items: const [
                       DropdownMenuItem(value: 'Banknote', child: Text('টাকা')),
@@ -1439,7 +1438,7 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                   const Text('হিসাবের নিয়ম', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 5),
                   DropdownButtonFormField<String>(
-                    value: rule,
+                    initialValue: rule,
                     items: const [
                       DropdownMenuItem(value: 'one-time', child: Text('সহজ হিসাব (একবার)')),
                       DropdownMenuItem(value: 'installment', child: Text('কিস্তির হিসাব')),
@@ -1455,7 +1454,7 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                     const Text('কিস্তির বিরতি', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                     const SizedBox(height: 5),
                     DropdownButtonFormField<String>(
-                      value: frequency,
+                      initialValue: frequency,
                       items: const [
                         DropdownMenuItem(value: 'weekly', child: Text('প্রতি সপ্তাহে')),
                         DropdownMenuItem(value: 'monthly', child: Text('প্রতি মাসে')),
@@ -1480,7 +1479,7 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                   const Text('ধরন', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                   const SizedBox(height: 5),
                   DropdownButtonFormField<String>(
-                    value: kind,
+                    initialValue: kind,
                     items: const [
                       DropdownMenuItem(value: 'পাওনা', child: Text('পাওনা')),
                       DropdownMenuItem(value: 'দেনা', child: Text('দেনা')),
@@ -1537,7 +1536,7 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                           if (rule == 'installment') 'installmentAmount': per,
                           if (rule == 'installment') 'installmentFrequency': frequency,
                           if (rule == 'installment') 'firstInstallmentDate': chosenDate,
-                          if (rule == 'installment') 'totalInstallments': (total! / per!).ceil(),
+                          if (rule == 'installment') 'totalInstallments': (total / per!).ceil(),
                         };
                         records.insert(0, item);
                         await _AuthApi._put('/data/debts', {'data': records});

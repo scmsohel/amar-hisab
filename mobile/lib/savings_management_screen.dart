@@ -92,7 +92,7 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
   String dueLabel(DateTime? d){
     if(d==null)return 'জমা সম্পন্ন';
     final days=d.difference(DateTime.now()).inDays;
-    if(days<0)return '\${days.abs()} দিন পেরিয়েছে';
+    if(days<0)return '${days.abs()} দিন পেরিয়েছে';
     if(days==0)return 'আজ জমা';
     if(days==1)return '১ দিন পরে';
     return '\$days দিন পরে';
@@ -134,16 +134,16 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
             const SizedBox(height:8),
             Row(children:[
               Text(money(p),style:const TextStyle(fontSize:16,fontWeight:FontWeight.w900,color:green)),
-              Text(' / \${money(target)}',style:TextStyle(fontSize:13,color:ink.withValues(alpha:.85))),
+              Text(' / ${money(target)}',style:TextStyle(fontSize:13,color:ink.withValues(alpha:.85))),
             ]),
             const SizedBox(height:5),
             Row(children:[
               Expanded(child:ClipRRect(borderRadius:BorderRadius.circular(8),child:LinearProgressIndicator(value:progress,minHeight:8,backgroundColor:const Color(0xFFD7E0EA),color:accent))),
               const SizedBox(width:8),
-              SizedBox(width:38,child:Text('\${(progress*100).toStringAsFixed(1)}%',textAlign:TextAlign.end,style:TextStyle(fontSize:11,fontWeight:FontWeight.w800,color:ink))),
+              SizedBox(width:38,child:Text('${(progress*100).toStringAsFixed(1)}%',textAlign:TextAlign.end,style:TextStyle(fontSize:11,fontWeight:FontWeight.w800,color:ink))),
             ]),
             const SizedBox(height:3),
-            Text('\${cycles.clamp(0,count)} / $count কিস্তি • বাকি \${money(left)}',style:const TextStyle(fontSize:9,color:Colors.blueGrey)),
+            Text('${cycles.clamp(0,count)} / $count কিস্তি • বাকি ${money(left)}',style:const TextStyle(fontSize:9,color:Colors.blueGrey)),
           ])),
           const SizedBox(width:8),
           Container(
@@ -175,7 +175,7 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
     final active=goals.length-completed;
     final total=goals.fold<double>(0,(a,g)=>a+n(g['amount']));
     final rows=goals.where((g){
-      final text='\${g['title']} \${g['notes']} \${g['status']}'.toLowerCase();
+      final text='${g['title']} ${g['notes']} ${g['status']}'.toLowerCase();
       if(q.isNotEmpty&&!text.contains(q))return false;
       if(status=='চলমান'&&done(g))return false;
       if(status=='সম্পন্ন'&&!done(g))return false;
@@ -233,7 +233,26 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
               focusedBorder:OutlineInputBorder(borderRadius:BorderRadius.circular(17),borderSide:const BorderSide(color:green)),
             ))),
             const SizedBox(width:9),
-            Container(width:54,height:54 decoration:BoxDecoration()),
+            Container(
+              width:54,height:54,
+              decoration:BoxDecoration(color:surface,borderRadius:BorderRadius.circular(17),border:Border.all(color:line)),
+              child:IconButton(
+                onPressed:(){
+                  FocusScope.of(context).unfocus();
+                  showModalBottomSheet<void>(context:context,showDragHandle:true,builder:(c)=>SafeArea(child:Padding(
+                    padding:const EdgeInsets.all(16),
+                    child:Column(mainAxisSize:MainAxisSize.min,children:[
+                      const Text('ফিল্টার',style:TextStyle(fontSize:17,fontWeight:FontWeight.w900)),
+                      const SizedBox(height:12),
+                      Row(children:[filter(status,const ['সব স্ট্যাটাস','চলমান','সম্পন্ন'],(v)=>status=v),const SizedBox(width:7),filter(period,const ['সব সময়','তারিখ আছে','তারিখ নেই'],(v)=>period=v)]),
+                      const SizedBox(height:8),
+                      Row(children:[filter(sort,const ['সর্বশেষ আগে','পুরোনো আগে','পরিমাণ বেশি আগে','পরিমাণ কম আগে'],(v)=>sort=v)]),
+                    ]),
+                  )));
+                },
+                icon:Icon(Icons.filter_list,color:ink),
+              ),
+            ),
           ]),
           const SizedBox(height:9),
           Row(children:[
@@ -244,7 +263,7 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
           const SizedBox(height:10),
           Row(children:[
             Expanded(child:Text('সকল সঞ্চয়',style:TextStyle(fontSize:17,fontWeight:FontWeight.w900,color:ink))),
-            Text('\${rows.length}টি রেকর্ড',style:const TextStyle(fontSize:10,color:Colors.blueGrey)),
+            Text('${rows.length}টি রেকর্ড',style:const TextStyle(fontSize:10,color:Colors.blueGrey)),
           ]),
         ])),
         Expanded(child:rows.isEmpty

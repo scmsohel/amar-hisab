@@ -2847,13 +2847,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
 
-  Future<void> _showAddTransaction({String initialWallet = 'ক্যাশ', String initialKind = 'আয়'}) async {
-    final title = TextEditingController();
-    final amount = TextEditingController();
+  Future<void> _showAddTransaction({String initialWallet = 'ক্যাশ', String initialKind = 'আয়', Map<String, dynamic>? editTransaction}) async {
+    final tx = editTransaction;
     final now = DateTime.now();
-    final date = TextEditingController(text: '${now.year.toString().padLeft(4, '0')}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}');
-    final time = TextEditingController(text: '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}');
-    var kind = initialKind; var category = 'অন্যান্য'; var wallet = initialWallet; var iconName = 'Banknote'; var saving = false;
+    final existingDate = tx == null ? now : (DateTime.tryParse((tx['dateInput'] ?? tx['date_input'] ?? '').toString()) ?? _parseTransactionDate(tx['date']) ?? now);
+    final existingTime = (tx?['timeInput'] ?? '').toString();
+    final title = TextEditingController(text: (tx?['title'] ?? tx?['description'] ?? tx?['note'] ?? '').toString());
+    final amount = TextEditingController(text: tx == null ? '' : _amount(tx['amount']).toString());
+    final note = TextEditingController(text: (tx?['note'] ?? '').toString());
+    final date = TextEditingController(text: '${existingDate.year.toString().padLeft(4, '0')}-${existingDate.month.toString().padLeft(2, '0')}-${existingDate.day.toString().padLeft(2, '0')}');
+    final time = TextEditingController(text: existingTime.isNotEmpty ? existingTime : '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}');
+    var kind = (tx?['kind'] ?? initialKind).toString(); var category = (tx?['category'] ?? tx?['categoryName'] ?? 'অন্যান্য').toString(); var wallet = (tx?['wallet'] ?? tx?['walletName'] ?? tx?['account'] ?? initialWallet).toString(); var iconName = (tx?['icon'] ?? 'Banknote').toString(); var saving = false;
     final formKey = GlobalKey<FormState>();
     final dark = Theme.of(context).brightness == Brightness.dark;
     final surface = dark ? const Color(0xFF102638) : Colors.white;
@@ -2883,7 +2887,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             child: Text(label, style: TextStyle(color: ink, fontSize: 12, fontWeight: FontWeight.w800)),
           );
           return _ControllerDisposalScope(
-            controllers: [title, amount, date, time],
+            controllers: [title, amount, date, time, note],
             child: Dialog(
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -2904,7 +2908,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: Form(key: formKey, child: SingleChildScrollView(padding: const EdgeInsets.fromLTRB(18, 15, 18, 18),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
                   Row(children: [Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('নতুন ${kind == 'আয়' ? 'আয়' : 'ব্যয়'} যোগ করুন', style: TextStyle(color: ink, fontSize: 19, fontWeight: FontWeight.w900)),
+                    Text(tx == null ? 'নতুন ${kind == 'আয়' ? 'আয়' : 'ব্যয়'} যোগ করুন' : 'লেনদেন এডিট করুন', style: TextStyle(color: ink, fontSize: 19, fontWeight: FontWeight.w900)),
                     const SizedBox(height: 3), Text('আপনার হিসাবের তথ্য পূরণ করুন', style: TextStyle(color: muted, fontSize: 11)),
                   ])), IconButton(onPressed: saving ? null : () => Navigator.pop(sheetContext), icon: Icon(Icons.close_rounded, color: muted))]),
                   const SizedBox(height: 12),
@@ -3087,6 +3091,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     decoration: deco(suffix: Icon(Icons.keyboard_arrow_down_rounded, color: muted)), dropdownColor: surface,
                     style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w600), items: wallets.map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
                     onChanged: saving ? null : (v) => setSheetState(() => wallet = v ?? wallet)),
+                  const SizedBox(height: 13), fieldLabel('নোট (ঐচ্ছিক)'),
+                  TextFormField(controller: note, maxLines: 2, minLines: 1, style: TextStyle(color: ink, fontSize: 13), decoration: deco(hint: 'অতিরিক্ত তথ্য লিখুন'),),
                   const SizedBox(height: 17),
                   Row(children: [
                     Expanded(child: OutlinedButton(onPressed: saving ? null : () => Navigator.pop(sheetContext), child: const Text('বাতিল'))),
@@ -3101,20 +3107,29 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           final dateLabel = '${parsed.day.toString().padLeft(2, '0')} $month, ${parsed.year}';
                           final p = time.text.split(':'); final h = int.tryParse(p.first) ?? 0; final m = int.tryParse(p.last) ?? 0;
                           final timeLabel = '${h % 12 == 0 ? 12 : h % 12}:${m.toString().padLeft(2, '0')} ${h < 12 ? 'AM' : 'PM'}';
-                          final item = <String, dynamic>{'id': DateTime.now().millisecondsSinceEpoch, 'title': title.text.trim(),
-                            'category': category, 'date': dateLabel, 'time': timeLabel, 'icon': iconName, 'dateInput': date.text,
-                            'timeInput': time.text, 'wallet': wallet, 'amount': double.parse(amount.text.trim()), 'kind': kind};
-                          await _AuthApi._put('/data/transactions', {'data': [item, ..._transactions]});
+                          final item = <String, dynamic>{
+                            ...?tx,
+                            'id': tx?['id'] ?? DateTime.now().millisecondsSinceEpoch,
+                            'title': title.text.trim(), 'description': title.text.trim(),
+                            'category': category, 'date': dateLabel, 'time': timeLabel,
+                            'icon': iconName, 'dateInput': date.text, 'timeInput': time.text,
+                            'wallet': wallet, 'amount': double.parse(amount.text.trim()),
+                            'kind': kind, 'note': note.text.trim(),
+                          };
+                          final nextTransactions = tx == null
+                              ? [item, ..._transactions]
+                              : _transactions.map((old) => old['id'].toString() == tx['id'].toString() ? item : old).toList();
+                          await _AuthApi._put('/data/transactions', {'data': nextTransactions});
                           if (!mounted || !sheetContext.mounted) return;
                           Navigator.pop(sheetContext); await _load();
-                          if (mounted) ScaffoldMessenger.of(this.context).showSnackBar(const SnackBar(content: Text('নতুন লেনদেন যোগ হয়েছে।')));
+                          if (mounted) ScaffoldMessenger.of(this.context).showSnackBar(SnackBar(content: Text(tx == null ? 'নতুন লেনদেন যোগ হয়েছে।' : 'লেনদেন আপডেট হয়েছে।')));
                         } catch (e) {
                           if (sheetContext.mounted) setSheetState(() => saving = false);
                           if (mounted) ScaffoldMessenger.of(this.context).showSnackBar(SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))));
                         }
                       },
                       child: saving ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : Text('$kind সংরক্ষণ', style: const TextStyle(fontWeight: FontWeight.w800)))),
+                        : Text(tx == null ? '$kind সংরক্ষণ' : 'পরিবর্তন সংরক্ষণ করুন', style: const TextStyle(fontWeight: FontWeight.w800)))),
                   ]),
                 ]))),
             ),
@@ -3124,80 +3139,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _editTransaction(Map<String, dynamic> tx) async {
-    final title = TextEditingController(text: (tx['title'] ?? tx['description'] ?? tx['note'] ?? '').toString());
-    final amount = TextEditingController(text: _amount(tx['amount']).toString());
-    final category = TextEditingController(text: (tx['category'] ?? tx['categoryName'] ?? '').toString());
-    final wallet = TextEditingController(text: (tx['wallet'] ?? tx['walletName'] ?? tx['account'] ?? 'ক্যাশ').toString());
-    final note = TextEditingController(text: (tx['note'] ?? '').toString());
-    final transferTo = TextEditingController(text: (tx['transferTo'] ?? '').toString());
-    final parsed = DateTime.tryParse((tx['dateInput'] ?? tx['date_input'] ?? '').toString()) ?? _parseTransactionDate(tx['date']) ?? DateTime.now();
-    final date = TextEditingController(text: '${parsed.year.toString().padLeft(4, '0')}-${parsed.month.toString().padLeft(2, '0')}-${parsed.day.toString().padLeft(2, '0')}');
-    var kind = (tx['kind'] ?? 'ব্যয়').toString();
-    var saving = false;
-    final key = GlobalKey<FormState>();
-    final messenger = ScaffoldMessenger.of(context);
-    try {
-      await showDialog<void>(context: context, builder: (dialogContext) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: const Text('লেনদেন এডিট করুন'),
-          content: SizedBox(width: 420, child: SingleChildScrollView(child: Form(key: key, child: Column(mainAxisSize: MainAxisSize.min, children: [
-            TextFormField(controller: title, decoration: const InputDecoration(labelText: 'বিবরণ'), validator: (v) => v == null || v.trim().isEmpty ? 'বিবরণ লিখুন' : null),
-            DropdownButtonFormField<String>(
-              initialValue: ['আয়', 'ব্যয়', 'ট্রান্সফার'].contains(kind) ? kind : 'ব্যয়',
-              decoration: const InputDecoration(labelText: 'ধরন'),
-              items: const ['আয়', 'ব্যয়', 'ট্রান্সফার'].map((v) => DropdownMenuItem(value: v, child: Text(v))).toList(),
-              onChanged: saving ? null : (v) => setDialogState(() => kind = v ?? kind),
-            ),
-            TextFormField(controller: amount, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(labelText: 'পরিমাণ (৳)'), validator: (v) { final n = double.tryParse(v ?? ''); return n == null || n <= 0 ? 'সঠিক পরিমাণ লিখুন' : null; }),
-            TextFormField(controller: category, decoration: const InputDecoration(labelText: 'ক্যাটাগরি')),
-            TextFormField(controller: wallet, decoration: const InputDecoration(labelText: 'ওয়ালেট')),
-            if (kind == 'ট্রান্সফার') TextFormField(controller: transferTo, decoration: const InputDecoration(labelText: 'গন্তব্য ওয়ালেট')),
-            TextFormField(controller: date, readOnly: true, decoration: const InputDecoration(labelText: 'তারিখ', suffixIcon: Icon(Icons.calendar_month)), onTap: () async {
-              final picked = await showDatePicker(context: context, initialDate: DateTime.tryParse(date.text) ?? DateTime.now(), firstDate: DateTime(2000), lastDate: DateTime(2100));
-              if (!context.mounted) return;
-              if (picked != null) date.text = '${picked.year.toString().padLeft(4, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}';
-            }),
-            TextFormField(controller: note, decoration: const InputDecoration(labelText: 'নোট (ঐচ্ছিক)')),
-          ])))),
-          actions: [
-            TextButton(onPressed: saving ? null : () => Navigator.pop(dialogContext), child: const Text('বাতিল')),
-            FilledButton(onPressed: saving ? null : () async {
-              if (!key.currentState!.validate()) return;
-              if (kind == 'ট্রান্সফার' && transferTo.text.trim().isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('গন্তব্য ওয়ালেট লিখুন।')));
-                return;
-              }
-              setDialogState(() => saving = true);
-              try {
-                final changed = Map<String, dynamic>.from(tx)
-                  ..['title'] = title.text.trim()
-                  ..['amount'] = double.parse(amount.text.trim())
-                  ..['kind'] = kind
-                  ..['category'] = category.text.trim()
-                  ..['wallet'] = wallet.text.trim()
-                  ..['date'] = date.text
-                  ..['dateInput'] = date.text
-                  ..['note'] = note.text.trim();
-                if (kind == 'ট্রান্সফার') { changed['transferTo'] = transferTo.text.trim(); }
-                else { changed.remove('transferTo'); changed.remove('transfer_to'); }
-                final next = _transactions.map((item) => item['id'].toString() == tx['id'].toString() ? changed : item).toList();
-                await _AuthApi._put('/data/transactions', {'data': next});
-                if (!mounted || !dialogContext.mounted) return;
-                Navigator.pop(dialogContext);
-                await _load();
-                if (!mounted) return;
-                messenger.showSnackBar(const SnackBar(content: Text('লেনদেন আপডেট হয়েছে।')));
-              } catch (e) {
-                if (dialogContext.mounted) setDialogState(() => saving = false);
-                if (mounted) messenger.showSnackBar(SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))));
-              }
-            }, child: saving ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('সংরক্ষণ করুন')),
-          ],
-        ),
-      ));
-    } finally {
-      title.dispose(); amount.dispose(); category.dispose(); wallet.dispose(); note.dispose(); transferTo.dispose(); date.dispose();
-    }
+    await _showAddTransaction(
+      initialWallet: (tx['wallet'] ?? tx['walletName'] ?? 'ক্যাশ').toString(),
+      initialKind: (tx['kind'] ?? 'ব্যয়').toString(),
+      editTransaction: tx,
+    );
   }
 
   Future<void> _deleteTransaction(Map<String, dynamic> tx) async {

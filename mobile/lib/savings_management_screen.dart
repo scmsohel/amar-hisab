@@ -68,65 +68,114 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
   }
   Future<void> deleteGoal(Map<String,dynamic> g)async{final yes=await showDialog<bool>(context:context,builder:(c)=>AlertDialog(title:const Text('সঞ্চয় মুছবেন?'),content:Text('${g['title']} পরিকল্পনাটি মুছে যাবে।'),actions:[TextButton(onPressed:()=>Navigator.pop(c,false),child:const Text('বাতিল')),FilledButton(onPressed:()=>Navigator.pop(c,true),child:const Text('মুছুন'))]));if(yes==true)await persist(goals.where((x)=>x['id']!=g['id']).toList(),transactions.where((x)=>!(x['category']=='সঞ্চয়'&&x['title']=='সঞ্চয় জমা — ${g['title']}')).toList());}
   Future<void> detail(Map<String,dynamic> g)async{await showModalBottomSheet<void>(context:context,isScrollControlled:true,showDragHandle:true,builder:(c)=>StatefulBuilder(builder:(c,set){final ps=payments(g)..sort((a,b)=>n(b['id']).compareTo(n(a['id'])));return Padding(padding:const EdgeInsets.all(16),child:SingleChildScrollView(child:Column(mainAxisSize:MainAxisSize.min,crossAxisAlignment:CrossAxisAlignment.start,children:[Text(g['title'].toString(),style:const TextStyle(fontSize:19,fontWeight:FontWeight.w900)),const SizedBox(height:10),Text('লক্ষ্য ${money(n(g['amount']))}   •   জমা ${money(paid(g))}   •   বাকি ${money(remaining(g))}'),const SizedBox(height:8),LinearProgressIndicator(value:n(g['amount'])>0?(paid(g)/n(g['amount'])).clamp(0,1):0,minHeight:7),const SizedBox(height:12),const Text('জমার ইতিহাস',style:TextStyle(fontWeight:FontWeight.w900)),if(ps.isEmpty)const Padding(padding:EdgeInsets.all(12),child:Text('এখনো কোনো জমা যোগ করা হয়নি।')), ...ps.map((p)=>ListTile(dense:true,contentPadding:EdgeInsets.zero,title:Text('জমা • ${p['date']}'),subtitle:Text('${p['wallet']} • ${p['notes']??''}'),leading:const Icon(Icons.savings_outlined),trailing:Row(mainAxisSize:MainAxisSize.min,children:[Text(money(n(p['amount']))),IconButton(onPressed:(){Navigator.pop(c);paymentForm(g,old:p);},icon:const Icon(Icons.edit_outlined,size:18)),IconButton(onPressed:(){Navigator.pop(c);final ps2=payments(g)..removeWhere((x)=>x['id']==p['id']);final total=ps2.fold<double>(0,(a,x)=>a+n(x['amount']));final up=<String,dynamic>{...g,'payments':ps2,'status':total>=n(g['amount'])?'সম্পন্ন':'চলমান'};persist(goals.map((x)=>x['id']==g['id']?up:x).toList(),transactions.where((x)=>x['id']!=p['transactionId']).toList());},icon:const Icon(Icons.delete_outline,size:18))]))),if(remaining(g)>0)SizedBox(width:double.infinity,child:FilledButton.icon(onPressed:(){Navigator.pop(c);paymentForm(g);},icon:const Icon(Icons.add),label:const Text('জমা যোগ করুন')))])));}));}
-  Widget summary(String t,String v,String sub,IconData icon,Color color,Color tint)=>Expanded(child:Container(padding:const EdgeInsets.all(9),decoration:BoxDecoration(color:tint,borderRadius:BorderRadius.circular(14),border:Border.all(color:color.withValues(alpha:.2))),child:Row(children:[Icon(icon,color:color,size:20),const SizedBox(width:6),Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text(t,style:TextStyle(fontSize:9,color:color)),FittedBox(alignment:Alignment.centerLeft,child:Text(v,style:TextStyle(fontSize:15,fontWeight:FontWeight.w900,color:color))),Text(sub,maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:8,color:Colors.blueGrey))]))])));
-  Widget filter(String v,List<String> options,ValueChanged<String> set)=>Expanded(child:DropdownButtonFormField<String>(initialValue:v,isExpanded:true,decoration:const InputDecoration(contentPadding:EdgeInsets.symmetric(horizontal:7,vertical:7)),items:options.map((x)=>DropdownMenuItem(value:x,child:Text(x,style:const TextStyle(fontSize:10),overflow:TextOverflow.ellipsis))).toList(),onChanged:(x){if(x!=null)setState(()=>set(x));}));
+  Widget summary(String t,String v,String sub,IconData icon,Color color,Color tint)=>Expanded(
+    child:Container(
+      constraints:const BoxConstraints(minHeight:92),
+      padding:const EdgeInsets.symmetric(horizontal:11,vertical:12),
+      decoration:BoxDecoration(
+        color:tint.withValues(alpha:.72),
+        borderRadius:BorderRadius.circular(18),
+        border:Border.all(color:color.withValues(alpha:.42)),
+      ),
+      child:Row(children:[
+        Container(width:42,height:42,decoration:BoxDecoration(color:color.withValues(alpha:.13),shape:BoxShape.circle),child:Icon(icon,color:color,size:24)),
+        const SizedBox(width:10),
+        Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisAlignment:MainAxisAlignment.center,children:[
+          Text(t,maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:11,fontWeight:FontWeight.w700,color:color.withValues(alpha:.9))),
+          const SizedBox(height:3),
+          FittedBox(alignment:Alignment.centerLeft,fit:BoxFit.scaleDown,child:Text(v,style:TextStyle(fontSize:21,fontWeight:FontWeight.w900,color:color))),
+          Text(sub,maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:9,color:Colors.blueGrey)),
+        ])),
+      ]),
+    ),
+  );
+  String dueLabel(DateTime? d){
+    if(d==null)return 'জমা সম্পন্ন';
+    final days=d.difference(DateTime.now()).inDays;
+    if(days<0)return '\${days.abs()} দিন পেরিয়েছে';
+    if(days==0)return 'আজ জমা';
+    if(days==1)return '১ দিন পরে';
+    return '\$days দিন পরে';
+  }
   Widget _goalCard(Map<String,dynamic> g,Color surface,Color line,Color ink) {
-    final p=paid(g);
-    final target=n(g['amount']);
-    final left=remaining(g);
+    final p=paid(g),target=n(g['amount']),left=remaining(g);
     final progress=target>0?(p/target).clamp(0.0,1.0).toDouble():0.0;
-    final isDone=done(g);
+    final isDone=done(g),next=nextDate(g);
     final accent=isDone?green:blue;
-    final next=nextDate(g);
+    final freq=(g['goalFrequency']??'monthly')=='weekly'?'সাপ্তাহিক':'মাসিক';
     final count=n(g['goalInstallmentCount']).toInt().clamp(0,100000);
     final per=n(g['goalInstallmentAmount']);
     final cycles=per>0?(p/per+1e-8).floor():payments(g).length;
-    return Container(
-      padding:const EdgeInsets.all(10),
-      decoration:BoxDecoration(color:surface,borderRadius:BorderRadius.circular(15),border:Border.all(color:line)),
-      child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-        Row(children:[
-          CircleAvatar(radius:17,backgroundColor:accent.withValues(alpha:.12),child:Icon(Icons.savings_outlined,color:accent,size:18)),
-          const SizedBox(width:8),
+    return InkWell(
+      borderRadius:BorderRadius.circular(22),
+      onTap:()=>detail(g),
+      child:Container(
+        padding:const EdgeInsets.fromLTRB(13,12,12,12),
+        decoration:BoxDecoration(color:surface,borderRadius:BorderRadius.circular(22),border:Border.all(color:line.withValues(alpha:.9)),boxShadow:[BoxShadow(color:Colors.black.withValues(alpha:.045),blurRadius:9,offset:const Offset(0,3))]),
+        child:Row(crossAxisAlignment:CrossAxisAlignment.center,children:[
+          Container(width:48,height:48,decoration:BoxDecoration(color:accent.withValues(alpha:.13),shape:BoxShape.circle),child:Icon(Icons.account_balance_wallet_outlined,color:accent,size:26)),
+          const SizedBox(width:12),
           Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
-            Text(g['title'].toString(),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontWeight:FontWeight.w900,fontSize:13,color:ink)),
-            Text('${(g['goalFrequency']??'monthly')=='weekly'?'সাপ্তাহিক':'মাসিক'} • শুরু ${dateLabel(g['goalStartDate']??g['date'])}',style:const TextStyle(fontSize:9,color:Colors.blueGrey)),
+            Row(children:[
+              Expanded(child:Text(g['title'].toString(),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:16,fontWeight:FontWeight.w900,color:ink))),
+              Container(padding:const EdgeInsets.symmetric(horizontal:10,vertical:5),decoration:BoxDecoration(color:(isDone?green:next!=null&&next.difference(DateTime.now()).inDays<0?red:green).withValues(alpha:.11),borderRadius:BorderRadius.circular(18)),child:Text(isDone?'সম্পন্ন':next!=null&&next.difference(DateTime.now()).inDays<0?'দিন বাকি':'চলমান',style:TextStyle(fontSize:10,fontWeight:FontWeight.w800,color:isDone?green:next!=null&&next.difference(DateTime.now()).inDays<0?red:green))),
+              PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints(minWidth:125),icon:Icon(Icons.more_horiz,color:ink.withValues(alpha:.65),size:21),onSelected:(v){if(v=='edit'){goalForm(old:g);}else if(v=='delete'){deleteGoal(g);}},itemBuilder:(_)=>const [PopupMenuItem(value:'edit',child:Text('সম্পাদনা')),PopupMenuItem(value:'delete',child:Text('মুছে ফেলুন'))]),
+            ]),
+            const SizedBox(height:3),
+            Row(children:[
+              Icon(Icons.calendar_today_outlined,size:14,color:ink.withValues(alpha:.65)),
+              const SizedBox(width:5),
+              Text(dateLabel(g['goalStartDate']??g['date']),style:TextStyle(fontSize:11,color:ink.withValues(alpha:.78))),
+              const SizedBox(width:10),
+              Icon(Icons.layers_outlined,size:14,color:ink.withValues(alpha:.65)),
+              const SizedBox(width:4),
+              Text(freq,style:TextStyle(fontSize:11,color:ink.withValues(alpha:.78))),
+            ]),
+            const SizedBox(height:8),
+            Row(children:[
+              Text(money(p),style:const TextStyle(fontSize:16,fontWeight:FontWeight.w900,color:green)),
+              Text(' / \${money(target)}',style:TextStyle(fontSize:13,color:ink.withValues(alpha:.85))),
+            ]),
+            const SizedBox(height:5),
+            Row(children:[
+              Expanded(child:ClipRRect(borderRadius:BorderRadius.circular(8),child:LinearProgressIndicator(value:progress,minHeight:8,backgroundColor:const Color(0xFFD7E0EA),color:accent))),
+              const SizedBox(width:8),
+              SizedBox(width:38,child:Text('\${(progress*100).toStringAsFixed(1)}%',textAlign:TextAlign.end,style:TextStyle(fontSize:11,fontWeight:FontWeight.w800,color:ink))),
+            ]),
+            const SizedBox(height:3),
+            Text('\${cycles.clamp(0,count)} / $count কিস্তি • বাকি \${money(left)}',style:const TextStyle(fontSize:9,color:Colors.blueGrey)),
           ])),
-          Text(isDone?'সম্পন্ন':'চলমান',style:TextStyle(fontSize:9,fontWeight:FontWeight.w800,color:accent)),
-          PopupMenuButton<String>(padding:EdgeInsets.zero,icon:const Icon(Icons.more_horiz,size:19),onSelected:(v){if(v=='edit'){goalForm(old:g);}else{deleteGoal(g);}},itemBuilder:(_)=>const [PopupMenuItem(value:'edit',child:Text('সম্পাদনা')),PopupMenuItem(value:'delete',child:Text('মুছে ফেলুন'))]),
+          const SizedBox(width:8),
+          Container(
+            constraints:const BoxConstraints(minWidth:76,maxWidth:102),
+            padding:const EdgeInsets.symmetric(horizontal:8,vertical:10),
+            decoration:BoxDecoration(color:const Color(0xFFFFEEF2),borderRadius:BorderRadius.circular(15)),
+            child:Column(mainAxisSize:MainAxisSize.min,children:[
+              const Icon(Icons.calendar_month_outlined,color:red,size:20),
+              const SizedBox(height:3),
+              const Text('পরবর্তী জমা',style:TextStyle(fontSize:9,color:Color(0xFF475569))),
+              Text(dueLabel(next),textAlign:TextAlign.center,maxLines:2,style:const TextStyle(fontSize:11,fontWeight:FontWeight.w900,color:red)),
+            ]),
+          ),
+          const SizedBox(width:2),
+          Icon(Icons.chevron_right,color:ink.withValues(alpha:.8),size:23),
         ]),
-        const SizedBox(height:8),
-        Row(children:[
-          Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[const Text('জমা হয়েছে',style:TextStyle(fontSize:9,color:Colors.blueGrey)),Text(money(p),style:const TextStyle(fontSize:15,fontWeight:FontWeight.w900,color:green))])),
-          Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[const Text('লক্ষ্য',style:TextStyle(fontSize:9,color:Colors.blueGrey)),Text(money(target),style:TextStyle(fontSize:14,fontWeight:FontWeight.w800,color:ink))])),
-          Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[const Text('বাকি',style:TextStyle(fontSize:9,color:Colors.blueGrey)),Text(money(left),style:const TextStyle(fontSize:13,fontWeight:FontWeight.w800,color:red))])),
-        ]),
-        const SizedBox(height:7),
-        ClipRRect(borderRadius:BorderRadius.circular(8),child:LinearProgressIndicator(value:progress,minHeight:6,backgroundColor:accent.withValues(alpha:.12),color:accent)),
-        const SizedBox(height:6),
-        Row(children:[
-          Text('${(progress*100).toStringAsFixed(0)}% সম্পন্ন',style:const TextStyle(fontSize:9,color:Colors.blueGrey)),
-          const Spacer(),
-          Text('${cycles.clamp(0,count)} / $count কিস্তি',style:const TextStyle(fontSize:9,color:Colors.blueGrey)),
-          if(next!=null)...[const SizedBox(width:8),Text('পরবর্তী: ${dateLabel(iso(next))}',style:const TextStyle(fontSize:9,color:Colors.blueGrey))],
-        ]),
-        Align(alignment:Alignment.centerRight,child:TextButton.icon(onPressed:()=>detail(g),icon:const Icon(Icons.add_circle_outline,size:15),label:const Text('জমা / বিস্তারিত',style:TextStyle(fontSize:10)))),
-      ]),
+      ),
     );
   }
   @override
   Widget build(BuildContext context) {
     final dark=Theme.of(context).brightness==Brightness.dark;
-    final bg=dark?const Color(0xFF071827):const Color(0xFFF3F7FB);
+    final bg=dark?const Color(0xFF071827):const Color(0xFFF4F7FC);
     final surface=dark?const Color(0xFF10283D):Colors.white;
-    final line=dark?const Color(0xFF294158):const Color(0xFFE3EAF1);
+    final line=dark?const Color(0xFF294158):const Color(0xFFDCE5F0);
     final ink=dark?Colors.white:const Color(0xFF172B43);
     final q=search.text.toLowerCase();
     final completed=goals.where(done).length;
     final active=goals.length-completed;
     final total=goals.fold<double>(0,(a,g)=>a+n(g['amount']));
     final rows=goals.where((g){
-      final text='${g['title']} ${g['notes']} ${g['status']}'.toLowerCase();
+      final text='\${g['title']} \${g['notes']} \${g['status']}'.toLowerCase();
       if(q.isNotEmpty&&!text.contains(q))return false;
       if(status=='চলমান'&&done(g))return false;
       if(status=='সম্পন্ন'&&!done(g))return false;
@@ -143,52 +192,67 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
     });
     return Scaffold(
       backgroundColor:bg,
-      appBar:AppBar(
-        backgroundColor:bg,surfaceTintColor:Colors.transparent,
-        title:const Text('সঞ্চয়',style:TextStyle(fontWeight:FontWeight.w900)),
-        leading:IconButton(onPressed:()=>Navigator.pop(context),icon:const Icon(Icons.arrow_back)),
-        actions:[
-          IconButton(onPressed:refresh,icon:busy?const SizedBox(width:18,height:18,child:CircularProgressIndicator(strokeWidth:2)):const Icon(Icons.refresh)),
-          IconButton(onPressed:()=>goalForm(),icon:const Icon(Icons.add,size:27)),
-        ],
+      appBar:PreferredSize(
+        preferredSize:const Size.fromHeight(91),
+        child:AppBar(
+          toolbarHeight:91,backgroundColor:bg,surfaceTintColor:Colors.transparent,elevation:0,
+          leading:IconButton(onPressed:()=>Navigator.pop(context),icon:Icon(Icons.arrow_back,color:ink,size:25)),
+          titleSpacing:0,
+          title:Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisAlignment:MainAxisAlignment.center,children:[
+            Text('সঞ্চয়',style:TextStyle(fontSize:25,fontWeight:FontWeight.w900,color:ink)),
+            Text('আপনার সঞ্চয় পরিকল্পনা, সঞ্চয়ের অগ্রগতি ও লক্ষ্য',maxLines:2,style:TextStyle(fontSize:11,color:ink.withValues(alpha:.75))),
+          ]),
+          actions:[
+            IconButton(onPressed:refresh,icon:busy?const SizedBox(width:19,height:19,child:CircularProgressIndicator(strokeWidth:2)):Icon(Icons.refresh,color:ink,size:25)),
+            Padding(padding:const EdgeInsets.only(right:10),child:FilledButton.icon(
+              style:FilledButton.styleFrom(backgroundColor:const Color(0xFF008B55),foregroundColor:Colors.white,padding:const EdgeInsets.symmetric(horizontal:12,vertical:11),shape:RoundedRectangleBorder(borderRadius:BorderRadius.circular(16))),
+              onPressed:()=>goalForm(),icon:const Icon(Icons.add,size:19),label:const Text('নতুন সঞ্চয়',style:TextStyle(fontSize:12,fontWeight:FontWeight.w800)),
+            )),
+          ],
+        ),
       ),
       body:SafeArea(top:false,child:Column(children:[
-        Padding(padding:const EdgeInsets.fromLTRB(12,7,12,8),child:Column(children:[
+        Padding(padding:const EdgeInsets.fromLTRB(12,5,12,10),child:Column(children:[
           Row(children:[
             summary('মোট সঞ্চয় পরিকল্পনা',goals.length.toString(),'সঞ্চয়ের লক্ষ্য রেকর্ড',Icons.track_changes,green,const Color(0xFFEAF8F2)),
-            const SizedBox(width:7),
-            summary('মোট সঞ্চয়ের পরিমাণ',money(total),'সব পরিকল্পনার লক্ষ্য',Icons.savings,red,const Color(0xFFFFF0F1)),
+            const SizedBox(width:9),
+            summary('মোট সঞ্চয়ের পরিমাণ',money(total),'সব সঞ্চয় পরিকল্পনার মোট টাকা',Icons.currency_exchange,red,const Color(0xFFFFF0F1)),
           ]),
-          const SizedBox(height:7),
+          const SizedBox(height:9),
           Row(children:[
-            summary('সম্পন্ন সঞ্চয়',completed.toString(),'সম্পন্ন বা অর্জিত',Icons.check_circle,blue,const Color(0xFFEDF5FF)),
-            const SizedBox(width:7),
+            summary('সম্পন্ন সঞ্চয়',completed.toString(),'সম্পন্ন বা অর্জিত',Icons.check,blue,const Color(0xFFEDF5FF)),
+            const SizedBox(width:9),
             summary('চলমান সঞ্চয়',active.toString(),'এখনো সম্পন্ন হয়নি',Icons.calendar_month,purple,const Color(0xFFF4EEFF)),
           ]),
-          const SizedBox(height:8),
-          TextField(controller:search,onChanged:(_)=>setState((){}),decoration:InputDecoration(
-            hintText:'সঞ্চয় বা নোট খুঁজুন...',prefixIcon:const Icon(Icons.search,size:18),filled:true,fillColor:surface,
-            contentPadding:const EdgeInsets.symmetric(vertical:9),
-            border:OutlineInputBorder(borderRadius:BorderRadius.circular(14),borderSide:BorderSide(color:line)),
-          )),
-          const SizedBox(height:7),
+          const SizedBox(height:13),
+          Row(children:[
+            Expanded(child:TextField(controller:search,onChanged:(_)=>setState((){}),decoration:InputDecoration(
+              hintText:'সঞ্চয় বা নোট খুঁজুন...',prefixIcon:Icon(Icons.search,color:ink.withValues(alpha:.65)),filled:true,fillColor:surface,
+              contentPadding:const EdgeInsets.symmetric(vertical:14),
+              enabledBorder:OutlineInputBorder(borderRadius:BorderRadius.circular(17),borderSide:BorderSide(color:line)),
+              focusedBorder:OutlineInputBorder(borderRadius:BorderRadius.circular(17),borderSide:const BorderSide(color:green)),
+            ))),
+            const SizedBox(width:9),
+            Container(width:54,height:54 decoration:BoxDecoration()),
+          ]),
+          const SizedBox(height:9),
           Row(children:[
             filter(status,const ['সব স্ট্যাটাস','চলমান','সম্পন্ন'],(v)=>status=v),
-            const SizedBox(width:6),filter(period,const ['সব সময়','তারিখ আছে','তারিখ নেই'],(v)=>period=v),
-            const SizedBox(width:6),filter(sort,const ['সর্বশেষ আগে','পুরোনো আগে','পরিমাণ বেশি আগে','পরিমাণ কম আগে'],(v)=>sort=v),
+            const SizedBox(width:7),filter(period,const ['সব সময়','তারিখ আছে','তারিখ নেই'],(v)=>period=v),
+            const SizedBox(width:7),filter(sort,const ['সর্বশেষ আগে','পুরোনো আগে','পরিমাণ বেশি আগে','পরিমাণ কম আগে'],(v)=>sort=v),
           ]),
-          const SizedBox(height:7),
+          const SizedBox(height:10),
           Row(children:[
-            Expanded(child:Text('সকল সঞ্চয়',style:TextStyle(fontSize:15,fontWeight:FontWeight.w900,color:ink))),
-            Text('${rows.length}টি রেকর্ড',style:const TextStyle(fontSize:10,color:Colors.blueGrey)),
+            Expanded(child:Text('সকল সঞ্চয়',style:TextStyle(fontSize:17,fontWeight:FontWeight.w900,color:ink))),
+            Text('\${rows.length}টি রেকর্ড',style:const TextStyle(fontSize:10,color:Colors.blueGrey)),
           ]),
         ])),
         Expanded(child:rows.isEmpty
-          ?Center(child:Text(goals.isEmpty?'এখনো কোনো সঞ্চয় যোগ করা হয়নি।':'কোনো রেকর্ড পাওয়া যায়নি।'))
+          ?Center(child:Text(goals.isEmpty?'এখনো কোনো সঞ্চয় যোগ করা হয়নি।':'কোনো রেকর্ড পাওয়া যায়নি।',style:TextStyle(color:ink)))
           :ListView.separated(
-            padding:const EdgeInsets.fromLTRB(12,0,12,16),
+            padding:const EdgeInsets.fromLTRB(12,0,12,18),
             itemCount:rows.length,
-            separatorBuilder:(_,_)=>const SizedBox(height:7),
+            separatorBuilder:(_,_)=>const SizedBox(height:9),
             itemBuilder:(context,index)=>_goalCard(rows[index],surface,line,ink),
           ),
         ),

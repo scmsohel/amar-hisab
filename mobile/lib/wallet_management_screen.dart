@@ -178,7 +178,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                     physics: const NeverScrollableScrollPhysics(),
                     mainAxisSpacing: 8,
                     crossAxisSpacing: 8,
-                    childAspectRatio: 1.60,
+                    childAspectRatio: 1.80,
                     children: [
                       for (final wallet in _wallets)
                         _walletCard(wallet.$1, wallet.$2, wallet.$3, _balances[wallet.$1] ?? 0, surface, ink, muted),
@@ -266,18 +266,18 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
     final isNagad = name == 'নগদ';
     final bg = isBikash ? const Color(0xFFFFF5F9) : isNagad ? const Color(0xFFFFF8F1) : name == 'ক্যাশ' ? const Color(0xFFF2FCF7) : const Color(0xFFF3F7FF);
     return Container(
-      padding: const EdgeInsets.all(7),
+      padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(color: surface == Colors.white ? bg : surface, borderRadius: BorderRadius.circular(19), border: Border.all(color: accent.withValues(alpha: .55)), boxShadow: [BoxShadow(color: accent.withValues(alpha: .07), blurRadius: 10, offset: const Offset(0, 3))]),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Container(width: 28, height: 28, decoration: BoxDecoration(color: accent.withValues(alpha: .10), shape: BoxShape.circle), child: Center(child: SizedBox(width: 18, height: 18, child: isBikash ? SvgPicture.asset('assets/wallets/bkash-mark.svg') : isNagad ? SvgPicture.asset('assets/wallets/nagad-mark.svg') : Icon(icon, color: accent, size: 18)))),
+          Container(width: 24, height: 24, decoration: BoxDecoration(color: accent.withValues(alpha: .10), shape: BoxShape.circle), child: Center(child: SizedBox(width: 16, height: 16, child: isBikash ? SvgPicture.asset('assets/wallets/bkash-mark.svg') : isNagad ? SvgPicture.asset('assets/wallets/nagad-mark.svg') : Icon(icon, color: accent, size: 16)))),
           const Spacer(),
           Icon(Icons.more_horiz_rounded, color: muted, size: 20),
         ]),
         const SizedBox(height: 1),
-        Text(name, style: TextStyle(color: ink, fontSize: 11, fontWeight: FontWeight.w900)),
-        Text(_money(balance), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: accent, fontSize: 15.5, fontWeight: FontWeight.w900)),
-        const SizedBox(height: 4),
+        Text(name, style: TextStyle(color: ink, fontSize: 10, fontWeight: FontWeight.w900)),
+        Text(_money(balance), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: accent, fontSize: 14, fontWeight: FontWeight.w900)),
+        const SizedBox(height: 3),
         Row(children: [
           Expanded(child: _walletAction('↙ আয়', const Color(0xFF008F50), const Color(0xFFE1F8EA), () async { await widget.onAddTransaction(name, 'আয়'); await _refresh(); })),
           const SizedBox(width: 4),
@@ -296,8 +296,8 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
       borderRadius: BorderRadius.circular(10),
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 1),
-        child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Text(label, style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w800)))),
+        padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 1),
+        child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Text(label, style: TextStyle(color: color, fontSize: 8.5, fontWeight: FontWeight.w800)))),
       ),
     ),
   );

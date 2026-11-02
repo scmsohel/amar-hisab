@@ -1377,6 +1377,199 @@ class _DebtsScreenState extends State<_DebtsScreen> {
   }
   void _todo(String label) => _notice(context,'$label সুবিধাটি API সংযোগসহ পরবর্তী ধাপে যুক্ত করতে হবে।');
 
+  Future<void> _openCreateDebtModal() async {
+    final nameController = TextEditingController();
+    final amountController = TextEditingController();
+    final installmentController = TextEditingController();
+    final noteController = TextEditingController();
+    final wallets = widget.wallets.isEmpty ? ['ক্যাশ','ব্যাংক','বিকাশ','নগদ'] : widget.wallets;
+    var kind = 'পাওনা';
+    var rule = 'one-time';
+    var frequency = 'monthly';
+    var iconName = 'Banknote';
+    var entryDate = DateTime.now();
+    var saving = false;
+    var saved = false;
+    String? error;
+    String dateValue(DateTime d) => '${d.year.toString().padLeft(4,'0')}-${d.month.toString().padLeft(2,'0')}-${d.day.toString().padLeft(2,'0')}';
+    String dateLabel(DateTime d) => '${d.day.toString().padLeft(2,'0')}/${d.month.toString().padLeft(2,'0')}/${d.year}';
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (ctx, setModal) => Dialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 520, maxHeight: MediaQuery.of(ctx).size.height * .88),
+            child: Padding(
+              padding: const EdgeInsets.all(18),
+              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  const Expanded(child: Text('নতুন হিসাব', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900))),
+                  IconButton(onPressed: () => Navigator.pop(dialogContext), icon: const Icon(Icons.close)),
+                ]),
+                const Text('আপনার তথ্য অ্যাকাউন্টে সংরক্ষিত হবে।', style: TextStyle(fontSize: 12, color: Colors.blueGrey)),
+                const SizedBox(height: 12),
+                Flexible(child: SingleChildScrollView(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  const Text('ব্যক্তি/বিবরণ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 5),
+                  TextField(controller: nameController, textCapitalization: TextCapitalization.sentences, decoration: const InputDecoration(hintText: 'নাম বা বিবরণ')),
+                  const SizedBox(height: 12),
+                  const Text('আইকন নির্বাচন', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 5),
+                  DropdownButtonFormField<String>(
+                    value: iconName,
+                    decoration: const InputDecoration(),
+                    items: const [
+                      DropdownMenuItem(value: 'Banknote', child: Text('টাকা')),
+                      DropdownMenuItem(value: 'UserRound', child: Text('ব্যক্তি')),
+                      DropdownMenuItem(value: 'BriefcaseBusiness', child: Text('ব্যবসা')),
+                      DropdownMenuItem(value: 'Home', child: Text('বাড়ি')),
+                      DropdownMenuItem(value: 'Car', child: Text('গাড়ি')),
+                      DropdownMenuItem(value: 'GraduationCap', child: Text('শিক্ষা')),
+                      DropdownMenuItem(value: 'Heart', child: Text('ব্যক্তিগত')),
+                      DropdownMenuItem(value: 'ShoppingBag', child: Text('অন্যান্য')),
+                    ],
+                    onChanged: (v) { if (v != null) setModal(() => iconName = v); },
+                  ),
+                  const SizedBox(height: 12),
+                  const Text('মোট দেনা/পাওনা (৳)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 5),
+                  TextField(controller: amountController, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(hintText: '৳ 0')),
+                  const SizedBox(height: 12),
+                  const Text('হিসাবের নিয়ম', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 5),
+                  DropdownButtonFormField<String>(
+                    value: rule,
+                    items: const [
+                      DropdownMenuItem(value: 'one-time', child: Text('সহজ হিসাব (একবার)')),
+                      DropdownMenuItem(value: 'installment', child: Text('কিস্তির হিসাব')),
+                    ],
+                    onChanged: (v) => setModal(() => rule = v ?? 'one-time'),
+                  ),
+                  if (rule == 'installment') ...[
+                    const SizedBox(height: 12),
+                    const Text('প্রতি কিস্তির পরিমাণ (৳)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 5),
+                    TextField(controller: installmentController, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(hintText: '৳ 0')),
+                    const SizedBox(height: 12),
+                    const Text('কিস্তির বিরতি', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 5),
+                    DropdownButtonFormField<String>(
+                      value: frequency,
+                      items: const [
+                        DropdownMenuItem(value: 'weekly', child: Text('প্রতি সপ্তাহে')),
+                        DropdownMenuItem(value: 'monthly', child: Text('প্রতি মাসে')),
+                      ],
+                      onChanged: (v) => setModal(() => frequency = v ?? 'monthly'),
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                  Text(rule == 'installment' ? 'প্রথম কিস্তির তারিখ' : 'তারিখ (দিন/মাস/বছর)', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 5),
+                  OutlinedButton.icon(
+                    onPressed: () async {
+                      final selected = await showDatePicker(context: dialogContext, initialDate: entryDate, firstDate: DateTime(2000), lastDate: DateTime(2100));
+                      if (selected != null && ctx.mounted) setModal(() => entryDate = selected);
+                    },
+                    icon: const Icon(Icons.calendar_today_outlined, size: 16),
+                    label: Text(dateLabel(entryDate)),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text('তারিখ নির্বাচন করুন। Save করার আগে তারিখ যাচাই হবে।', style: TextStyle(fontSize: 10, color: Colors.blueGrey)),
+                  const SizedBox(height: 12),
+                  const Text('ধরন', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 5),
+                  DropdownButtonFormField<String>(
+                    value: kind,
+                    items: const [
+                      DropdownMenuItem(value: 'পাওনা', child: Text('পাওনা')),
+                      DropdownMenuItem(value: 'দেনা', child: Text('দেনা')),
+                    ],
+                    onChanged: (v) => setModal(() => kind = v ?? 'পাওনা'),
+                  ),
+                  const SizedBox(height: 12),
+                  const Text('নোট', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                  const SizedBox(height: 5),
+                  TextField(controller: noteController, maxLines: 2, decoration: const InputDecoration(hintText: 'ঐচ্ছিক নোট')),
+                  if (error != null) ...[
+                    const SizedBox(height: 8),
+                    Text(error!, style: const TextStyle(color: Colors.red, fontSize: 12)),
+                  ],
+                ]))),
+                const SizedBox(height: 12),
+                Row(children: [
+                  Expanded(child: OutlinedButton(onPressed: saving ? null : () => Navigator.pop(dialogContext), child: const Text('বাতিল'))),
+                  const SizedBox(width: 8),
+                  Expanded(child: FilledButton.icon(
+                    onPressed: saving ? null : () async {
+                      final name = nameController.text.trim();
+                      final total = double.tryParse(amountController.text.trim());
+                      final per = double.tryParse(installmentController.text.trim());
+                      if (name.isEmpty || total == null || !total.isFinite || total <= 0) {
+                        setModal(() => error = 'সঠিক নাম ও টাকার পরিমাণ দিন।');
+                        return;
+                      }
+                      if (rule == 'installment' && (per == null || !per.isFinite || per <= 0 || per > total)) {
+                        setModal(() => error = 'কিস্তির পরিমাণ মোট দেনা-পাওনার চেয়ে বেশি হতে পারবে না।');
+                        return;
+                      }
+                      setModal(() { saving = true; error = null; });
+                      try {
+                        final response = await _AuthApi._get('/data/debts');
+                        final records = (response['data'] as List).map((x) => Map<String,dynamic>.from(x as Map)).toList();
+                        final id = DateTime.now().millisecondsSinceEpoch;
+                        final chosenDate = dateValue(entryDate);
+                        final item = <String,dynamic>{
+                          'id': id,
+                          'title': name,
+                          'personName': name,
+                          'name': name,
+                          'amount': total,
+                          'date': chosenDate,
+                          'dateInput': chosenDate,
+                          'icon': iconName,
+                          'status': kind,
+                          'debtKind': kind,
+                          'debtRule': rule,
+                          'notes': noteController.text.trim(),
+                          'updatedAt': dateLabel(DateTime.now()),
+                          'payments': <Map<String,dynamic>>[],
+                          if (rule == 'installment') 'installmentAmount': per,
+                          if (rule == 'installment') 'installmentFrequency': frequency,
+                          if (rule == 'installment') 'firstInstallmentDate': chosenDate,
+                          if (rule == 'installment') 'totalInstallments': (total! / per!).ceil(),
+                        };
+                        records.insert(0, item);
+                        await _AuthApi._put('/data/debts', {'data': records});
+                        if (!dialogContext.mounted) return;
+                        saved = true;
+                        Navigator.pop(dialogContext);
+                      } catch (e) {
+                        if (!dialogContext.mounted) return;
+                        setModal(() { saving = false; error = e.toString().replaceFirst('Exception: ', ''); });
+                      }
+                    },
+                    icon: saving ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.check, size: 16),
+                    label: Text(saving ? 'সংরক্ষণ হচ্ছে...' : 'সংরক্ষণ'),
+                  )),
+                ]),
+              ]),
+            ),
+          ),
+        ),
+      ),
+    );
+    await WidgetsBinding.instance.endOfFrame;
+    nameController.dispose();
+    amountController.dispose();
+    installmentController.dispose();
+    noteController.dispose();
+    if (saved && mounted) {
+      await _refresh();
+      if (mounted) _notice(context, 'নতুন দেনা-পাওনার হিসাব সংরক্ষণ হয়েছে।');
+    }
+  }
+
   Future<void> _openPaymentModal(Map<String,dynamic> debt) async {
     final amount=TextEditingController(), note=TextEditingController();
     final payments=(debt['payments'] is List?(debt['payments'] as List).whereType<Map>().map((p)=>Map<String,dynamic>.from(p)).toList():<Map<String,dynamic>>[]);
@@ -1477,7 +1670,7 @@ class _DebtsScreenState extends State<_DebtsScreen> {
         leading:IconButton(icon:const Icon(Icons.arrow_back_rounded),onPressed:()=>Navigator.pop(context)),
         title:const Text('দেনা-পাওনা',style:TextStyle(fontWeight:FontWeight.w900)),
         actions:[IconButton(onPressed:_refresh,icon:_loading?const SizedBox(width:18,height:18,child:CircularProgressIndicator(strokeWidth:2)):const Icon(Icons.refresh_rounded)),
-          IconButton(onPressed:()=>_todo('নতুন হিসাব যোগ'),icon:const Icon(Icons.add_rounded,size:28)),const SizedBox(width:5)]),
+          IconButton(onPressed:_openCreateDebtModal,icon:const Icon(Icons.add_rounded,size:28)),const SizedBox(width:5)]),
       body:SafeArea(top:false,child:Column(children:[
         Padding(padding:const EdgeInsets.fromLTRB(13,8,13,0),child:Column(children:[
           Row(children:[summary('মোট পাওনা','৳ ${receivable.round()}', 'বাকি পাওনার পরিমাণ',Icons.south_west_rounded,green,const Color(0xFFEAF8F2)),const SizedBox(width:8),summary('মোট দেনা','৳ ${payable.round()}','দিতে হবে',Icons.trending_down_rounded,red,const Color(0xFFFFEFF0))]),

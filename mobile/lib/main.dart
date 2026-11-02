@@ -2859,7 +2859,7 @@ class _BillsScreenState extends State<_BillsScreen> {
                       mainAxisAlignment:MainAxisAlignment.spaceBetween,
                       mainAxisSize:MainAxisSize.min,
                       children:[
-                        SizedBox(width:19,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,tooltip:'পেমেন্ট',onPressed:()=>_openBillPaymentModal(e),icon:const Icon(Icons.payments_outlined,size:17,color:Color(0xFF00A875)))),
+                        SizedBox(width:19,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,tooltip:'পেমেন্ট',onPressed:()=>_openBillPaymentModal(e),icon:const Icon(Icons.volunteer_activism_outlined,size:17,color:Color(0xFF00A875)))),
                         SizedBox(width:19,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_notice(context,'বিল সম্পাদনা সুবিধাটি পরবর্তী ধাপে যুক্ত হবে।'),icon:const Icon(Icons.edit_outlined,size:16,color:Color(0xFF8292A4)))),
                         SizedBox(width:19,height:28,child:PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints.expand(),iconSize:17,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v)=>_notice(context,v=='edit'?'বিল সম্পাদনা সুবিধাটি পরবর্তী ধাপে যুক্ত হবে।':'বিল রিমাইন্ডার সুবিধাটি পরবর্তী ধাপে যুক্ত হবে।'),itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))])),
                       ],

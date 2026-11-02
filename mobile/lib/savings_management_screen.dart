@@ -147,16 +147,16 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
           Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisAlignment:MainAxisAlignment.center,children:[
             Row(children:[
               Expanded(child:Text(g['title'].toString(),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:14,fontWeight:FontWeight.w900,color:ink))),
-              Container(padding:const EdgeInsets.symmetric(horizontal:7,vertical:4),decoration:BoxDecoration(color:(isDone?green:late?red:green).withValues(alpha:.12),borderRadius:BorderRadius.circular(20)),child:Text(isDone?'সম্পন্ন':late?'দিন বাকি':'চলমান',style:TextStyle(fontSize:9,fontWeight:FontWeight.w800,color:isDone?green:late?red:green))),
-              PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints(minWidth:28),icon:Icon(Icons.more_horiz,color:ink.withValues(alpha:.65),size:18),onSelected:(v){if(v=='edit'){goalForm(old:g);}else if(v=='delete'){deleteGoal(g);}},itemBuilder:(_)=>const [PopupMenuItem(value:'edit',child:Text('সম্পাদনা')),PopupMenuItem(value:'delete',child:Text('মুছে ফেলুন'))]),
+              Container(padding:const EdgeInsets.symmetric(horizontal:6,vertical:2),decoration:BoxDecoration(color:(isDone?green:late?red:green).withValues(alpha:.12),borderRadius:BorderRadius.circular(20)),child:Text(isDone?'সম্পন্ন':late?'দিন বাকি':'চলমান',style:TextStyle(fontSize:9,fontWeight:FontWeight.w800,color:isDone?green:late?red:green))),
+              PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints(minWidth:24,minHeight:24),icon:Icon(Icons.more_horiz,color:ink.withValues(alpha:.65),size:16),onSelected:(v){if(v=='edit'){goalForm(old:g);}else if(v=='delete'){deleteGoal(g);}},itemBuilder:(_)=>const [PopupMenuItem(value:'edit',child:Text('সম্পাদনা')),PopupMenuItem(value:'delete',child:Text('মুছে ফেলুন'))]),
             ]),
-            const SizedBox(height:3),
+            const SizedBox(height:1),
             Row(children:[
-              Icon(Icons.calendar_today_outlined,size:13,color:ink.withValues(alpha:.68)),
+              Icon(Icons.calendar_today_outlined,size:12,color:ink.withValues(alpha:.68)),
               const SizedBox(width:4),
-              Flexible(child:Text(dateLabel(g['goalStartDate']??g['date']),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:11,color:ink.withValues(alpha:.82)))),
+              Flexible(child:Text(dateLabel(g['goalStartDate']??g['date']),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:10,color:ink.withValues(alpha:.82)))),
               const SizedBox(width:6),
-              Icon(Icons.layers_outlined,size:13,color:ink.withValues(alpha:.68)),
+              Icon(Icons.layers_outlined,size:12,color:ink.withValues(alpha:.68)),
               const SizedBox(width:3),
               Text(freq,style:TextStyle(fontSize:11,color:ink.withValues(alpha:.82))),
             ]),

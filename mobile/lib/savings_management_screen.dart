@@ -68,6 +68,28 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
   }
   Future<void> deleteGoal(Map<String,dynamic> g)async{final yes=await showDialog<bool>(context:context,builder:(c)=>AlertDialog(title:const Text('সঞ্চয় মুছবেন?'),content:Text('${g['title']} পরিকল্পনাটি মুছে যাবে।'),actions:[TextButton(onPressed:()=>Navigator.pop(c,false),child:const Text('বাতিল')),FilledButton(onPressed:()=>Navigator.pop(c,true),child:const Text('মুছুন'))]));if(yes==true)await persist(goals.where((x)=>x['id']!=g['id']).toList(),transactions.where((x)=>!(x['category']=='সঞ্চয়'&&x['title']=='সঞ্চয় জমা — ${g['title']}')).toList());}
   Future<void> detail(Map<String,dynamic> g)async{await showModalBottomSheet<void>(context:context,isScrollControlled:true,showDragHandle:true,builder:(c)=>StatefulBuilder(builder:(c,set){final ps=payments(g)..sort((a,b)=>n(b['id']).compareTo(n(a['id'])));return Padding(padding:const EdgeInsets.all(16),child:SingleChildScrollView(child:Column(mainAxisSize:MainAxisSize.min,crossAxisAlignment:CrossAxisAlignment.start,children:[Text(g['title'].toString(),style:const TextStyle(fontSize:19,fontWeight:FontWeight.w900)),const SizedBox(height:10),Text('লক্ষ্য ${money(n(g['amount']))}   •   জমা ${money(paid(g))}   •   বাকি ${money(remaining(g))}'),const SizedBox(height:8),LinearProgressIndicator(value:n(g['amount'])>0?(paid(g)/n(g['amount'])).clamp(0,1):0,minHeight:7),const SizedBox(height:12),const Text('জমার ইতিহাস',style:TextStyle(fontWeight:FontWeight.w900)),if(ps.isEmpty)const Padding(padding:EdgeInsets.all(12),child:Text('এখনো কোনো জমা যোগ করা হয়নি।')), ...ps.map((p)=>ListTile(dense:true,contentPadding:EdgeInsets.zero,title:Text('জমা • ${p['date']}'),subtitle:Text('${p['wallet']} • ${p['notes']??''}'),leading:const Icon(Icons.savings_outlined),trailing:Row(mainAxisSize:MainAxisSize.min,children:[Text(money(n(p['amount']))),IconButton(onPressed:(){Navigator.pop(c);paymentForm(g,old:p);},icon:const Icon(Icons.edit_outlined,size:18)),IconButton(onPressed:(){Navigator.pop(c);final ps2=payments(g)..removeWhere((x)=>x['id']==p['id']);final total=ps2.fold<double>(0,(a,x)=>a+n(x['amount']));final up=<String,dynamic>{...g,'payments':ps2,'status':total>=n(g['amount'])?'সম্পন্ন':'চলমান'};persist(goals.map((x)=>x['id']==g['id']?up:x).toList(),transactions.where((x)=>x['id']!=p['transactionId']).toList());},icon:const Icon(Icons.delete_outline,size:18))]))),if(remaining(g)>0)SizedBox(width:double.infinity,child:FilledButton.icon(onPressed:(){Navigator.pop(c);paymentForm(g);},icon:const Icon(Icons.add),label:const Text('জমা যোগ করুন')))])));}));}
+  Widget filter(String value,List<String> options,ValueChanged<String> onChanged) {
+    return Expanded(
+      child: PopupMenuButton<String>(
+        initialValue:null,
+        onSelected:(v)=>setState(()=>onChanged(v)),
+        itemBuilder:(context)=>options.map((v)=>PopupMenuItem<String>(value:v,child:Text(v))).toList(),
+        child:Container(
+          height:42,
+          padding:const EdgeInsets.symmetric(horizontal:10),
+          decoration:BoxDecoration(
+            color:Colors.white,
+            border:Border.all(color:const Color(0xFFDCE5F0)),
+            borderRadius:BorderRadius.circular(15),
+          ),
+          child:Row(children:[
+            Expanded(child:Text(value,maxLines:1,overflow:TextOverflow.ellipsis,style:const TextStyle(fontSize:11,fontWeight:FontWeight.w600))),
+            const Icon(Icons.keyboard_arrow_down,size:18,color:Colors.blueGrey),
+          ]),
+        ),
+      ),
+    );
+  }
   Widget summary(String t,String v,String sub,IconData icon,Color color,Color tint)=>Expanded(
     child:Container(
       constraints:const BoxConstraints(minHeight:92),
@@ -239,16 +261,31 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
               child:IconButton(
                 onPressed:(){
                   FocusScope.of(context).unfocus();
-                  showModalBottomSheet<void>(context:context,showDragHandle:true,builder:(c)=>SafeArea(child:Padding(
-                    padding:const EdgeInsets.all(16),
-                    child:Column(mainAxisSize:MainAxisSize.min,children:[
-                      const Text('ফিল্টার',style:TextStyle(fontSize:17,fontWeight:FontWeight.w900)),
-                      const SizedBox(height:12),
-                      Row(children:[filter(status,const ['সব স্ট্যাটাস','চলমান','সম্পন্ন'],(v)=>status=v),const SizedBox(width:7),filter(period,const ['সব সময়','তারিখ আছে','তারিখ নেই'],(v)=>period=v)]),
-                      const SizedBox(height:8),
-                      Row(children:[filter(sort,const ['সর্বশেষ আগে','পুরোনো আগে','পরিমাণ বেশি আগে','পরিমাণ কম আগে'],(v)=>sort=v)]),
-                    ]),
-                  ))));
+                  showModalBottomSheet<void>(
+                    context:context,
+                    showDragHandle:true,
+                    builder:(c)=>SafeArea(
+                      child:Padding(
+                        padding:const EdgeInsets.all(16),
+                        child:Column(
+                          mainAxisSize:MainAxisSize.min,
+                          children:[
+                            const Text('ফিল্টার',style:TextStyle(fontSize:17,fontWeight:FontWeight.w900)),
+                            const SizedBox(height:12),
+                            Row(children:[
+                              filter(status,const ['সব স্ট্যাটাস','চলমান','সম্পন্ন'],(v)=>status=v),
+                              const SizedBox(width:8),
+                              filter(period,const ['সব সময়','তারিখ আছে','তারিখ নেই'],(v)=>period=v),
+                            ]),
+                            const SizedBox(height:8),
+                            Row(children:[
+                              filter(sort,const ['সর্বশেষ আগে','পুরোনো আগে','পরিমাণ বেশি আগে','পরিমাণ কম আগে'],(v)=>sort=v),
+                            ]),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
                 },
                 icon:Icon(Icons.filter_list,color:ink),
               ),

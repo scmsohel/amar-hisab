@@ -147,7 +147,7 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
           Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisAlignment:MainAxisAlignment.center,children:[
             SizedBox(height:18,child:Row(children:[
               Expanded(child:Text(g['title'].toString(),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:14,fontWeight:FontWeight.w900,color:ink))),
-              Container(padding:const EdgeInsets.symmetric(horizontal:5,vertical:1),decoration:BoxDecoration(color:(isDone?green:late?red:green).withValues(alpha:.12),borderRadius:BorderRadius.circular(20)),child:Text(isDone?'সম্পন্ন':late?'দিন বাকি':'চলমান',style:TextStyle(fontSize:8,fontWeight:FontWeight.w800,color:isDone?green:late?red:green))),
+              Container(padding:const EdgeInsets.symmetric(horizontal:5,vertical:1),decoration:BoxDecoration(color:(isDone?green:late?red:green).withValues(alpha:.12),borderRadius:BorderRadius.circular(20)),child:Text(isDone?'সম্পন্ন':late?'জমা বাকি':'চলমান',style:TextStyle(fontSize:8,fontWeight:FontWeight.w800,color:isDone?green:late?red:green))),
               PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints(minWidth:20,minHeight:18),icon:Icon(Icons.more_horiz,color:ink.withValues(alpha:.65),size:14),onSelected:(v){if(v=='edit'){goalForm(old:g);}else if(v=='delete'){deleteGoal(g);}},itemBuilder:(_)=>const [PopupMenuItem(value:'edit',child:Text('সম্পাদনা')),PopupMenuItem(value:'delete',child:Text('মুছে ফেলুন'))]),
             ])),
             const SizedBox(height:0),

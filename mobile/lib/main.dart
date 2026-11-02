@@ -2169,6 +2169,183 @@ class _BillsScreenState extends State<_BillsScreen> {
   }
   String _money(double v) => '৳ ${v.round().toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',')}';
 
+  Future<void> _openCreateBillModal() async {
+    final nameController = TextEditingController();
+    final amountController = TextEditingController();
+    final noteController = TextEditingController();
+    DateTime dueDate = DateTime.now();
+    String iconName = 'ReceiptText';
+    String recurrence = 'one-time';
+    String reminder = '3';
+    String status = 'বাকি';
+    bool saving = false;
+    final dateLabel = (DateTime d) => '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) => StatefulBuilder(
+        builder: (context, setModal) {
+          final dark = Theme.of(context).brightness == Brightness.dark;
+          final surface = dark ? const Color(0xFF10283D) : Colors.white;
+          final ink = dark ? Colors.white : const Color(0xFF172B43);
+          final muted = dark ? const Color(0xFFA4B8CA) : const Color(0xFF8191A4);
+          final line = dark ? const Color(0xFF294158) : const Color(0xFFE1E8F0);
+          InputDecoration decoration(String hint) => InputDecoration(
+            hintText: hint, filled: true, fillColor: dark ? const Color(0xFF0B2032) : const Color(0xFFF8FAFC),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 13, vertical: 13),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: line)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: line)),
+          );
+          Widget fieldLabel(String value) => Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Text(value, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: muted)),
+          );
+          Widget dropdown<T>(String label, T value, List<DropdownMenuItem<T>> items, ValueChanged<T?> changed) =>
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              fieldLabel(label),
+              DropdownButtonFormField<T>(
+                initialValue: value, isExpanded: true,
+                decoration: decoration('নির্বাচন করুন'),
+                items: items, onChanged: saving ? null : changed,
+              ),
+            ]);
+          return Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Container(
+              constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * .92),
+              decoration: BoxDecoration(color: surface, borderRadius: const BorderRadius.vertical(top: Radius.circular(22))),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(18, 17, 12, 10),
+                  child: Row(children: [
+                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('বিল যোগ করুন', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900, color: ink)),
+                      const SizedBox(height: 3),
+                      Text('আপনার তথ্য অ্যাকাউন্টে সংরক্ষিত হবে।', style: TextStyle(fontSize: 11, color: muted)),
+                    ])),
+                    IconButton(onPressed: saving ? null : () => Navigator.pop(sheetContext), icon: Icon(Icons.close_rounded, color: muted)),
+                  ]),
+                ),
+                Divider(height: 1, color: line),
+                Flexible(child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(18, 15, 18, 18),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    fieldLabel('বিলের নাম'),
+                    TextField(controller: nameController, enabled: !saving, decoration: decoration('নাম বা বিবরণ')),
+                    const SizedBox(height: 13),
+                    fieldLabel('আইকন নির্বাচন'),
+                    DropdownButtonFormField<String>(
+                      initialValue: iconName, isExpanded: true, decoration: decoration('আইকন নির্বাচন করুন'),
+                      items: _transactionIconOptions.entries.map((entry) => DropdownMenuItem(
+                        value: entry.key, child: Row(children: [Icon(entry.value, size: 19, color: const Color(0xFF00A875)), const SizedBox(width: 10), Text(entry.key)]),
+                      )).toList(),
+                      onChanged: saving ? null : (value) { if (value != null) setModal(() => iconName = value); },
+                    ),
+                    const SizedBox(height: 13),
+                    fieldLabel('টাকার পরিমাণ'),
+                    TextField(controller: amountController, enabled: !saving, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: decoration('৳ 0')),
+                    const SizedBox(height: 13),
+                    fieldLabel('পরিশোধের তারিখ (দিন/মাস/বছর)'),
+                    InkWell(
+                      onTap: saving ? null : () async {
+                        final picked = await showDatePicker(context: context, initialDate: dueDate, firstDate: DateTime(2000), lastDate: DateTime(2100), helpText: 'পরিশোধের তারিখ নির্বাচন করুন');
+                        if (picked != null) setModal(() => dueDate = picked);
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        width: double.infinity, padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 15),
+                        decoration: BoxDecoration(color: dark ? const Color(0xFF0B2032) : const Color(0xFFF8FAFC), border: Border.all(color: line), borderRadius: BorderRadius.circular(12)),
+                        child: Row(children: [Icon(Icons.calendar_month_outlined, size: 19, color: muted), const SizedBox(width: 10), Expanded(child: Text(dateLabel(dueDate), style: TextStyle(color: ink))), Icon(Icons.keyboard_arrow_down_rounded, color: muted)]),
+                      ),
+                    ),
+                    const SizedBox(height: 13),
+                    Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Expanded(child: dropdown<String>('বিলের পুনরাবৃত্তি', recurrence, const [
+                        DropdownMenuItem(value: 'one-time', child: Text('একবার')),
+                        DropdownMenuItem(value: 'weekly', child: Text('প্রতি সপ্তাহে')),
+                        DropdownMenuItem(value: 'monthly', child: Text('প্রতি মাসে')),
+                        DropdownMenuItem(value: 'yearly', child: Text('প্রতি বছরে')),
+                      ], (v) => setModal(() => recurrence = v ?? 'one-time'))),
+                      const SizedBox(width: 10),
+                      Expanded(child: dropdown<String>('রিমাইন্ডার', reminder, const [
+                        DropdownMenuItem(value: '0', child: Text('রিমাইন্ডার বন্ধ')),
+                        DropdownMenuItem(value: '1', child: Text('১ দিন আগে')),
+                        DropdownMenuItem(value: '3', child: Text('৩ দিন আগে')),
+                        DropdownMenuItem(value: '7', child: Text('৭ দিন আগে')),
+                        DropdownMenuItem(value: '14', child: Text('১৪ দিন আগে')),
+                      ], (v) => setModal(() => reminder = v ?? '3'))),
+                    ]),
+                    const SizedBox(height: 13),
+                    dropdown<String>('অবস্থা', status, const [
+                      DropdownMenuItem(value: 'বাকি', child: Text('বাকি')),
+                      DropdownMenuItem(value: 'পরিশোধিত', child: Text('পরিশোধিত')),
+                    ], (v) => setModal(() => status = v ?? 'বাকি')),
+                    const SizedBox(height: 13),
+                    fieldLabel('নোট'),
+                    TextField(controller: noteController, enabled: !saving, minLines: 1, maxLines: 3, decoration: decoration('ঐচ্ছিক নোট')),
+                    const SizedBox(height: 20),
+                    Row(children: [
+                      Expanded(child: OutlinedButton(
+                        onPressed: saving ? null : () => Navigator.pop(sheetContext),
+                        style: OutlinedButton.styleFrom(minimumSize: const Size(0, 46), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                        child: const Text('বাতিল'),
+                      )),
+                      const SizedBox(width: 10),
+                      Expanded(child: FilledButton.icon(
+                        onPressed: saving ? null : () async {
+                          final name = nameController.text.trim();
+                          final amount = double.tryParse(amountController.text.trim());
+                          if (name.isEmpty || amount == null || !amount.isFinite || amount <= 0) {
+                            _notice(context, 'বিলের নাম ও সঠিক টাকার পরিমাণ দিন।');
+                            return;
+                          }
+                          setModal(() => saving = true);
+                          try {
+                            final date = '${dueDate.year.toString().padLeft(4, '0')}-${dueDate.month.toString().padLeft(2, '0')}-${dueDate.day.toString().padLeft(2, '0')}';
+                            final id = DateTime.now().millisecondsSinceEpoch;
+                            final bill = <String, dynamic>{
+                              'id': id, 'title': name, 'amount': amount, 'date': date,
+                              'icon': iconName, 'updatedAt': _dateLabel(DateTime.now()),
+                              'status': status, 'notes': noteController.text.trim(),
+                              'billRule': recurrence, 'billDay': dueDate.day,
+                              'reminderDays': int.parse(reminder),
+                              if (recurrence != 'one-time') 'recurringId': id,
+                              'cycleKey': date.substring(0, 7),
+                            };
+                            final updated = [bill, ..._items];
+                            await _AuthApi._put('/data/bills', {'data': updated});
+                            if (!mounted) return;
+                            setState(() => _items = updated);
+                            Navigator.pop(sheetContext);
+                            _notice(context, 'নতুন বিল সংরক্ষণ হয়েছে।');
+                          } catch (e) {
+                            if (mounted) {
+                              setModal(() => saving = false);
+                              _notice(context, e.toString().replaceFirst('Exception: ', ''));
+                            }
+                          }
+                        },
+                        icon: saving ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.check_rounded, size: 18),
+                        label: Text(saving ? 'সংরক্ষণ হচ্ছে' : 'সংরক্ষণ'),
+                        style: FilledButton.styleFrom(backgroundColor: const Color(0xFF009B70), foregroundColor: Colors.white, minimumSize: const Size(0, 46), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                      )),
+                    ]),
+                  ]),
+                )),
+              ]),
+            ),
+          );
+        },
+      ),
+    );
+    nameController.dispose();
+    amountController.dispose();
+    noteController.dispose();
+  }
+
   Future<void> _refresh() async {
     setState(() => _loading = true);
     try {
@@ -2228,7 +2405,7 @@ class _BillsScreenState extends State<_BillsScreen> {
       backgroundColor:bg,
       appBar:AppBar(backgroundColor:bg,surfaceTintColor:Colors.transparent,leading:IconButton(onPressed:()=>Navigator.pop(context),icon:const Icon(Icons.arrow_back_rounded)),title:const Text('বিল',style:TextStyle(fontWeight:FontWeight.w900)),actions:[
         IconButton(onPressed:_loading?null:_refresh,icon:_loading?const SizedBox(width:18,height:18,child:CircularProgressIndicator(strokeWidth:2)):const Icon(Icons.refresh_rounded)),
-        IconButton(onPressed:()=>_notice(context,'নতুন বিল যোগ করার ফর্ম এখনো যুক্ত করা হয়নি।'),icon:const Icon(Icons.add_rounded,size:28)),const SizedBox(width:5),
+        IconButton(onPressed:_openCreateBillModal,icon:const Icon(Icons.add_rounded,size:28)),const SizedBox(width:5),
       ]),
       body:SafeArea(top:false,child:Column(children:[
         Padding(padding:const EdgeInsets.fromLTRB(13,8,13,0),child:Column(children:[

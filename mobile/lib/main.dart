@@ -2179,7 +2179,7 @@ class _BillsScreenState extends State<_BillsScreen> {
     String reminder = '3';
     String status = 'বাকি';
     bool saving = false;
-    final dateLabel = (DateTime d) => '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+    String dateLabel(DateTime d) => '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
 
     await showModalBottomSheet<void>(
       context: context,
@@ -2317,12 +2317,13 @@ class _BillsScreenState extends State<_BillsScreen> {
                             };
                             final updated = [bill, ..._items];
                             await _AuthApi._put('/data/bills', {'data': updated});
-                            if (!mounted) return;
+                            if (!mounted || !sheetContext.mounted) return;
                             setState(() => _items = updated);
                             Navigator.pop(sheetContext);
+                            if (!mounted) return;
                             _notice(context, 'নতুন বিল সংরক্ষণ হয়েছে।');
                           } catch (e) {
-                            if (mounted) {
+                            if (mounted && sheetContext.mounted) {
                               setModal(() => saving = false);
                               _notice(context, e.toString().replaceFirst('Exception: ', ''));
                             }

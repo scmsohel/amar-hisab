@@ -123,12 +123,15 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
     final p=paid(g),target=n(g['amount']),left=remaining(g);
     final progress=target>0?(p/target).clamp(0.0,1.0).toDouble():0.0;
     final isDone=done(g),next=nextDate(g);
+    final now=DateTime.now();
+    final dueDays=next==null?null:DateTime(next.year,next.month,next.day).difference(DateTime(now.year,now.month,now.day)).inDays;
+    final dueColor=isDone?green:dueDays==null?green:dueDays<0?red:dueDays==0?const Color(0xFFF59E0B):dueDays<=3?blue:green;
     final accent=isDone?green:blue;
     final freq=(g['goalFrequency']??'monthly')=='weekly'?'সাপ্তাহিক':'মাসিক';
     final count=n(g['goalInstallmentCount']).toInt().clamp(0,100000);
     final per=n(g['goalInstallmentAmount']);
     final cycles=per>0?(p/per+1e-8).floor():payments(g).length;
-    final late=!isDone&&next!=null&&next.difference(DateTime.now()).inDays<0;
+    final late=!isDone&&dueDays!=null&&dueDays<0;
     return InkWell(
       borderRadius:BorderRadius.circular(18),
       onTap:()=>detail(g),
@@ -147,7 +150,7 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
           Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,mainAxisAlignment:MainAxisAlignment.center,children:[
             SizedBox(height:18,child:Row(children:[
               Expanded(child:Text(g['title'].toString(),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:14,fontWeight:FontWeight.w900,color:ink))),
-              Container(padding:const EdgeInsets.symmetric(horizontal:5,vertical:1),decoration:BoxDecoration(color:(isDone?green:late?red:green).withValues(alpha:.12),borderRadius:BorderRadius.circular(20)),child:Text(isDone?'সম্পন্ন':late?'জমা বাকি':'চলমান',style:TextStyle(fontSize:8,fontWeight:FontWeight.w800,color:isDone?green:late?red:green))),
+              Container(padding:const EdgeInsets.symmetric(horizontal:5,vertical:1),decoration:BoxDecoration(color:dueColor.withValues(alpha:.12),borderRadius:BorderRadius.circular(20)),child:Text(isDone?'সম্পন্ন':late?'জমা বাকি':'চলমান',style:TextStyle(fontSize:8,fontWeight:FontWeight.w800,color:dueColor))),
               PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints(minWidth:20,minHeight:18),icon:Icon(Icons.more_horiz,color:ink.withValues(alpha:.65),size:14),onSelected:(v){if(v=='edit'){goalForm(old:g);}else if(v=='delete'){deleteGoal(g);}},itemBuilder:(_)=>const [PopupMenuItem(value:'edit',child:Text('সম্পাদনা')),PopupMenuItem(value:'delete',child:Text('মুছে ফেলুন'))]),
             ])),
             const SizedBox(height:0),
@@ -179,12 +182,12 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
             width:76,
             constraints:const BoxConstraints(minHeight:84),
             padding:const EdgeInsets.symmetric(horizontal:4,vertical:6),
-            decoration:BoxDecoration(color:const Color(0xFFFFEEF2),borderRadius:BorderRadius.circular(16)),
+            decoration:BoxDecoration(color:dueColor.withValues(alpha:.12),borderRadius:BorderRadius.circular(16)),
             child:Column(mainAxisAlignment:MainAxisAlignment.center,children:[
-              const Icon(Icons.calendar_month_outlined,color:red,size:16),
+              Icon(Icons.calendar_month_outlined,color:dueColor,size:16),
               const SizedBox(height:3),
               const Text('পরবর্তী জমা',style:TextStyle(fontSize:8,color:Color(0xFF475569))),
-              Text(dueLabel(next),textAlign:TextAlign.center,maxLines:2,style:const TextStyle(fontSize:9,fontWeight:FontWeight.w900,color:red)),
+              Text(dueLabel(next),textAlign:TextAlign.center,maxLines:2,style:TextStyle(fontSize:9,fontWeight:FontWeight.w900,color:dueColor)),
             ]),
           ),
           Icon(Icons.chevron_right,color:ink.withValues(alpha:.8),size:20),

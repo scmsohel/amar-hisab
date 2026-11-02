@@ -2518,7 +2518,7 @@ class _BillsScreenState extends State<_BillsScreen> {
                   const SizedBox(height: 12),
                   Row(children: [
                     Expanded(child: Text('পরিশোধের ইতিহাস', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: ink))),
-                    Text('$payments.lengthটি লেনদেন', style: TextStyle(fontSize: 10, color: muted)),
+                    Text('${payments.length}টি লেনদেন', style: TextStyle(fontSize: 10, color: muted)),
                   ]),
                   const SizedBox(height: 7),
                   Expanded(child: Container(

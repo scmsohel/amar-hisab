@@ -2421,6 +2421,283 @@ class _BillsScreenState extends State<_BillsScreen> {
     noteController.dispose();
   }
 
+  Future<void> _openBillPaymentModal(Map<String, dynamic> bill) async {
+    final amountController = TextEditingController();
+    final noteController = TextEditingController();
+    final currentBill = Map<String, dynamic>.from(bill);
+    final payments = currentBill['payments'] is List
+        ? (currentBill['payments'] as List).whereType<Map>().map((p) => Map<String, dynamic>.from(p)).toList()
+        : <Map<String, dynamic>>[];
+    var wallets = <String>['ক্যাশ', 'ব্যাংক', 'বিকাশ', 'নগদ'];
+    var wallet = 'ক্যাশ';
+    var paymentDate = DateTime.now();
+    var saving = false;
+    int? editingPaymentId;
+    String? message;
+    final billCycle = (currentBill['date'] ?? '').toString();
+
+    String isoDate(DateTime d) => d.year.toString().padLeft(4, '0') + '-' + d.month.toString().padLeft(2, '0') + '-' + d.day.toString().padLeft(2, '0');
+    String displayDate(DateTime d) => d.day.toString().padLeft(2, '0') + '/' + d.month.toString().padLeft(2, '0') + '/' + d.year.toString();
+    double paid() => payments.where((p) {
+      final cycle = (p['cycleDate'] ?? '').toString();
+      return cycle.isEmpty || cycle == billCycle;
+    }).fold<double>(0, (sum, p) => sum + _num(p['amount']));
+    double remaining() => (_num(currentBill['amount']) - paid()).clamp(0, double.infinity).toDouble();
+    DateTime nextDueDate(DateTime date, String rule) {
+      if (rule == 'weekly') return date.add(const Duration(days: 7));
+      final next = rule == 'yearly' ? DateTime(date.year + 1, date.month, 1) : DateTime(date.year, date.month + 1, 1);
+      final lastDay = DateTime(next.year, next.month + 1, 0).day;
+      return DateTime(next.year, next.month, date.day > lastDay ? lastDay : date.day);
+    }
+
+    try {
+      final response = await _AuthApi._get('/data/wallets');
+      final data = response['data'];
+      if (data is List) {
+        final names = data.whereType<Map>().map((x) => (x['name'] ?? '').toString().trim()).where((x) => x.isNotEmpty);
+        wallets = <String>{...wallets, ...names}.toList();
+      }
+    } catch (_) {}
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (ctx, setModal) {
+          final dark = Theme.of(ctx).brightness == Brightness.dark;
+          final surface = dark ? const Color(0xFF10283D) : Colors.white;
+          final ink = dark ? const Color(0xFFEAF2FA) : const Color(0xFF172B43);
+          final muted = dark ? const Color(0xFFA4B8CA) : const Color(0xFF8191A4);
+          final line = dark ? const Color(0xFF294158) : const Color(0xFFE1E8F0);
+          const green = Color(0xFF00A875), red = Color(0xFFFF625B);
+          final total = _num(currentBill['amount']);
+          final left = remaining();
+          final progress = total <= 0 ? 0.0 : (paid() / total).clamp(0.0, 1.0);
+          InputDecoration decoration(String label, String hint) => InputDecoration(
+            labelText: label, hintText: hint, filled: true,
+            fillColor: dark ? const Color(0xFF0B2032) : const Color(0xFFF8FAFC),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(11), borderSide: BorderSide(color: line)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(11), borderSide: BorderSide(color: line)),
+          );
+          Widget metric(String label, double value, Color color) => Expanded(child: Container(
+            padding: const EdgeInsets.all(9),
+            decoration: BoxDecoration(color: dark ? const Color(0xFF0B2032) : const Color(0xFFF7F9FB), borderRadius: BorderRadius.circular(11), border: Border.all(color: line)),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 10, color: muted)),
+              const SizedBox(height: 4),
+              FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(_money(value), style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: color))),
+            ]),
+          ));
+          return Dialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 20),
+            backgroundColor: surface,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: 520, maxHeight: (MediaQuery.of(ctx).size.height - MediaQuery.of(ctx).viewInsets.bottom - 40).clamp(260.0, MediaQuery.of(ctx).size.height * .90)),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(15, 12, 15, 14),
+                child: Column(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(_name(currentBill), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: ink)),
+                      const SizedBox(height: 3),
+                      Text('আপনার বিল পরিশোধ করতে হবে', style: TextStyle(fontSize: 11, color: muted)),
+                    ])),
+                    IconButton(onPressed: saving ? null : () => Navigator.pop(dialogContext), icon: Icon(Icons.close_rounded, color: muted)),
+                  ]),
+                  const SizedBox(height: 7),
+                  Row(children: [metric('মূল হিসাব', total, ink), const SizedBox(width: 6), metric('পরিশোধিত', paid(), green), const SizedBox(width: 6), metric('এখনো বাকি', left, left > 0 ? red : green)]),
+                  const SizedBox(height: 10),
+                  ClipRRect(borderRadius: BorderRadius.circular(8), child: LinearProgressIndicator(value: progress, minHeight: 6, color: green, backgroundColor: dark ? const Color(0xFF294158) : const Color(0xFFE8EDF2))),
+                  const SizedBox(height: 12),
+                  Row(children: [
+                    Expanded(child: Text('পরিশোধের ইতিহাস', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: ink))),
+                    Text(payments.length.toString() + 'টি লেনদেন', style: TextStyle(fontSize: 10, color: muted)),
+                  ]),
+                  const SizedBox(height: 7),
+                  Expanded(child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(color: dark ? const Color(0xFF0B2A32) : const Color(0xFFEAF8F2), borderRadius: BorderRadius.circular(12), border: Border.all(color: dark ? const Color(0xFF245343) : const Color(0xFFB7E5D3))),
+                    child: payments.isEmpty
+                      ? Center(child: Text('এখনো কোনো পেমেন্ট যোগ করা হয়নি।', style: TextStyle(fontSize: 11, color: muted)))
+                      : ListView.separated(
+                          itemCount: payments.length,
+                          separatorBuilder: (_, __) => Divider(height: 1, color: line),
+                          itemBuilder: (rowContext, index) {
+                            final payment = payments[payments.length - 1 - index];
+                            final paymentId = _num(payment['id']).toInt();
+                            final isEditing = editingPaymentId == paymentId;
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Row(children: [
+                                Container(width: 30, height: 30, decoration: BoxDecoration(color: green.withValues(alpha: .12), borderRadius: BorderRadius.circular(9)), child: const Icon(Icons.account_balance_wallet_outlined, size: 16, color: green)),
+                                const SizedBox(width: 7),
+                                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                  Text((payment['date'] ?? '').toString(), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ink)),
+                                  Text((payment['wallet'] ?? 'ক্যাশ').toString() + ((payment['notes'] ?? '').toString().trim().isEmpty ? '' : ' • ' + payment['notes'].toString()), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 9, color: muted)),
+                                ])),
+                                Text(_money(_num(payment['amount'])), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: green)),
+                                IconButton(visualDensity: VisualDensity.compact, constraints: const BoxConstraints.tightFor(width: 30, height: 32), padding: EdgeInsets.zero, tooltip: 'এডিট',
+                                  onPressed: saving ? null : () {
+                                    final parsed = DateTime.tryParse((payment['dateInput'] ?? '').toString());
+                                    setModal(() {
+                                      editingPaymentId = paymentId;
+                                      amountController.text = _num(payment['amount']).toString();
+                                      noteController.text = (payment['notes'] ?? '').toString();
+                                      wallet = (payment['wallet'] ?? 'ক্যাশ').toString();
+                                      if (!wallets.contains(wallet)) wallets.add(wallet);
+                                      if (parsed != null) paymentDate = parsed;
+                                    });
+                                  }, icon: Icon(Icons.edit_outlined, size: 16, color: isEditing ? green : muted)),
+                                IconButton(visualDensity: VisualDensity.compact, constraints: const BoxConstraints.tightFor(width: 30, height: 32), padding: EdgeInsets.zero, tooltip: 'মুছুন',
+                                  onPressed: saving ? null : () async {
+                                    final confirm = await showDialog<bool>(context: dialogContext, builder: (c) => AlertDialog(
+                                      title: const Text('পেমেন্ট মুছুন'),
+                                      content: const Text('এই পেমেন্টের রেকর্ড এবং সংশ্লিষ্ট লেনদেন মুছে ফেলা হবে।'),
+                                      actions: [TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('বাতিল')), FilledButton(onPressed: () => Navigator.pop(c, true), child: const Text('মুছুন'))],
+                                    ));
+                                    if (confirm != true) return;
+                                    setModal(() => saving = true);
+                                    try {
+                                      final br = await _AuthApi._get('/data/bills'), tr = await _AuthApi._get('/data/transactions');
+                                      final bills = (br['data'] as List).whereType<Map>().map((x) => Map<String, dynamic>.from(x)).toList();
+                                      final txs = (tr['data'] as List).whereType<Map>().map((x) => Map<String, dynamic>.from(x)).toList();
+                                      final ix = bills.indexWhere((x) => x['id'].toString() == currentBill['id'].toString());
+                                      if (ix < 0) throw Exception('বিলটি পাওয়া যায়নি। Refresh করে আবার চেষ্টা করুন।');
+                                      final next = payments.where((x) => x['id'].toString() != payment['id'].toString()).toList();
+                                      final sum = next.where((x) { final c = (x['cycleDate'] ?? '').toString(); return c.isEmpty || c == billCycle; }).fold<double>(0, (v, x) => v + _num(x['amount']));
+                                      bills[ix] = {...bills[ix], 'payments': next, 'status': sum >= total ? 'পরিশোধিত' : 'বাকি', 'updatedAt': _dateLabel(DateTime.now())};
+                                      if (payment['transactionId'] != null) txs.removeWhere((x) => x['id'].toString() == payment['transactionId'].toString());
+                                      await _AuthApi._put('/data/bills', {'data': bills});
+                                      await _AuthApi._put('/data/transactions', {'data': txs});
+                                      payments..clear()..addAll(next);
+                                      currentBill['payments'] = payments;
+                                      currentBill['status'] = sum >= total ? 'পরিশোধিত' : 'বাকি';
+                                      setModal(() { saving = false; if (editingPaymentId == paymentId) { editingPaymentId = null; amountController.clear(); noteController.clear(); } });
+                                      await _refresh();
+                                      if (dialogContext.mounted) setModal(() {});
+                                    } catch (e) {
+                                      if (dialogContext.mounted) { setModal(() => saving = false); _notice(dialogContext, e.toString().replaceFirst('Exception: ', '')); }
+                                    }
+                                  }, icon: const Icon(Icons.delete_outline_rounded, size: 17, color: red)),
+                              ]),
+                            );
+                          },
+                        ),
+                  )),
+                  const SizedBox(height: 10),
+                  if (left > 0 || editingPaymentId != null) ...[
+                    Text(editingPaymentId == null ? 'পরিশোধ / জমা যোগ করুন' : 'পরিশোধ সম্পাদনা', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: ink)),
+                    const SizedBox(height: 6),
+                    Flexible(child: SingleChildScrollView(child: Column(children: [
+                      TextField(controller: amountController, enabled: !saving, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: decoration('পরিমাণ (৳)', '0.00')),
+                      const SizedBox(height: 7),
+                      Row(children: [
+                        Expanded(child: OutlinedButton.icon(
+                          onPressed: saving ? null : () async {
+                            final picked = await showDatePicker(context: dialogContext, initialDate: paymentDate, firstDate: DateTime(2000), lastDate: DateTime(2100));
+                            if (picked != null) setModal(() => paymentDate = picked);
+                          },
+                          icon: const Icon(Icons.calendar_month_outlined, size: 16), label: Text(displayDate(paymentDate), maxLines: 1, overflow: TextOverflow.ellipsis),
+                        )),
+                        const SizedBox(width: 7),
+                        Expanded(child: DropdownButtonFormField<String>(
+                          initialValue: wallets.contains(wallet) ? wallet : wallets.first,
+                          isExpanded: true, decoration: decoration('ওয়ালেট', ''),
+                          items: wallets.map((w) => DropdownMenuItem(value: w, child: Text(w, overflow: TextOverflow.ellipsis))).toList(),
+                          onChanged: saving ? null : (v) { if (v != null) setModal(() => wallet = v); },
+                        )),
+                      ]),
+                      const SizedBox(height: 7),
+                      TextField(controller: noteController, enabled: !saving, maxLines: 2, decoration: decoration('নোট (ঐচ্ছিক)', 'পেমেন্টের বিবরণ')),
+                      const SizedBox(height: 8),
+                      Row(children: [
+                        if (editingPaymentId != null) ...[
+                          Expanded(child: OutlinedButton(onPressed: saving ? null : () => setModal(() { editingPaymentId = null; amountController.clear(); noteController.clear(); paymentDate = DateTime.now(); wallet = wallets.first; }), child: const Text('বাতিল'))),
+                          const SizedBox(width: 7),
+                        ],
+                        Expanded(child: FilledButton.icon(
+                          onPressed: saving ? null : () async {
+                            final value = double.tryParse(amountController.text.trim());
+                            final old = editingPaymentId == null ? null : payments.where((p) => p['id'].toString() == editingPaymentId.toString()).firstOrNull;
+                            if (value == null || !value.isFinite || value <= 0) { _notice(dialogContext, 'শূন্যের বেশি সঠিক পরিমাণ দিন।'); return; }
+                            if (value > remaining() + _num(old?['amount'])) { _notice(dialogContext, 'এই বিলের বাকি টাকার চেয়ে বেশি পরিশোধ করা যাবে না।'); return; }
+                            setModal(() => saving = true);
+                            try {
+                              final br = await _AuthApi._get('/data/bills'), tr = await _AuthApi._get('/data/transactions');
+                              final bills = (br['data'] as List).whereType<Map>().map((x) => Map<String, dynamic>.from(x)).toList();
+                              final txs = (tr['data'] as List).whereType<Map>().map((x) => Map<String, dynamic>.from(x)).toList();
+                              final ix = bills.indexWhere((x) => x['id'].toString() == currentBill['id'].toString());
+                              if (ix < 0) throw Exception('বিলটি পাওয়া যায়নি। Refresh করে আবার চেষ্টা করুন।');
+                              final paymentId = editingPaymentId ?? DateTime.now().millisecondsSinceEpoch;
+                              final txId = old?['transactionId'] ?? (DateTime.now().millisecondsSinceEpoch + 1);
+                              final date = isoDate(paymentDate);
+                              final payment = <String, dynamic>{
+                                'id': paymentId, 'amount': value, 'date': displayDate(paymentDate), 'dateInput': date,
+                                'wallet': wallet, 'notes': noteController.text.trim(), 'transactionId': txId,
+                                'cycleDate': (old?['cycleDate'] ?? billCycle).toString(),
+                              };
+                              final next = old == null ? [...payments, payment] : payments.map((p) => p['id'].toString() == paymentId.toString() ? payment : p).toList();
+                              final sum = next.where((p) { final c = (p['cycleDate'] ?? '').toString(); return c.isEmpty || c == billCycle; }).fold<double>(0, (v, p) => v + _num(p['amount']));
+                              final complete = sum + 1e-8 >= total;
+                              final rule = (currentBill['billRule'] ?? 'one-time').toString();
+                              final due = _date(currentBill['date']);
+                              final nextDue = complete && due != null && rule != 'one-time' ? nextDueDate(due, rule) : null;
+                              final normalizedPayments = next.map((p) => (p['cycleDate'] ?? '').toString().isEmpty ? {...p, 'cycleDate': billCycle} : p).toList();
+                              final updated = <String, dynamic>{
+                                ...bills[ix], 'payments': normalizedPayments,
+                                'status': complete ? (nextDue == null ? 'পরিশোধিত' : 'বাকি') : 'বাকি',
+                                'updatedAt': _dateLabel(DateTime.now()),
+                                if (nextDue != null) 'date': isoDate(nextDue),
+                                if (nextDue != null) 'cycleKey': rule == 'weekly' ? isoDate(nextDue) : rule == 'yearly' ? nextDue.year.toString() : isoDate(nextDue).substring(0, 7),
+                              };
+                              bills[ix] = updated;
+                              final tx = <String, dynamic>{
+                                'id': txId, 'title': 'বিল পরিশোধ — ' + _name(currentBill), 'category': 'বিল',
+                                'date': displayDate(paymentDate), 'dateInput': date, 'time': TimeOfDay.now().format(context),
+                                'wallet': wallet, 'amount': value, 'kind': 'ব্যয়',
+                                'icon': (currentBill['icon'] ?? 'ReceiptText').toString(),
+                                'billId': currentBill['id'], 'billPaymentId': paymentId, 'note': noteController.text.trim(),
+                              };
+                              final txIndex = txs.indexWhere((x) => x['id'].toString() == txId.toString());
+                              if (txIndex < 0) { txs.insert(0, tx); } else { txs[txIndex] = tx; }
+                              await _AuthApi._put('/data/bills', {'data': bills});
+                              await _AuthApi._put('/data/transactions', {'data': txs});
+                              if (!dialogContext.mounted) return;
+                              payments..clear()..addAll(normalizedPayments);
+                              currentBill..clear()..addAll(updated);
+                              message = old == null ? 'পেমেন্ট যোগ হয়েছে।' : 'পেমেন্ট আপডেট হয়েছে।';
+                              setModal(() { saving = false; editingPaymentId = null; amountController.clear(); noteController.clear(); paymentDate = DateTime.now(); wallet = wallets.first; });
+                              await _refresh();
+                              if (dialogContext.mounted) setModal(() {});
+                            } catch (e) {
+                              if (dialogContext.mounted) { setModal(() => saving = false); _notice(dialogContext, e.toString().replaceFirst('Exception: ', '')); }
+                            }
+                          },
+                          icon: saving ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.check_rounded, size: 17),
+                          label: Text(saving ? 'সংরক্ষণ হচ্ছে...' : editingPaymentId == null ? 'পরিশোধ সংরক্ষণ' : 'পরিবর্তন সংরক্ষণ'),
+                          style: FilledButton.styleFrom(backgroundColor: green, foregroundColor: Colors.white),
+                        )),
+                      ]),
+                    ]))),
+                  ] else ...[
+                    const SizedBox(height: 10),
+                    Center(child: Text('সম্পূর্ণ পরিশোধিত', style: TextStyle(color: green, fontWeight: FontWeight.w800))),
+                  ],
+                ]),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+    await WidgetsBinding.instance.endOfFrame;
+    amountController.dispose();
+    noteController.dispose();
+    if (mounted && message != null) _notice(context, message!);
+  }
+
   Future<void> _refresh() async {
     setState(() => _loading = true);
     try {
@@ -2569,7 +2846,7 @@ class _BillsScreenState extends State<_BillsScreen> {
                       mainAxisAlignment:MainAxisAlignment.spaceBetween,
                       mainAxisSize:MainAxisSize.min,
                       children:[
-                        SizedBox(width:19,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_notice(context,'বিল রিমাইন্ডার সুবিধাটি পরবর্তী ধাপে যুক্ত হবে।'),icon:const Icon(Icons.notifications_none_rounded,size:16,color:Color(0xFF8292A4)))),
+                        SizedBox(width:19,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,tooltip:'পেমেন্ট',onPressed:()=>_openBillPaymentModal(e),icon:const Icon(Icons.payments_outlined,size:17,color:Color(0xFF00A875)))),
                         SizedBox(width:19,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_notice(context,'বিল সম্পাদনা সুবিধাটি পরবর্তী ধাপে যুক্ত হবে।'),icon:const Icon(Icons.edit_outlined,size:16,color:Color(0xFF8292A4)))),
                         SizedBox(width:19,height:28,child:PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints.expand(),iconSize:17,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v)=>_notice(context,v=='edit'?'বিল সম্পাদনা সুবিধাটি পরবর্তী ধাপে যুক্ত হবে।':'বিল রিমাইন্ডার সুবিধাটি পরবর্তী ধাপে যুক্ত হবে।'),itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))])),
                       ],

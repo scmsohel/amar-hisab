@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lottie/lottie.dart';
 import 'wallet_management_screen.dart';
+import 'savings_management_screen.dart';
 
 class _ControllerDisposalScope extends StatefulWidget {
   const _ControllerDisposalScope({
@@ -266,11 +267,12 @@ class _AuthApi {
       _get('/data/transactions'),
       _get('/data/debts'),
       _get('/data/bills'),
+      _get('/data/goals'),
     ]);
     return {
       'user': results[0]['user'], 'wallets': results[1]['data'],
       'transactions': results[2]['data'], 'debts': results[3]['data'],
-      'bills': results[4]['data'],
+      'bills': results[4]['data'], 'goals': results[5]['data'],
     };
   }
 
@@ -1714,6 +1716,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<Map<String, dynamic>> _transactions = <Map<String, dynamic>>[];
   List<Map<String, dynamic>> _debts = <Map<String, dynamic>>[];
   List<Map<String, dynamic>> _bills = <Map<String, dynamic>>[];
+  List<Map<String, dynamic>> _goals = <Map<String, dynamic>>[];
   int _chartRangeDays = 30;
   int _incomeDonutMonthOffset = 0;
   int _expenseDonutMonthOffset = 0;
@@ -1761,6 +1764,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final transactions = data['transactions'] is List ? data['transactions'] as List : <dynamic>[];
       final debts = data['debts'] is List ? data['debts'] as List : <dynamic>[];
       final bills = data['bills'] is List ? data['bills'] as List : <dynamic>[];
+      final goals = data['goals'] is List ? data['goals'] as List : <dynamic>[];
       final opening = <String, double>{'ক্যাশ': 0, 'ব্যাংক': 0, 'বিকাশ': 0, 'নগদ': 0};
       for (final item in wallets) {
         if (item is Map) opening[(item['name'] ?? '').toString()] = _amount(item['base']);
@@ -1819,6 +1823,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _transactions = transactions.whereType<Map>().map((item) => Map<String, dynamic>.from(item)).toList();
         _debts = debts.whereType<Map>().map((item) => Map<String, dynamic>.from(item)).toList();
         _bills = bills.whereType<Map>().map((item) => Map<String, dynamic>.from(item)).toList();
+        _goals = goals.whereType<Map>().map((item) => Map<String, dynamic>.from(item)).toList();
         _loading = false;
       });
     } catch (error) {
@@ -3256,6 +3261,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
     )));
   }
 
+  void _openSavingsManagement() {
+    Navigator.of(context).push(_route(SavingsManagementScreen(
+      initialGoals: List<Map<String, dynamic>>.from(_goals),
+      initialTransactions: List<Map<String, dynamic>>.from(_transactions),
+      walletNames: <String>{'ক্যাশ','ব্যাংক','বিকাশ','নগদ', ..._walletBalances.keys}.toList(),
+      onRefresh: () async {
+        await _load();
+        return (goals: List<Map<String, dynamic>>.from(_goals), transactions: List<Map<String, dynamic>>.from(_transactions));
+      },
+      onSave: (goals, transactions) async {
+        await _AuthApi._put('/data/goals', {'data': goals});
+        await _AuthApi._put('/data/transactions', {'data': transactions});
+        if (!mounted) return;
+        setState(() { _goals = goals; _transactions = transactions; });
+        await _load();
+      },
+    )));
+  }
+
   void _openTransactionsPage() {
     Navigator.of(context).push(_route(TransactionsScreen(
       initialTransactions: _transactions,
@@ -3786,6 +3810,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             },
           ),
           ListTile(leading: const Icon(Icons.account_balance_wallet_rounded), title: const Text('ওয়ালেট ম্যানেজমেন্ট'), subtitle: const Text('সব ওয়ালেট ও ব্যালেন্স দেখুন'), onTap: () { Navigator.pop(sheetContext); _openWalletManagement(); }),
+          ListTile(leading: const Icon(Icons.savings_rounded), title: const Text('সঞ্চয়'), subtitle: const Text('সঞ্চয়ের লক্ষ্য ও কিস্তির হিসাব দেখুন'), onTap: () { Navigator.pop(sheetContext); _openSavingsManagement(); }),
           ListTile(leading: const Icon(Icons.receipt_long_rounded), title: const Text('সব লেনদেন'), onTap: () { Navigator.pop(sheetContext); _openTransactionsPage(); }),
           ListTile(leading: const Icon(Icons.refresh_rounded), title: const Text('ডেটা রিফ্রেশ'), onTap: () { Navigator.pop(sheetContext); _load(); }),
           ListTile(leading: const Icon(Icons.dns_outlined), title: const Text('Server Settings'), onTap: () { Navigator.pop(sheetContext); Navigator.of(context).push(_route(const ServerSettingsScreen())); }),

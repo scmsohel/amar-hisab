@@ -2493,7 +2493,7 @@ class _BillsScreenState extends State<_BillsScreen> {
             backgroundColor: surface,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
             child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: 520, maxHeight: (MediaQuery.of(ctx).size.height - MediaQuery.of(ctx).viewInsets.bottom - 40).clamp(260.0, MediaQuery.of(ctx).size.height * .90)),
+              constraints: BoxConstraints(maxWidth: 520, maxHeight: (MediaQuery.of(ctx).size.height - MediaQuery.of(ctx).viewInsets.bottom - 40).clamp(260.0, MediaQuery.of(ctx).size.height * .90).toDouble()),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(15, 12, 15, 14),
                 child: Column(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -2736,7 +2736,7 @@ class _BillsScreenState extends State<_BillsScreen> {
     });
     final unpaid = _items.where((e) => !_done(e)).toList();
     final remaining = unpaid.fold<double>(0,(s,e) => s + _left(e));
-    final paid = _items.where(_done).fold<double>(0,(s,e) => s + _num(e['amount']));
+    final paid = _items.fold<double>(0, (sum, e) { final recorded = _paid(e); return sum + (recorded > 0 ? recorded : _done(e) ? _num(e['amount']) : 0); });
     final overdue = _items.where(_overdue).length;
     final upcoming = _items.where((e) {
       final d = _due(e);

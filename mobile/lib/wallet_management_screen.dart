@@ -131,21 +131,21 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               SliverPadding(
-                padding: const EdgeInsets.fromLTRB(18, 8, 18, 18),
+                padding: const EdgeInsets.fromLTRB(12, 3, 12, 12),
                 sliver: SliverList(delegate: SliverChildListDelegate([
                   Row(children: [
-                    IconButton(onPressed: () => Navigator.maybePop(context), icon: Icon(Icons.arrow_back_rounded, color: ink, size: 28)),
-                    const SizedBox(width: 4),
+                    IconButton(onPressed: () => Navigator.maybePop(context), icon: Icon(Icons.arrow_back_rounded, color: ink, size: 23)),
+                    const SizedBox(width: 2),
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('ওয়ালেট ম্যানেজমেন্ট', style: TextStyle(color: ink, fontSize: 21, fontWeight: FontWeight.w900)),
-                      Text('আপনার সব ওয়ালেটের ব্যালেন্স ও লেনদেন', style: TextStyle(color: muted, fontSize: 11.5)),
+                      Text('ওয়ালেট ম্যানেজমেন্ট', style: TextStyle(color: ink, fontSize: 17, fontWeight: FontWeight.w900)),
+                      Text('আপনার সব ওয়ালেটের ব্যালেন্স ও লেনদেন', style: TextStyle(color: muted, fontSize: 8.5)),
                     ])),
-                    IconButton(onPressed: _loading ? null : _refresh, icon: Icon(Icons.refresh_rounded, color: ink)),
-                    FilledButton.icon(onPressed: _showAddWallet, icon: const Icon(Icons.add_rounded, size: 18), label: const Text('ওয়ালেট যোগ')),
+                    IconButton(visualDensity: VisualDensity.compact, constraints: const BoxConstraints.tightFor(width: 27, height: 27), padding: EdgeInsets.zero, onPressed: _loading ? null : _refresh, icon: Icon(Icons.refresh_rounded, color: ink, size: 19)),
+                    FilledButton.icon(style: FilledButton.styleFrom(visualDensity: VisualDensity.compact, padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 7), minimumSize: Size.zero), onPressed: _showAddWallet, icon: const Icon(Icons.add_rounded, size: 15), label: const Text('যোগ', style: TextStyle(fontSize: 10))),
                   ]),
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(colors: [Color(0xFFEAF9F3), Color(0xFFDDF4EF)]),
                       borderRadius: BorderRadius.circular(22),
@@ -153,15 +153,15 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                     ),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Row(children: [
-                        Container(width: 58, height: 58, decoration: const BoxDecoration(color: Color(0xFFCFF3E5), shape: BoxShape.circle), child: const Icon(Icons.account_balance_wallet_rounded, color: Color(0xFF009B61), size: 34)),
-                        const SizedBox(width: 12),
+                        Container(width: 42, height: 42, decoration: const BoxDecoration(color: Color(0xFFCFF3E5), shape: BoxShape.circle), child: const Icon(Icons.account_balance_wallet_rounded, color: Color(0xFF009B61), size: 25)),
+                        const SizedBox(width: 9),
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          const Text('মোট ব্যালেন্স', style: TextStyle(color: Color(0xFF10233B), fontWeight: FontWeight.w800, fontSize: 14)),
-                          Text(_money(_total), style: const TextStyle(color: Color(0xFF008D4B), fontWeight: FontWeight.w900, fontSize: 25)),
-                          const Text('সকল ওয়ালেটের বর্তমান ব্যালেন্স', style: TextStyle(color: Color(0xFF58708C), fontSize: 10.5)),
+                          const Text('মোট ব্যালেন্স', style: TextStyle(color: Color(0xFF10233B), fontWeight: FontWeight.w800, fontSize: 9.5)),
+                          Text(_money(_total), style: const TextStyle(color: Color(0xFF008D4B), fontWeight: FontWeight.w900, fontSize: 21)),
+                          const Text('সকল ওয়ালেটের বর্তমান ব্যালেন্স', style: TextStyle(color: Color(0xFF58708C), fontSize: 9)),
                         ])),
                       ]),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
                       Row(children: [
                         Expanded(child: _summaryPill('↗', 'আয় (মোট)', _money(income), const Color(0xFF009B58), const Color(0xFFE0F8EC))),
                         const SizedBox(width: 6),
@@ -171,14 +171,14 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                       ]),
                     ]),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 9),
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 1.20,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                    childAspectRatio: 1.43,
                     children: [
                       for (final wallet in _wallets)
                         _walletCard(wallet.$1, wallet.$2, wallet.$3, _balances[wallet.$1] ?? 0, surface, ink, muted),
@@ -186,50 +186,50 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                         _walletCard(name, Icons.account_balance_wallet_rounded, const Color(0xFF64748B), _balances[name] ?? 0, surface, ink, muted),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 9),
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(22), border: Border.all(color: line), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: dark ? .08 : .04), blurRadius: 16, offset: const Offset(0, 5))]),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('ওয়ালেট ব্যালেন্স (চার্ট)', style: TextStyle(color: ink, fontSize: 17, fontWeight: FontWeight.w900)),
-                      Text('সকল ওয়ালেটের ব্যালেন্সের তুলনা', style: TextStyle(color: muted, fontSize: 11.5)),
-                      const SizedBox(height: 12),
+                      Text('ওয়ালেট ব্যালেন্স (চার্ট)', style: TextStyle(color: ink, fontSize: 14, fontWeight: FontWeight.w900)),
+                      Text('সকল ওয়ালেটের ব্যালেন্সের তুলনা', style: TextStyle(color: muted, fontSize: 9.5)),
+                      const SizedBox(height: 7),
                       Row(children: [
-                        SizedBox(width: 150, height: 150, child: CustomPaint(painter: _WalletDonutPainter(
+                        SizedBox(width: 108, height: 108, child: CustomPaint(painter: _WalletDonutPainter(
                           values: _wallets.map((w) => (_balances[w.$1] ?? 0).abs()).toList(),
                           colors: palette,
                           centerText: _money(_total),
                           textColor: ink,
                           mutedColor: muted,
                         ))),
-                        const SizedBox(width: 14),
-                        Expanded(child: Wrap(spacing: 10, runSpacing: 12, children: [
+                        const SizedBox(width: 8),
+                        Expanded(child: Wrap(spacing: 7, runSpacing: 7, children: [
                           for (var i = 0; i < _wallets.length; i++)
-                            SizedBox(width: 115, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                              Row(children: [Container(width: 8, height: 8, decoration: BoxDecoration(color: palette[i], shape: BoxShape.circle)), const SizedBox(width: 6), Text(_wallets[i].$1, style: TextStyle(color: muted, fontSize: 12))]),
-                              const SizedBox(height: 2),
-                              Text(_money(_balances[_wallets[i].$1] ?? 0), style: TextStyle(color: ink, fontWeight: FontWeight.w900, fontSize: 13)),
-                              Text(_total > 0 ? '${((_balances[_wallets[i].$1] ?? 0) / _total * 100).toStringAsFixed(1)}%' : '0.0%', style: TextStyle(color: muted, fontSize: 11)),
+                            SizedBox(width: 76, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Row(children: [Container(width: 8, height: 8, decoration: BoxDecoration(color: palette[i], shape: BoxShape.circle)), const SizedBox(width: 6), Text(_wallets[i].$1, style: TextStyle(color: muted, fontSize: 10))]),
+                              const SizedBox(height: 1),
+                              Text(_money(_balances[_wallets[i].$1] ?? 0), style: TextStyle(color: ink, fontWeight: FontWeight.w900, fontSize: 10.5)),
+                              Text(_total > 0 ? '${((_balances[_wallets[i].$1] ?? 0) / _total * 100).toStringAsFixed(1)}%' : '0.0%', style: TextStyle(color: muted, fontSize: 9)),
                             ])),
                         ])),
                       ]),
                     ]),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 9),
                   Container(
-                    padding: const EdgeInsets.fromLTRB(14, 14, 14, 8),
+                    padding: const EdgeInsets.fromLTRB(10, 10, 10, 5),
                     decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(22), border: Border.all(color: line), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: dark ? .08 : .04), blurRadius: 16, offset: const Offset(0, 5))]),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Row(children: [
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text('লেনদেনের তালিকা', style: TextStyle(color: ink, fontSize: 17, fontWeight: FontWeight.w900)),
+                          Text('লেনদেনের তালিকা', style: TextStyle(color: ink, fontSize: 14, fontWeight: FontWeight.w900)),
                           Text('সকল ওয়ালেটের সাম্প্রতিক লেনদেন', style: TextStyle(color: muted, fontSize: 11.5)),
                         ])),
                         DropdownButtonHideUnderline(child: DropdownButton<String>(value: _filterWallet, items: ['সব ওয়ালেট', ...entries].map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 11)))).toList(), onChanged: (v) => setState(() => _filterWallet = v ?? 'সব ওয়ালেট'))),
                         const SizedBox(width: 8),
                         DropdownButtonHideUnderline(child: DropdownButton<String>(value: _filterTime, items: const ['সব সময়', 'এই মাস'].map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 11)))).toList(), onChanged: (v) => setState(() => _filterTime = v ?? 'সব সময়'))),
                       ]),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 5),
                       Divider(height: 1, color: line),
                       if (rows.isEmpty)
                         Padding(padding: const EdgeInsets.all(24), child: Center(child: Text('কোনো লেনদেন পাওয়া যায়নি', style: TextStyle(color: muted))))
@@ -248,16 +248,16 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
   }
 
   Widget _summaryPill(String icon, String label, String value, Color color, Color bg) => Container(
-    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 8),
+    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
     decoration: BoxDecoration(color: Colors.white.withValues(alpha: .8), borderRadius: BorderRadius.circular(13)),
     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
-        Container(width: 23, height: 23, decoration: BoxDecoration(color: bg, shape: BoxShape.circle), child: Center(child: Text(icon, style: TextStyle(color: color, fontSize: 16, fontWeight: FontWeight.w900)))),
+        Container(width: 18, height: 18, decoration: BoxDecoration(color: bg, shape: BoxShape.circle), child: Center(child: Text(icon, style: TextStyle(color: color, fontSize: 10.5, fontWeight: FontWeight.w900)))),
         const SizedBox(width: 4),
-        Expanded(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF536B86), fontSize: 9.5))),
+        Expanded(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Color(0xFF536B86), fontSize: 8))),
       ]),
-      const SizedBox(height: 4),
-      FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(value, style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w900))),
+      const SizedBox(height: 2),
+      FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(value, style: TextStyle(color: color, fontSize: 9.5, fontWeight: FontWeight.w900))),
     ]),
   );
 
@@ -266,17 +266,17 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
     final isNagad = name == 'নগদ';
     final bg = isBikash ? const Color(0xFFFFF5F9) : isNagad ? const Color(0xFFFFF8F1) : name == 'ক্যাশ' ? const Color(0xFFF2FCF7) : const Color(0xFFF3F7FF);
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(7),
       decoration: BoxDecoration(color: surface == Colors.white ? bg : surface, borderRadius: BorderRadius.circular(19), border: Border.all(color: accent.withValues(alpha: .55)), boxShadow: [BoxShadow(color: accent.withValues(alpha: .07), blurRadius: 10, offset: const Offset(0, 3))]),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Container(width: 35, height: 35, decoration: BoxDecoration(color: accent.withValues(alpha: .10), shape: BoxShape.circle), child: Center(child: SizedBox(width: 22, height: 22, child: isBikash ? SvgPicture.asset('assets/wallets/bkash-mark.svg') : isNagad ? SvgPicture.asset('assets/wallets/nagad-mark.svg') : Icon(icon, color: accent, size: 22)))),
+          Container(width: 28, height: 28, decoration: BoxDecoration(color: accent.withValues(alpha: .10), shape: BoxShape.circle), child: Center(child: SizedBox(width: 18, height: 18, child: isBikash ? SvgPicture.asset('assets/wallets/bkash-mark.svg') : isNagad ? SvgPicture.asset('assets/wallets/nagad-mark.svg') : Icon(icon, color: accent, size: 18)))),
           const Spacer(),
           Icon(Icons.more_horiz_rounded, color: muted, size: 20),
         ]),
-        const SizedBox(height: 3),
-        Text(name, style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w900)),
-        Text(_money(balance), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: accent, fontSize: 18, fontWeight: FontWeight.w900)),
+        const SizedBox(height: 1),
+        Text(name, style: TextStyle(color: ink, fontSize: 11, fontWeight: FontWeight.w900)),
+        Text(_money(balance), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: accent, fontSize: 15.5, fontWeight: FontWeight.w900)),
         const Spacer(),
         Row(children: [
           Expanded(child: _walletAction('↙ আয়', const Color(0xFF008F50), const Color(0xFFE1F8EA), () async { await widget.onAddTransaction(name, 'আয়'); await _refresh(); })),
@@ -296,8 +296,8 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
       borderRadius: BorderRadius.circular(10),
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 2),
-        child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Text(label, style: TextStyle(color: color, fontSize: 10.5, fontWeight: FontWeight.w800)))),
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 1),
+        child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Text(label, style: TextStyle(color: color, fontSize: 9, fontWeight: FontWeight.w800)))),
       ),
     ),
   );
@@ -314,18 +314,18 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
     return InkWell(
       onTap: () async { await widget.onEditTransaction(tx); await _refresh(); },
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 9),
+        padding: const EdgeInsets.symmetric(vertical: 6),
         decoration: BoxDecoration(border: Border(bottom: BorderSide(color: line))),
         child: Row(children: [
-          Container(width: 34, height: 34, decoration: BoxDecoration(color: accent.withValues(alpha: .11), shape: BoxShape.circle), child: Icon(Icons.account_balance_wallet_rounded, color: accent, size: 19)),
-          const SizedBox(width: 7),
-          SizedBox(width: 76, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Container(width: 34, height: 34, decoration: BoxDecoration(color: accent.withValues(alpha: .11), shape: BoxShape.circle), child: Icon(Icons.account_balance_wallet_rounded, color: accent, size: 15)),
+          const SizedBox(width: 5),
+          SizedBox(width: 66, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(date, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: ink, fontSize: 9.5, fontWeight: FontWeight.w700)),
             Text(wallet, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muted, fontSize: 9.5)),
           ])),
           const SizedBox(width: 6),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: ink, fontSize: 11.5, fontWeight: FontWeight.w800)),
+            Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: ink, fontSize: 10.5, fontWeight: FontWeight.w800)),
             Text('$kind • ${(tx['category'] ?? tx['categoryName'] ?? '').toString()}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muted, fontSize: 9.5)),
           ])),
           const SizedBox(width: 4),

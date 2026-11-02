@@ -2465,6 +2465,12 @@ class _BillsScreenState extends State<_BillsScreen> {
       }
     } catch (_) {}
 
+    if (!mounted) {
+      amountController.dispose();
+      noteController.dispose();
+      return;
+    }
+
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(

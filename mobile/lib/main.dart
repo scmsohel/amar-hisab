@@ -2235,13 +2235,89 @@ class _BillsScreenState extends State<_BillsScreen> {
                     TextField(controller: nameController, enabled: !saving, decoration: decoration('নাম বা বিবরণ')),
                     const SizedBox(height: 13),
                     fieldLabel('আইকন নির্বাচন'),
-                    DropdownButtonFormField<String>(
-                      initialValue: iconName, isExpanded: true, decoration: decoration('আইকন নির্বাচন করুন'),
-                      items: _transactionIconOptions.entries.map((entry) => DropdownMenuItem(
-                        value: entry.key, child: Row(children: [Icon(entry.value, size: 19, color: const Color(0xFF00A875)), const SizedBox(width: 10), Text(entry.key)]),
-                      )).toList(),
-                      onChanged: saving ? null : (value) { if (value != null) setModal(() => iconName = value); },
-                    ),
+                    Builder(builder: (selectorContext) {
+                      final selectedIcon = _transactionIconOptions[iconName] ?? Icons.receipt_long_outlined;
+                      return Row(children: [
+                        Container(
+                          width: 38, height: 38,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF00A875).withValues(alpha: .10),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Icon(selectedIcon, color: const Color(0xFF00A875), size: 21),
+                        ),
+                        const SizedBox(width: 9),
+                        Expanded(
+                          child: PopupMenuButton<String>(
+                            tooltip: 'আইকন বেছে নিন',
+                            enabled: !saving,
+                            onSelected: (value) => setModal(() => iconName = value),
+                            itemBuilder: (menuContext) => [
+                              PopupMenuItem<String>(
+                                enabled: false,
+                                padding: const EdgeInsets.all(8),
+                                child: Builder(builder: (popupContext) => SizedBox(
+                                  width: 280,
+                                  height: 220,
+                                  child: GridView.builder(
+                                    padding: EdgeInsets.zero,
+                                    itemCount: _transactionIconOptions.length,
+                                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 6,
+                                      mainAxisSpacing: 5,
+                                      crossAxisSpacing: 5,
+                                    ),
+                                    itemBuilder: (gridContext, index) {
+                                      final entry = _transactionIconOptions.entries.elementAt(index);
+                                      final isSelected = iconName == entry.key;
+                                      return InkWell(
+                                        borderRadius: BorderRadius.circular(10),
+                                        onTap: () => Navigator.of(popupContext).pop(entry.key),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: isSelected
+                                                ? const Color(0xFF00A875).withValues(alpha: .13)
+                                                : Colors.transparent,
+                                            borderRadius: BorderRadius.circular(10),
+                                            border: Border.all(
+                                              color: isSelected
+                                                  ? const Color(0xFF00A875)
+                                                  : Colors.transparent,
+                                            ),
+                                          ),
+                                          child: Icon(
+                                            entry.value,
+                                            size: 22,
+                                            color: isSelected
+                                                ? const Color(0xFF00A875)
+                                                : (dark ? const Color(0xFFB7C7D6) : const Color(0xFF64748B)),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                )),
+                              ),
+                            ],
+                            child: Container(
+                              height: 42,
+                              decoration: BoxDecoration(
+                                color: dark ? const Color(0xFF0B2032) : const Color(0xFFF8FAFC),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: line),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.grid_view_rounded,
+                                  color: dark ? const Color(0xFFD4E0EA) : const Color(0xFF1E293B),
+                                  size: 21,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ]);
+                    }),
                     const SizedBox(height: 13),
                     fieldLabel('টাকার পরিমাণ'),
                     TextField(controller: amountController, enabled: !saving, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: decoration('৳ 0')),

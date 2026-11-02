@@ -1532,8 +1532,8 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                   const SizedBox(height: 5),
                   DropdownButtonFormField<String>(
                     initialValue: rule,
-                    items: const [
-                      DropdownMenuItem(value: 'one-time', child: Text('সহজ হিসাব (একবার)')),
+                    items: [
+                      const DropdownMenuItem(value: 'one-time', child: Text('সহজ হিসাব (একবার)')),
                       DropdownMenuItem(value: 'installment', child: Text(credit ? 'মাসিক হিসাব' : 'কিস্তির হিসাব')),
                     ],
                     onChanged: (v) => setModal(() => rule = v ?? 'one-time'),

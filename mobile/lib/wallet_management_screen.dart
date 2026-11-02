@@ -178,7 +178,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                     physics: const NeverScrollableScrollPhysics(),
                     mainAxisSpacing: 8,
                     crossAxisSpacing: 8,
-                    childAspectRatio: 1.80,
+                    childAspectRatio: 2.00,
                     children: [
                       for (final wallet in _wallets)
                         _walletCard(wallet.$1, wallet.$2, wallet.$3, _balances[wallet.$1] ?? 0, surface, ink, muted),

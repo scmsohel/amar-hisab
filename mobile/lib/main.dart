@@ -5257,7 +5257,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final isDark = _appThemeMode.value == ThemeMode.dark;
     final surface = isDark ? const Color(0xFF10243A) : Colors.white;
     final ink = isDark ? const Color(0xFFE6F0FA) : const Color(0xFF172B3A);
-    final muted = isDark ? const Color(0xFF9DB0C2) : const Color(0xFF7F91A2);
     final divider = isDark ? const Color(0xFF294158) : const Color(0xFFE3EAF0);
 
     showGeneralDialog<void>(
@@ -5401,7 +5400,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     title: 'Compact / Expand',
                                     trailing: Switch(
                                       value: _compactCharts,
-                                      activeColor: const Color(0xFF08B63C),
+                                      activeThumbColor: const Color(0xFF08B63C),
                                       onChanged: (value) {
                                         setState(() => _compactCharts = value);
                                         setPopupState(() {});

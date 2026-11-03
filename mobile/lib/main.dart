@@ -2406,7 +2406,7 @@ class _BillsScreenState extends State<_BillsScreen> {
                               'status': status, 'notes': noteController.text.trim(),
                               'billRule': recurrence, 'billDay': dueDate.day,
                               'reminderDays': int.parse(reminder),
-                              if (oldPayments case final payments?) 'payments': payments,
+                              ...?(oldPayments == null ? null : {'payments': oldPayments}),
                               if (recurrence != 'one-time') 'recurringId': billToEdit?['recurringId'] ?? id,
                               if (recurrence == 'one-time') 'recurringId': null,
                               'cycleKey': billToEdit?['cycleKey'] ?? date.substring(0, 7),

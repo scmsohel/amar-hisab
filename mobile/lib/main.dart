@@ -3162,6 +3162,136 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  int? _reminderDays(dynamic value) {
+    final date = _parseTransactionDate(value);
+    if (date == null) return null;
+    final now = DateTime.now();
+    return DateTime(date.year, date.month, date.day)
+        .difference(DateTime(now.year, now.month, now.day)).inDays;
+  }
+
+  String _reminderDateLabel(dynamic value) {
+    final date = _parseTransactionDate(value);
+    if (date == null) return 'তারিখ পাওয়া যায়নি';
+    const months = ['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
+    return '${_bengaliDigits(date.day.toString())} ${months[date.month - 1]}, ${_bengaliDigits(date.year.toString())}';
+  }
+
+  Future<void> _showReminderSheet() async {
+    await _load();
+    if (!mounted) return;
+    final billsDue = _bills.where((e) {
+      if (['পরিশোধিত','সম্পন্ন'].contains((e['status'] ?? '').toString())) return false;
+      final days = _reminderDays(e['date'] ?? e['dueDate'] ?? e['due_date']);
+      final reminder = int.tryParse((e['reminderDays'] ?? 3).toString()) ?? 3;
+      return days != null && days >= 0 && days <= reminder;
+    }).toList();
+    final debtsDue = _debts.where((e) {
+      if (['পরিশোধিত','সম্পন্ন'].contains((e['status'] ?? '').toString())) return false;
+      final days = _reminderDays(e['date']);
+      return days != null && days <= 3;
+    }).toList();
+    var filter = 'সবগুলো';
+    await showModalBottomSheet<void>(
+      context: context, isScrollControlled: true, useSafeArea: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        final dark = Theme.of(sheetContext).brightness == Brightness.dark;
+        final surface = dark ? const Color(0xFF102338) : Colors.white;
+        final panel = dark ? const Color(0xFF172D40) : const Color(0xFFF0F3F8);
+        final ink = dark ? const Color(0xFFE5F0FA) : const Color(0xFF203447);
+        final muted = dark ? const Color(0xFF9BAFC0) : const Color(0xFF8292A4);
+        final border = dark ? const Color(0xFF29445B) : const Color(0xFFE3EAF0);
+        return StatefulBuilder(builder: (context, setSheetState) {
+          List<Map<String,dynamic>> applyFilter(List<Map<String,dynamic>> items) => items.where((e) {
+            final days = _reminderDays(e['date'] ?? e['dueDate'] ?? e['due_date']) ?? 0;
+            return filter == 'সবগুলো' || (filter == 'আজকের' && days == 0) || (filter == 'আসন্ন' && days > 0);
+          }).toList();
+          final bills = applyFilter(billsDue), debts = applyFilter(debtsDue);
+          final all = [...billsDue, ...debtsDue];
+          final todayCount = all.where((e) => _reminderDays(e['date'] ?? e['dueDate'] ?? e['due_date']) == 0).length;
+          final upcomingCount = all.where((e) => (_reminderDays(e['date'] ?? e['dueDate'] ?? e['due_date']) ?? -1) > 0).length;
+          Widget card(Map<String,dynamic> item, bool isBill) {
+            final dateValue = item['date'] ?? item['dueDate'] ?? item['due_date'];
+            final days = _reminderDays(dateValue) ?? 0;
+            final due = days < 0 ? '${_bengaliDigits(days.abs().toString())} দিন পেরিয়েছে' : days == 0 ? 'আজ' : '${_bengaliDigits(days.toString())} দিন বাকি';
+            final title = isBill ? (item['title'] ?? item['name'] ?? 'নাম নেই').toString() : (item['personName'] ?? item['name'] ?? item['person'] ?? item['title'] ?? 'নাম নেই').toString();
+            final accent = isBill ? const Color(0xFFFF6472) : const Color(0xFF347FF5);
+            final urgent = days <= 1;
+            return Material(color: surface, borderRadius: BorderRadius.circular(14), child: InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                Navigator.of(context).push(_route(isBill
+                  ? _BillsScreen(bills: _bills, onReload: () async { await _load(); return List<Map<String,dynamic>>.from(_bills); })
+                  : _DebtsScreen(debts: _debts, wallets: _walletBalances.keys.toList(), onReload: () async { await _load(); return List<Map<String,dynamic>>.from(_debts); })));
+              },
+              child: Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(border: Border.all(color: border), borderRadius: BorderRadius.circular(14)), child: Column(children: [
+                Row(children: [
+                  Container(width:38,height:38,decoration:BoxDecoration(color:accent.withValues(alpha:.12),borderRadius:BorderRadius.circular(11)),child:Icon(isBill?Icons.receipt_long_rounded:Icons.account_balance_wallet_outlined,color:accent,size:20)),
+                  const SizedBox(width:10),
+                  Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+                    Text(title,maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(color:ink,fontSize:13,fontWeight:FontWeight.w800)),
+                    const SizedBox(height:3),
+                    Text(isBill?_reminderDateLabel(dateValue):'${(item['debtKind']??item['status']??'').toString()} · ${_reminderDateLabel(dateValue)}',style:TextStyle(color:muted,fontSize:10.5),maxLines:1,overflow:TextOverflow.ellipsis),
+                  ])),
+                  const SizedBox(width:7),
+                  Container(padding:const EdgeInsets.symmetric(horizontal:9,vertical:6),decoration:BoxDecoration(color:urgent?const Color(0xFFFFF0E5):const Color(0xFFFFF4D9),borderRadius:BorderRadius.circular(9)),child:Text(due,style:TextStyle(color:urgent?const Color(0xFFD65D27):const Color(0xFFB7791F),fontSize:10,fontWeight:FontWeight.w800))),
+                  Icon(Icons.chevron_right_rounded,color:muted),
+                ]),
+                const SizedBox(height:9),
+                ClipRRect(borderRadius:BorderRadius.circular(8),child:LinearProgressIndicator(value:days<0?1:((8-days)/8).clamp(.12,1).toDouble(),minHeight:4,backgroundColor:panel,color:urgent?const Color(0xFFEF5350):accent)),
+              ])),
+            ));
+          }
+          return Container(
+            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height*.82),
+            decoration: BoxDecoration(color:surface,borderRadius:const BorderRadius.vertical(top:Radius.circular(24))),
+            child: Column(mainAxisSize:MainAxisSize.min,children:[
+              const SizedBox(height:9),
+              Container(width:38,height:4,decoration:BoxDecoration(color:muted.withValues(alpha:.5),borderRadius:BorderRadius.circular(8))),
+              Padding(padding:const EdgeInsets.fromLTRB(18,15,12,12),child:Row(children:[
+                Container(width:42,height:42,decoration:BoxDecoration(color:const Color(0xFFEAF0FF),borderRadius:BorderRadius.circular(13)),child:const Icon(Icons.notifications_active_rounded,color:Color(0xFF347FF5))),
+                const SizedBox(width:10),
+                Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+                  Text('রিমাইন্ডার',style:TextStyle(color:ink,fontSize:18,fontWeight:FontWeight.w900)),
+                  Text('আপনার বিল এবং দেনা-পাওনার রিমাইন্ডার',style:TextStyle(color:muted,fontSize:10.5)),
+                ])),
+                IconButton(onPressed:()=>Navigator.pop(sheetContext),icon:Icon(Icons.close,color:muted)),
+              ])),
+              Divider(height:1,color:border),
+              Padding(padding:const EdgeInsets.fromLTRB(15,12,15,9),child:Container(padding:const EdgeInsets.all(4),decoration:BoxDecoration(color:panel,borderRadius:BorderRadius.circular(30)),child:Row(children:[
+                for(final entry in [('সবগুলো',all.length),('আজকের',todayCount),('আসন্ন',upcomingCount)])
+                  Expanded(child:GestureDetector(onTap:()=>setSheetState(()=>filter=entry.$1),child:AnimatedContainer(duration:const Duration(milliseconds:150),padding:const EdgeInsets.symmetric(vertical:10,horizontal:2),decoration:BoxDecoration(color:filter==entry.$1?const Color(0xFF347FF5):Colors.transparent,borderRadius:BorderRadius.circular(24)),child:Row(mainAxisAlignment:MainAxisAlignment.center,children:[
+                    Text(entry.$1,style:TextStyle(color:filter==entry.$1?Colors.white:muted,fontSize:11,fontWeight:FontWeight.w800)),
+                    const SizedBox(width:4),
+                    Text(_bengaliDigits(entry.$2.toString()),style:TextStyle(color:filter==entry.$1?Colors.white:ink,fontSize:10,fontWeight:FontWeight.w900)),
+                  ])))),
+              ]))),
+              Flexible(child:ListView(shrinkWrap:true,padding:const EdgeInsets.fromLTRB(15,2,15,18),children:[
+                if(bills.isEmpty&&debts.isEmpty) Padding(padding:const EdgeInsets.symmetric(vertical:34),child:Center(child:Text('এখন কোনো রিমাইন্ডার নেই।',style:TextStyle(color:muted,fontSize:12)))),
+                if(bills.isNotEmpty)...[
+                  Padding(padding:const EdgeInsets.only(top:5,bottom:9),child:Text('বিল',style:TextStyle(color:ink,fontWeight:FontWeight.w900,fontSize:13))),
+                  ...bills.map((e)=>Padding(padding:const EdgeInsets.only(bottom:9),child:card(e,true))),
+                ],
+                if(debts.isNotEmpty)...[
+                  Padding(padding:const EdgeInsets.only(top:5,bottom:9),child:Text('দেনা-পাওনা',style:TextStyle(color:ink,fontWeight:FontWeight.w900,fontSize:13))),
+                  ...debts.map((e)=>Padding(padding:const EdgeInsets.only(bottom:9),child:card(e,false))),
+                ],
+              ])),
+              Padding(padding:const EdgeInsets.fromLTRB(15,0,15,14),child:SizedBox(width:double.infinity,child:OutlinedButton(onPressed:(){
+                Navigator.pop(sheetContext);
+                Navigator.of(context).push(_route(debts.isNotEmpty&&bills.isEmpty
+                  ? _DebtsScreen(debts:_debts,wallets:_walletBalances.keys.toList(),onReload:()async{await _load();return List<Map<String,dynamic>>.from(_debts);})
+                  : _BillsScreen(bills:_bills,onReload:()async{await _load();return List<Map<String,dynamic>>.from(_bills); })));
+              },child:const Text('সব দেখুন →')))),
+            ]),
+          );
+        });
+      },
+    );
+  }
+
   Widget _entranceAnimation(Widget child, int _) => child;
 
   String _money(double value) => '৳ ${value.round().toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',')}';
@@ -3237,7 +3367,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 children: [
                                   IconButton(
                                     tooltip: 'নোটিফিকেশন',
-                                    onPressed: () => _notice(context, 'এখন কোনো নতুন নোটিফিকেশন নেই।'),
+                                    onPressed: _showReminderSheet,
                                     icon: Icon(Icons.notifications_none_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : const Color(0xFF087A5B), size: 25),
                                   ),
                                   Positioned(

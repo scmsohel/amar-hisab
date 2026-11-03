@@ -3207,17 +3207,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
       return days != null && days <= 3;
     }).toList();
     var filter = 'সবগুলো';
-    await showModalBottomSheet<void>(
-      context: context, isScrollControlled: true, useSafeArea: true,
-      backgroundColor: Colors.transparent,
-      builder: (sheetContext) {
-        final dark = Theme.of(sheetContext).brightness == Brightness.dark;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) {
+        final dark = Theme.of(dialogContext).brightness == Brightness.dark;
         final surface = dark ? const Color(0xFF102338) : Colors.white;
         final panel = dark ? const Color(0xFF172D40) : const Color(0xFFF0F3F8);
         final ink = dark ? const Color(0xFFE5F0FA) : const Color(0xFF203447);
         final muted = dark ? const Color(0xFF9BAFC0) : const Color(0xFF8292A4);
         final border = dark ? const Color(0xFF29445B) : const Color(0xFFE3EAF0);
-        return StatefulBuilder(builder: (context, setSheetState) {
+        return StatefulBuilder(builder: (popupContext, setSheetState) {
           List<Map<String,dynamic>> applyFilter(List<Map<String,dynamic>> items) => items.where((e) {
             final days = _reminderDays(e['date'] ?? e['dueDate'] ?? e['due_date']) ?? 0;
             return filter == 'সবগুলো' || (filter == 'আজকের' && days == 0) || (filter == 'আসন্ন' && days > 0);
@@ -3236,8 +3236,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             return Material(color: surface, borderRadius: BorderRadius.circular(14), child: InkWell(
               borderRadius: BorderRadius.circular(14),
               onTap: () {
-                Navigator.pop(sheetContext);
-                Navigator.of(context).push(_route(isBill
+                Navigator.pop(dialogContext);
+                Navigator.of(this.context).push(_route(isBill
                   ? _BillsScreen(bills: _bills, onReload: () async { await _load(); return List<Map<String,dynamic>>.from(_bills); })
                   : _DebtsScreen(debts: _debts, wallets: _walletBalances.keys.toList(), onReload: () async { await _load(); return List<Map<String,dynamic>>.from(_debts); })));
               },
@@ -3259,9 +3259,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ])),
             ));
           }
-          return Container(
-            constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height*.82),
-            decoration: BoxDecoration(color:surface,borderRadius:const BorderRadius.vertical(top:Radius.circular(24))),
+          return Dialog(
+            alignment: Alignment.center,
+            insetPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 28),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(22),
+              child: Container(
+            width: double.infinity,
+            constraints: BoxConstraints(maxWidth: 520, maxHeight: MediaQuery.of(dialogContext).size.height * .78),
+            decoration: BoxDecoration(color:surface,borderRadius:BorderRadius.circular(22)),
             child: Column(mainAxisSize:MainAxisSize.min,children:[
               const SizedBox(height:9),
               Container(width:38,height:4,decoration:BoxDecoration(color:muted.withValues(alpha:.5),borderRadius:BorderRadius.circular(8))),
@@ -3272,7 +3280,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   Text('রিমাইন্ডার',style:TextStyle(color:ink,fontSize:18,fontWeight:FontWeight.w900)),
                   Text('আপনার বিল এবং দেনা-পাওনার রিমাইন্ডার',style:TextStyle(color:muted,fontSize:10.5)),
                 ])),
-                IconButton(onPressed:()=>Navigator.pop(sheetContext),icon:Icon(Icons.close,color:muted)),
+                IconButton(onPressed:()=>Navigator.pop(dialogContext),icon:Icon(Icons.close,color:muted)),
               ])),
               Divider(height:1,color:border),
               Padding(padding:const EdgeInsets.fromLTRB(15,12,15,9),child:Container(padding:const EdgeInsets.all(4),decoration:BoxDecoration(color:panel,borderRadius:BorderRadius.circular(30)),child:Row(children:[
@@ -3295,12 +3303,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
               ])),
               Padding(padding:const EdgeInsets.fromLTRB(15,0,15,14),child:SizedBox(width:double.infinity,child:OutlinedButton(onPressed:(){
-                Navigator.pop(sheetContext);
-                Navigator.of(context).push(_route(debts.isNotEmpty&&bills.isEmpty
+                Navigator.pop(dialogContext);
+                Navigator.of(this.context).push(_route(debts.isNotEmpty&&bills.isEmpty
                   ? _DebtsScreen(debts:_debts,wallets:_walletBalances.keys.toList(),onReload:()async{await _load();return List<Map<String,dynamic>>.from(_debts);})
                   : _BillsScreen(bills:_bills,onReload:()async{await _load();return List<Map<String,dynamic>>.from(_bills); })));
               },child:const Text('সব দেখুন →')))),
             ]),
+              ),
+            ),
           );
         });
       },

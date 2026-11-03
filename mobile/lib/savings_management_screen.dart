@@ -67,7 +67,207 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
     amount.dispose();note.dispose();
   }
   Future<void> deleteGoal(Map<String,dynamic> g)async{final yes=await showDialog<bool>(context:context,builder:(c)=>AlertDialog(title:const Text('সঞ্চয় মুছবেন?'),content:Text('${g['title']} পরিকল্পনাটি মুছে যাবে।'),actions:[TextButton(onPressed:()=>Navigator.pop(c,false),child:const Text('বাতিল')),FilledButton(onPressed:()=>Navigator.pop(c,true),child:const Text('মুছুন'))]));if(yes==true)await persist(goals.where((x)=>x['id']!=g['id']).toList(),transactions.where((x)=>!(x['category']=='সঞ্চয়'&&x['title']=='সঞ্চয় জমা — ${g['title']}')).toList());}
-  Future<void> detail(Map<String,dynamic> g)async{await showModalBottomSheet<void>(context:context,isScrollControlled:true,showDragHandle:true,builder:(c)=>StatefulBuilder(builder:(c,set){final ps=payments(g)..sort((a,b)=>n(b['id']).compareTo(n(a['id'])));return Padding(padding:const EdgeInsets.all(16),child:SingleChildScrollView(child:Column(mainAxisSize:MainAxisSize.min,crossAxisAlignment:CrossAxisAlignment.start,children:[Text(g['title'].toString(),style:const TextStyle(fontSize:19,fontWeight:FontWeight.w900)),const SizedBox(height:10),Text('লক্ষ্য ${money(n(g['amount']))}   •   জমা ${money(paid(g))}   •   বাকি ${money(remaining(g))}'),const SizedBox(height:8),LinearProgressIndicator(value:n(g['amount'])>0?(paid(g)/n(g['amount'])).clamp(0,1):0,minHeight:7),const SizedBox(height:12),const Text('জমার ইতিহাস',style:TextStyle(fontWeight:FontWeight.w900)),if(ps.isEmpty)const Padding(padding:EdgeInsets.all(12),child:Text('এখনো কোনো জমা যোগ করা হয়নি।')), ...ps.map((p)=>ListTile(dense:true,contentPadding:EdgeInsets.zero,title:Text('জমা • ${p['date']}'),subtitle:Text('${p['wallet']} • ${p['notes']??''}'),leading:const Icon(Icons.savings_outlined),trailing:Row(mainAxisSize:MainAxisSize.min,children:[Text(money(n(p['amount']))),IconButton(onPressed:(){Navigator.pop(c);paymentForm(g,old:p);},icon:const Icon(Icons.edit_outlined,size:18)),IconButton(onPressed:(){Navigator.pop(c);final ps2=payments(g)..removeWhere((x)=>x['id']==p['id']);final total=ps2.fold<double>(0,(a,x)=>a+n(x['amount']));final up=<String,dynamic>{...g,'payments':ps2,'status':total>=n(g['amount'])?'সম্পন্ন':'চলমান'};persist(goals.map((x)=>x['id']==g['id']?up:x).toList(),transactions.where((x)=>x['id']!=p['transactionId']).toList());},icon:const Icon(Icons.delete_outline,size:18))]))),if(remaining(g)>0)SizedBox(width:double.infinity,child:FilledButton.icon(onPressed:(){Navigator.pop(c);paymentForm(g);},icon:const Icon(Icons.add),label:const Text('জমা যোগ করুন')))])));}));}
+  Future<void> detail(Map<String,dynamic> goal) async {
+    final amountController = TextEditingController(text: (n(goal['goalInstallmentAmount']) > 0 ? n(goal['goalInstallmentAmount']).clamp(0, remaining(goal)) : remaining(goal)).toString());
+    final noteController = TextEditingController();
+    var paymentDate = iso(DateTime.now());
+    var wallet = widget.walletNames.isNotEmpty ? widget.walletNames.first : 'ক্যাশ';
+    dynamic editingId;
+    var saving = false;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final ink = dark ? const Color(0xFFE8F2EE) : const Color(0xFF1B3040);
+    final muted = dark ? const Color(0xFFA5B8B0) : const Color(0xFF81909D);
+    final panel = dark ? const Color(0xFF10291F) : const Color(0xFFEAF8F2);
+    final border = dark ? const Color(0xFF2B5141) : const Color(0xFFB7E5D3);
+    final surface = dark ? const Color(0xFF19372B) : Colors.white;
+
+    await showModalBottomSheet<void>(
+      context: context, isScrollControlled: true, useSafeArea: true, showDragHandle: true,
+      backgroundColor: dark ? const Color(0xFF101F2D) : Colors.white,
+      builder: (sheetContext) => StatefulBuilder(builder: (sheetContext, setSheet) {
+        final current = goals.firstWhere((item) => item['id'].toString() == goal['id'].toString(), orElse: () => goal);
+        final history = payments(current)..sort((a, b) => n(b['id']).compareTo(n(a['id'])));
+        final total = n(current['amount']), deposited = paid(current), left = remaining(current);
+        final progress = total > 0 ? (deposited / total).clamp(0.0, 1.0) : 0.0;
+        final suggested = n(current['goalInstallmentAmount']);
+        final installmentLeft = suggested > 0 ? (suggested < left ? suggested : left) : left;
+        final inputDecoration = (String label, String hint) => InputDecoration(
+          labelText: label, hintText: hint, isDense: true, filled: true,
+          fillColor: dark ? const Color(0xFF172B3B) : const Color(0xFFF8FAFC),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(11), borderSide: BorderSide(color: border)),
+          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(11), borderSide: BorderSide(color: border)),
+        );
+        Widget metric(String label, double value, Color color) => Expanded(child: Container(
+          constraints: const BoxConstraints(minHeight: 68), padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 10),
+          decoration: BoxDecoration(color: dark ? const Color(0xFF172B3B) : const Color(0xFFF7FAFC), borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: dark ? const Color(0xFF294158) : const Color(0xFFE2EAF0))),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 9, color: muted)),
+            const SizedBox(height: 5),
+            FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(money(value), style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: color))),
+          ]),
+        ));
+        Future<void> savePayment() async {
+          final value = double.tryParse(amountController.text.trim());
+          final old = editingId == null ? null : history.where((item) => item['id'].toString() == editingId.toString()).firstOrNull;
+          final maxAllowed = left + n(old?['amount']);
+          if (value == null || !value.isFinite || value <= 0 || value > maxAllowed) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value != null && value > maxAllowed ? 'লক্ষ্যের বাকি টাকার চেয়ে বেশি জমা দেওয়া যাবে না।' : 'সঠিক জমার পরিমাণ দিন।')));
+            return;
+          }
+          setSheet(() => saving = true);
+          try {
+            final pid = editingId ?? DateTime.now().millisecondsSinceEpoch;
+            final tid = old?['transactionId'] ?? (DateTime.now().millisecondsSinceEpoch + 1);
+            final savedDate = paymentDate;
+            final payment = <String, dynamic>{'id': pid, 'amount': value, 'date': dateLabel(savedDate), 'dateInput': savedDate, 'wallet': wallet, 'notes': noteController.text.trim(), 'transactionId': tid};
+            final nextPayments = old == null ? [...history, payment] : history.map((item) => item['id'].toString() == pid.toString() ? payment : item).toList();
+            final sum = nextPayments.fold<double>(0, (v, item) => v + n(item['amount']));
+            final updatedGoal = <String, dynamic>{...current, 'payments': nextPayments, 'status': sum + 1e-8 >= total ? 'সম্পন্ন' : 'চলমান', 'updatedAt': dateLabel(iso(DateTime.now()))};
+            final transaction = <String, dynamic>{
+              'id': tid, 'title': 'সঞ্চয় জমা — \${current['title']}', 'category': 'সঞ্চয়',
+              'date': dateLabel(savedDate), 'dateInput': savedDate, 'time': '', 'wallet': wallet,
+              'amount': value, 'kind': 'ব্যয়', 'note': noteController.text.trim(),
+            };
+            final nextTransactions = old == null ? [transaction, ...transactions] : transactions.map((item) => item['id'].toString() == old['transactionId'].toString() ? transaction : item).toList();
+            await persist(goals.map((item) => item['id'].toString() == current['id'].toString() ? updatedGoal : item).toList(), nextTransactions);
+            if (!mounted || !sheetContext.mounted) return;
+            final newRemaining = (total - sum).clamp(0, double.infinity).toDouble();
+            setSheet(() {
+              saving = false; editingId = null;
+              amountController.text = n(updatedGoal['goalInstallmentAmount']) > 0 ? n(updatedGoal['goalInstallmentAmount']).clamp(0, newRemaining).toString() : newRemaining.toString();
+              noteController.clear(); paymentDate = iso(DateTime.now());
+              wallet = widget.walletNames.isNotEmpty ? widget.walletNames.first : 'ক্যাশ';
+            });
+          } catch (e) {
+            if (sheetContext.mounted) setSheet(() => saving = false);
+            msg('জমা সংরক্ষণ করা যায়নি: $e');
+          }
+        }
+        Future<void> removePayment(Map<String, dynamic> payment) async {
+          final yes = await showDialog<bool>(context: sheetContext, builder: (dialogContext) => AlertDialog(
+            title: const Text('জমা মুছবেন?'), content: const Text('এই জমার রেকর্ড এবং সংশ্লিষ্ট লেনদেন মুছে ফেলা হবে।'),
+            actions: [TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('বাতিল')), FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('মুছুন'))],
+          ));
+          if (yes != true) return;
+          final nextPayments = history.where((item) => item['id'].toString() != payment['id'].toString()).toList();
+          final sum = nextPayments.fold<double>(0, (v, item) => v + n(item['amount']));
+          final updatedGoal = <String, dynamic>{...current, 'payments': nextPayments, 'status': sum + 1e-8 >= total ? 'সম্পন্ন' : 'চলমান', 'updatedAt': dateLabel(iso(DateTime.now()))};
+          await persist(goals.map((item) => item['id'].toString() == current['id'].toString() ? updatedGoal : item).toList(),
+            transactions.where((item) => item['id'].toString() != payment['transactionId'].toString()).toList());
+          if (sheetContext.mounted) setSheet(() {});
+        }
+        return ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(sheetContext).size.height * .92),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(16, 4, 16, MediaQuery.of(sheetContext).viewInsets.bottom + 16),
+            child: SingleChildScrollView(child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+              Row(children: [
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(current['title'].toString(), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900, color: ink)),
+                  const SizedBox(height: 3), Text('সঞ্চয়ের লক্ষ্য জমা করুন', style: TextStyle(fontSize: 11, color: muted)),
+                ])),
+                IconButton(onPressed: () => Navigator.pop(sheetContext), icon: Icon(Icons.close_rounded, color: muted)),
+              ]),
+              const SizedBox(height: 7),
+              Row(children: [metric('লক্ষ্য পরিমাণ', total, ink), const SizedBox(width: 7), metric('জমা হয়েছে', deposited, green), const SizedBox(width: 7), metric('এখনো বাকি', left, red)]),
+              const SizedBox(height: 10),
+              ClipRRect(borderRadius: BorderRadius.circular(8), child: LinearProgressIndicator(value: progress, minHeight: 6, color: green, backgroundColor: dark ? const Color(0xFF294158) : const Color(0xFFE2EAF0))),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: panel, borderRadius: BorderRadius.circular(13), border: Border.all(color: border)),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [Expanded(child: Text('জমার ইতিহাস', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: ink))), Text('\${history.length}টি লেনদেন', style: TextStyle(fontSize: 10, color: muted))]),
+                  const SizedBox(height: 8),
+                  if (history.isEmpty) Padding(padding: const EdgeInsets.symmetric(vertical: 12), child: Center(child: Text('এখনো কোনো জমা যোগ করা হয়নি।', style: TextStyle(fontSize: 11, color: muted))))
+                  else ...history.map((payment) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 10),
+                      decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(11),
+                        border: Border.all(color: dark ? const Color(0xFF2B5141) : const Color(0xFFE2EEE7)),
+                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: dark ? .08 : .035), blurRadius: 7, offset: const Offset(0, 2))]),
+                      child: Row(children: [
+                        Icon(Icons.account_balance_wallet_outlined, size: 19, color: ink), const SizedBox(width: 9),
+                        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text('জমা · \${payment['date'] ?? ''}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ink)),
+                          Text((payment['wallet'] ?? 'ক্যাশ').toString(), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 9, color: muted)),
+                          if ((payment['notes'] ?? '').toString().trim().isNotEmpty) Text(payment['notes'].toString(), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 9, color: muted)),
+                        ])),
+                        Text(money(n(payment['amount'])), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: green)),
+                        IconButton(visualDensity: VisualDensity.compact, padding: EdgeInsets.zero, constraints: const BoxConstraints.tightFor(width: 30, height: 30),
+                          onPressed: saving ? null : () {
+                            final linked = transactions.where((item) => item['id'].toString() == payment['transactionId'].toString()).toList();
+                            setSheet(() {
+                              editingId = payment['id']; amountController.text = n(payment['amount']).toString();
+                              noteController.text = (payment['notes'] ?? '').toString();
+                              paymentDate = (linked.isNotEmpty ? linked.first['dateInput'] : payment['dateInput'] ?? payment['date'])?.toString() ?? iso(DateTime.now());
+                              wallet = (payment['wallet'] ?? 'ক্যাশ').toString();
+                            });
+                          }, icon: Icon(Icons.edit_outlined, size: 17, color: muted)),
+                        IconButton(visualDensity: VisualDensity.compact, padding: EdgeInsets.zero, constraints: const BoxConstraints.tightFor(width: 30, height: 30),
+                          onPressed: saving ? null : () => removePayment(payment), icon: const Icon(Icons.delete_outline_rounded, size: 17, color: red)),
+                      ]),
+                    ),
+                  )),
+                ]),
+              ),
+              const SizedBox(height: 12),
+              Text(editingId == null ? 'জমা যোগ করুন' : 'জমা সম্পাদনা', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: ink)),
+              const SizedBox(height: 8),
+              TextField(controller: amountController, enabled: !saving, keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                decoration: inputDecoration('পরিমাণ (৳)', suggested > 0 ? 'প্রস্তাবিত \${money(suggested)}' : 'জমার পরিমাণ')),
+              const SizedBox(height: 8),
+              Row(children: [
+                Expanded(child: OutlinedButton.icon(
+                  onPressed: saving ? null : () async {
+                    final picked = await showDatePicker(context: sheetContext, initialDate: date(paymentDate) ?? DateTime.now(), firstDate: DateTime(2000), lastDate: DateTime(2100));
+                    if (picked != null) setSheet(() => paymentDate = iso(picked));
+                  },
+                  icon: const Icon(Icons.calendar_month_outlined, size: 16), label: Text(dateLabel(paymentDate), maxLines: 1, overflow: TextOverflow.ellipsis),
+                )),
+                const SizedBox(width: 8),
+                Expanded(child: DropdownButtonFormField<String>(
+                  initialValue: widget.walletNames.contains(wallet) ? wallet : (widget.walletNames.isNotEmpty ? widget.walletNames.first : null),
+                  isExpanded: true, decoration: inputDecoration('ওয়ালেট', ''),
+                  items: widget.walletNames.map((name) => DropdownMenuItem(value: name, child: Text(name, overflow: TextOverflow.ellipsis))).toList(),
+                  onChanged: saving ? null : (value) => setSheet(() => wallet = value ?? wallet),
+                )),
+              ]),
+              const SizedBox(height: 8),
+              TextField(controller: noteController, enabled: !saving, maxLines: 2, decoration: inputDecoration('নোট (ঐচ্ছিক)', 'যেমন: প্রথম কিস্তি')),
+              const SizedBox(height: 10),
+              Container(
+                padding: const EdgeInsets.all(11),
+                decoration: BoxDecoration(color: dark ? const Color(0xFF172B3B) : const Color(0xFFEDF9F4), borderRadius: BorderRadius.circular(12), border: Border.all(color: border)),
+                child: Row(children: [
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('প্রস্তাবিত কিস্তি', style: TextStyle(fontSize: 10, color: muted)), const SizedBox(height: 4),
+                    Text(money(suggested), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: ink)),
+                  ])),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('বর্তমান কিস্তির বাকি', style: TextStyle(fontSize: 10, color: muted)), const SizedBox(height: 4),
+                    Text(money(installmentLeft), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: ink)),
+                  ])),
+                ]),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(width: double.infinity, child: FilledButton.icon(
+                onPressed: saving || left <= 0 ? null : savePayment,
+                icon: saving ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.check_rounded, size: 17),
+                label: Text(saving ? 'সংরক্ষণ হচ্ছে...' : editingId == null ? 'জমা সংরক্ষণ' : 'পরিবর্তন সংরক্ষণ করুন'),
+                style: FilledButton.styleFrom(backgroundColor: green, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 13), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+              )),
+            ])),
+          ),
+        );
+      }),
+    );
+    amountController.dispose();
+    noteController.dispose();
+  }
   Widget filter(String value,List<String> options,ValueChanged<String> onChanged) {
     return Expanded(
       child: PopupMenuButton<String>(

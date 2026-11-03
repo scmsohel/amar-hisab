@@ -181,7 +181,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                     physics: const NeverScrollableScrollPhysics(),
                     mainAxisSpacing: 8,
                     crossAxisSpacing: 8,
-                    childAspectRatio: 2.00,
+                    childAspectRatio: 1.95,
                     children: [
                       for (final wallet in _wallets)
                         _walletCard(wallet.$1, wallet.$2, wallet.$3, _balances[wallet.$1] ?? 0, surface, ink, muted),
@@ -304,7 +304,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
       borderRadius: BorderRadius.circular(10),
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 1),
+        padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 1),
         child: Center(child: FittedBox(fit: BoxFit.scaleDown, child: Text(label, style: TextStyle(color: color, fontSize: 8.5, fontWeight: FontWeight.w800)))),
       ),
     ),

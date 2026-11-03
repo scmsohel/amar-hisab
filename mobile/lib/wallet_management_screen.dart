@@ -28,6 +28,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
   late Map<String, double> _balances;
   late List<Map<String, dynamic>> _transactions;
   String _filterWallet = 'সব ওয়ালেট';
+  String _filterKind = 'সব';
   String _filterTime = 'সব সময়';
 
   @override
@@ -51,7 +52,9 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
   List<Map<String, dynamic>> get _filteredTransactions {
     final rows = _transactions.where((tx) {
       final wallet = (tx['wallet'] ?? tx['walletName'] ?? tx['wallet_name'] ?? tx['account'] ?? '').toString();
-      if (_filterWallet != 'সব ওয়ালেট' && wallet != _filterWallet) return false;
+      final transferTo = (tx['transferTo'] ?? tx['transfer_to'] ?? '').toString();
+      if (_filterWallet != 'সব ওয়ালেট' && wallet != _filterWallet && transferTo != _filterWallet) return false;
+      if (_filterKind != 'সব' && (wallet != _filterWallet || tx['kind'] != _filterKind)) return false;
       if (_filterTime == 'এই মাস') {
         final raw = tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at'];
         final date = DateTime.tryParse(raw?.toString() ?? '');
@@ -111,9 +114,9 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
     final ink = dark ? const Color(0xFFEAF4FA) : const Color(0xFF101F33);
     final muted = dark ? const Color(0xFF9CB1C3) : const Color(0xFF58708C);
     final line = dark ? const Color(0xFF29465A) : const Color(0xFFE2EAF1);
-    final income = _transactions.where((e) => e['kind'] == 'আয়').fold<double>(0, (s, e) => s + _amount(e['amount']));
-    final expense = _transactions.where((e) => e['kind'] == 'ব্যয়').fold<double>(0, (s, e) => s + _amount(e['amount']));
     final rows = _filteredTransactions;
+    final income = rows.where((e) => e['kind'] == 'আয়').fold<double>(0, (s, e) => s + _amount(e['amount']));
+    final expense = rows.where((e) => e['kind'] == 'ব্যয়').fold<double>(0, (s, e) => s + _amount(e['amount']));
     final knownWallets = <String>{..._balances.keys};
     for (final tx in _transactions) {
       final name = (tx['wallet'] ?? tx['walletName'] ?? tx['wallet_name'] ?? '').toString();
@@ -167,7 +170,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                         const SizedBox(width: 6),
                         Expanded(child: _summaryPill('↙', 'ব্যয় (মোট)', _money(expense), const Color(0xFFE32645), const Color(0xFFFFE8EC))),
                         const SizedBox(width: 6),
-                        Expanded(child: _summaryPill('⇄', 'লেনদেন', '${_transactions.length}', const Color(0xFF1768D8), const Color(0xFFE4EEFF))),
+                        Expanded(child: _summaryPill('⇄', 'লেনদেন', '${rows.length}', const Color(0xFF1768D8), const Color(0xFFE4EEFF))),
                       ]),
                     ]),
                   ),
@@ -223,9 +226,14 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                       Row(children: [
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Text('লেনদেনের তালিকা', style: TextStyle(color: ink, fontSize: 14, fontWeight: FontWeight.w900)),
-                          Text('সকল ওয়ালেটের সাম্প্রতিক লেনদেন', style: TextStyle(color: muted, fontSize: 9.5)),
+                          Text(
+                            _filterWallet == 'সব ওয়ালেট'
+                                ? 'সকল ওয়ালেটের সাম্প্রতিক লেনদেন'
+                                : '${_filterWallet} ওয়ালেটের ${_filterKind == 'আয়' ? 'আয়ের' : _filterKind == 'ব্যয়' ? 'ব্যয়ের' : 'সকল'} লেনদেন',
+                            style: TextStyle(color: muted, fontSize: 9.5),
+                          ),
                         ])),
-                        DropdownButtonHideUnderline(child: DropdownButton<String>(value: _filterWallet, items: ['সব ওয়ালেট', ...entries].map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 11)))).toList(), onChanged: (v) => setState(() => _filterWallet = v ?? 'সব ওয়ালেট'))),
+                        DropdownButtonHideUnderline(child: DropdownButton<String>(value: _filterWallet, items: ['সব ওয়ালেট', ...entries].map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 11)))).toList(), onChanged: (v) => setState(() { _filterWallet = v ?? 'সব ওয়ালেট'; _filterKind = 'সব'; }))),
                         const SizedBox(width: 8),
                         DropdownButtonHideUnderline(child: DropdownButton<String>(value: _filterTime, items: const ['সব সময়', 'এই মাস'].map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 11)))).toList(), onChanged: (v) => setState(() => _filterTime = v ?? 'সব সময়'))),
                       ]),
@@ -279,11 +287,11 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
         Text(_money(balance), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: accent, fontSize: 14, fontWeight: FontWeight.w900)),
         const SizedBox(height: 3),
         Row(children: [
-          Expanded(child: _walletAction('↙ আয়', const Color(0xFF008F50), const Color(0xFFE1F8EA), () async { await widget.onAddTransaction(name, 'আয়'); await _refresh(); })),
+          Expanded(child: _walletAction('↙ আয়', const Color(0xFF008F50), const Color(0xFFE1F8EA), () => setState(() { _filterWallet = name; _filterKind = 'আয়'; _filterTime = 'সব সময়'; }))),
           const SizedBox(width: 4),
-          Expanded(child: _walletAction('↗ ব্যয়', const Color(0xFFE32645), const Color(0xFFFFE8EC), () async { await widget.onAddTransaction(name, 'ব্যয়'); await _refresh(); })),
+          Expanded(child: _walletAction('↗ ব্যয়', const Color(0xFFE32645), const Color(0xFFFFE8EC), () => setState(() { _filterWallet = name; _filterKind = 'ব্যয়'; _filterTime = 'সব সময়'; }))),
           const SizedBox(width: 4),
-          Expanded(child: _walletAction('বিবরণ', const Color(0xFF1768D8), const Color(0xFFE5EEFF), () => setState(() => _filterWallet = name))),
+          Expanded(child: _walletAction('বিবরণ', const Color(0xFF1768D8), const Color(0xFFE5EEFF), () => setState(() { _filterWallet = name; _filterKind = 'সব'; _filterTime = 'সব সময়'; }))),
         ]),
       ]),
     );

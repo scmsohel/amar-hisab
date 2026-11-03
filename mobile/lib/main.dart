@@ -5036,7 +5036,6 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
     final dark=Theme.of(context).brightness==Brightness.dark;
     final txKind=kindOf(x),income=txKind=='আয়',transfer=txKind=='ট্রান্সফার'||txKind.toLowerCase()=='transfer';
     final value='${titleOf(x)} ${catOf(x)}'.toLowerCase();
-    final isPaymentTitle = RegExp(r'^(বিল পরিশোধ|দেনা পরিশোধ|পাওনা জমা|ক্রেডিট কার্ড উত্তোলন)\s*[—-]\s*(.+)$').hasMatch(titleOf(x));
     final name=(x['icon']??x['iconName']??x['icon_name']??'').toString();
 const icons = <String, IconData>{
     'Briefcase': Icons.work_outline_rounded,

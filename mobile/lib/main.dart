@@ -3699,7 +3699,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final isTransfer = kind == 'ট্রান্সফার' || kind.toLowerCase() == 'transfer';
     final style = _transactionStyle(tx);
     final rawTitle = (tx['title'] ?? tx['description'] ?? tx['note'] ?? tx['name'] ?? 'লেনদেন').toString();
-    final paymentTitle = RegExp(r'^(বিল পরিশোধ|দেনা পরিশোধ|পাওনা জমা|ক্রেডিট কার্ড উত্তোলন)\s*[—-]\s*(.+)$').firstMatch(rawTitle);
+    final paymentTitle = RegExp(r'^(বিল পরিশোধ|দেনা পরিশোধ|পাওনা জমা|ক্রেডিট কার্ড উত্তোলন)\s*[—–-]\s*(.+)$').firstMatch(rawTitle);
     final title = paymentTitle?.group(2)?.trim() ?? rawTitle;
     final category = (tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? tx['categoryTitle'] ?? '').toString();
     final wallet = (tx['wallet'] ?? tx['walletName'] ?? tx['wallet_name'] ?? tx['accountName'] ?? tx['account'] ?? '').toString();
@@ -5000,11 +5000,11 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
   String bn(String v)=>v.replaceAll('0','০').replaceAll('1','১').replaceAll('2','২').replaceAll('3','৩').replaceAll('4','৪').replaceAll('5','৫').replaceAll('6','৬').replaceAll('7','৭').replaceAll('8','৮').replaceAll('9','৯');
   String titleOf(Map x)=>(x['title']??x['description']??x['note']??'লেনদেন').toString();
   String displayTitleOf(Map x) {
-    final match = RegExp(r'^(বিল পরিশোধ|দেনা পরিশোধ|পাওনা জমা|ক্রেডিট কার্ড উত্তোলন)\s*[—-]\s*(.+)$').firstMatch(titleOf(x));
+    final match = RegExp(r'^(বিল পরিশোধ|দেনা পরিশোধ|পাওনা জমা|ক্রেডিট কার্ড উত্তোলন)\s*[—–-]\s*(.+)$').firstMatch(titleOf(x));
     return match?.group(2)?.trim() ?? titleOf(x);
   }
   String subtitleOf(Map x) {
-    final match = RegExp(r'^(বিল পরিশোধ|দেনা পরিশোধ|পাওনা জমা|ক্রেডিট কার্ড উত্তোলন)\s*[—-]\s*(.+)$').firstMatch(titleOf(x));
+    final match = RegExp(r'^(বিল পরিশোধ|দেনা পরিশোধ|পাওনা জমা|ক্রেডিট কার্ড উত্তোলন)\s*[—–-]\s*(.+)$').firstMatch(titleOf(x));
     final category = catOf(x);
     return [
       if (match != null) match.group(1)!.trim(),

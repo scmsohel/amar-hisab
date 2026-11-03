@@ -2177,9 +2177,9 @@ class _BillsScreenState extends State<_BillsScreen> {
 
   Future<void> _openCreateBillModal([Map<String, dynamic>? billToEdit]) async {
     final isEditing = billToEdit != null;
-    final nameController = TextEditingController(text: isEditing ? _name(billToEdit!) : '');
-    final amountController = TextEditingController(text: isEditing ? _num(billToEdit!['amount']).toString() : '');
-    final noteController = TextEditingController(text: isEditing ? (billToEdit!['notes'] ?? billToEdit['note'] ?? '').toString() : '');
+    final nameController = TextEditingController(text: isEditing ? _name(billToEdit) : '');
+    final amountController = TextEditingController(text: isEditing ? _num(billToEdit['amount']).toString() : '');
+    final noteController = TextEditingController(text: isEditing ? (billToEdit['notes'] ?? billToEdit['note'] ?? '').toString() : '');
     DateTime dueDate = _date(billToEdit?['date']) ?? DateTime.now();
     String iconName = (billToEdit?['icon'] ?? 'ReceiptText').toString();
     String recurrence = (billToEdit?['billRule'] ?? 'one-time').toString();
@@ -2406,14 +2406,14 @@ class _BillsScreenState extends State<_BillsScreen> {
                               'status': status, 'notes': noteController.text.trim(),
                               'billRule': recurrence, 'billDay': dueDate.day,
                               'reminderDays': int.parse(reminder),
-                              if (oldPayments != null) 'payments': oldPayments,
+                              if (oldPayments case final payments?) 'payments': payments,
                               if (recurrence != 'one-time') 'recurringId': billToEdit?['recurringId'] ?? id,
                               if (recurrence == 'one-time') 'recurringId': null,
                               'cycleKey': billToEdit?['cycleKey'] ?? date.substring(0, 7),
                             };
                             final updated = List<Map<String, dynamic>>.from(_items);
                             if (isEditing) {
-                              final index = updated.indexWhere((item) => item['id'].toString() == billToEdit!['id'].toString());
+                              final index = updated.indexWhere((item) => item['id'].toString() == billToEdit['id'].toString());
                               if (index < 0) throw Exception('বিলটি পাওয়া যায়নি। Refresh করে আবার চেষ্টা করুন।');
                               updated[index] = updatedBill;
                             } else {

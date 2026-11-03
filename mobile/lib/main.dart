@@ -3705,7 +3705,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final wallet = (tx['wallet'] ?? tx['walletName'] ?? tx['wallet_name'] ?? tx['accountName'] ?? tx['account'] ?? '').toString();
     final subtitle = [
       if (paymentTitle != null) paymentTitle.group(1)!.trim(),
-      if (!(paymentTitle?.group(1) == 'বিল পরিশোধ' && category.trim() == 'বিল')) category,
       wallet,
     ].where((v) => v.trim().isNotEmpty).join(' • ');
     final amountColor = isIncome ? const Color(0xFF00A653) : isTransfer ? const Color(0xFF1688D4) : const Color(0xFFE92743);
@@ -5005,10 +5004,8 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
   }
   String subtitleOf(Map x) {
     final match = RegExp(r'^(বিল পরিশোধ|দেনা পরিশোধ|পাওনা জমা|ক্রেডিট কার্ড উত্তোলন)\s*[—–-]\s*(.+)$').firstMatch(titleOf(x));
-    final category = catOf(x);
     return [
       if (match != null) match.group(1)!.trim(),
-      if (!(match?.group(1) == 'বিল পরিশোধ' && category.trim() == 'বিল')) category,
       walletOf(x),
     ].where((v) => v.trim().isNotEmpty).join(' • ');
   }

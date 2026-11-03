@@ -1155,35 +1155,116 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final nameController = TextEditingController(text: (_user['name'] ?? '').toString());
     final mobileController = TextEditingController(text: (_user['mobile'] ?? '').toString());
     final formKey = GlobalKey<FormState>();
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    const accent = Color(0xFF08A66A);
+    final surface = dark ? const Color(0xFF12283A) : Colors.white;
+    final fieldFill = dark ? const Color(0xFF1B3548) : const Color(0xFFF7FAF9);
+    final ink = dark ? const Color(0xFFEAF4F0) : const Color(0xFF142B25);
+    final muted = dark ? const Color(0xFFB2C3BC) : const Color(0xFF60756D);
+    final line = dark ? const Color(0xFF345346) : const Color(0xFFDCEBE4);
     final result = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('ব্যক্তিগত তথ্য'),
-        content: SingleChildScrollView(child: Form(
-          key: formKey,
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            TextFormField(
-              controller: nameController,
-              decoration: const InputDecoration(labelText: 'নাম'),
-              validator: (value) => (value ?? '').trim().length < 2 ? 'কমপক্ষে ২ অক্ষরের নাম দিন।' : null,
+      barrierDismissible: false,
+      builder: (dialogContext) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 440),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+            decoration: BoxDecoration(
+              color: surface,
+              borderRadius: BorderRadius.circular(28),
+              border: Border.all(color: line.withValues(alpha: .8)),
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: dark ? .28 : .12), blurRadius: 30, offset: const Offset(0, 14))],
+              gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
+                colors: dark ? [const Color(0xFF173A32), surface, surface] : [const Color(0xFFF0FFF7), Colors.white, Colors.white]),
             ),
-            const SizedBox(height: 10),
-            TextFormField(
-              controller: mobileController,
-              keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(labelText: 'মোবাইল নম্বর'),
-            ),
-            const SizedBox(height: 6),
-            Align(alignment: Alignment.centerLeft, child: Text('ইমেইল: ${(_user['email'] ?? '').toString()}',
-              style: TextStyle(fontSize: 12, color: Theme.of(dialogContext).colorScheme.onSurfaceVariant))),
-          ]),
-        )),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('বাতিল')),
-          FilledButton(onPressed: () {
-            if (formKey.currentState?.validate() ?? false) Navigator.pop(dialogContext, true);
-          }, child: const Text('সংরক্ষণ')),
-        ],
+            child: SingleChildScrollView(child: Form(
+              key: formKey,
+              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(children: [
+                  Container(width: 54, height: 54, decoration: BoxDecoration(color: accent.withValues(alpha: .12), shape: BoxShape.circle),
+                    child: const Icon(Icons.person_rounded, color: accent, size: 29)),
+                  const SizedBox(width: 13),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('ব্যক্তিগত তথ্য', style: TextStyle(color: ink, fontSize: 19, fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 3),
+                    Text('আপনার ব্যক্তিগত তথ্য আপডেট করুন', style: TextStyle(color: muted, fontSize: 11.5)),
+                  ])),
+                  IconButton(visualDensity: VisualDensity.compact, onPressed: () => Navigator.pop(dialogContext, false),
+                    icon: Icon(Icons.close_rounded, color: muted, size: 22)),
+                ]),
+                const SizedBox(height: 20),
+                Text('নাম', style: TextStyle(color: ink, fontSize: 12, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 6),
+                TextFormField(
+                  controller: nameController,
+                  style: TextStyle(color: ink, fontSize: 14, fontWeight: FontWeight.w600),
+                  decoration: InputDecoration(
+                    hintText: 'আপনার নাম লিখুন',
+                    prefixIcon: Icon(Icons.person_outline_rounded, color: accent, size: 20),
+                    filled: true, fillColor: fieldFill, contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: line)),
+                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: accent, width: 1.4)),
+                    errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.redAccent)),
+                    focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.redAccent)),
+                  ),
+                  validator: (value) => (value ?? '').trim().length < 2 ? 'কমপক্ষে ২ অক্ষরের নাম দিন।' : null,
+                ),
+                const SizedBox(height: 14),
+                Text('মোবাইল নম্বর', style: TextStyle(color: ink, fontSize: 12, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 6),
+                TextFormField(
+                  controller: mobileController,
+                  keyboardType: TextInputType.phone,
+                  style: TextStyle(color: ink, fontSize: 14, fontWeight: FontWeight.w600),
+                  decoration: InputDecoration(
+                    hintText: 'মোবাইল নম্বর লিখুন',
+                    prefixIcon: Icon(Icons.call_outlined, color: accent, size: 20),
+                    filled: true, fillColor: fieldFill, contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: line)),
+                    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: accent, width: 1.4)),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Container(
+                  width: double.infinity, padding: const EdgeInsets.all(13),
+                  decoration: BoxDecoration(color: accent.withValues(alpha: dark ? .13 : .08), borderRadius: BorderRadius.circular(16)),
+                  child: Row(children: [
+                    const Icon(Icons.mail_outline_rounded, color: accent, size: 21),
+                    const SizedBox(width: 10),
+                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('ইমেইল', style: TextStyle(color: muted, fontSize: 10.5, fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 2),
+                      Text((_user['email'] ?? '').toString(), maxLines: 1, overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: ink, fontSize: 12.5, fontWeight: FontWeight.w600)),
+                    ])),
+                    Icon(Icons.lock_rounded, color: muted, size: 17),
+                  ]),
+                ),
+                const SizedBox(height: 20),
+                Row(children: [
+                  Expanded(child: OutlinedButton(
+                    onPressed: () => Navigator.pop(dialogContext, false),
+                    style: OutlinedButton.styleFrom(foregroundColor: accent, side: BorderSide(color: accent.withValues(alpha: .35)),
+                      backgroundColor: accent.withValues(alpha: .05), padding: const EdgeInsets.symmetric(vertical: 13),
+                      shape: const StadiumBorder()),
+                    child: const Text('বাতিল', style: TextStyle(fontWeight: FontWeight.w700)),
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: FilledButton.icon(
+                    onPressed: () { if (formKey.currentState?.validate() ?? false) Navigator.pop(dialogContext, true); },
+                    icon: const Icon(Icons.check_rounded, size: 19),
+                    label: const Text('সংরক্ষণ', style: TextStyle(fontWeight: FontWeight.w800)),
+                    style: FilledButton.styleFrom(backgroundColor: accent, foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 13), shape: const StadiumBorder()),
+                  )),
+                ]),
+              ]),
+            )),
+          ),
+        ),
       ),
     );
     if (result != true) { nameController.dispose(); mobileController.dispose(); return; }
@@ -1260,49 +1341,211 @@ class _ProfileScreenState extends State<ProfileScreen> {
     var bills = preferences.getBool('profile_notify_bills') ?? true;
     var reminders = preferences.getBool('profile_notify_reminders') ?? true;
     if (!mounted) return;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    const accent = Color(0xFF08A66A);
+    final surface = dark ? const Color(0xFF12283A) : Colors.white;
+    final ink = dark ? const Color(0xFFEAF4F0) : const Color(0xFF142B25);
+    final muted = dark ? const Color(0xFFB2C3BC) : const Color(0xFF60756D);
+    final line = dark ? const Color(0xFF345346) : const Color(0xFFDCEBE4);
     await showDialog<void>(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(builder: (context, setDialogState) => AlertDialog(
-        title: const Text('নোটিফিকেশন পছন্দ'),
-        content: Column(mainAxisSize: MainAxisSize.min, children: [
-          SwitchListTile(contentPadding: EdgeInsets.zero, title: const Text('লেনদেনের আপডেট'), value: transactions,
-            onChanged: (v) async { setDialogState(() => transactions = v); await preferences.setBool('profile_notify_transactions', v); }),
-          SwitchListTile(contentPadding: EdgeInsets.zero, title: const Text('বিলের রিমাইন্ডার'), value: bills,
-            onChanged: (v) async { setDialogState(() => bills = v); await preferences.setBool('profile_notify_bills', v); }),
-          SwitchListTile(contentPadding: EdgeInsets.zero, title: const Text('অন্যান্য সতর্কতা'), value: reminders,
-            onChanged: (v) async { setDialogState(() => reminders = v); await preferences.setBool('profile_notify_reminders', v); }),
-          const SizedBox(height: 4),
-          const Text('এই পছন্দগুলো এই ডিভাইসে সংরক্ষিত হবে। Push notification চালু করতে সার্ভার সাপোর্ট প্রয়োজন।',
-            style: TextStyle(fontSize: 11, height: 1.4)),
-        ]),
-        actions: [TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('বন্ধ করুন'))],
-      )),
+      builder: (dialogContext) => StatefulBuilder(builder: (context, setDialogState) {
+        Widget preferenceRow({required IconData icon, required Color tint, required String title, required String subtitle,
+          required bool value, required ValueChanged<bool> onChanged}) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 9),
+          child: Row(children: [
+            Container(width: 42, height: 42, decoration: BoxDecoration(color: tint.withValues(alpha: .11), shape: BoxShape.circle),
+              child: Icon(icon, color: tint, size: 21)),
+            const SizedBox(width: 12),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title, style: TextStyle(color: ink, fontSize: 13.5, fontWeight: FontWeight.w700)),
+              const SizedBox(height: 3),
+              Text(subtitle, style: TextStyle(color: muted, fontSize: 10.5), maxLines: 2, overflow: TextOverflow.ellipsis),
+            ])),
+            const SizedBox(width: 8),
+            Switch.adaptive(value: value, activeTrackColor: accent, onChanged: onChanged),
+          ]),
+        );
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 440),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+              decoration: BoxDecoration(
+                color: surface, borderRadius: BorderRadius.circular(28), border: Border.all(color: line.withValues(alpha: .8)),
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: dark ? .28 : .12), blurRadius: 30, offset: const Offset(0, 14))],
+                gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
+                  colors: dark ? [const Color(0xFF173A32), surface, surface] : [const Color(0xFFF0FFF7), Colors.white, Colors.white]),
+              ),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Row(children: [
+                  Container(width: 54, height: 54, decoration: BoxDecoration(color: accent.withValues(alpha: .12), shape: BoxShape.circle),
+                    child: const Icon(Icons.notifications_active_rounded, color: accent, size: 27)),
+                  const SizedBox(width: 13),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('নোটিফিকেশন পছন্দ', style: TextStyle(color: ink, fontSize: 18, fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 3),
+                    Text('কোন কোন নোটিফিকেশন পেতে চান', style: TextStyle(color: muted, fontSize: 11.5)),
+                  ])),
+                  IconButton(visualDensity: VisualDensity.compact, onPressed: () => Navigator.pop(dialogContext),
+                    icon: Icon(Icons.close_rounded, color: muted, size: 22)),
+                ]),
+                const SizedBox(height: 14),
+                preferenceRow(icon: Icons.swap_horiz_rounded, tint: const Color(0xFF08A66A), title: 'লেনদেনের আপডেট',
+                  subtitle: 'নতুন লেনদেনের তথ্য জানান', value: transactions,
+                  onChanged: (v) async { setDialogState(() => transactions = v); await preferences.setBool('profile_notify_transactions', v); }),
+                Divider(height: 1, color: line),
+                preferenceRow(icon: Icons.calendar_month_rounded, tint: const Color(0xFF1688F8), title: 'বিলের রিমাইন্ডার',
+                  subtitle: 'বিলের তারিখের আগে মনে করিয়ে দেবে', value: bills,
+                  onChanged: (v) async { setDialogState(() => bills = v); await preferences.setBool('profile_notify_bills', v); }),
+                Divider(height: 1, color: line),
+                preferenceRow(icon: Icons.shield_outlined, tint: const Color(0xFF0AAE75), title: 'অন্যান্য সতর্কতা',
+                  subtitle: 'গুরুত্বপূর্ণ আপডেট ও নিরাপত্তা সতর্কতা', value: reminders,
+                  onChanged: (v) async { setDialogState(() => reminders = v); await preferences.setBool('profile_notify_reminders', v); }),
+                const SizedBox(height: 10),
+                Container(
+                  width: double.infinity, padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(color: accent.withValues(alpha: dark ? .14 : .08), borderRadius: BorderRadius.circular(15)),
+                  child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    const Icon(Icons.info_outline_rounded, color: accent, size: 19),
+                    const SizedBox(width: 9),
+                    Expanded(child: Text('এই পছন্দগুলো আপনার ডিভাইসে সংরক্ষিত থাকবে। Push Notification পেতে অ্যাপের অনুমতি ও সার্ভার সাপোর্ট প্রয়োজন।',
+                      style: TextStyle(color: muted, fontSize: 10.5, height: 1.45))),
+                  ]),
+                ),
+                const SizedBox(height: 14),
+                Align(alignment: Alignment.centerRight, child: OutlinedButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  style: OutlinedButton.styleFrom(foregroundColor: accent, side: BorderSide(color: accent.withValues(alpha: .35)),
+                    backgroundColor: accent.withValues(alpha: .05), padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: const StadiumBorder()),
+                  child: const Text('বন্ধ করুন', style: TextStyle(fontWeight: FontWeight.w700)),
+                )),
+              ]),
+            ),
+          ),
+        );
+      }),
     );
   }
 
   Future<void> _chooseTheme() async {
     final current = _appThemeMode.value;
+    var selectedTheme = current;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    const accent = Color(0xFF08A66A);
+    final surface = dark ? const Color(0xFF12283A) : Colors.white;
+    final ink = dark ? const Color(0xFFEAF4F0) : const Color(0xFF142B25);
+    final muted = dark ? const Color(0xFFB2C3BC) : const Color(0xFF60756D);
+    final line = dark ? const Color(0xFF345346) : const Color(0xFFDCEBE4);
     final selected = await showDialog<ThemeMode>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('অ্যাপের থিম'),
-        content: RadioGroup<ThemeMode>(
-          groupValue: current,
-          onChanged: (value) => Navigator.pop(dialogContext, value),
-          child: Column(mainAxisSize: MainAxisSize.min, children: const [
-            RadioListTile<ThemeMode>(
-              value: ThemeMode.light,
-              title: Text('লাইট মোড'),
-              secondary: Icon(Icons.light_mode_rounded),
+      builder: (dialogContext) => StatefulBuilder(builder: (context, setDialogState) {
+        Widget themeCard({required ThemeMode mode, required String title, required IconData icon, required bool isDark}) {
+          final active = selectedTheme == mode;
+          final previewBg = isDark ? const Color(0xFF102B2A) : const Color(0xFFF1FBF6);
+          final previewSurface = isDark ? const Color(0xFF1E4540) : Colors.white;
+          final previewText = isDark ? const Color(0xFFDFF7EB) : const Color(0xFF25483A);
+          return Expanded(child: InkWell(
+            borderRadius: BorderRadius.circular(19),
+            onTap: () => setDialogState(() => selectedTheme = mode),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              padding: const EdgeInsets.fromLTRB(10, 12, 10, 13),
+              decoration: BoxDecoration(
+                color: active ? accent.withValues(alpha: dark ? .16 : .07) : surface,
+                borderRadius: BorderRadius.circular(19),
+                border: Border.all(color: active ? accent : line, width: active ? 1.6 : 1),
+              ),
+              child: Column(children: [
+                Row(children: [
+                  Icon(icon, color: isDark ? const Color(0xFF607D8B) : const Color(0xFFE6A800), size: 22),
+                  const Spacer(),
+                  Icon(active ? Icons.check_circle_rounded : Icons.circle_outlined,
+                    color: active ? accent : muted, size: 20),
+                ]),
+                const SizedBox(height: 11),
+                Container(
+                  height: 72, width: double.infinity, padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: previewBg, borderRadius: BorderRadius.circular(12)),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Container(height: 7, width: 48, decoration: BoxDecoration(color: accent, borderRadius: BorderRadius.circular(5))),
+                    const SizedBox(height: 7),
+                    Container(height: 22, decoration: BoxDecoration(color: previewSurface, borderRadius: BorderRadius.circular(6))),
+                    const SizedBox(height: 6),
+                    Row(children: [
+                      Expanded(child: Container(height: 9, decoration: BoxDecoration(color: accent.withValues(alpha: .65), borderRadius: BorderRadius.circular(5)))),
+                      const SizedBox(width: 5),
+                      Expanded(child: Container(height: 9, decoration: BoxDecoration(color: previewSurface, borderRadius: BorderRadius.circular(5))),
+                    ]),
+                  ]),
+                ),
+                const SizedBox(height: 10),
+                Text(title, style: TextStyle(color: ink, fontSize: 13.5, fontWeight: FontWeight.w800)),
+                const SizedBox(height: 3),
+                Text(isDark ? 'চোখের জন্য আরামদায়ক' : 'উজ্জ্বল ও পরিষ্কার ইন্টারফেস',
+                  textAlign: TextAlign.center, style: TextStyle(color: muted, fontSize: 10, height: 1.35)),
+              ]),
             ),
-            RadioListTile<ThemeMode>(
-              value: ThemeMode.dark,
-              title: Text('ডার্ক মোড'),
-              secondary: Icon(Icons.dark_mode_rounded),
+          ));
+        }
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 440),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+              decoration: BoxDecoration(
+                color: surface, borderRadius: BorderRadius.circular(28), border: Border.all(color: line.withValues(alpha: .8)),
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: dark ? .28 : .12), blurRadius: 30, offset: const Offset(0, 14))],
+                gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
+                  colors: dark ? [const Color(0xFF173A32), surface, surface] : [const Color(0xFFF0FFF7), Colors.white, Colors.white]),
+              ),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Row(children: [
+                  Container(width: 54, height: 54, decoration: BoxDecoration(color: accent.withValues(alpha: .12), shape: BoxShape.circle),
+                    child: const Icon(Icons.palette_rounded, color: accent, size: 27)),
+                  const SizedBox(width: 13),
+                  Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Text('অ্যাপের থিম', style: TextStyle(color: ink, fontSize: 18, fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 3),
+                    Text('আপনার পছন্দের থিম নির্বাচন করুন', style: TextStyle(color: muted, fontSize: 11.5)),
+                  ])),
+                  IconButton(visualDensity: VisualDensity.compact, onPressed: () => Navigator.pop(dialogContext),
+                    icon: Icon(Icons.close_rounded, color: muted, size: 22)),
+                ]),
+                const SizedBox(height: 18),
+                Row(children: [
+                  themeCard(mode: ThemeMode.light, title: 'লাইট মোড', icon: Icons.light_mode_rounded, isDark: false),
+                  const SizedBox(width: 10),
+                  themeCard(mode: ThemeMode.dark, title: 'ডার্ক মোড', icon: Icons.dark_mode_rounded, isDark: true),
+                ]),
+                const SizedBox(height: 18),
+                Row(children: [
+                  Expanded(child: OutlinedButton(
+                    onPressed: () => Navigator.pop(dialogContext),
+                    style: OutlinedButton.styleFrom(foregroundColor: accent, side: BorderSide(color: accent.withValues(alpha: .35)),
+                      backgroundColor: accent.withValues(alpha: .05), padding: const EdgeInsets.symmetric(vertical: 13),
+                      shape: const StadiumBorder()),
+                    child: const Text('বাতিল', style: TextStyle(fontWeight: FontWeight.w700)),
+                  )),
+                  const SizedBox(width: 10),
+                  Expanded(child: FilledButton.icon(
+                    onPressed: () => Navigator.pop(dialogContext, selectedTheme),
+                    icon: const Icon(Icons.check_rounded, size: 18),
+                    label: const Text('প্রয়োগ করুন', style: TextStyle(fontWeight: FontWeight.w800)),
+                    style: FilledButton.styleFrom(backgroundColor: accent, foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 13), shape: const StadiumBorder()),
+                  )),
+                ]),
+              ]),
             ),
-          ]),
-        ),
-      ),
+          ),
+        );
+      }),
     );
     if (selected != null) await _setAppThemeMode(selected);
   }

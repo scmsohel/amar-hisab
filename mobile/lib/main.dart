@@ -1292,37 +1292,125 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final formKey = GlobalKey<FormState>();
     var hideCurrent = true;
     var hideNext = true;
+    var hideConfirm = true;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    const accent = Color(0xFF08A66A);
+    final surface = dark ? const Color(0xFF12283A) : Colors.white;
+    final fieldFill = dark ? const Color(0xFF1B3548) : const Color(0xFFF7FAF9);
+    final ink = dark ? const Color(0xFFEAF4F0) : const Color(0xFF142B25);
+    final muted = dark ? const Color(0xFFB2C3BC) : const Color(0xFF60756D);
+    final line = dark ? const Color(0xFF345346) : const Color(0xFFDCEBE4);
     final result = await showDialog<bool>(
       context: context,
-      builder: (dialogContext) => StatefulBuilder(builder: (context, setDialogState) => AlertDialog(
-        title: const Text('পাসওয়ার্ড পরিবর্তন'),
-        content: Form(
-          key: formKey,
-          child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
-            TextFormField(controller: current, obscureText: hideCurrent,
-              decoration: InputDecoration(labelText: 'বর্তমান পাসওয়ার্ড', suffixIcon: IconButton(
-                onPressed: () => setDialogState(() => hideCurrent = !hideCurrent),
-                icon: Icon(hideCurrent ? Icons.visibility_off : Icons.visibility))),
-              validator: (v) => (v ?? '').isEmpty ? 'বর্তমান পাসওয়ার্ড দিন।' : null),
-            const SizedBox(height: 8),
-            TextFormField(controller: next, obscureText: hideNext,
-              decoration: InputDecoration(labelText: 'নতুন পাসওয়ার্ড (কমপক্ষে ১২ অক্ষর)', suffixIcon: IconButton(
-                onPressed: () => setDialogState(() => hideNext = !hideNext),
-                icon: Icon(hideNext ? Icons.visibility_off : Icons.visibility))),
-              validator: (v) => (v ?? '').length < 12 ? 'নতুন পাসওয়ার্ড কমপক্ষে ১২ অক্ষরের হতে হবে।' : null),
-            const SizedBox(height: 8),
-            TextFormField(controller: confirm, obscureText: hideNext,
-              decoration: const InputDecoration(labelText: 'নতুন পাসওয়ার্ড আবার লিখুন'),
-              validator: (v) => v != next.text ? 'পাসওয়ার্ড দুটি মিলছে না।' : null),
-          ])),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('বাতিল')),
-          FilledButton(onPressed: () {
-            if (formKey.currentState?.validate() ?? false) Navigator.pop(dialogContext, true);
-          }, child: const Text('পরিবর্তন করুন')),
-        ],
-      )),
+      barrierDismissible: false,
+      builder: (dialogContext) => StatefulBuilder(builder: (context, setDialogState) {
+        Widget passwordField({
+          required TextEditingController controller,
+          required String label,
+          required bool hidden,
+          required VoidCallback toggleVisibility,
+          required String? Function(String?) validator,
+        }) => TextFormField(
+          controller: controller,
+          obscureText: hidden,
+          style: TextStyle(color: ink, fontSize: 13.5, fontWeight: FontWeight.w600),
+          decoration: InputDecoration(
+            hintText: label,
+            hintStyle: TextStyle(color: muted, fontSize: 12.5, fontWeight: FontWeight.w500),
+            prefixIcon: Icon(Icons.lock_outline_rounded, color: accent.withValues(alpha: .85), size: 19),
+            suffixIcon: IconButton(
+              visualDensity: VisualDensity.compact,
+              onPressed: toggleVisibility,
+              icon: Icon(hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: muted, size: 19),
+            ),
+            filled: true,
+            fillColor: fieldFill,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: BorderSide(color: line)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: accent, width: 1.4)),
+            errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.redAccent)),
+            focusedErrorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(15), borderSide: const BorderSide(color: Colors.redAccent)),
+          ),
+          validator: validator,
+        );
+
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 440),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
+              decoration: BoxDecoration(
+                color: surface,
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(color: line.withValues(alpha: .8)),
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: dark ? .28 : .12), blurRadius: 30, offset: const Offset(0, 14))],
+                gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight,
+                  colors: dark ? [const Color(0xFF173A32), surface, surface] : [const Color(0xFFF0FFF7), Colors.white, Colors.white]),
+              ),
+              child: SingleChildScrollView(child: Form(
+                key: formKey,
+                child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Row(children: [
+                    Container(width: 54, height: 54, decoration: BoxDecoration(color: accent.withValues(alpha: .12), shape: BoxShape.circle),
+                      child: const Icon(Icons.lock_reset_rounded, color: accent, size: 28)),
+                    const SizedBox(width: 13),
+                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text('পাসওয়ার্ড পরিবর্তন', style: TextStyle(color: ink, fontSize: 18, fontWeight: FontWeight.w800)),
+                      const SizedBox(height: 3),
+                      Text('আপনার অ্যাকাউন্ট সুরক্ষিত রাখুন', style: TextStyle(color: muted, fontSize: 11.5)),
+                    ])),
+                    IconButton(visualDensity: VisualDensity.compact, onPressed: () => Navigator.pop(dialogContext, false),
+                      icon: Icon(Icons.close_rounded, color: muted, size: 22)),
+                  ]),
+                  const SizedBox(height: 18),
+                  passwordField(
+                    controller: current,
+                    label: 'বর্তমান পাসওয়ার্ড',
+                    hidden: hideCurrent,
+                    toggleVisibility: () => setDialogState(() => hideCurrent = !hideCurrent),
+                    validator: (v) => (v ?? '').isEmpty ? 'বর্তমান পাসওয়ার্ড দিন।' : null,
+                  ),
+                  const SizedBox(height: 10),
+                  passwordField(
+                    controller: next,
+                    label: 'নতুন পাসওয়ার্ড (কমপক্ষে ১২ অক্ষর)',
+                    hidden: hideNext,
+                    toggleVisibility: () => setDialogState(() => hideNext = !hideNext),
+                    validator: (v) => (v ?? '').length < 12 ? 'নতুন পাসওয়ার্ড কমপক্ষে ১২ অক্ষরের হতে হবে।' : null,
+                  ),
+                  const SizedBox(height: 10),
+                  passwordField(
+                    controller: confirm,
+                    label: 'নতুন পাসওয়ার্ড আবার লিখুন',
+                    hidden: hideConfirm,
+                    toggleVisibility: () => setDialogState(() => hideConfirm = !hideConfirm),
+                    validator: (v) => v != next.text ? 'পাসওয়ার্ড দুটি মিলছে না।' : null,
+                  ),
+                  const SizedBox(height: 18),
+                  Row(children: [
+                    Expanded(child: OutlinedButton(
+                      onPressed: () => Navigator.pop(dialogContext, false),
+                      style: OutlinedButton.styleFrom(foregroundColor: accent, side: BorderSide(color: accent.withValues(alpha: .35)),
+                        backgroundColor: accent.withValues(alpha: .05), padding: const EdgeInsets.symmetric(vertical: 13),
+                        shape: const StadiumBorder()),
+                      child: const Text('বাতিল', style: TextStyle(fontWeight: FontWeight.w700)),
+                    )),
+                    const SizedBox(width: 10),
+                    Expanded(child: FilledButton(
+                      onPressed: () { if (formKey.currentState?.validate() ?? false) Navigator.pop(dialogContext, true); },
+                      style: FilledButton.styleFrom(backgroundColor: accent, foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 13), shape: const StadiumBorder()),
+                      child: const Text('পরিবর্তন করুন', style: TextStyle(fontWeight: FontWeight.w800)),
+                    )),
+                  ]),
+                ]),
+              )),
+            ),
+          ),
+        );
+      }),
     );
     if (result != true) { current.dispose(); next.dispose(); confirm.dispose(); return; }
     try {

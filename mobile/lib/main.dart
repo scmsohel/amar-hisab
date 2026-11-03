@@ -1159,7 +1159,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('ব্যক্তিগত তথ্য'),
-        content: Form(
+        content: SingleChildScrollView(child: Form(
           key: formKey,
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             TextFormField(
@@ -1177,7 +1177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Align(alignment: Alignment.centerLeft, child: Text('ইমেইল: ${(_user['email'] ?? '').toString()}',
               style: TextStyle(fontSize: 12, color: Theme.of(dialogContext).colorScheme.onSurfaceVariant))),
           ]),
-        ),
+        )),
         actions: [
           TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('বাতিল')),
           FilledButton(onPressed: () {
@@ -1311,10 +1311,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _message(String label) => ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text('$label — শীঘ্রই চালু হবে।')),
-  );
-
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
@@ -1420,11 +1416,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(28),
                             boxShadow: [BoxShadow(color: const Color(0xFF345A64).withValues(alpha: dark ? .10 : .12), blurRadius: 18, offset: const Offset(0, 8))]),
                           child: Column(children: [
-                            _menuRow(Icons.person_rounded, const Color(0xFF1688F8), 'ব্যক্তিগত তথ্য', 'নাম, ইমেইল ও প্রোফাইল ছবি', _editPersonalInfo, dark, ink, muted, line),
+                            _menuRow(Icons.person_rounded, const Color(0xFF1688F8), 'ব্যক্তিগত তথ্য', 'নাম, মোবাইল নম্বর ও ইমেইল', _editPersonalInfo, dark, ink, muted, line),
                             _menuRow(Icons.verified_user_rounded, const Color(0xFF10B83F), 'নিরাপত্তা', 'পাসওয়ার্ড পরিবর্তন', _changePassword, dark, ink, muted, line),
                             _menuRow(Icons.notifications_active_rounded, const Color(0xFFFFB000), 'নোটিফিকেশন', 'লেনদেন, বিল ও অন্যান্য সতর্কতা', _notificationSettings, dark, ink, muted, line),
                             _menuRow(Icons.palette_rounded, const Color(0xFF9B35E8), 'থিম', 'লাইট ও ডার্ক মোড পরিবর্তন', _chooseTheme, dark, ink, muted, line),
-                            _menuRow(Icons.info_rounded, const Color(0xFF1688F8), 'অ্যাপ সম্পর্কে', 'ভার্সন ১.০.০ • গোপনীয়তা নীতি', _showAbout, dark, ink, muted, line, last: true),
+                            _menuRow(Icons.info_rounded, const Color(0xFF1688F8), 'অ্যাপ সম্পর্কে', 'ভার্সন 0.1.0 • গোপনীয়তা নীতি', _showAbout, dark, ink, muted, line, last: true),
                           ]),
                         ),
                       ],

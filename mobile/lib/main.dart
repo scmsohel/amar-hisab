@@ -2177,9 +2177,9 @@ class _BillsScreenState extends State<_BillsScreen> {
 
   Future<void> _openCreateBillModal([Map<String, dynamic>? billToEdit]) async {
     final isEditing = billToEdit != null;
-    final nameController = TextEditingController(text: isEditing ? _name(billToEdit) : '');
-    final amountController = TextEditingController(text: isEditing ? _num(billToEdit['amount']).toString() : '');
-    final noteController = TextEditingController(text: isEditing ? (billToEdit['notes'] ?? billToEdit['note'] ?? '').toString() : '');
+    final nameController = TextEditingController(text: isEditing ? _name(billToEdit!) : '');
+    final amountController = TextEditingController(text: isEditing ? _num(billToEdit!['amount']).toString() : '');
+    final noteController = TextEditingController(text: isEditing ? (billToEdit!['notes'] ?? billToEdit['note'] ?? '').toString() : '');
     DateTime dueDate = _date(billToEdit?['date']) ?? DateTime.now();
     String iconName = (billToEdit?['icon'] ?? 'ReceiptText').toString();
     String recurrence = (billToEdit?['billRule'] ?? 'one-time').toString();

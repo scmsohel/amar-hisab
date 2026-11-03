@@ -1447,7 +1447,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           final active = selectedTheme == mode;
           final previewBg = isDark ? const Color(0xFF102B2A) : const Color(0xFFF1FBF6);
           final previewSurface = isDark ? const Color(0xFF1E4540) : Colors.white;
-          final previewText = isDark ? const Color(0xFFDFF7EB) : const Color(0xFF25483A);
           return Expanded(child: InkWell(
             borderRadius: BorderRadius.circular(19),
             onTap: () => setDialogState(() => selectedTheme = mode),
@@ -1478,7 +1477,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Row(children: [
                       Expanded(child: Container(height: 9, decoration: BoxDecoration(color: accent.withValues(alpha: .65), borderRadius: BorderRadius.circular(5)))),
                       const SizedBox(width: 5),
-                      Expanded(child: Container(height: 9, decoration: BoxDecoration(color: previewSurface, borderRadius: BorderRadius.circular(5))),
+                      Expanded(child: Container(height: 9, decoration: BoxDecoration(color: previewSurface, borderRadius: BorderRadius.circular(5)))),
                     ]),
                   ]),
                 ),

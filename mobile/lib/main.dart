@@ -1151,6 +1151,166 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return '${_bn(d.inDays.toString())} দিন আগে';
   }
 
+  Future<void> _editPersonalInfo() async {
+    final nameController = TextEditingController(text: (_user['name'] ?? '').toString());
+    final mobileController = TextEditingController(text: (_user['mobile'] ?? '').toString());
+    final formKey = GlobalKey<FormState>();
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('ব্যক্তিগত তথ্য'),
+        content: Form(
+          key: formKey,
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            TextFormField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: 'নাম'),
+              validator: (value) => (value ?? '').trim().length < 2 ? 'কমপক্ষে ২ অক্ষরের নাম দিন।' : null,
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              controller: mobileController,
+              keyboardType: TextInputType.phone,
+              decoration: const InputDecoration(labelText: 'মোবাইল নম্বর'),
+            ),
+            const SizedBox(height: 6),
+            Align(alignment: Alignment.centerLeft, child: Text('ইমেইল: ${(_user['email'] ?? '').toString()}',
+              style: TextStyle(fontSize: 12, color: Theme.of(dialogContext).colorScheme.onSurfaceVariant))),
+          ]),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('বাতিল')),
+          FilledButton(onPressed: () {
+            if (formKey.currentState?.validate() ?? false) Navigator.pop(dialogContext, true);
+          }, child: const Text('সংরক্ষণ')),
+        ],
+      ),
+    );
+    if (result != true) { nameController.dispose(); mobileController.dispose(); return; }
+    try {
+      final response = await _AuthApi._put('/auth/profile', {
+        'name': nameController.text.trim(),
+        'mobile': mobileController.text.trim(),
+      });
+      if (!mounted) return;
+      final user = response['user'];
+      if (user is Map) setState(() => _user = Map<String, dynamic>.from(user));
+      _notice(context, 'ব্যক্তিগত তথ্য সংরক্ষণ হয়েছে।');
+    } catch (error) {
+      if (mounted) _notice(context, error.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      nameController.dispose();
+      mobileController.dispose();
+    }
+  }
+
+  Future<void> _changePassword() async {
+    final current = TextEditingController();
+    final next = TextEditingController();
+    final confirm = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    var hideCurrent = true;
+    var hideNext = true;
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(builder: (context, setDialogState) => AlertDialog(
+        title: const Text('পাসওয়ার্ড পরিবর্তন'),
+        content: Form(
+          key: formKey,
+          child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
+            TextFormField(controller: current, obscureText: hideCurrent,
+              decoration: InputDecoration(labelText: 'বর্তমান পাসওয়ার্ড', suffixIcon: IconButton(
+                onPressed: () => setDialogState(() => hideCurrent = !hideCurrent),
+                icon: Icon(hideCurrent ? Icons.visibility_off : Icons.visibility))),
+              validator: (v) => (v ?? '').isEmpty ? 'বর্তমান পাসওয়ার্ড দিন।' : null),
+            const SizedBox(height: 8),
+            TextFormField(controller: next, obscureText: hideNext,
+              decoration: InputDecoration(labelText: 'নতুন পাসওয়ার্ড (কমপক্ষে ১২ অক্ষর)', suffixIcon: IconButton(
+                onPressed: () => setDialogState(() => hideNext = !hideNext),
+                icon: Icon(hideNext ? Icons.visibility_off : Icons.visibility))),
+              validator: (v) => (v ?? '').length < 12 ? 'নতুন পাসওয়ার্ড কমপক্ষে ১২ অক্ষরের হতে হবে।' : null),
+            const SizedBox(height: 8),
+            TextFormField(controller: confirm, obscureText: hideNext,
+              decoration: const InputDecoration(labelText: 'নতুন পাসওয়ার্ড আবার লিখুন'),
+              validator: (v) => v != next.text ? 'পাসওয়ার্ড দুটি মিলছে না।' : null),
+          ])),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('বাতিল')),
+          FilledButton(onPressed: () {
+            if (formKey.currentState?.validate() ?? false) Navigator.pop(dialogContext, true);
+          }, child: const Text('পরিবর্তন করুন')),
+        ],
+      )),
+    );
+    if (result != true) { current.dispose(); next.dispose(); confirm.dispose(); return; }
+    try {
+      await _AuthApi._post('/auth/password', {'currentPassword': current.text, 'newPassword': next.text});
+      if (mounted) _notice(context, 'পাসওয়ার্ড পরিবর্তন হয়েছে।');
+    } catch (error) {
+      if (mounted) _notice(context, error.toString().replaceFirst('Exception: ', ''));
+    } finally {
+      current.dispose(); next.dispose(); confirm.dispose();
+    }
+  }
+
+  Future<void> _notificationSettings() async {
+    final preferences = await SharedPreferences.getInstance();
+    var transactions = preferences.getBool('profile_notify_transactions') ?? true;
+    var bills = preferences.getBool('profile_notify_bills') ?? true;
+    var reminders = preferences.getBool('profile_notify_reminders') ?? true;
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(builder: (context, setDialogState) => AlertDialog(
+        title: const Text('নোটিফিকেশন পছন্দ'),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          SwitchListTile(contentPadding: EdgeInsets.zero, title: const Text('লেনদেনের আপডেট'), value: transactions,
+            onChanged: (v) async { setDialogState(() => transactions = v); await preferences.setBool('profile_notify_transactions', v); }),
+          SwitchListTile(contentPadding: EdgeInsets.zero, title: const Text('বিলের রিমাইন্ডার'), value: bills,
+            onChanged: (v) async { setDialogState(() => bills = v); await preferences.setBool('profile_notify_bills', v); }),
+          SwitchListTile(contentPadding: EdgeInsets.zero, title: const Text('অন্যান্য সতর্কতা'), value: reminders,
+            onChanged: (v) async { setDialogState(() => reminders = v); await preferences.setBool('profile_notify_reminders', v); }),
+          const SizedBox(height: 4),
+          const Text('এই পছন্দগুলো এই ডিভাইসে সংরক্ষিত হবে। Push notification চালু করতে সার্ভার সাপোর্ট প্রয়োজন।',
+            style: TextStyle(fontSize: 11, height: 1.4)),
+        ]),
+        actions: [TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('বন্ধ করুন'))],
+      )),
+    );
+  }
+
+  Future<void> _chooseTheme() async {
+    final current = _appThemeMode.value;
+    final selected = await showDialog<ThemeMode>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('অ্যাপের থিম'),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          RadioListTile<ThemeMode>(value: ThemeMode.light, groupValue: current, title: const Text('লাইট মোড'),
+            secondary: const Icon(Icons.light_mode_rounded), onChanged: (v) => Navigator.pop(dialogContext, v)),
+          RadioListTile<ThemeMode>(value: ThemeMode.dark, groupValue: current, title: const Text('ডার্ক মোড'),
+            secondary: const Icon(Icons.dark_mode_rounded), onChanged: (v) => Navigator.pop(dialogContext, v)),
+        ]),
+      ),
+    );
+    if (selected != null) await _setAppThemeMode(selected);
+  }
+
+  Future<void> _showAbout() async {
+    await showAboutDialog(
+      context: context,
+      applicationName: 'আমার হিসাব',
+      applicationVersion: '0.1.0+1',
+      applicationIcon: const Icon(Icons.account_balance_wallet_rounded, size: 34, color: Color(0xFF08A66A)),
+      children: const [
+        Text('ব্যক্তিগত আয়-ব্যয়ের হিসাব, ওয়ালেট, সঞ্চয় ও আর্থিক ব্যবস্থাপনার অ্যাপ।'),
+        SizedBox(height: 8),
+        Text('গোপনীয়তা: আপনার আর্থিক তথ্য আপনার অ্যাকাউন্টের সঙ্গে সার্ভারে সংরক্ষিত থাকে।'),
+      ],
+    );
+  }
+
   void _message(String label) => ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(content: Text('$label — শীঘ্রই চালু হবে।')),
   );
@@ -1186,7 +1346,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Expanded(child: Text('প্রোফাইল', style: TextStyle(color: ink, fontSize: 20, fontWeight: FontWeight.w900))),
                   _actionIcon(dark ? Icons.wb_sunny_rounded : Icons.nightlight_round, muted, () => _setAppThemeMode(dark ? ThemeMode.light : ThemeMode.dark)),
                   const SizedBox(width: 8),
-                  _actionIcon(Icons.settings_rounded, const Color(0xFF1688F8), () => _message('অ্যাপ সেটিংস')),
+                  _actionIcon(Icons.settings_rounded, const Color(0xFF1688F8), () => Navigator.of(context).push(_route(const ServerSettingsScreen()))),
                 ]),
               ),
               Expanded(
@@ -1214,7 +1374,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           Positioned(right: 0, bottom: 4, child: Material(
                             color: const Color(0xFF08B83D), shape: const CircleBorder(side: BorderSide(color: Colors.white, width: 3)), elevation: 3,
-                            child: InkWell(customBorder: const CircleBorder(), onTap: () => _message('প্রোফাইল ছবি পরিবর্তন'),
+                            child: InkWell(customBorder: const CircleBorder(), onTap: () => _notice(context, 'প্রোফাইল ছবি আপলোডের জন্য Backend Upload API প্রয়োজন।'),
                               child: const SizedBox(width: 32, height: 32, child: Icon(Icons.edit_rounded, color: Colors.white, size: 17))),
                           )),
                         ])),
@@ -1260,11 +1420,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(28),
                             boxShadow: [BoxShadow(color: const Color(0xFF345A64).withValues(alpha: dark ? .10 : .12), blurRadius: 18, offset: const Offset(0, 8))]),
                           child: Column(children: [
-                            _menuRow(Icons.person_rounded, const Color(0xFF1688F8), 'ব্যক্তিগত তথ্য', 'নাম, ইমেইল ও প্রোফাইল ছবি', () => _message('ব্যক্তিগত তথ্য'), dark, ink, muted, line),
-                            _menuRow(Icons.verified_user_rounded, const Color(0xFF10B83F), 'নিরাপত্তা', 'পাসওয়ার্ড ও ২-ধাপ যাচাইকরণ (2FA)', () => _message('নিরাপত্তা'), dark, ink, muted, line),
-                            _menuRow(Icons.notifications_active_rounded, const Color(0xFFFFB000), 'নোটিফিকেশন', 'লেনদেন, বিল ও অন্যান্য সতর্কতা', () => _message('নোটিফিকেশন'), dark, ink, muted, line),
-                            _menuRow(Icons.palette_rounded, const Color(0xFF9B35E8), 'থিম', 'লাইট, ডার্ক ও অ্যাপের রঙ পরিবর্তন', () => _message('থিম'), dark, ink, muted, line),
-                            _menuRow(Icons.info_rounded, const Color(0xFF1688F8), 'অ্যাপ সম্পর্কে', 'ভার্সন ১.০.০ • গোপনীয়তা নীতি', () => _message('অ্যাপ সম্পর্কে'), dark, ink, muted, line, last: true),
+                            _menuRow(Icons.person_rounded, const Color(0xFF1688F8), 'ব্যক্তিগত তথ্য', 'নাম, ইমেইল ও প্রোফাইল ছবি', _editPersonalInfo, dark, ink, muted, line),
+                            _menuRow(Icons.verified_user_rounded, const Color(0xFF10B83F), 'নিরাপত্তা', 'পাসওয়ার্ড পরিবর্তন', _changePassword, dark, ink, muted, line),
+                            _menuRow(Icons.notifications_active_rounded, const Color(0xFFFFB000), 'নোটিফিকেশন', 'লেনদেন, বিল ও অন্যান্য সতর্কতা', _notificationSettings, dark, ink, muted, line),
+                            _menuRow(Icons.palette_rounded, const Color(0xFF9B35E8), 'থিম', 'লাইট ও ডার্ক মোড পরিবর্তন', _chooseTheme, dark, ink, muted, line),
+                            _menuRow(Icons.info_rounded, const Color(0xFF1688F8), 'অ্যাপ সম্পর্কে', 'ভার্সন ১.০.০ • গোপনীয়তা নীতি', _showAbout, dark, ink, muted, line, last: true),
                           ]),
                         ),
                       ],

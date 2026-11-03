@@ -3170,6 +3170,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
         .difference(DateTime(now.year, now.month, now.day)).inDays;
   }
 
+  int get _activeReminderCount {
+    final billCount = _bills.where((e) {
+      if (['পরিশোধিত', 'সম্পন্ন'].contains((e['status'] ?? '').toString())) return false;
+      final days = _reminderDays(e['date'] ?? e['dueDate'] ?? e['due_date']);
+      final reminder = int.tryParse((e['reminderDays'] ?? 3).toString()) ?? 3;
+      return days != null && days >= 0 && days <= reminder;
+    }).length;
+    final debtCount = _debts.where((e) {
+      if (['পরিশোধিত', 'সম্পন্ন'].contains((e['status'] ?? '').toString())) return false;
+      final days = _reminderDays(e['date']);
+      return days != null && days <= 3;
+    }).length;
+    return billCount + debtCount;
+  }
+
   String _reminderDateLabel(dynamic value) {
     final date = _parseTransactionDate(value);
     if (date == null) return 'তারিখ পাওয়া যায়নি';
@@ -3373,7 +3388,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   Positioned(
                                     right: 9,
                                     top: 8,
-                                    child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: Color(0xFFE53935), shape: BoxShape.circle)),
+                                    child: _activeReminderCount > 0
+                                        ? Container(
+                                            constraints: const BoxConstraints(minWidth: 8, minHeight: 8),
+                                            padding: const EdgeInsets.symmetric(horizontal: 3),
+                                            decoration: const BoxDecoration(color: Color(0xFFE53935), shape: BoxShape.circle),
+                                          )
+                                        : const SizedBox.shrink(),
                                   ),
                                 ],
                               ),

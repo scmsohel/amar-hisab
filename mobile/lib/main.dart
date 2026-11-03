@@ -5255,45 +5255,198 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _showDashboardMenu(BuildContext context) {
     final isDark = _appThemeMode.value == ThemeMode.dark;
-    showModalBottomSheet<void>(
+    final surface = isDark ? const Color(0xFF10243A) : Colors.white;
+    final ink = isDark ? const Color(0xFFE6F0FA) : const Color(0xFF172B3A);
+    final muted = isDark ? const Color(0xFF9DB0C2) : const Color(0xFF7F91A2);
+    final divider = isDark ? const Color(0xFF294158) : const Color(0xFFE3EAF0);
+
+    showGeneralDialog<void>(
       context: context,
-      backgroundColor: isDark ? const Color(0xFF10243A) : Colors.white,
-      showDragHandle: true,
-      isScrollControlled: true,
-      builder: (sheetContext) => SafeArea(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(sheetContext).size.height * 0.8,
+      barrierDismissible: true,
+      barrierLabel: 'Dashboard menu',
+      barrierColor: Colors.transparent,
+      transitionDuration: const Duration(milliseconds: 150),
+      pageBuilder: (dialogContext, animation, secondaryAnimation) {
+        return SafeArea(
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned(
+                left: 14,
+                top: 58,
+                child: Material(
+                  color: Colors.transparent,
+                  child: StatefulBuilder(
+                    builder: (popupContext, setPopupState) {
+                      Widget menuItem({
+                        required IconData icon,
+                        required Color color,
+                        required String title,
+                        required VoidCallback onTap,
+                        Widget? trailing,
+                        bool last = false,
+                      }) {
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              height: 65,
+                              child: InkWell(
+                                onTap: onTap,
+                                borderRadius: BorderRadius.circular(10),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 13),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                        width: 28,
+                                        child: Icon(icon, color: color, size: 25),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          title,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: ink,
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                      trailing ?? Icon(Icons.chevron_right_rounded, color: ink, size: 25),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            if (!last)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 12, right: 10),
+                                child: Divider(height: 1, thickness: 1, color: divider),
+                              ),
+                          ],
+                        );
+                      }
+
+                      return SizedBox(
+                        width: MediaQuery.of(popupContext).size.width < 252
+                            ? MediaQuery.of(popupContext).size.width - 28
+                            : 224,
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Positioned(
+                              left: 19,
+                              top: -7,
+                              child: Transform.rotate(
+                                angle: 0.785398,
+                                child: Container(
+                                  width: 15,
+                                  height: 15,
+                                  decoration: BoxDecoration(
+                                    color: surface,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: surface,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: divider.withValues(alpha: .75)),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: isDark ? .28 : .16),
+                                    blurRadius: 22,
+                                    offset: const Offset(0, 9),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  menuItem(
+                                    icon: Icons.account_balance_wallet_rounded,
+                                    color: const Color(0xFF08B63C),
+                                    title: 'ওয়ালেট ম্যানেজমেন্ট',
+                                    onTap: () {
+                                      Navigator.pop(popupContext);
+                                      _openWalletManagement();
+                                    },
+                                  ),
+                                  menuItem(
+                                    icon: Icons.savings_rounded,
+                                    color: const Color(0xFF0868D9),
+                                    title: 'সঞ্চয়',
+                                    onTap: () {
+                                      Navigator.pop(popupContext);
+                                      _openSavingsManagement();
+                                    },
+                                  ),
+                                  menuItem(
+                                    icon: Icons.format_list_bulleted_rounded,
+                                    color: const Color(0xFF087A55),
+                                    title: 'সব লেনদেন',
+                                    onTap: () {
+                                      Navigator.pop(popupContext);
+                                      _openTransactionsPage();
+                                    },
+                                  ),
+                                  menuItem(
+                                    icon: Icons.grid_view_rounded,
+                                    color: const Color(0xFF087A55),
+                                    title: 'Compact / Expand',
+                                    trailing: Switch(
+                                      value: _compactCharts,
+                                      activeColor: const Color(0xFF08B63C),
+                                      onChanged: (value) {
+                                        setState(() => _compactCharts = value);
+                                        setPopupState(() {});
+                                      },
+                                    ),
+                                    onTap: () {
+                                      final value = !_compactCharts;
+                                      setState(() => _compactCharts = value);
+                                      setPopupState(() {});
+                                    },
+                                  ),
+                                  menuItem(
+                                    icon: Icons.dns_rounded,
+                                    color: const Color(0xFF0868D9),
+                                    title: 'Server Settings',
+                                    last: true,
+                                    onTap: () {
+                                      Navigator.pop(popupContext);
+                                      Navigator.of(context).push(_route(const ServerSettingsScreen()));
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
-          child: SingleChildScrollView(
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-          SwitchListTile(
-            secondary: const Icon(Icons.dashboard_customize_rounded),
-            title: const Text('Compact / Expand'),
-            subtitle: Text(_compactCharts ? 'Compact view চালু' : 'Expanded view চালু'),
-            value: _compactCharts,
-            onChanged: (value) => setState(() => _compactCharts = value),
+        );
+      },
+      transitionBuilder: (context, animation, secondaryAnimation, child) {
+        final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+        return FadeTransition(
+          opacity: curved,
+          child: SlideTransition(
+            position: Tween<Offset>(begin: const Offset(0, -0.025), end: Offset.zero).animate(curved),
+            child: child,
           ),
-          SwitchListTile(
-            secondary: Icon(isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded),
-            title: Text(isDark ? 'Dark Future Mode' : 'Light Mode'),
-            subtitle: Text(isDark ? 'Premium dark theme চালু' : 'Light theme চালু'),
-            value: isDark,
-            onChanged: (value) async {
-              await _setAppThemeMode(value ? ThemeMode.dark : ThemeMode.light);
-              if (sheetContext.mounted) Navigator.pop(sheetContext);
-            },
-          ),
-          ListTile(leading: const Icon(Icons.account_balance_wallet_rounded), title: const Text('ওয়ালেট ম্যানেজমেন্ট'), subtitle: const Text('সব ওয়ালেট ও ব্যালেন্স দেখুন'), onTap: () { Navigator.pop(sheetContext); _openWalletManagement(); }),
-          ListTile(leading: const Icon(Icons.savings_rounded), title: const Text('সঞ্চয়'), subtitle: const Text('সঞ্চয়ের লক্ষ্য ও কিস্তির হিসাব দেখুন'), onTap: () { Navigator.pop(sheetContext); _openSavingsManagement(); }),
-          ListTile(leading: const Icon(Icons.receipt_long_rounded), title: const Text('সব লেনদেন'), onTap: () { Navigator.pop(sheetContext); _openTransactionsPage(); }),
-          ListTile(leading: const Icon(Icons.refresh_rounded), title: const Text('ডেটা রিফ্রেশ'), onTap: () { Navigator.pop(sheetContext); _load(); }),
-          ListTile(leading: const Icon(Icons.dns_outlined), title: const Text('Server Settings'), onTap: () { Navigator.pop(sheetContext); Navigator.of(context).push(_route(const ServerSettingsScreen())); }),
-          ListTile(leading: const Icon(Icons.logout_rounded), title: const Text('লগআউট'), onTap: () async { Navigator.pop(sheetContext); await _AuthApi.clearSession(); if (context.mounted) Navigator.of(context).pushAndRemoveUntil(_route(const LoginScreen()), (route) => false); }),
-            ]),
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

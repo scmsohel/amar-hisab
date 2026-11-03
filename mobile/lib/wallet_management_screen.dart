@@ -229,7 +229,7 @@ class _WalletManagementScreenState extends State<WalletManagementScreen> {
                           Text(
                             _filterWallet == 'সব ওয়ালেট'
                                 ? 'সকল ওয়ালেটের সাম্প্রতিক লেনদেন'
-                                : '${_filterWallet} ওয়ালেটের ${_filterKind == 'আয়' ? 'আয়ের' : _filterKind == 'ব্যয়' ? 'ব্যয়ের' : 'সকল'} লেনদেন',
+                                : '$_filterWallet ওয়ালেটের ${_filterKind == 'আয়' ? 'আয়ের' : _filterKind == 'ব্যয়' ? 'ব্যয়ের' : 'সকল'} লেনদেন',
                             style: TextStyle(color: muted, fontSize: 9.5),
                           ),
                         ])),

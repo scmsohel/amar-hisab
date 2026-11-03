@@ -3705,7 +3705,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final wallet = (tx['wallet'] ?? tx['walletName'] ?? tx['wallet_name'] ?? tx['accountName'] ?? tx['account'] ?? '').toString();
     final subtitle = [
       if (paymentTitle != null) paymentTitle.group(1)!.trim(),
-      category,
+      if (!(paymentTitle?.group(1) == 'বিল পরিশোধ' && category.trim() == 'বিল')) category,
       wallet,
     ].where((v) => v.trim().isNotEmpty).join(' • ');
     final amountColor = isIncome ? const Color(0xFF00A653) : isTransfer ? const Color(0xFF1688D4) : const Color(0xFFE92743);
@@ -3734,7 +3734,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         SizedBox(width: 98, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
           FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerRight, child: Text('$prefix ${_money(_amount(tx['amount']))}', maxLines: 1, style: TextStyle(color: amountColor, fontSize: 13, fontWeight: FontWeight.w900))),
           const SizedBox(height: 3),
-          if (category.isNotEmpty && paymentTitle == null) Container(
+          if (category.isNotEmpty) Container(
             constraints: const BoxConstraints(maxWidth: 96),
             padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
             decoration: BoxDecoration(color: style.accent.withValues(alpha: .06), borderRadius: BorderRadius.circular(20), border: Border.all(color: style.accent.withValues(alpha: .10))),
@@ -5005,8 +5005,12 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
   }
   String subtitleOf(Map x) {
     final match = RegExp(r'^(বিল পরিশোধ|দেনা পরিশোধ|পাওনা জমা|ক্রেডিট কার্ড উত্তোলন)\s*[—-]\s*(.+)$').firstMatch(titleOf(x));
-    return [if (match != null) match.group(1)!.trim(), catOf(x), walletOf(x)]
-        .where((v) => v.trim().isNotEmpty).join(' • ');
+    final category = catOf(x);
+    return [
+      if (match != null) match.group(1)!.trim(),
+      if (!(match?.group(1) == 'বিল পরিশোধ' && category.trim() == 'বিল')) category,
+      walletOf(x),
+    ].where((v) => v.trim().isNotEmpty).join(' • ');
   }
   String catOf(Map x)=>(x['categoryName']??x['category_name']??x['category']??'অন্যান্য').toString();
   String walletOf(Map x)=>(x['wallet']??x['walletName']??x['wallet_name']??x['accountName']??'').toString();
@@ -5188,7 +5192,7 @@ const icons = <String, IconData>{
         Column(crossAxisAlignment:CrossAxisAlignment.end,mainAxisSize:MainAxisSize.min,children:[
           Text('${income?'+ ':transfer?'↔ ':'− '}${money(amount(x['amount']))}',style:TextStyle(fontSize:12,fontWeight:FontWeight.w900,color:color)),
           const SizedBox(height:4),
-          if(!isPaymentTitle) Container(padding:const EdgeInsets.symmetric(horizontal:9,vertical:4),decoration:BoxDecoration(color:color.withValues(alpha:.09),borderRadius:BorderRadius.circular(18),border:Border.all(color:color.withValues(alpha:.16))),child:Text(catOf(x),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,fontWeight:FontWeight.w800,color:color))),
+          Container(padding:const EdgeInsets.symmetric(horizontal:9,vertical:4),decoration:BoxDecoration(color:color.withValues(alpha:.09),borderRadius:BorderRadius.circular(18),border:Border.all(color:color.withValues(alpha:.16))),child:Text(catOf(x),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,fontWeight:FontWeight.w800,color:color))),
         ]),
         PopupMenuButton<String>(padding:EdgeInsets.zero,onSelected:(v)async{if(v=='edit'){await widget.onEdit(x);await reload();}else{await widget.onDelete(x);await reload();}},itemBuilder:(_)=>const[PopupMenuItem(value:'edit',child:Text('এডিট করুন')),PopupMenuItem(value:'delete',child:Text('ডিলিট করুন'))]),
       ]),

@@ -3732,7 +3732,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
         onTap: () => _showTransactionDetails(tx),
         borderRadius: BorderRadius.circular(15),
         child: Row(children: [
-        Container(width: 36, height: 36, decoration: BoxDecoration(color: style.accent.withValues(alpha: .08), borderRadius: BorderRadius.circular(12)), child: Icon(style.icon, color: style.accent, size: 21)),
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: amountColor.withValues(alpha: isDark ? .18 : .10),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(style.icon, color: amountColor, size: 21),
+        ),
         const SizedBox(width: 10),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: isDark ? const Color(0xFFF1FAF6) : const Color(0xFF111827), fontSize: 13, fontWeight: FontWeight.w900)),

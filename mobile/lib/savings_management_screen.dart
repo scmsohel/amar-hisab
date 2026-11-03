@@ -76,13 +76,15 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
         final progress = total > 0 ? (deposited / total).clamp(0.0, 1.0) : 0.0;
         final suggested = n(current['goalInstallmentAmount']);
         final installmentLeft = suggested > 0 ? (suggested < left ? suggested : left) : left;
-        final inputDecoration = (String label, String hint) => InputDecoration(
-          labelText: label, hintText: hint, isDense: true, filled: true,
-          fillColor: dark ? const Color(0xFF172B3B) : const Color(0xFFF8FAFC),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(11), borderSide: BorderSide(color: border)),
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(11), borderSide: BorderSide(color: border)),
-        );
+        InputDecoration inputDecoration(String label, String hint) {
+          return InputDecoration(
+            labelText: label, hintText: hint, isDense: true, filled: true,
+            fillColor: dark ? const Color(0xFF172B3B) : const Color(0xFFF8FAFC),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(11), borderSide: BorderSide(color: border)),
+            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(11), borderSide: BorderSide(color: border)),
+          );
+        }
         Widget metric(String label, double value, Color color) => Expanded(child: Container(
           constraints: const BoxConstraints(minHeight: 68), padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 10),
           decoration: BoxDecoration(color: dark ? const Color(0xFF172B3B) : const Color(0xFFF7FAFC), borderRadius: BorderRadius.circular(12),
@@ -111,7 +113,7 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
             final sum = nextPayments.fold<double>(0, (v, item) => v + n(item['amount']));
             final updatedGoal = <String, dynamic>{...current, 'payments': nextPayments, 'status': sum + 1e-8 >= total ? 'সম্পন্ন' : 'চলমান', 'updatedAt': dateLabel(iso(DateTime.now()))};
             final transaction = <String, dynamic>{
-              'id': tid, 'title': 'সঞ্চয় জমা — \${current['title']}', 'category': 'সঞ্চয়',
+              'id': tid, 'title': 'সঞ্চয় জমা — ${current['title']}', 'category': 'সঞ্চয়',
               'date': dateLabel(savedDate), 'dateInput': savedDate, 'time': '', 'wallet': wallet,
               'amount': value, 'kind': 'ব্যয়', 'note': noteController.text.trim(),
             };
@@ -164,7 +166,7 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(color: panel, borderRadius: BorderRadius.circular(13), border: Border.all(color: border)),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [Expanded(child: Text('জমার ইতিহাস', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: ink))), Text('\${history.length}টি লেনদেন', style: TextStyle(fontSize: 10, color: muted))]),
+                  Row(children: [Expanded(child: Text('জমার ইতিহাস', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: ink))), Text('${history.length}টি লেনদেন', style: TextStyle(fontSize: 10, color: muted))]),
                   const SizedBox(height: 8),
                   if (history.isEmpty) Padding(padding: const EdgeInsets.symmetric(vertical: 12), child: Center(child: Text('এখনো কোনো জমা যোগ করা হয়নি।', style: TextStyle(fontSize: 11, color: muted))))
                   else ...history.map((payment) => Padding(
@@ -177,7 +179,7 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
                       child: Row(children: [
                         Icon(Icons.account_balance_wallet_outlined, size: 19, color: ink), const SizedBox(width: 9),
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Text('জমা · \${payment['date'] ?? ''}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ink)),
+                          Text('জমা · ${payment['date'] ?? ''}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ink)),
                           Text((payment['wallet'] ?? 'ক্যাশ').toString(), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 9, color: muted)),
                           if ((payment['notes'] ?? '').toString().trim().isNotEmpty) Text(payment['notes'].toString(), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 9, color: muted)),
                         ])),
@@ -203,7 +205,7 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
               Text(editingId == null ? 'জমা যোগ করুন' : 'জমা সম্পাদনা', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: ink)),
               const SizedBox(height: 8),
               TextField(controller: amountController, enabled: !saving, keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: inputDecoration('পরিমাণ (৳)', suggested > 0 ? 'প্রস্তাবিত \${money(suggested)}' : 'জমার পরিমাণ')),
+                decoration: inputDecoration('পরিমাণ (৳)', suggested > 0 ? 'প্রস্তাবিত ${money(suggested)}' : 'জমার পরিমাণ')),
               const SizedBox(height: 8),
               Row(children: [
                 Expanded(child: OutlinedButton.icon(

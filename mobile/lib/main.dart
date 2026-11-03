@@ -2529,25 +2529,32 @@ class _BillsScreenState extends State<_BillsScreen> {
                   const SizedBox(height: 7),
                   Expanded(child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(color: dark ? const Color(0xFF0B2A32) : const Color(0xFFEAF8F2), borderRadius: BorderRadius.circular(12), border: Border.all(color: dark ? const Color(0xFF245343) : const Color(0xFFB7E5D3))),
                     child: payments.isEmpty
                       ? Center(child: Text('এখনো কোনো পেমেন্ট যোগ করা হয়নি।', style: TextStyle(fontSize: 11, color: muted)))
                       : ListView.separated(
                           itemCount: payments.length,
-                          separatorBuilder: (_, _) => Divider(height: 1, color: line),
+                          separatorBuilder: (_, _) => const SizedBox(height: 8),
                           itemBuilder: (rowContext, index) {
                             final payment = payments[payments.length - 1 - index];
                             final paymentId = _num(payment['id']).toInt();
                             final isEditing = editingPaymentId == paymentId;
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 4),
+                            return Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: dark ? const Color(0xFF19372B) : Colors.white,
+                                borderRadius: BorderRadius.circular(11),
+                                border: Border.all(color: dark ? const Color(0xFF2B5141) : const Color(0xFFE2EEE7)),
+                                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: dark ? 0.08 : 0.035), blurRadius: 7, offset: const Offset(0, 2))],
+                              ),
                               child: Row(children: [
-                                Container(width: 30, height: 30, decoration: BoxDecoration(color: green.withValues(alpha: .12), borderRadius: BorderRadius.circular(9)), child: const Icon(Icons.account_balance_wallet_outlined, size: 16, color: green)),
-                                const SizedBox(width: 7),
+                                SizedBox(width: 30, height: 30, child: Icon(Icons.account_balance_wallet_outlined, size: 18, color: dark ? const Color(0xFFE7F2EE) : ink)),
+                                const SizedBox(width: 9),
                                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                  Text((payment['date'] ?? '').toString(), style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ink)),
-                                  Text('${payment['wallet'] ?? 'ক্যাশ'}${(payment['notes'] ?? '').toString().trim().isEmpty ? '' : ' • ${payment['notes']}'}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 9, color: muted)),
+                                  Text('পরিশোধ · ${(payment['date'] ?? '').toString()}', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: ink)),
+                                  Text((payment['wallet'] ?? 'ক্যাশ').toString(), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 9, color: muted)),
+                                  if ((payment['notes'] ?? '').toString().trim().isNotEmpty) Text(payment['notes'].toString(), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 9, color: muted)),
                                 ])),
                                 Text(_money(_num(payment['amount'])), style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: green)),
                                 IconButton(visualDensity: VisualDensity.compact, constraints: const BoxConstraints.tightFor(width: 30, height: 32), padding: EdgeInsets.zero, tooltip: 'এডিট',

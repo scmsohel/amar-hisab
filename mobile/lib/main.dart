@@ -3193,7 +3193,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Future<void> _showReminderSheet() async {
-    await _load();
     if (!mounted) return;
     final billsDue = _bills.where((e) {
       if (['পরিশোধিত','সম্পন্ন'].contains((e['status'] ?? '').toString())) return false;

@@ -3708,12 +3708,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
       wallet,
     ].where((v) => v.trim().isNotEmpty).join(' • ');
     final amountColor = isIncome ? const Color(0xFF00A653) : isTransfer ? const Color(0xFF1688D4) : const Color(0xFFE92743);
+    final cardTint = isIncome
+        ? const Color(0xFFF3FBF6)
+        : isTransfer
+            ? const Color(0xFFEAF4FF)
+            : const Color(0xFFFFF7F8);
+    final cardDarkBase = isIncome
+        ? const Color(0xFF142F27)
+        : isTransfer
+            ? const Color(0xFF142B40)
+            : const Color(0xFF351F28);
     final prefix = isIncome ? '+' : isTransfer ? '↔' : '−';
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.fromLTRB(8, 3, 2, 3),
       decoration: BoxDecoration(
-        color: isDark ? Color.lerp(const Color(0xFF14283A), style.accent, .10) : style.tint,
+        color: isDark ? cardDarkBase : cardTint,
         borderRadius: BorderRadius.circular(15),
         border: Border.all(color: style.accent.withValues(alpha: isDark ? .24 : .05)),
 

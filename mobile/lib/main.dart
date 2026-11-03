@@ -1724,18 +1724,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         const SizedBox(height: 2),
                         Center(child: Text(email, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muted, fontSize: 14))),
                         const SizedBox(height: 10),
-                        Center(child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: [Color(0xFFFFF9D8), Color(0xFFFFE99A)]),
-                            borderRadius: BorderRadius.circular(40), border: Border.all(color: const Color(0xFFFFB300), width: 1.2),
-                            boxShadow: [BoxShadow(color: const Color(0xFFE9A21A).withValues(alpha: .2), blurRadius: 9, offset: const Offset(0, 4))]),
-                          child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                            Icon(Icons.workspace_premium_rounded, color: Color(0xFFB87900), size: 22), SizedBox(width: 12),
-                            Text('প্রিমিয়াম সদস্য', style: TextStyle(color: Color(0xFF9C5B00), fontSize: 14, fontWeight: FontWeight.w900)),
-                          ]),
-                        )),
-                        const SizedBox(height: 10),
+                        if ((_user['role'] ?? '').toString().toLowerCase() == 'admin') ...[
+                          Center(child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: dark ? const Color(0xFF173A32) : const Color(0xFFE8F8EF),
+                              borderRadius: BorderRadius.circular(40),
+                              border: Border.all(color: const Color(0xFF08A66A).withValues(alpha: .45), width: 1.1),
+                              boxShadow: [BoxShadow(color: const Color(0xFF08A66A).withValues(alpha: .10), blurRadius: 9, offset: const Offset(0, 4))]),
+                            child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                              Icon(Icons.verified_rounded, color: Color(0xFF08A66A), size: 19), SizedBox(width: 8),
+                              Text('Owner', style: TextStyle(color: Color(0xFF078653), fontSize: 13, fontWeight: FontWeight.w800)),
+                            ]),
+                          )),
+                          const SizedBox(height: 10),
+                        ],
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
                           decoration: BoxDecoration(color: dark ? const Color(0xFF142C3D) : const Color(0xFFFFFCF9),

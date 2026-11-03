@@ -51,21 +51,6 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
     if(ok==true){final cnt=int.parse(count.text),begin=date(start)??DateTime.now(),end=addPeriod(begin,cnt-1,freq);final item=<String,dynamic>{'id':old?['id']??DateTime.now().millisecondsSinceEpoch,'title':title.text.trim(),'amount':n(per.text)*cnt,'date':iso(end),'icon':old?['icon']??'PiggyBank','updatedAt':dateLabel(iso(DateTime.now())),'status':st,'notes':notes.text.trim(),'goalFrequency':freq,'goalInstallmentAmount':n(per.text),'goalInstallmentCount':cnt,'goalStartDate':start,'payments':old==null?<dynamic>[]:payments(old)};await persist(old==null?[item,...goals]:goals.map((g)=>g['id']==old['id']?item:g).toList(),transactions);}
     title.dispose();per.dispose();count.dispose();notes.dispose();
   }
-  Future<void> paymentForm(Map<String,dynamic> g,{Map<String,dynamic>? old})async{
-    final amount=TextEditingController(text:old==null?(n(g['goalInstallmentAmount'])>0?n(g['goalInstallmentAmount']).clamp(0,remaining(g)).toString():remaining(g).toString()):n(old['amount']).toString()),note=TextEditingController(text:(old?['notes']??'').toString());
-    final linkedTx=old==null?null:transactions.where((t)=>t['id']==old['transactionId']).toList();var day=(linkedTx!=null&&linkedTx.isNotEmpty?linkedTx.first['dateInput']:old?['date'])?.toString()??iso(DateTime.now()),wallet=(old?['wallet']??widget.walletNames.first).toString();final key=GlobalKey<FormState>();final max=remaining(g)+(old==null?0:n(old['amount']));
-    final ok=await showModalBottomSheet<bool>(context:context,isScrollControlled:true,showDragHandle:true,builder:(c)=>StatefulBuilder(builder:(c,set)=>Padding(padding:EdgeInsets.fromLTRB(16,8,16,MediaQuery.of(c).viewInsets.bottom+18),child:Form(key:key,child:Column(mainAxisSize:MainAxisSize.min,children:[
-      Text(old==null?'সঞ্চয় জমা করুন':'জমা সম্পাদনা',style:const TextStyle(fontSize:18,fontWeight:FontWeight.w900)),
-      Text('লক্ষ্য ${money(n(g['amount']))} • বাকি ${money(remaining(g))}',style:const TextStyle(fontSize:12)),
-      TextFormField(controller:amount,keyboardType:const TextInputType.numberWithOptions(decimal:true),decoration:const InputDecoration(labelText:'জমার পরিমাণ (৳)'),validator:(v)=>n(v)>0&&n(v)<=max?null:'সঠিক পরিমাণ দিন'),
-      ListTile(contentPadding:EdgeInsets.zero,title:const Text('জমার তারিখ'),subtitle:Text(dateLabel(day)),trailing:const Icon(Icons.calendar_month),onTap:()async{final d=date(day)??DateTime.now();final p=await showDatePicker(context:c,initialDate:d,firstDate:DateTime(2000),lastDate:DateTime(2100));if(p!=null)set(()=>day=iso(p));}),
-      DropdownButtonFormField<String>(initialValue:widget.walletNames.contains(wallet)?wallet:widget.walletNames.first,decoration:const InputDecoration(labelText:'ওয়ালেট'),items:widget.walletNames.map((w)=>DropdownMenuItem(value:w,child:Text(w))).toList(),onChanged:(v)=>set(()=>wallet=v??wallet)),
-      TextFormField(controller:note,decoration:const InputDecoration(labelText:'নোট (ঐচ্ছিক)')),
-      const SizedBox(height:10),Row(children:[Expanded(child:OutlinedButton(onPressed:()=>Navigator.pop(c,false),child:const Text('বাতিল'))),const SizedBox(width:8),Expanded(child:FilledButton(onPressed:(){if(key.currentState!.validate())Navigator.pop(c,true);},child:const Text('জমা সংরক্ষণ')))])
-    ])))));
-    if(ok==true){final value=n(amount.text),pid=old?['id']??DateTime.now().millisecondsSinceEpoch,tid=old?['transactionId']??(DateTime.now().millisecondsSinceEpoch+1);final ps=payments(g),p=<String,dynamic>{'id':pid,'amount':value,'date':dateLabel(day),'wallet':wallet,'notes':note.text.trim(),'transactionId':tid};final updatedPs=old==null?[...ps,p]:ps.map((x)=>x['id']==old['id']?p:x).toList();final sum=updatedPs.fold<double>(0,(a,x)=>a+n(x['amount']));final updated=<String,dynamic>{...g,'payments':updatedPs,'status':sum+1e-8>=n(g['amount'])?'সম্পন্ন':'চলমান','updatedAt':dateLabel(iso(DateTime.now()))};final tx=<String,dynamic>{'id':tid,'title':'সঞ্চয় জমা — ${g['title']}','category':'সঞ্চয়','date':dateLabel(day),'dateInput':day,'time':'','wallet':wallet,'amount':value,'kind':'ব্যয়','note':note.text.trim()};final txs=old==null?[tx,...transactions]:transactions.map((x)=>x['id']==old['transactionId']?tx:x).toList();await persist(goals.map((x)=>x['id']==g['id']?updated:x).toList(),txs);}
-    amount.dispose();note.dispose();
-  }
   Future<void> deleteGoal(Map<String,dynamic> g)async{final yes=await showDialog<bool>(context:context,builder:(c)=>AlertDialog(title:const Text('সঞ্চয় মুছবেন?'),content:Text('${g['title']} পরিকল্পনাটি মুছে যাবে।'),actions:[TextButton(onPressed:()=>Navigator.pop(c,false),child:const Text('বাতিল')),FilledButton(onPressed:()=>Navigator.pop(c,true),child:const Text('মুছুন'))]));if(yes==true)await persist(goals.where((x)=>x['id']!=g['id']).toList(),transactions.where((x)=>!(x['category']=='সঞ্চয়'&&x['title']=='সঞ্চয় জমা — ${g['title']}')).toList());}
   Future<void> detail(Map<String,dynamic> goal) async {
     final amountController = TextEditingController(text: (n(goal['goalInstallmentAmount']) > 0 ? n(goal['goalInstallmentAmount']).clamp(0, remaining(goal)) : remaining(goal)).toString());
@@ -255,7 +240,7 @@ class _SavingsManagementScreenState extends State<SavingsManagementScreen>{
               ),
               const SizedBox(height: 12),
               SizedBox(width: double.infinity, child: FilledButton.icon(
-                onPressed: saving || left <= 0 ? null : savePayment,
+                onPressed: saving || (left <= 0 && editingId == null) ? null : savePayment,
                 icon: saving ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.check_rounded, size: 17),
                 label: Text(saving ? 'সংরক্ষণ হচ্ছে...' : editingId == null ? 'জমা সংরক্ষণ' : 'পরিবর্তন সংরক্ষণ করুন'),
                 style: FilledButton.styleFrom(backgroundColor: green, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 13), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),

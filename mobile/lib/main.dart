@@ -3237,7 +3237,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               borderRadius: BorderRadius.circular(14),
               onTap: () {
                 Navigator.pop(dialogContext);
-                Navigator.of(this.context).push(_route(isBill
+                Navigator.of(context).push(_route(isBill
                   ? _BillsScreen(bills: _bills, onReload: () async { await _load(); return List<Map<String,dynamic>>.from(_bills); })
                   : _DebtsScreen(debts: _debts, wallets: _walletBalances.keys.toList(), onReload: () async { await _load(); return List<Map<String,dynamic>>.from(_debts); })));
               },
@@ -3304,7 +3304,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ])),
               Padding(padding:const EdgeInsets.fromLTRB(15,0,15,14),child:SizedBox(width:double.infinity,child:OutlinedButton(onPressed:(){
                 Navigator.pop(dialogContext);
-                Navigator.of(this.context).push(_route(debts.isNotEmpty&&bills.isEmpty
+                Navigator.of(context).push(_route(debts.isNotEmpty&&bills.isEmpty
                   ? _DebtsScreen(debts:_debts,wallets:_walletBalances.keys.toList(),onReload:()async{await _load();return List<Map<String,dynamic>>.from(_debts);})
                   : _BillsScreen(bills:_bills,onReload:()async{await _load();return List<Map<String,dynamic>>.from(_bills); })));
               },child:const Text('সব দেখুন →')))),

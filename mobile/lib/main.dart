@@ -3702,7 +3702,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final paymentTitle = RegExp(r'^(বিল পরিশোধ|দেনা পরিশোধ|পাওনা জমা|ক্রেডিট কার্ড উত্তোলন)\s*[—-]\s*(.+)$').firstMatch(rawTitle);
     final title = paymentTitle?.group(2)?.trim() ?? rawTitle;
     final category = (tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? tx['categoryTitle'] ?? '').toString();
-    final wallet = (tx['wallet'] ?? tx['walletName'] ?? tx['wallet_name'] ?? tx['accountName'] ?? tx['account'] ?? tx['account'] ?? '').toString();
+    final wallet = (tx['wallet'] ?? tx['walletName'] ?? tx['wallet_name'] ?? tx['accountName'] ?? tx['account'] ?? '').toString();
     final subtitle = [
       if (paymentTitle != null) paymentTitle.group(1)!.trim(),
       category,
@@ -3734,7 +3734,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         SizedBox(width: 98, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
           FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerRight, child: Text('$prefix ${_money(_amount(tx['amount']))}', maxLines: 1, style: TextStyle(color: amountColor, fontSize: 13, fontWeight: FontWeight.w900))),
           const SizedBox(height: 3),
-          if (category.isNotEmpty) Container(
+          if (category.isNotEmpty && paymentTitle == null) Container(
             constraints: const BoxConstraints(maxWidth: 96),
             padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
             decoration: BoxDecoration(color: style.accent.withValues(alpha: .06), borderRadius: BorderRadius.circular(20), border: Border.all(color: style.accent.withValues(alpha: .10))),
@@ -5032,6 +5032,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
     final dark=Theme.of(context).brightness==Brightness.dark;
     final txKind=kindOf(x),income=txKind=='আয়',transfer=txKind=='ট্রান্সফার'||txKind.toLowerCase()=='transfer';
     final value='${titleOf(x)} ${catOf(x)}'.toLowerCase();
+    final isPaymentTitle = RegExp(r'^(বিল পরিশোধ|দেনা পরিশোধ|পাওনা জমা|ক্রেডিট কার্ড উত্তোলন)\s*[—-]\s*(.+)$').hasMatch(titleOf(x));
     final name=(x['icon']??x['iconName']??x['icon_name']??'').toString();
 const icons = <String, IconData>{
     'Briefcase': Icons.work_outline_rounded,
@@ -5187,7 +5188,7 @@ const icons = <String, IconData>{
         Column(crossAxisAlignment:CrossAxisAlignment.end,mainAxisSize:MainAxisSize.min,children:[
           Text('${income?'+ ':transfer?'↔ ':'− '}${money(amount(x['amount']))}',style:TextStyle(fontSize:12,fontWeight:FontWeight.w900,color:color)),
           const SizedBox(height:4),
-          Container(padding:const EdgeInsets.symmetric(horizontal:9,vertical:4),decoration:BoxDecoration(color:color.withValues(alpha:.09),borderRadius:BorderRadius.circular(18),border:Border.all(color:color.withValues(alpha:.16))),child:Text(catOf(x),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,fontWeight:FontWeight.w800,color:color))),
+          if(!isPaymentTitle) Container(padding:const EdgeInsets.symmetric(horizontal:9,vertical:4),decoration:BoxDecoration(color:color.withValues(alpha:.09),borderRadius:BorderRadius.circular(18),border:Border.all(color:color.withValues(alpha:.16))),child:Text(catOf(x),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,fontWeight:FontWeight.w800,color:color))),
         ]),
         PopupMenuButton<String>(padding:EdgeInsets.zero,onSelected:(v)async{if(v=='edit'){await widget.onEdit(x);await reload();}else{await widget.onDelete(x);await reload();}},itemBuilder:(_)=>const[PopupMenuItem(value:'edit',child:Text('এডিট করুন')),PopupMenuItem(value:'delete',child:Text('ডিলিট করুন'))]),
       ]),

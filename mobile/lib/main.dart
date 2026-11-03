@@ -1286,19 +1286,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('অ্যাপের থিম'),
-        content: Column(mainAxisSize: MainAxisSize.min, children: [
-          RadioListTile<ThemeMode>(value: ThemeMode.light, groupValue: current, title: const Text('লাইট মোড'),
-            secondary: const Icon(Icons.light_mode_rounded), onChanged: (v) => Navigator.pop(dialogContext, v)),
-          RadioListTile<ThemeMode>(value: ThemeMode.dark, groupValue: current, title: const Text('ডার্ক মোড'),
-            secondary: const Icon(Icons.dark_mode_rounded), onChanged: (v) => Navigator.pop(dialogContext, v)),
-        ]),
+        content: RadioGroup<ThemeMode>(
+          groupValue: current,
+          onChanged: (value) => Navigator.pop(dialogContext, value),
+          child: Column(mainAxisSize: MainAxisSize.min, children: const [
+            RadioListTile<ThemeMode>(
+              value: ThemeMode.light,
+              title: Text('লাইট মোড'),
+              secondary: Icon(Icons.light_mode_rounded),
+            ),
+            RadioListTile<ThemeMode>(
+              value: ThemeMode.dark,
+              title: Text('ডার্ক মোড'),
+              secondary: Icon(Icons.dark_mode_rounded),
+            ),
+          ]),
+        ),
       ),
     );
     if (selected != null) await _setAppThemeMode(selected);
   }
 
-  Future<void> _showAbout() async {
-    await showAboutDialog(
+  void _showAbout() {
+    showAboutDialog(
       context: context,
       applicationName: 'আমার হিসাব',
       applicationVersion: '0.1.0+1',

@@ -5301,7 +5301,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         width: 26,
                                         child: Icon(icon, color: color, size: 23),
                                       ),
-                                      const SizedBox(width: 10),
+                                      const SizedBox(width: 8),
                                       Expanded(
                                         child: Text(
                                           title,
@@ -5309,8 +5309,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             color: ink,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w600,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
                                           ),
                                         ),
                                       ),

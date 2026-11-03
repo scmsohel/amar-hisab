@@ -5289,7 +5289,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             SizedBox(
-                              height: 65,
+                              height: 48,
                               child: InkWell(
                                 onTap: onTap,
                                 borderRadius: BorderRadius.circular(10),
@@ -5298,10 +5298,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   child: Row(
                                     children: [
                                       SizedBox(
-                                        width: 28,
-                                        child: Icon(icon, color: color, size: 25),
+                                        width: 26,
+                                        child: Icon(icon, color: color, size: 23),
                                       ),
-                                      const SizedBox(width: 12),
+                                      const SizedBox(width: 10),
                                       Expanded(
                                         child: Text(
                                           title,
@@ -5310,11 +5310,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           style: TextStyle(
                                             color: ink,
                                             fontSize: 14,
-                                            fontWeight: FontWeight.w700,
+                                            fontWeight: FontWeight.w600,
                                           ),
                                         ),
                                       ),
-                                      trailing ?? Icon(Icons.chevron_right_rounded, color: ink, size: 25),
+                                      trailing ?? Icon(Icons.chevron_right_rounded, color: ink, size: 23),
                                     ],
                                   ),
                                 ),
@@ -5358,9 +5358,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 border: Border.all(color: divider.withValues(alpha: .75)),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: isDark ? .28 : .16),
-                                    blurRadius: 22,
-                                    offset: const Offset(0, 9),
+                                    color: Colors.black.withValues(alpha: isDark ? .24 : .13),
+                                    blurRadius: 18,
+                                    offset: const Offset(0, 7),
                                   ),
                                 ],
                               ),
@@ -5398,13 +5398,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     icon: Icons.grid_view_rounded,
                                     color: const Color(0xFF087A55),
                                     title: 'Compact / Expand',
-                                    trailing: Switch(
+                                    trailing: Transform.scale(
+                                      scale: 0.88,
+                                      child: Switch(
                                       value: _compactCharts,
                                       activeThumbColor: const Color(0xFF08B63C),
                                       onChanged: (value) {
                                         setState(() => _compactCharts = value);
                                         setPopupState(() {});
                                       },
+                                    ),
                                     ),
                                     onTap: () {
                                       final value = !_compactCharts;

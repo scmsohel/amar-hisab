@@ -2175,15 +2175,19 @@ class _BillsScreenState extends State<_BillsScreen> {
   }
   String _money(double v) => '৳ ${v.round().toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',')}';
 
-  Future<void> _openCreateBillModal() async {
-    final nameController = TextEditingController();
-    final amountController = TextEditingController();
-    final noteController = TextEditingController();
-    DateTime dueDate = DateTime.now();
-    String iconName = 'ReceiptText';
-    String recurrence = 'one-time';
-    String reminder = '3';
-    String status = 'বাকি';
+  Future<void> _openCreateBillModal([Map<String, dynamic>? billToEdit]) async {
+    final isEditing = billToEdit != null;
+    final nameController = TextEditingController(text: isEditing ? _name(billToEdit) : '');
+    final amountController = TextEditingController(text: isEditing ? _num(billToEdit['amount']).toString() : '');
+    final noteController = TextEditingController(text: isEditing ? (billToEdit['notes'] ?? billToEdit['note'] ?? '').toString() : '');
+    DateTime dueDate = _date(billToEdit?['date']) ?? DateTime.now();
+    String iconName = (billToEdit?['icon'] ?? 'ReceiptText').toString();
+    String recurrence = (billToEdit?['billRule'] ?? 'one-time').toString();
+    if (!['one-time', 'weekly', 'monthly', 'yearly'].contains(recurrence)) recurrence = 'one-time';
+    String reminder = (billToEdit?['reminderDays'] ?? 3).toString();
+    if (!['0', '1', '3', '7', '14'].contains(reminder)) reminder = '3';
+    String status = (billToEdit?['status'] ?? 'বাকি').toString();
+    if (!['বাকি', 'পরিশোধিত'].contains(status)) status = 'বাকি';
     bool saving = false;
     String dateLabel(DateTime d) => '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
 
@@ -2226,7 +2230,7 @@ class _BillsScreenState extends State<_BillsScreen> {
                   padding: const EdgeInsets.fromLTRB(18, 17, 12, 10),
                   child: Row(children: [
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('বিল যোগ করুন', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900, color: ink)),
+                      Text(isEditing ? 'বিল সম্পাদনা' : 'বিল যোগ করুন', style: TextStyle(fontSize: 19, fontWeight: FontWeight.w900, color: ink)),
                       const SizedBox(height: 3),
                       Text('আপনার তথ্য অ্যাকাউন্টে সংরক্ষিত হবে।', style: TextStyle(fontSize: 11, color: muted)),
                     ])),
@@ -2385,23 +2389,42 @@ class _BillsScreenState extends State<_BillsScreen> {
                           setModal(() => saving = true);
                           try {
                             final date = '${dueDate.year.toString().padLeft(4, '0')}-${dueDate.month.toString().padLeft(2, '0')}-${dueDate.day.toString().padLeft(2, '0')}';
-                            final id = DateTime.now().millisecondsSinceEpoch;
-                            final bill = <String, dynamic>{
+                            final id = billToEdit?['id'] ?? DateTime.now().millisecondsSinceEpoch;
+                            final oldDate = (billToEdit?['date'] ?? '').toString();
+                            final oldPayments = billToEdit?['payments'] is List
+                                ? (billToEdit!['payments'] as List).whereType<Map>().map((p) {
+                                    final payment = Map<String, dynamic>.from(p);
+                                    final cycle = (payment['cycleDate'] ?? '').toString();
+                                    if (cycle.isEmpty || cycle == oldDate) payment['cycleDate'] = date;
+                                    return payment;
+                                  }).toList()
+                                : null;
+                            final updatedBill = <String, dynamic>{
+                              ...?billToEdit,
                               'id': id, 'title': name, 'amount': amount, 'date': date,
                               'icon': iconName, 'updatedAt': _dateLabel(DateTime.now()),
                               'status': status, 'notes': noteController.text.trim(),
                               'billRule': recurrence, 'billDay': dueDate.day,
                               'reminderDays': int.parse(reminder),
-                              if (recurrence != 'one-time') 'recurringId': id,
-                              'cycleKey': date.substring(0, 7),
+                              if (oldPayments != null) 'payments': oldPayments,
+                              if (recurrence != 'one-time') 'recurringId': billToEdit?['recurringId'] ?? id,
+                              if (recurrence == 'one-time') 'recurringId': null,
+                              'cycleKey': billToEdit?['cycleKey'] ?? date.substring(0, 7),
                             };
-                            final updated = [bill, ..._items];
+                            final updated = List<Map<String, dynamic>>.from(_items);
+                            if (isEditing) {
+                              final index = updated.indexWhere((item) => item['id'].toString() == billToEdit!['id'].toString());
+                              if (index < 0) throw Exception('বিলটি পাওয়া যায়নি। Refresh করে আবার চেষ্টা করুন।');
+                              updated[index] = updatedBill;
+                            } else {
+                              updated.insert(0, updatedBill);
+                            }
                             await _AuthApi._put('/data/bills', {'data': updated});
                             if (!mounted || !dialogContext.mounted) return;
                             setState(() => _items = updated);
                             Navigator.pop(dialogContext);
                             if (!mounted) return;
-                            _notice(context, 'নতুন বিল সংরক্ষণ হয়েছে।');
+                            _notice(context, isEditing ? 'বিলের তথ্য আপডেট হয়েছে।' : 'নতুন বিল সংরক্ষণ হয়েছে।');
                           } catch (e) {
                             if (mounted && dialogContext.mounted) {
                               setModal(() => saving = false);
@@ -2410,7 +2433,7 @@ class _BillsScreenState extends State<_BillsScreen> {
                           }
                         },
                         icon: saving ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.check_rounded, size: 18),
-                        label: Text(saving ? 'সংরক্ষণ হচ্ছে' : 'সংরক্ষণ'),
+                        label: Text(saving ? 'সংরক্ষণ হচ্ছে' : isEditing ? 'পরিবর্তন সংরক্ষণ' : 'সংরক্ষণ'),
                         style: FilledButton.styleFrom(backgroundColor: const Color(0xFF009B70), foregroundColor: Colors.white, minimumSize: const Size(0, 46), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
                       )),
                     ]),
@@ -2867,8 +2890,8 @@ class _BillsScreenState extends State<_BillsScreen> {
                       mainAxisSize:MainAxisSize.min,
                       children:[
                         SizedBox(width:19,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,tooltip:'পেমেন্ট',onPressed:()=>_openBillPaymentModal(e),icon:const Icon(Icons.payments_outlined,size:17,color:Color(0xFF00A875)))),
-                        SizedBox(width:19,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,onPressed:()=>_notice(context,'বিল সম্পাদনা সুবিধাটি পরবর্তী ধাপে যুক্ত হবে।'),icon:const Icon(Icons.edit_outlined,size:16,color:Color(0xFF8292A4)))),
-                        SizedBox(width:19,height:28,child:PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints.expand(),iconSize:17,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v)=>_notice(context,v=='edit'?'বিল সম্পাদনা সুবিধাটি পরবর্তী ধাপে যুক্ত হবে।':'বিল রিমাইন্ডার সুবিধাটি পরবর্তী ধাপে যুক্ত হবে।'),itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))])),
+                        SizedBox(width:19,height:28,child:IconButton(visualDensity:VisualDensity.compact,constraints:const BoxConstraints.expand(),padding:EdgeInsets.zero,tooltip:'এডিট',onPressed:()=>_openCreateBillModal(e),icon:const Icon(Icons.edit_outlined,size:16,color:Color(0xFF8292A4)))),
+                        SizedBox(width:19,height:28,child:PopupMenuButton<String>(padding:EdgeInsets.zero,constraints:const BoxConstraints.expand(),iconSize:17,icon:const Icon(Icons.more_horiz_rounded,color:Color(0xFF8292A4)),onSelected:(v){if(v=='edit'){_openCreateBillModal(e);}else{_notice(context,'বিল রিমাইন্ডার সুবিধাটি পরবর্তী ধাপে যুক্ত হবে।');}},itemBuilder:(_)=>const [PopupMenuItem(value:'remind',child:Text('রিমাইন্ডার')),PopupMenuItem(value:'edit',child:Text('এডিট'))])),
                       ],
                     )),
                   ],

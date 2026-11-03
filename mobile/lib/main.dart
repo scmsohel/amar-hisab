@@ -4389,17 +4389,133 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final title = (tx['title'] ?? tx['description'] ?? tx['note'] ?? 'লেনদেন').toString();
     final category = (tx['categoryName'] ?? tx['category_name'] ?? tx['category'] ?? '').toString();
     final wallet = (tx['wallet'] ?? tx['walletName'] ?? tx['wallet_name'] ?? tx['accountName'] ?? '').toString();
-    showDialog<void>(context: context, builder: (dialogContext) => AlertDialog(
-      backgroundColor: isDark ? const Color(0xFF14283A) : Colors.white,
-      title: Text(title),
-      content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(_money(_amount(tx['amount'])), style: TextStyle(color: _transactionStyle(tx).accent, fontSize: 22, fontWeight: FontWeight.w900)),
-        if (category.isNotEmpty) Text('ক্যাটাগরি: $category'),
-        if (wallet.isNotEmpty) Text('ওয়ালেট: $wallet'),
-        Text('তারিখ: ${_transactionDateTimeLabel(tx)}'),
+    final kind = (tx['kind'] ?? '').toString();
+    final isIncome = kind == 'আয়';
+    final isTransfer = kind == 'ট্রান্সফার' || kind.toLowerCase() == 'transfer';
+    final accent = isIncome
+        ? const Color(0xFF079B62)
+        : isTransfer
+            ? const Color(0xFF1688D4)
+            : const Color(0xFFE54855);
+    final tint = isIncome
+        ? const Color(0xFFEAF8F0)
+        : isTransfer
+            ? const Color(0xFFEAF4FF)
+            : const Color(0xFFFFF0F1);
+    final darkSurface = isIncome
+        ? const Color(0xFF142F27)
+        : isTransfer
+            ? const Color(0xFF142B40)
+            : const Color(0xFF351F28);
+    final typeLabel = isIncome ? 'আয়' : isTransfer ? 'ট্রান্সফার' : 'ব্যয়';
+    final style = _transactionStyle(tx);
+    final date = _parseTransactionDate(tx['dateInput'] ?? tx['date_input'] ?? tx['date'] ?? tx['createdAt'] ?? tx['created_at']);
+    final dateText = date == null
+        ? (tx['date'] ?? '').toString()
+        : '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+    final timeText = (tx['timeInput'] ?? tx['time_input'] ?? tx['time'] ?? '').toString().trim();
+    final note = (tx['note'] ?? tx['notes'] ?? '').toString().trim();
+    final ink = isDark ? Colors.white : const Color(0xFF172B43);
+    final muted = isDark ? Colors.white60 : const Color(0xFF718096);
+    final surface = isDark ? const Color(0xFF14283A) : Colors.white;
+
+    Widget detailRow(IconData icon, String label, String value) => Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5),
+      child: Row(children: [
+        Container(
+          width: 30,
+          height: 30,
+          decoration: BoxDecoration(color: accent.withValues(alpha: isDark ? .18 : .09), borderRadius: BorderRadius.circular(9)),
+          child: Icon(icon, size: 16, color: accent),
+        ),
+        const SizedBox(width: 10),
+        Expanded(child: Text(label, style: TextStyle(fontSize: 12, color: muted, fontWeight: FontWeight.w600))),
+        const SizedBox(width: 8),
+        Flexible(child: Text(value, textAlign: TextAlign.end, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, color: ink, fontWeight: FontWeight.w800))),
       ]),
-      actions: [TextButton(onPressed: () => Navigator.of(dialogContext).pop(), child: const Text('বন্ধ করুন'))],
-    ));
+    );
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => Dialog(
+        backgroundColor: surface,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 22),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 380),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(13)),
+                  child: Icon(style.icon, color: accent, size: 22),
+                ),
+                const SizedBox(width: 10),
+                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: ink)),
+                  const SizedBox(height: 2),
+                  Text(isIncome ? 'আয়ের বিবরণ' : isTransfer ? 'ট্রান্সফারের বিবরণ' : 'ব্যয়ের বিবরণ', style: TextStyle(fontSize: 11, color: muted)),
+                ])),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(color: tint, borderRadius: BorderRadius.circular(20)),
+                  child: Text(typeLabel, style: TextStyle(fontSize: 11, color: accent, fontWeight: FontWeight.w800)),
+                ),
+                const SizedBox(width: 2),
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints.tightFor(width: 30, height: 30),
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  icon: Icon(Icons.close_rounded, size: 19, color: muted),
+                ),
+              ]),
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: isDark ? darkSurface : tint,
+                  borderRadius: BorderRadius.circular(15),
+                  border: Border.all(color: accent.withValues(alpha: isDark ? .22 : .12)),
+                ),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('লেনদেনের পরিমাণ', style: TextStyle(fontSize: 11, color: muted, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 3),
+                  Text('${isIncome ? '+' : isTransfer ? '↔ ' : '− '}${_money(_amount(tx['amount']))}', style: TextStyle(fontSize: 24, height: 1.15, color: accent, fontWeight: FontWeight.w900)),
+                ]),
+              ),
+              const SizedBox(height: 13),
+              Text('লেনদেনের বিস্তারিত', style: TextStyle(fontSize: 13, color: ink, fontWeight: FontWeight.w900)),
+              const SizedBox(height: 5),
+              if (category.isNotEmpty) detailRow(Icons.sell_outlined, 'ক্যাটাগরি', category),
+              if (wallet.isNotEmpty) detailRow(Icons.account_balance_wallet_outlined, 'ওয়ালেট', wallet),
+              if (dateText.isNotEmpty) detailRow(Icons.calendar_today_outlined, 'তারিখ', dateText),
+              if (timeText.isNotEmpty) detailRow(Icons.access_time_rounded, 'সময়', timeText),
+              if (note.isNotEmpty) detailRow(Icons.notes_rounded, 'নোট', note),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 42,
+                child: FilledButton(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: accent,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
+                  ),
+                  onPressed: () => Navigator.of(dialogContext).pop(),
+                  child: const Text('বন্ধ করুন', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
+                ),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
   }
 
 

@@ -5064,9 +5064,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             'wallet': wallet, 'amount': double.parse(amount.text.trim()),
                             'kind': kind, 'note': note.text.trim(),
                           };
-                          final nextTransactions = tx == null
-                              ? [item, ..._transactions]
-                              : _transactions.map((old) => old['id'].toString() == tx['id'].toString() ? item : old).toList();
                           await _AuthApi.saveTransactionOffline(item);
                           if (!mounted || !sheetContext.mounted) return;
                           Navigator.pop(sheetContext); await _load();

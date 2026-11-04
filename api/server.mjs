@@ -340,6 +340,10 @@ app.post("/sync/push", asyncRoute(async (req, res) => {
     await client.query("BEGIN");
     const results = [];
     for (const operation of prepared) {
+      await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",
+        [String(user.id) + ":" + operation.operationId]
+      );
       const replay = await client.query(
         "SELECT result FROM user_sync_operations WHERE user_id=$1 AND operation_id=$2",
         [user.id, operation.operationId]
@@ -348,6 +352,10 @@ app.post("/sync/push", asyncRoute(async (req, res) => {
         results.push(replay.rows[0].result);
         continue;
       }
+      await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",
+        [String(user.id) + ":" + operation.collection + ":" + operation.recordId]
+      );
       const current = await client.query(
         `SELECT version,payload,deleted_at FROM user_finance_records
          WHERE user_id=$1 AND collection=$2 AND record_id=$3 FOR UPDATE`,

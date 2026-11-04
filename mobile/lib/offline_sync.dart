@@ -72,7 +72,9 @@ class OfflineSyncStore {
     final db = await database;
     await db.transaction((txn) async {
       for (final raw in items) {
-        if (raw is! Map) continue;
+        if (raw is! Map) {
+          continue;
+        }
         final data = Map<String, dynamic>.from(raw);
         final id = (data['_syncId'] ?? data['id'] ?? '').toString();
         if (id.isEmpty) continue;

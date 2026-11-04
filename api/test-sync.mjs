@@ -173,10 +173,52 @@ const legacyWrite = await request("/data/transactions", {
 });
 assert.equal(legacyWrite.response.status, 200, "legacy PUT");
 const legacyPull = await request("/sync/pull?cursor=0", { cookie: secondCookie });
-assert.ok(legacyPull.data.events.some(event =>
+const legacyCreatedEvent = legacyPull.data.events.find(event =>
   event.collection === "transactions" &&
   event.operation === "upsert" &&
   event.data?.id === legacyRecordId
-), "legacy PUT creates a sync upsert event");
+);
+assert.ok(legacyCreatedEvent, "legacy PUT creates a sync upsert event");
+const stableLegacyRecordId = legacyCreatedEvent.recordId;
+assert.ok(stableLegacyRecordId, "legacy bridge assigns a stable sync record id");
 
-console.log("PASS: PostgreSQL startup, auth, push/pull, idempotency, conflict, tombstone, legacy bridge, restore revival, multi-instance concurrent version safety, and user isolation.");
+// Replacing a legacy record must preserve its sync identity and increment its version.
+const legacyUpdate = await request("/data/transactions", {
+  method: "PUT",
+  cookie: secondCookie,
+  body: { data: [{ id: legacyRecordId, description: "legacy bridge updated", amount: 50, type: "income" }] }
+});
+assert.equal(legacyUpdate.response.status, 200, "legacy update PUT");
+const legacyAfterUpdate = await request("/sync/pull?cursor=0&limit=100", { cookie: secondCookie });
+const legacyUpdatedEvent = legacyAfterUpdate.data.events.find(event =>
+  event.recordId === stableLegacyRecordId && event.operation === "upsert" && event.data?.description === "legacy bridge updated"
+);
+assert.ok(legacyUpdatedEvent, "legacy update creates an upsert event");
+assert.equal(legacyUpdatedEvent.version, legacyCreatedEvent.version + 1, "legacy update increments record version");
+
+// Removing a legacy record from the full collection must create a tombstone.
+const legacyDelete = await request("/data/transactions", {
+  method: "PUT",
+  cookie: secondCookie,
+  body: { data: [] }
+});
+assert.equal(legacyDelete.response.status, 200, "legacy delete PUT");
+const legacyAfterDelete = await request("/sync/pull?cursor=0&limit=100", { cookie: secondCookie });
+assert.ok(legacyAfterDelete.data.events.some(event =>
+  event.recordId === stableLegacyRecordId && event.operation === "delete"
+), "legacy collection removal creates a delete event");
+const legacySnapshotAfterDelete = await request("/data/transactions", { cookie: secondCookie });
+assert.ok(!legacySnapshotAfterDelete.data.data.some(item => item._syncId === stableLegacyRecordId), "legacy snapshot omits deleted record");
+
+// Pull cursors are validated and pagination advances without skipping events.
+const firstPage = await request("/sync/pull?cursor=0&limit=1", { cookie: secondCookie });
+assert.equal(firstPage.response.status, 200, "first paginated pull");
+assert.equal(firstPage.data.events.length, 1, "pull respects requested page size");
+assert.equal(firstPage.data.hasMore, true, "pull signals remaining events");
+const nextPage = await request("/sync/pull?cursor=" + firstPage.data.nextCursor + "&limit=100", { cookie: secondCookie });
+assert.equal(nextPage.response.status, 200, "next paginated pull");
+assert.ok(nextPage.data.events.every(event => event.eventId > firstPage.data.nextCursor), "next page contains only later events");
+const invalidCursor = await request("/sync/pull?cursor=-1", { cookie: secondCookie });
+assert.equal(invalidCursor.response.status, 400, "negative pull cursor is rejected");
+
+console.log("PASS: PostgreSQL startup, auth, push/pull pagination, idempotency, conflict, tombstones, legacy create/update/delete bridge, restore revival, multi-instance concurrent version safety, and user isolation.");

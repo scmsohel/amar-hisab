@@ -1,0 +1,68 @@
+name: Backend sync smoke test
+
+on:
+  push:
+    branches: [backend-sync]
+  pull_request:
+    branches: [backend-sync]
+
+permissions:
+  contents: read
+
+jobs:
+  api-postgres-smoke:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: amarhisab_test
+          POSTGRES_USER: amarhisab_test
+          POSTGRES_PASSWORD: test-only-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U amarhisab_test -d amarhisab_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    defaults:
+      run:
+        working-directory: api
+    env:
+      DATABASE_URL: postgres://amarhisab_test:test-only-password@localhost:5432/amarhisab_test
+      SESSION_SECRET: test-only-session-secret-with-more-than-32-characters
+      ADMIN_SETUP_KEY: test-only-setup-key
+      ADMIN_EMAIL: admin@example.test
+      ADMIN_PASSWORD: test-only-admin-password
+      PORT: 3100
+    steps:
+      - name: Checkout backend-sync
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install API dependencies
+        run: npm install --no-audit --no-fund
+      - name: Check API syntax
+        run: node --check server.mjs
+      - name: Start API and verify PostgreSQL initialization
+        run: |
+          node server.mjs > /tmp/amar-hisab-api.log 2>&1 &
+          API_PID=$!
+          trap 'kill "$API_PID" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:3100/health; then
+              echo
+              exit 0
+            fi
+            if ! kill -0 "$API_PID" 2>/dev/null; then
+              cat /tmp/amar-hisab-api.log
+              exit 1
+            fi
+            sleep 2
+          done
+          cat /tmp/amar-hisab-api.log
+          echo "API did not become healthy in time"
+          exit 1

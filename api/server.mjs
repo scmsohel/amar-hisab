@@ -353,6 +353,12 @@ app.post("/sync/push", asyncRoute(async (req, res) => {
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+    for (const collection of [...new Set(prepared.map(operation => operation.collection))].sort()) {
+      await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",
+        [String(user.id) + ":legacy:" + collection]
+      );
+    }
     const results = [];
     for (const operation of prepared) {
       await client.query(

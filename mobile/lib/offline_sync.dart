@@ -251,6 +251,18 @@ class OfflineSyncEngine {
     if (_running) return;
     _running = true;
     try {
+      // Pull first so a newly cached record learns its authoritative server version
+      // before a local edit is pushed.
+      var cursor = await store.cursor;
+      for (var page = 0; page < 10; page++) {
+        final pulled = await _request('GET', '/sync/pull?cursor=$cursor&limit=500');
+        final events = (pulled['events'] as List?) ?? const [];
+        final next = pulled['nextCursor'] is int ? pulled['nextCursor'] as int : cursor;
+        await store.applyRemoteEvents(events, next);
+        cursor = next;
+        if (pulled['hasMore'] != true || events.isEmpty) break;
+      }
+
       final operations = await store.pending();
       if (operations.isNotEmpty) {
         final payload = operations.map((op) {
@@ -266,7 +278,7 @@ class OfflineSyncEngine {
         await store.applyPushResults((pushed['results'] as List?) ?? const []);
       }
 
-      var cursor = await store.cursor;
+      cursor = await store.cursor;
       for (var page = 0; page < 10; page++) {
         final pulled = await _request('GET', '/sync/pull?cursor=$cursor&limit=500');
         final events = (pulled['events'] as List?) ?? const [];

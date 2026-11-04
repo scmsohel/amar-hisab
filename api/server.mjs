@@ -461,7 +461,7 @@ async function saveLegacyCollectionWithSync(client, userId, collection, payload)
     [String(userId) + ":legacy:" + collection]
   );
   const current = await client.query(
-    "SELECT record_id,legacy_id,payload,version FROM user_finance_records WHERE user_id=$1 AND collection=$2 AND deleted_at IS NULL FOR UPDATE",
+    "SELECT record_id,legacy_id,payload,version,deleted_at FROM user_finance_records WHERE user_id=$1 AND collection=$2 FOR UPDATE",
     [userId, collection]
   );
   const byRecordId = new Map(current.rows.map(row => [row.record_id, row]));
@@ -497,7 +497,7 @@ async function saveLegacyCollectionWithSync(client, userId, collection, payload)
         "INSERT INTO user_sync_events(user_id,collection,record_id,version,operation,payload) VALUES($1,$2,$3,1,'upsert',$4::jsonb)",
         [userId, collection, recordId, encoded]
       );
-    } else if (stableJson(existing.payload) !== stableJson(record)) {
+    } else if (existing.deleted_at || stableJson(existing.payload) !== stableJson(record)) {
       const version = Number(existing.version) + 1;
       await client.query(
         "UPDATE user_finance_records SET legacy_id=$4,payload=$5::jsonb,version=$6,updated_at=NOW(),deleted_at=NULL WHERE user_id=$1 AND collection=$2 AND record_id=$3",
@@ -512,7 +512,7 @@ async function saveLegacyCollectionWithSync(client, userId, collection, payload)
   }
 
   for (const row of current.rows) {
-    if (seen.has(row.record_id)) continue;
+    if (seen.has(row.record_id) || row.deleted_at) continue;
     const version = Number(row.version) + 1;
     await client.query(
       "UPDATE user_finance_records SET payload=NULL,version=$4,updated_at=NOW(),deleted_at=NOW() WHERE user_id=$1 AND collection=$2 AND record_id=$3",

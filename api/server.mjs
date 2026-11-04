@@ -463,6 +463,13 @@ async function saveLegacyCollectionWithSync(client, userId, collection, payload)
     : (Array.isArray(payload) ? payload.filter(item => item && typeof item === "object" && !Array.isArray(item)) : []);
   const seen = new Set();
   const savedRecords = [];
+  const stableJson = value => {
+    if (Array.isArray(value)) return "[" + value.map(stableJson).join(",") + "]";
+    if (value && typeof value === "object") {
+      return "{" + Object.keys(value).sort().map(key => JSON.stringify(key) + ":" + stableJson(value[key])).join(",") + "}";
+    }
+    return JSON.stringify(value);
+  };
 
   for (const source of sourceRecords) {
     const legacyId = source.id === undefined || source.id === null ? null : String(source.id);
@@ -482,7 +489,7 @@ async function saveLegacyCollectionWithSync(client, userId, collection, payload)
         "INSERT INTO user_sync_events(user_id,collection,record_id,version,operation,payload) VALUES($1,$2,$3,1,'upsert',$4::jsonb)",
         [userId, collection, recordId, encoded]
       );
-    } else if (JSON.stringify(existing.payload) !== JSON.stringify(record)) {
+    } else if (stableJson(existing.payload) !== stableJson(record)) {
       const version = Number(existing.version) + 1;
       await client.query(
         "UPDATE user_finance_records SET legacy_id=$4,payload=$5::jsonb,version=$6,updated_at=NOW(),deleted_at=NULL WHERE user_id=$1 AND collection=$2 AND record_id=$3",

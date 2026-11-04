@@ -48,7 +48,10 @@ jobs:
       - name: Install API dependencies
         run: npm install --no-audit --no-fund
       - name: Check API syntax
-        run: node --check server.mjs
+        run: |
+          node --check server.mjs
+          node --check test-sync.mjs
+          node --check test-migration.mjs
       - name: Run sync API integration tests
         run: |
           node server.mjs > /tmp/amar-hisab-api-1.log 2>&1 &
@@ -72,3 +75,5 @@ jobs:
             fi
           done
           node test-sync.mjs
+      - name: Run legacy migration integration tests
+        run: node test-migration.mjs

@@ -77,12 +77,16 @@ class OfflineSyncStore {
         }
         final data = Map<String, dynamic>.from(raw);
         final id = (data['_syncId'] ?? data['id'] ?? '').toString();
-        if (id.isEmpty) continue;
+        if (id.isEmpty) {
+          continue;
+        }
         data['_syncId'] = id;
         final existing = await txn.query('local_records',
           where: 'collection = ? AND record_id = ?', whereArgs: [collection, id], limit: 1);
         if (existing.isNotEmpty &&
-            (existing.first['is_dirty'] == 1 || existing.first['has_conflict'] == 1)) continue;
+            (existing.first['is_dirty'] == 1 || existing.first['has_conflict'] == 1)) {
+          continue;
+        }
         await txn.insert('local_records', {
           'collection': collection, 'record_id': id, 'data': jsonEncode(data),
           'version': existing.isEmpty ? 0 : existing.first['version'],

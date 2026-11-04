@@ -115,4 +115,45 @@ assert.equal(pull.response.status, 200, "pull events");
 assert.ok(pull.data.events.some(event => event.recordId === recordId && event.operation === "delete"), "pull includes tombstone event");
 assert.ok(pull.data.events.some(event => event.recordId === recordId && event.operation === "upsert" && event.version >= 3), "pull includes restored upsert event");
 
-console.log("PASS: PostgreSQL startup, auth, push/pull, idempotency, conflict, tombstone, legacy snapshot, and restore revival.");
+// A second user must not see the first user's records.
+const secondInvite = await request("/admin/invitations", {
+  method: "POST",
+  headers: { "x-admin-setup-key": setupKey }
+});
+assert.equal(secondInvite.response.status, 201, "create second test invitation");
+const secondRegistered = await request("/auth/register", {
+  method: "POST",
+  body: {
+    invite: secondInvite.data.code,
+    name: "Sync Isolation User",
+    email: `isolation-${unique}@example.test`,
+    mobile: `8${unique.slice(-9)}`,
+    password: "sync-test-password"
+  }
+});
+assert.equal(secondRegistered.response.status, 201, "register second isolated user");
+const secondCookie = secondRegistered.cookie;
+assert.ok(secondCookie, "second user session cookie");
+const isolatedRead = await request("/data/transactions", { cookie: secondCookie });
+assert.equal(isolatedRead.response.status, 200, "second user's legacy GET");
+assert.ok(!isolatedRead.data.data?.some(item => item._syncId === recordId), "first user's record is not visible to second user");
+const isolatedPull = await request("/sync/pull?cursor=0", { cookie: secondCookie });
+assert.equal(isolatedPull.response.status, 200, "second user's sync pull");
+assert.ok(!isolatedPull.data.events.some(event => event.recordId === recordId), "first user's events are not visible to second user");
+
+// Legacy full-collection writes must also produce record-level sync events.
+const legacyRecordId = 876543;
+const legacyWrite = await request("/data/transactions", {
+  method: "PUT",
+  cookie: secondCookie,
+  body: { data: [{ id: legacyRecordId, description: "legacy bridge test", amount: 45, type: "income" }] }
+});
+assert.equal(legacyWrite.response.status, 200, "legacy PUT");
+const legacyPull = await request("/sync/pull?cursor=0", { cookie: secondCookie });
+assert.ok(legacyPull.data.events.some(event =>
+  event.collection === "transactions" &&
+  event.operation === "upsert" &&
+  event.data?.id === legacyRecordId
+), "legacy PUT creates a sync upsert event");
+
+console.log("PASS: PostgreSQL startup, auth, push/pull, idempotency, conflict, tombstone, legacy bridge, restore revival, and user isolation.");

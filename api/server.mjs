@@ -59,7 +59,11 @@ async function verifyPassword(password, stored) {
   return actual.length === expected.length && timingSafeEqual(actual, expected);
 }
 async function init() {
-  await pool.query(`
+  const schemaClient = await pool.connect();
+  try {
+    await schemaClient.query("BEGIN");
+    await schemaClient.query("SELECT pg_advisory_xact_lock(hashtextextended($1, 0))", ["amar-hisab:schema:init"]);
+    await schemaClient.query(`
     CREATE TABLE IF NOT EXISTS app_users (
       id BIGSERIAL PRIMARY KEY,
       name TEXT NOT NULL,
@@ -116,7 +120,14 @@ async function init() {
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       PRIMARY KEY (user_id, operation_id)
     );
-  `);
+    `);
+    await schemaClient.query("COMMIT");
+  } catch (error) {
+    await schemaClient.query("ROLLBACK");
+    throw error;
+  } finally {
+    schemaClient.release();
+  }
   await migrateLegacyFinanceRecords();
 async function migrateLegacyFinanceRecords() {
   const legacy = await pool.query(

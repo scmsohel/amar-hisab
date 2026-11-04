@@ -3689,8 +3689,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _loading = false;
       });
     } catch (error) {
+      final cachedTransactions = await _AuthApi.localTransactions();
       if (!mounted) return;
-      setState(() { _error = error.toString().replaceFirst('Exception: ', ''); _loading = false; });
+      setState(() {
+        if (cachedTransactions.isNotEmpty) {
+          _transactions = cachedTransactions;
+          _error = null;
+        } else {
+          _error = error.toString().replaceFirst('Exception: ', '');
+        }
+        _loading = false;
+      });
     }
   }
 

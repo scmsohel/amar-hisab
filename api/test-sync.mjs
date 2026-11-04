@@ -296,4 +296,4 @@ assert.ok(recoveryCreated, "recovery seed event exists");
 assert.ok(recoveryPull.data.events.some(event =>
   event.recordId === recoveryCreated.recordId && event.operation === "delete"
 ), "restoring an empty collection creates a tombstone for omitted records");
-\nconsole.log("PASS: PostgreSQL startup, auth, push/pull pagination, idempotency, conflict, tombstones, legacy create/update/delete bridge, restore revival, multi-instance concurrent version safety, and user isolation.");
+console.log("PASS: PostgreSQL startup, auth, push/pull pagination, idempotency, conflict, tombstones, legacy create/update/delete bridge, restore revival, multi-instance concurrent version safety, and user isolation.");

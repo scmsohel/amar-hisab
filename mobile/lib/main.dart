@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lottie/lottie.dart';
+import 'offline_sync.dart';
 import 'wallet_management_screen.dart';
 import 'savings_management_screen.dart';
 
@@ -84,6 +85,36 @@ class _AuthApi {
   static String? _sessionCookie;
 
   static String? get baseUrl => _baseUrl;
+
+  static String? get syncCookie => _sessionCookie;
+
+  static Future<void> cacheTransactions(List<dynamic> items) =>
+      OfflineSyncStore.instance.cacheRemoteRecords('transactions', items);
+
+  static Future<List<Map<String, dynamic>>> localTransactions() =>
+      OfflineSyncStore.instance.records('transactions');
+
+  static Future<void> saveTransactionOffline(Map<String, dynamic> item) async {
+    await OfflineSyncStore.instance.save('transactions', item);
+    await trySyncPending();
+  }
+
+  static Future<void> deleteTransactionOffline(Map<String, dynamic> item) async {
+    final id = (item['_syncId'] ?? item['id'] ?? '').toString();
+    if (id.isEmpty) throw Exception('লেনদেনের পরিচয় পাওয়া যায়নি।');
+    await OfflineSyncStore.instance.delete('transactions', id);
+    await trySyncPending();
+  }
+
+  static Future<void> trySyncPending() async {
+    final cookie = _sessionCookie;
+    final base = _baseUrl;
+    if (cookie == null || cookie.isEmpty || base == null) return;
+    final engine = OfflineSyncEngine(baseUrl: base, sessionCookie: cookie);
+    try { await engine.syncOnce(); } catch (_) {
+      // Keep the durable outbox for the next retry.
+    } finally { engine.dispose(); }
+  }
 
   static Future<void> loadBaseUrl() async {
     final preferences = await SharedPreferences.getInstance();

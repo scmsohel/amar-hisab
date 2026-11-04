@@ -83,6 +83,8 @@ class _AuthApi {
     ..connectionTimeout = const Duration(seconds: 12);
   static String? _baseUrl;
   static String? _sessionCookie;
+  static final ValueNotifier<String> syncStatus = ValueNotifier<String>('এখনো Sync হয়নি');
+  static final ValueNotifier<int> syncPendingCount = ValueNotifier<int>(0);
 
   static String? get baseUrl => _baseUrl;
 
@@ -107,11 +109,31 @@ class _AuthApi {
   static Future<void> trySyncPending() async {
     final cookie = _sessionCookie;
     final base = _baseUrl;
-    if (cookie == null || cookie.isEmpty || base == null) return;
+    syncPendingCount.value = await OfflineSyncStore.instance.pendingCount();
+    if (cookie == null || cookie.isEmpty) {
+      syncStatus.value = 'Login session পাওয়া যায়নি';
+      return;
+    }
+    if (base == null || base.isEmpty) {
+      syncStatus.value = 'Server URL সেট করা নেই';
+      return;
+    }
     final engine = OfflineSyncEngine(baseUrl: base, sessionCookie: cookie);
-    try { await engine.syncOnce(); } catch (_) {
-      // Keep the durable outbox for the next retry.
-    } finally { engine.dispose(); }
+    syncStatus.value = 'Sync হচ্ছে...';
+    try {
+      await engine.syncOnce();
+      syncPendingCount.value = await OfflineSyncStore.instance.pendingCount();
+      if (syncPendingCount.value == 0) {
+        syncStatus.value = 'সব তথ্য Server-এ Sync হয়েছে';
+      } else {
+        syncStatus.value = '${syncPendingCount.value}টি Pending / Conflict আছে';
+      }
+    } catch (error) {
+      syncPendingCount.value = await OfflineSyncStore.instance.pendingCount();
+      syncStatus.value = 'Sync ব্যর্থ: ${error.toString().replaceFirst('HttpException: ', '').replaceFirst('Exception: ', '')}';
+    } finally {
+      engine.dispose();
+    }
   }
 
   static Future<void> loadBaseUrl() async {
@@ -5997,6 +6019,45 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                                       setState(() => _compactCharts = value);
                                       setPopupState(() {});
                                     },
+                                  ),
+                                  ValueListenableBuilder<String>(
+                                    valueListenable: _AuthApi.syncStatus,
+                                    builder: (context, status, _) => ValueListenableBuilder<int>(
+                                      valueListenable: _AuthApi.syncPendingCount,
+                                      builder: (context, pending, _) => menuItem(
+                                        icon: pending > 0 ? Icons.sync_problem_rounded : Icons.cloud_done_rounded,
+                                        color: pending > 0 ? const Color(0xFFE39A24) : const Color(0xFF08A66A),
+                                        title: pending > 0 ? 'Sync Status · $pending Pending' : 'Sync Status',
+                                        trailing: Icon(Icons.chevron_right_rounded, color: ink, size: 21),
+                                        onTap: () {
+                                          Navigator.pop(popupContext);
+                                          showDialog<void>(
+                                            context: context,
+                                            builder: (dialog) => AlertDialog(
+                                              title: const Text('Sync Status'),
+                                              content: ValueListenableBuilder<String>(
+                                                valueListenable: _AuthApi.syncStatus,
+                                                builder: (_, value, __) => Text(value),
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () async {
+                                                    Navigator.pop(dialog);
+                                                    await _AuthApi.trySyncPending();
+                                                    if (mounted) setState(() {});
+                                                  },
+                                                  child: const Text('আবার Sync করুন'),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () => Navigator.pop(dialog),
+                                                  child: const Text('বন্ধ'),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
                                   ),
                                   menuItem(
                                     icon: Icons.dns_rounded,

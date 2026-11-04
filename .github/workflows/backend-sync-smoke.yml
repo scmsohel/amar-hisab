@@ -47,6 +47,23 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Check API syntax
         run: node --check server.mjs
+      - name: Run sync API integration tests
+        run: |
+          node server.mjs > /tmp/amar-hisab-api.log 2>&1 &
+          API_PID=$!
+          trap 'kill "$API_PID" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:3100/health; then
+              echo
+              break
+            fi
+            if ! kill -0 "$API_PID" 2>/dev/null; then
+              cat /tmp/amar-hisab-api.log
+              exit 1
+            fi
+            sleep 2
+          done
+          node test-sync.mjs
       - name: Start API and verify PostgreSQL initialization
         run: |
           node server.mjs > /tmp/amar-hisab-api.log 2>&1 &

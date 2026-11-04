@@ -221,4 +221,74 @@ assert.ok(nextPage.data.events.every(event => event.eventId > firstPage.data.nex
 const invalidCursor = await request("/sync/pull?cursor=-1", { cookie: secondCookie });
 assert.equal(invalidCursor.response.status, 400, "negative pull cursor is rejected");
 
-console.log("PASS: PostgreSQL startup, auth, push/pull pagination, idempotency, conflict, tombstones, legacy create/update/delete bridge, restore revival, multi-instance concurrent version safety, and user isolation.");
+// Backup restore must validate the entire payload before changing any collection.
+const recoveryRecordId = 765432;
+const recoverySeed = await request("/data/transactions", {
+  method: "PUT",
+  cookie: secondCookie,
+  body: { data: [{ id: recoveryRecordId, description: "must survive rejected restore", amount: 77, type: "expense" }] }
+});
+assert.equal(recoverySeed.response.status, 200, "seed recovery record");
+const invalidRestoreData = {
+  transactions: [],
+  debts: [],
+  bills: [],
+  goals: [],
+  wallets: [],
+  settings: {}
+};
+const invalidRestore = await request("/data/restore", {
+  method: "POST",
+  cookie: secondCookie,
+  body: { data: invalidRestoreData }
+});
+assert.equal(invalidRestore.response.status, 400, "restore rejects backup missing a required collection");
+const afterRejectedRestore = await request("/data/transactions", { cookie: secondCookie });
+assert.ok(afterRejectedRestore.data.data.some(item => item.id === recoveryRecordId),
+  "rejected restore must not partially clear existing records");
+
+// Re-applying an identical backup is idempotent: no duplicate event or version bump.
+const restoreSnapshotBeforeReplay = await request("/sync/pull?cursor=0&limit=1000", { cookie });
+const targetBeforeReplay = restoreSnapshotBeforeReplay.data.events
+  .filter(event => event.recordId === recordId)
+  .sort((a, b) => b.eventId - a.eventId)[0];
+assert.ok(targetBeforeReplay, "restored record has a latest event");
+const replayedRestore = await request("/data/restore", {
+  method: "POST",
+  cookie,
+  body: { data: collections }
+});
+assert.equal(replayedRestore.response.status, 200, "repeat identical restore");
+const restoreSnapshotAfterReplay = await request("/sync/pull?cursor=0&limit=1000", { cookie });
+const targetEventsAfterReplay = restoreSnapshotAfterReplay.data.events.filter(event => event.recordId === recordId);
+const targetAfterReplay = targetEventsAfterReplay.sort((a, b) => b.eventId - a.eventId)[0];
+assert.equal(targetAfterReplay.eventId, targetBeforeReplay.eventId,
+  "identical restore must not append another sync event");
+assert.equal(targetAfterReplay.version, targetBeforeReplay.version,
+  "identical restore must not increment record version");
+
+// A valid empty collection in a backup is an intentional clear and must produce tombstones.
+const clearCollections = {
+  transactions: [],
+  debts: [],
+  bills: [],
+  goals: [],
+  wallets: [],
+  settings: {},
+  categories: []
+};
+const clearRestore = await request("/data/restore", {
+  method: "POST",
+  cookie: secondCookie,
+  body: { data: clearCollections }
+});
+assert.equal(clearRestore.response.status, 200, "restore valid empty collections");
+const recoveryPull = await request("/sync/pull?cursor=0&limit=1000", { cookie: secondCookie });
+const recoveryCreated = recoveryPull.data.events.find(event =>
+  event.collection === "transactions" && event.operation === "upsert" && event.data?.id === recoveryRecordId
+);
+assert.ok(recoveryCreated, "recovery seed event exists");
+assert.ok(recoveryPull.data.events.some(event =>
+  event.recordId === recoveryCreated.recordId && event.operation === "delete"
+), "restoring an empty collection creates a tombstone for omitted records");
+\nconsole.log("PASS: PostgreSQL startup, auth, push/pull pagination, idempotency, conflict, tombstones, legacy create/update/delete bridge, restore revival, multi-instance concurrent version safety, and user isolation.");

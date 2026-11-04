@@ -299,6 +299,21 @@ app.get("/sync/pull", asyncRoute(async (req, res) => {
   res.json({ events, nextCursor, hasMore: events.length === limit });
 }));
 
+async function refreshLegacyCollectionSnapshot(client, userId, collection) {
+  const records = await client.query(
+    "SELECT payload FROM user_finance_records WHERE user_id=$1 AND collection=$2 AND deleted_at IS NULL ORDER BY updated_at ASC,record_id ASC",
+    [userId, collection]
+  );
+  const active = records.rows.map(row => row.payload).filter(value => value && typeof value === "object");
+  const payload = collection === "settings" ? (active[active.length - 1] || {}) : active;
+  await client.query(
+    `INSERT INTO user_finance_data(user_id,collection,payload,updated_at)
+     VALUES($1,$2,$3::jsonb,NOW())
+     ON CONFLICT(user_id,collection) DO UPDATE SET payload=EXCLUDED.payload,updated_at=NOW()`,
+    [userId, collection, JSON.stringify(payload)]
+  );
+}
+
 app.post("/sync/push", asyncRoute(async (req, res) => {
   const user = await requireUser(req, res);
   if (!user) return;
@@ -411,6 +426,9 @@ app.post("/sync/push", asyncRoute(async (req, res) => {
         [user.id, operation.operationId, JSON.stringify(accepted)]
       );
       results.push(accepted);
+    }
+    for (const collection of new Set(prepared.map(operation => operation.collection))) {
+      await refreshLegacyCollectionSnapshot(client, user.id, collection);
     }
     await client.query("COMMIT");
     res.set("Cache-Control", "no-store");

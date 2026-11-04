@@ -248,6 +248,11 @@ assert.ok(afterRejectedRestore.data.data.some(item => item.id === recoveryRecord
   "rejected restore must not partially clear existing records");
 
 // Re-applying an identical backup is idempotent: no duplicate event or version bump.
+// The concurrent-writer test above changed this record, so build the backup from
+// the current snapshot rather than reusing the earlier pre-race payload.
+const currentTransactions = await request("/data/transactions", { cookie });
+assert.equal(currentTransactions.response.status, 200, "read current transactions for idempotent backup");
+const idempotentCollections = { ...collections, transactions: currentTransactions.data.data };
 const restoreSnapshotBeforeReplay = await request("/sync/pull?cursor=0&limit=1000", { cookie });
 const targetBeforeReplay = restoreSnapshotBeforeReplay.data.events
   .filter(event => event.recordId === recordId)
@@ -256,7 +261,7 @@ assert.ok(targetBeforeReplay, "restored record has a latest event");
 const replayedRestore = await request("/data/restore", {
   method: "POST",
   cookie,
-  body: { data: collections }
+  body: { data: idempotentCollections }
 });
 assert.equal(replayedRestore.response.status, 200, "repeat identical restore");
 const restoreSnapshotAfterReplay = await request("/sync/pull?cursor=0&limit=1000", { cookie });

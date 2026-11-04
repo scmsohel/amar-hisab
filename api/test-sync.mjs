@@ -2,9 +2,10 @@ import assert from "node:assert/strict";
 
 const baseUrl = process.env.TEST_API_URL || "http://127.0.0.1:3100";
 const setupKey = process.env.ADMIN_SETUP_KEY;
+const secondApiUrl = process.env.TEST_SECOND_API_URL || baseUrl;
 
-async function request(path, { method = "GET", body, cookie, headers = {} } = {}) {
-  const response = await fetch(baseUrl + path, {
+async function requestAt(url, path, { method = "GET", body, cookie, headers = {} } = {}) {
+  const response = await fetch(url + path, {
     method,
     headers: {
       ...(body === undefined ? {} : { "content-type": "application/json" }),
@@ -18,6 +19,7 @@ async function request(path, { method = "GET", body, cookie, headers = {} } = {}
   try { data = text ? JSON.parse(text) : null; } catch { data = text; }
   return { response, data, cookie: response.headers.getSetCookie?.()[0]?.split(";")[0] };
 }
+const request = (path, options) => requestAt(baseUrl, path, options);
 
 const health = await request("/health");
 assert.equal(health.response.status, 200, "API health check");
@@ -115,6 +117,27 @@ assert.equal(pull.response.status, 200, "pull events");
 assert.ok(pull.data.events.some(event => event.recordId === recordId && event.operation === "delete"), "pull includes tombstone event");
 assert.ok(pull.data.events.some(event => event.recordId === recordId && event.operation === "upsert" && event.version >= 3), "pull includes restored upsert event");
 
+
+// Concurrent clients on separate API instances must not both commit the same base version.
+const restoredEvent = pull.data.events.filter(event => event.recordId === recordId && event.operation === "upsert").sort((a, b) => b.version - a.version)[0];
+assert.ok(restoredEvent, "restored record event exists");
+const raceBaseVersion = restoredEvent.version;
+const raceRequests = await Promise.all([
+  requestAt(baseUrl, "/sync/push", { method: "POST", cookie, body: { operations: [{
+    operationId: "race-a-" + unique, collection: "transactions", recordId, type: "upsert", baseVersion: raceBaseVersion,
+    data: { ...payload, description: "concurrent writer A" }
+  }] } }),
+  requestAt(secondApiUrl, "/sync/push", { method: "POST", cookie, body: { operations: [{
+    operationId: "race-b-" + unique, collection: "transactions", recordId, type: "upsert", baseVersion: raceBaseVersion,
+    data: { ...payload, description: "concurrent writer B" }
+  }] } })
+]);
+assert.ok(raceRequests.every(result => result.response.status === 200), "both concurrent API requests return normally");
+const raceStatuses = raceRequests.map(result => result.data.results[0].status).sort();
+assert.deepEqual(raceStatuses, ["accepted", "conflict"], "only one concurrent writer may win the same base version");
+const raceAccepted = raceRequests.find(result => result.data.results[0].status === "accepted");
+const raceConflict = raceRequests.find(result => result.data.results[0].status === "conflict");
+assert.equal(raceConflict.data.results[0].currentVersion, raceAccepted.data.results[0].version, "losing writer sees winning version");
 // A second user must not see the first user's records.
 const secondInvite = await request("/admin/invitations", {
   method: "POST",
@@ -156,4 +179,4 @@ assert.ok(legacyPull.data.events.some(event =>
   event.data?.id === legacyRecordId
 ), "legacy PUT creates a sync upsert event");
 
-console.log("PASS: PostgreSQL startup, auth, push/pull, idempotency, conflict, tombstone, legacy bridge, restore revival, and user isolation.");
+console.log("PASS: PostgreSQL startup, auth, push/pull, idempotency, conflict, tombstone, legacy bridge, restore revival, multi-instance concurrent version safety, and user isolation.");

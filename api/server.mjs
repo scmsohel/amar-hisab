@@ -186,10 +186,11 @@ async function migrateLegacyFinanceRecords() {
 }
 
   if (adminEmail && adminPassword) {
-    const existing = await pool.query("SELECT id FROM app_users WHERE email=$1", [adminEmail]);
-    if (!existing.rowCount) {
-      await pool.query("INSERT INTO app_users(name,email,mobile,password_hash,role) VALUES($1,$2,'',$3,'admin')",
-        [adminName, adminEmail, await hashPassword(adminPassword)]);
+    const inserted = await pool.query(
+      "INSERT INTO app_users(name,email,mobile,password_hash,role) VALUES($1,$2,'',$3,'admin') ON CONFLICT(email) DO NOTHING RETURNING id",
+      [adminName, adminEmail, await hashPassword(adminPassword)]
+    );
+    if (inserted.rowCount) {
       console.log("Initial admin account created from environment configuration.");
     }
   }

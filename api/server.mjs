@@ -423,6 +423,79 @@ app.post("/sync/push", asyncRoute(async (req, res) => {
   }
 }));
 
+async function saveLegacyCollectionWithSync(client, userId, collection, payload) {
+  await client.query(
+    "SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",
+    [String(userId) + ":legacy:" + collection]
+  );
+  const current = await client.query(
+    "SELECT record_id,legacy_id,payload,version FROM user_finance_records WHERE user_id=$1 AND collection=$2 AND deleted_at IS NULL FOR UPDATE",
+    [userId, collection]
+  );
+  const byRecordId = new Map(current.rows.map(row => [row.record_id, row]));
+  const byLegacyId = new Map(current.rows.filter(row => row.legacy_id !== null).map(row => [String(row.legacy_id), row]));
+  const sourceRecords = collection === "settings"
+    ? (payload && typeof payload === "object" && !Array.isArray(payload) ? [payload] : [])
+    : (Array.isArray(payload) ? payload.filter(item => item && typeof item === "object" && !Array.isArray(item)) : []);
+  const seen = new Set();
+  const savedRecords = [];
+
+  for (const source of sourceRecords) {
+    const legacyId = source.id === undefined || source.id === null ? null : String(source.id);
+    const existing = (typeof source._syncId === "string" ? byRecordId.get(source._syncId) : null)
+      || (legacyId !== null ? byLegacyId.get(legacyId) : null);
+    const recordId = existing?.record_id || (typeof source._syncId === "string" && source._syncId ? source._syncId : randomUUID());
+    const record = { ...source, _syncId: recordId };
+    const encoded = JSON.stringify(record);
+    seen.add(recordId);
+
+    if (!existing) {
+      await client.query(
+        "INSERT INTO user_finance_records(user_id,collection,record_id,legacy_id,payload,version) VALUES($1,$2,$3,$4,$5::jsonb,1)",
+        [userId, collection, recordId, legacyId, encoded]
+      );
+      await client.query(
+        "INSERT INTO user_sync_events(user_id,collection,record_id,version,operation,payload) VALUES($1,$2,$3,1,'upsert',$4::jsonb)",
+        [userId, collection, recordId, encoded]
+      );
+    } else if (JSON.stringify(existing.payload) !== JSON.stringify(record)) {
+      const version = Number(existing.version) + 1;
+      await client.query(
+        "UPDATE user_finance_records SET legacy_id=$4,payload=$5::jsonb,version=$6,updated_at=NOW(),deleted_at=NULL WHERE user_id=$1 AND collection=$2 AND record_id=$3",
+        [userId, collection, recordId, legacyId, encoded, version]
+      );
+      await client.query(
+        "INSERT INTO user_sync_events(user_id,collection,record_id,version,operation,payload) VALUES($1,$2,$3,$4,'upsert',$5::jsonb)",
+        [userId, collection, recordId, version, encoded]
+      );
+    }
+    savedRecords.push(record);
+  }
+
+  for (const row of current.rows) {
+    if (seen.has(row.record_id)) continue;
+    const version = Number(row.version) + 1;
+    await client.query(
+      "UPDATE user_finance_records SET payload=NULL,version=$4,updated_at=NOW(),deleted_at=NOW() WHERE user_id=$1 AND collection=$2 AND record_id=$3",
+      [userId, collection, row.record_id, version]
+    );
+    await client.query(
+      "INSERT INTO user_sync_events(user_id,collection,record_id,version,operation,payload) VALUES($1,$2,$3,$4,'delete',NULL)",
+      [userId, collection, row.record_id, version]
+    );
+  }
+
+  const legacyPayload = collection === "settings" ? (savedRecords[0] || {}) : savedRecords;
+  const legacy = await client.query(
+    `INSERT INTO user_finance_data(user_id,collection,payload,updated_at)
+     VALUES($1,$2,$3::jsonb,NOW())
+     ON CONFLICT(user_id,collection) DO UPDATE SET payload=EXCLUDED.payload,updated_at=NOW()
+     RETURNING updated_at`,
+    [userId, collection, JSON.stringify(legacyPayload)]
+  );
+  return { updatedAt: legacy.rows[0].updated_at, data: legacyPayload };
+}
+
 app.get("/data/:collection", asyncRoute(async (req, res) => {
   const collection = String(req.params.collection || "");
   if (!financeCollections.has(collection)) return res.status(404).json({ error: "এই data collection পাওয়া যায়নি।" });
@@ -444,22 +517,27 @@ app.put("/data/:collection", asyncRoute(async (req, res) => {
     return res.status(400).json({ error: "সংরক্ষণের data দেওয়া হয়নি।" });
   }
   const payload = req.body.data;
-  if (payload !== null && !Array.isArray(payload) && (typeof payload !== "object" || payload === null)) {
+  if (payload !== null && (typeof payload !== "object")) {
     return res.status(400).json({ error: "Data-এর format সঠিক নয়।" });
   }
   const encoded = JSON.stringify(payload);
   if (!encoded || Buffer.byteLength(encoded, "utf8") > 2 * 1024 * 1024) {
     return res.status(413).json({ error: "একবারে সর্বোচ্চ ২ MB data সংরক্ষণ করা যাবে।" });
   }
-  const result = await pool.query(
-    `INSERT INTO user_finance_data(user_id, collection, payload, updated_at)
-     VALUES($1,$2,$3::jsonb,NOW())
-     ON CONFLICT(user_id, collection) DO UPDATE SET payload=EXCLUDED.payload, updated_at=NOW()
-     RETURNING updated_at`,
-    [user.id, collection, encoded]
-  );
-  res.set("Cache-Control", "no-store");
-  res.json({ ok: true, collection, updatedAt: result.rows[0].updated_at });
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const saved = await saveLegacyCollectionWithSync(client, user.id, collection, payload);
+    await client.query("COMMIT");
+    res.set("Cache-Control", "no-store");
+    res.json({ ok: true, collection, updatedAt: saved.updatedAt });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
 }));
 
 app.post("/data/restore", asyncRoute(async (req, res) => {

@@ -516,7 +516,7 @@ async function saveLegacyCollectionWithSync(client, userId, collection, payload)
     );
   }
 
-  const legacyPayload = collection === "settings" ? (savedRecords[0] || {}) : savedRecords;
+  const legacyPayload = payload === null ? null : collection === "settings" ? (savedRecords[0] || {}) : savedRecords;
   const legacy = await client.query(
     `INSERT INTO user_finance_data(user_id,collection,payload,updated_at)
      VALUES($1,$2,$3::jsonb,NOW())
@@ -579,9 +579,10 @@ app.post("/data/restore", asyncRoute(async (req, res) => {
     return res.status(400).json({ error: "Backup data-এর format সঠিক নয়।" });
   }
   const supplied = Object.keys(data);
-  if (supplied.length !== financeCollections.size || supplied.some((key) => !financeCollections.has(key))) {
+  if (supplied.length !== financeCollections.size || supplied.some(key => !financeCollections.has(key))) {
     return res.status(400).json({ error: "Backup-এ প্রয়োজনীয় collection তালিকা সঠিক নয়।" });
   }
+
   const entries = [];
   let totalBytes = 0;
   for (const collection of financeCollections) {
@@ -589,7 +590,13 @@ app.post("/data/restore", asyncRoute(async (req, res) => {
       return res.status(400).json({ error: collection + " collection backup-এ নেই।" });
     }
     const payload = data[collection];
-    if (payload !== null && !Array.isArray(payload) && typeof payload !== "object") {
+    if (payload !== null && typeof payload !== "object") {
+      return res.status(400).json({ error: collection + " collection-এর format সঠিক নয়।" });
+    }
+    if (collection === "settings" && payload !== null && Array.isArray(payload)) {
+      return res.status(400).json({ error: "settings collection-এর format সঠিক নয়।" });
+    }
+    if (collection !== "settings" && payload !== null && !Array.isArray(payload)) {
       return res.status(400).json({ error: collection + " collection-এর format সঠিক নয়।" });
     }
     const encoded = JSON.stringify(payload);
@@ -598,21 +605,23 @@ app.post("/data/restore", asyncRoute(async (req, res) => {
       return res.status(413).json({ error: collection + " collection ২ MB সীমা ছাড়িয়েছে।" });
     }
     totalBytes += bytes;
-    entries.push([collection, encoded]);
+    entries.push([collection, payload]);
   }
   if (totalBytes > 8 * 1024 * 1024) {
     return res.status(413).json({ error: "সম্পূর্ণ backup সর্বোচ্চ ৮ MB হতে পারবে।" });
   }
+
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
-    for (const [collection, encoded] of entries) {
+    for (const [collection] of entries) {
       await client.query(
-        `INSERT INTO user_finance_data(user_id, collection, payload, updated_at)
-         VALUES($1,$2,$3::jsonb,NOW())
-         ON CONFLICT(user_id, collection) DO UPDATE SET payload=EXCLUDED.payload, updated_at=NOW()`,
-        [user.id, collection, encoded]
+        "SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",
+        [String(user.id) + ":legacy:" + collection]
       );
+    }
+    for (const [collection, payload] of entries) {
+      await saveLegacyCollectionWithSync(client, user.id, collection, payload);
     }
     await client.query("COMMIT");
     res.set("Cache-Control", "no-store");

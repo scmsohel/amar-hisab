@@ -3621,7 +3621,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
     try {
       final data = await _AuthApi.loadDashboardData();
       final wallets = data['wallets'] is List ? data['wallets'] as List : <dynamic>[];
-      final transactions = data['transactions'] is List ? data['transactions'] as List : <dynamic>[];
+      final remoteTransactions = data['transactions'] is List ? data['transactions'] as List : <dynamic>[];
+      await _AuthApi.cacheTransactions(remoteTransactions);
+      final transactions = await _AuthApi.localTransactions();
       final debts = data['debts'] is List ? data['debts'] as List : <dynamic>[];
       final bills = data['bills'] is List ? data['bills'] as List : <dynamic>[];
       final goals = data['goals'] is List ? data['goals'] as List : <dynamic>[];
@@ -5056,7 +5058,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           final nextTransactions = tx == null
                               ? [item, ..._transactions]
                               : _transactions.map((old) => old['id'].toString() == tx['id'].toString() ? item : old).toList();
-                          await _AuthApi._put('/data/transactions', {'data': nextTransactions});
+                          await _AuthApi.saveTransactionOffline(item);
                           if (!mounted || !sheetContext.mounted) return;
                           Navigator.pop(sheetContext); await _load();
                           if (mounted) ScaffoldMessenger.of(this.context).showSnackBar(SnackBar(content: Text(tx == null ? 'নতুন লেনদেন যোগ হয়েছে।' : 'লেনদেন আপডেট হয়েছে।')));
@@ -5096,7 +5098,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     if (ok != true || !mounted) return;
     try {
       final next = _transactions.where((item) => item['id'].toString() != tx['id'].toString()).toList();
-      await _AuthApi._put('/data/transactions', {'data': next});
+      await _AuthApi.deleteTransactionOffline(tx);
       await _load();
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('লেনদেন ডিলিট হয়েছে।')));
     } catch (e) {

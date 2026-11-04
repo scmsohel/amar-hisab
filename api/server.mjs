@@ -119,24 +119,30 @@ async function init() {
   `);
   await migrateLegacyFinanceRecords();
 async function migrateLegacyFinanceRecords() {
-  const collections = ["transactions", "debts", "bills", "goals", "wallets", "settings", "categories"];
   const legacy = await pool.query(
     "SELECT user_id, collection, payload FROM user_finance_data ORDER BY user_id, collection"
   );
   for (const row of legacy.rows) {
-    const existing = await pool.query(
-      "SELECT 1 FROM user_finance_records WHERE user_id=$1 AND collection=$2 LIMIT 1",
-      [row.user_id, row.collection]
-    );
-    if (existing.rowCount) continue;
-    const source = row.payload;
-    const records = row.collection === "settings"
-      ? (source && typeof source === "object" && !Array.isArray(source) ? [{ ...source }] : [])
-      : (Array.isArray(source) ? source.filter(item => item && typeof item === "object" && !Array.isArray(item)) : []);
-    if (!records.length) continue;
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
+      await client.query(
+        "SELECT pg_advisory_xact_lock(hashtextextended($1, 0))",
+        [String(row.user_id) + ":legacy:" + row.collection]
+      );
+      const existing = await client.query(
+        "SELECT 1 FROM user_finance_records WHERE user_id=$1 AND collection=$2 LIMIT 1",
+        [row.user_id, row.collection]
+      );
+      if (existing.rowCount) {
+        await client.query("COMMIT");
+        continue;
+      }
+
+      const source = row.payload;
+      const records = row.collection === "settings"
+        ? (source && typeof source === "object" && !Array.isArray(source) ? [{ ...source }] : [])
+        : (Array.isArray(source) ? source.filter(item => item && typeof item === "object" && !Array.isArray(item)) : []);
       for (const sourceRecord of records) {
         const record = { ...sourceRecord };
         const recordId = typeof record._syncId === "string" && record._syncId
@@ -144,12 +150,14 @@ async function migrateLegacyFinanceRecords() {
           : randomUUID();
         record._syncId = recordId;
         const legacyId = record.id === undefined || record.id === null ? null : String(record.id);
-        await client.query(
+        const inserted = await client.query(
           `INSERT INTO user_finance_records(user_id,collection,record_id,legacy_id,payload,version)
            VALUES($1,$2,$3,$4,$5::jsonb,1)
-           ON CONFLICT(user_id,collection,record_id) DO NOTHING`,
+           ON CONFLICT(user_id,collection,record_id) DO NOTHING
+           RETURNING record_id`,
           [row.user_id, row.collection, recordId, legacyId, JSON.stringify(record)]
         );
+        if (!inserted.rowCount) continue;
         await client.query(
           `INSERT INTO user_sync_events(user_id,collection,record_id,version,operation,payload)
            VALUES($1,$2,$3,1,'upsert',$4::jsonb)`,

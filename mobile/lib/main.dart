@@ -3617,6 +3617,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   Future<void> _load() async {
     setState(() { _loading = true; _error = null; });
     try {
+      // A manual refresh or app resume must flush the durable outbox first.
+      await _AuthApi.trySyncPending();
       final data = await _AuthApi.loadDashboardData();
       final wallets = data['wallets'] is List ? data['wallets'] as List : <dynamic>[];
       final remoteTransactions = data['transactions'] is List ? data['transactions'] as List : <dynamic>[];
@@ -3688,8 +3690,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
     } catch (error) {
       final cachedTransactions = await _AuthApi.localTransactions();
       if (!mounted) return;
+      // Reconcile the local transaction delta against the currently displayed
+      // totals so offline add/edit/delete updates the dashboard immediately.
+      final oldById = {for (final item in _transactions) (item['_syncId'] ?? item['id']).toString(): item};
+      final newById = {for (final item in cachedTransactions) (item['_syncId'] ?? item['id']).toString(): item};
+      double signedAmount(Map<String, dynamic>? item) {
+        if (item == null) return 0;
+        final amount = _amount(item['amount']);
+        if (item['kind'] == 'আয়') return amount;
+        if (item['kind'] == 'ব্যয়') return -amount;
+        return 0;
+      }
+      final changedIds = <String>{...oldById.keys, ...newById.keys};
+      var balanceDelta = 0.0;
+      final walletDelta = <String, double>{};
+      for (final id in changedIds) {
+        final before = oldById[id];
+        final after = newById[id];
+        balanceDelta += signedAmount(after) - signedAmount(before);
+        final beforeWallet = (before?['wallet'] ?? before?['walletName'] ?? before?['wallet_name'] ?? '').toString();
+        final afterWallet = (after?['wallet'] ?? after?['walletName'] ?? after?['wallet_name'] ?? '').toString();
+        if (before != null && beforeWallet.isNotEmpty) {
+          walletDelta[beforeWallet] = (walletDelta[beforeWallet] ?? 0) - signedAmount(before);
+        }
+        if (after != null && afterWallet.isNotEmpty) {
+          walletDelta[afterWallet] = (walletDelta[afterWallet] ?? 0) + signedAmount(after);
+        }
+      }
       setState(() {
-        if (cachedTransactions.isNotEmpty) {
+        if (cachedTransactions.isNotEmpty || _transactions.isNotEmpty) {
+          _balance += balanceDelta;
+          for (final entry in walletDelta.entries) {
+            if (_walletBalances.containsKey(entry.key)) {
+              _walletBalances[entry.key] = _walletBalances[entry.key]! + entry.value;
+            }
+          }
           _transactions = cachedTransactions;
           _error = null;
         } else {

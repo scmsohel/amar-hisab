@@ -6037,7 +6037,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                                               title: const Text('Sync Status'),
                                               content: ValueListenableBuilder<String>(
                                                 valueListenable: _AuthApi.syncStatus,
-                                                builder: (_, value, __) => Text(value),
+                                                builder: (_, value, _) => Text(value),
                                               ),
                                               actions: [
                                                 TextButton(

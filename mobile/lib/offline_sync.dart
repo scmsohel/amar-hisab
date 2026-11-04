@@ -67,6 +67,30 @@ class OfflineSyncStore {
     return rows.map((row) => jsonDecode(row['data']! as String) as Map<String, dynamic>).toList();
   }
 
+
+  Future<void> cacheRemoteRecords(String collection, List<dynamic> items) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      for (final raw in items) {
+        if (raw is! Map) continue;
+        final data = Map<String, dynamic>.from(raw);
+        final id = (data['_syncId'] ?? data['id'] ?? '').toString();
+        if (id.isEmpty) continue;
+        data['_syncId'] = id;
+        final existing = await txn.query('local_records',
+          where: 'collection = ? AND record_id = ?', whereArgs: [collection, id], limit: 1);
+        if (existing.isNotEmpty &&
+            (existing.first['is_dirty'] == 1 || existing.first['has_conflict'] == 1)) continue;
+        await txn.insert('local_records', {
+          'collection': collection, 'record_id': id, 'data': jsonEncode(data),
+          'version': existing.isEmpty ? 0 : existing.first['version'],
+          'is_deleted': 0, 'is_dirty': 0, 'has_conflict': 0,
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        }, conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+    });
+  }
+
   Future<void> save(String collection, Map<String, dynamic> input) async {
     final db = await database;
     await db.transaction((txn) async {

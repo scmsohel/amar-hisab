@@ -1,6 +1,6 @@
 import express from "express";
 import pg from "pg";
-import { randomBytes, scrypt as scryptCallback, timingSafeEqual, createHmac } from "node:crypto";
+import { randomBytes, randomUUID, scrypt as scryptCallback, timingSafeEqual, createHmac } from "node:crypto";
 import { promisify } from "node:util";
 
 const scrypt = promisify(scryptCallback);
@@ -84,7 +84,88 @@ async function init() {
       expires_at TIMESTAMPTZ NOT NULL,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+    CREATE TABLE IF NOT EXISTS user_finance_records (
+      user_id BIGINT NOT NULL REFERENCES app_users(id) ON DELETE CASCADE,
+      collection TEXT NOT NULL CHECK (collection IN ('transactions','debts','bills','goals','wallets','settings','categories')),
+      record_id TEXT NOT NULL,
+      legacy_id TEXT,
+      payload JSONB,
+      version BIGINT NOT NULL DEFAULT 1,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      deleted_at TIMESTAMPTZ,
+      PRIMARY KEY (user_id, collection, record_id)
+    );
+    CREATE INDEX IF NOT EXISTS user_finance_records_updated_idx
+      ON user_finance_records(user_id, updated_at);
+    CREATE TABLE IF NOT EXISTS user_sync_events (
+      event_id BIGSERIAL PRIMARY KEY,
+      user_id BIGINT NOT NULL REFERENCES app_users(id) ON DELETE CASCADE,
+      collection TEXT NOT NULL,
+      record_id TEXT NOT NULL,
+      version BIGINT NOT NULL,
+      operation TEXT NOT NULL CHECK (operation IN ('upsert','delete')),
+      payload JSONB,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS user_sync_events_user_cursor_idx
+      ON user_sync_events(user_id, event_id);
+    CREATE TABLE IF NOT EXISTS user_sync_operations (
+      user_id BIGINT NOT NULL REFERENCES app_users(id) ON DELETE CASCADE,
+      operation_id TEXT NOT NULL,
+      result JSONB NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (user_id, operation_id)
+    );
   `);
+  await migrateLegacyFinanceRecords();
+async function migrateLegacyFinanceRecords() {
+  const collections = ["transactions", "debts", "bills", "goals", "wallets", "settings", "categories"];
+  const legacy = await pool.query(
+    "SELECT user_id, collection, payload FROM user_finance_data ORDER BY user_id, collection"
+  );
+  for (const row of legacy.rows) {
+    const existing = await pool.query(
+      "SELECT 1 FROM user_finance_records WHERE user_id=$1 AND collection=$2 LIMIT 1",
+      [row.user_id, row.collection]
+    );
+    if (existing.rowCount) continue;
+    const source = row.payload;
+    const records = row.collection === "settings"
+      ? (source && typeof source === "object" && !Array.isArray(source) ? [{ ...source }] : [])
+      : (Array.isArray(source) ? source.filter(item => item && typeof item === "object" && !Array.isArray(item)) : []);
+    if (!records.length) continue;
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      for (const sourceRecord of records) {
+        const record = { ...sourceRecord };
+        const recordId = typeof record._syncId === "string" && record._syncId
+          ? record._syncId
+          : randomUUID();
+        record._syncId = recordId;
+        const legacyId = record.id === undefined || record.id === null ? null : String(record.id);
+        await client.query(
+          `INSERT INTO user_finance_records(user_id,collection,record_id,legacy_id,payload,version)
+           VALUES($1,$2,$3,$4,$5::jsonb,1)
+           ON CONFLICT(user_id,collection,record_id) DO NOTHING`,
+          [row.user_id, row.collection, recordId, legacyId, JSON.stringify(record)]
+        );
+        await client.query(
+          `INSERT INTO user_sync_events(user_id,collection,record_id,version,operation,payload)
+           VALUES($1,$2,$3,1,'upsert',$4::jsonb)`,
+          [row.user_id, row.collection, recordId, JSON.stringify(record)]
+        );
+      }
+      await client.query("COMMIT");
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  }
+}
+
   if (adminEmail && adminPassword) {
     const existing = await pool.query("SELECT id FROM app_users WHERE email=$1", [adminEmail]);
     if (!existing.rowCount) {
@@ -187,6 +268,153 @@ async function requireUser(req, res) {
   }
   return result.rows[0];
 }
+app.get("/sync/pull", asyncRoute(async (req, res) => {
+  const user = await requireUser(req, res);
+  if (!user) return;
+  const rawCursor = req.query.cursor ?? "0";
+  const cursor = Number(rawCursor);
+  if (!Number.isSafeInteger(cursor) || cursor < 0) {
+    return res.status(400).json({ error: "Sync cursor সঠিক নয়।" });
+  }
+  const limit = Math.min(1000, Math.max(1, Number(req.query.limit) || 500));
+  const result = await pool.query(
+    `SELECT event_id, collection, record_id, version, operation, payload, created_at
+     FROM user_sync_events
+     WHERE user_id=$1 AND event_id>$2
+     ORDER BY event_id ASC
+     LIMIT $3`,
+    [user.id, cursor, limit]
+  );
+  const events = result.rows.map(row => ({
+    eventId: Number(row.event_id),
+    collection: row.collection,
+    recordId: row.record_id,
+    version: Number(row.version),
+    operation: row.operation,
+    data: row.payload,
+    createdAt: row.created_at
+  }));
+  const nextCursor = events.length ? events[events.length - 1].eventId : cursor;
+  res.set("Cache-Control", "no-store");
+  res.json({ events, nextCursor, hasMore: events.length === limit });
+}));
+
+app.post("/sync/push", asyncRoute(async (req, res) => {
+  const user = await requireUser(req, res);
+  if (!user) return;
+  const operations = req.body?.operations;
+  if (!Array.isArray(operations) || operations.length < 1 || operations.length > 200) {
+    return res.status(400).json({ error: "একবারে ১ থেকে ২০০টি Sync operation পাঠাতে হবে।" });
+  }
+  const allowedTypes = new Set(["upsert", "delete"]);
+  const prepared = [];
+  for (const operation of operations) {
+    const operationId = String(operation?.operationId || "");
+    const collection = String(operation?.collection || "");
+    const recordId = String(operation?.recordId || "");
+    const type = String(operation?.type || "");
+    const baseVersion = operation?.baseVersion;
+    if (!/^[A-Za-z0-9._:-]{8,128}$/.test(operationId) ||
+        !financeCollections.has(collection) ||
+        !/^[A-Za-z0-9._:-]{1,128}$/.test(recordId) ||
+        !allowedTypes.has(type) ||
+        !Number.isSafeInteger(baseVersion) || baseVersion < 0) {
+      return res.status(400).json({ error: "Sync operation-এর তথ্য সঠিক নয়।" });
+    }
+    let data = null;
+    if (type === "upsert") {
+      if (!operation.data || typeof operation.data !== "object" || Array.isArray(operation.data)) {
+        return res.status(400).json({ error: "Upsert operation-এর data সঠিক নয়।" });
+      }
+      data = { ...operation.data, _syncId: recordId };
+      const encoded = JSON.stringify(data);
+      if (!encoded || Buffer.byteLength(encoded, "utf8") > 1024 * 1024) {
+        return res.status(413).json({ error: "একটি Sync record সর্বোচ্চ ১ MB হতে পারবে।" });
+      }
+    }
+    prepared.push({ operationId, collection, recordId, type, baseVersion, data });
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const results = [];
+    for (const operation of prepared) {
+      const replay = await client.query(
+        "SELECT result FROM user_sync_operations WHERE user_id=$1 AND operation_id=$2",
+        [user.id, operation.operationId]
+      );
+      if (replay.rowCount) {
+        results.push(replay.rows[0].result);
+        continue;
+      }
+      const current = await client.query(
+        `SELECT version,payload,deleted_at FROM user_finance_records
+         WHERE user_id=$1 AND collection=$2 AND record_id=$3 FOR UPDATE`,
+        [user.id, operation.collection, operation.recordId]
+      );
+      const currentVersion = current.rowCount ? Number(current.rows[0].version) : 0;
+      if (currentVersion !== operation.baseVersion) {
+        const conflict = {
+          operationId: operation.operationId,
+          status: "conflict",
+          currentVersion,
+          currentData: current.rowCount && !current.rows[0].deleted_at ? current.rows[0].payload : null,
+          deleted: current.rowCount ? Boolean(current.rows[0].deleted_at) : false
+        };
+        await client.query(
+          "INSERT INTO user_sync_operations(user_id,operation_id,result) VALUES($1,$2,$3::jsonb)",
+          [user.id, operation.operationId, JSON.stringify(conflict)]
+        );
+        results.push(conflict);
+        continue;
+      }
+      const nextVersion = currentVersion + 1;
+      const payload = operation.type === "upsert" ? JSON.stringify(operation.data) : null;
+      const saved = await client.query(
+        `INSERT INTO user_finance_records(user_id,collection,record_id,legacy_id,payload,version,updated_at,deleted_at)
+         VALUES($1,$2,$3,$4,$5::jsonb,$6,NOW(),CASE WHEN $7='delete' THEN NOW() ELSE NULL END)
+         ON CONFLICT(user_id,collection,record_id) DO UPDATE SET
+           legacy_id=COALESCE(EXCLUDED.legacy_id,user_finance_records.legacy_id),
+           payload=EXCLUDED.payload,
+           version=EXCLUDED.version,
+           updated_at=NOW(),
+           deleted_at=EXCLUDED.deleted_at
+         RETURNING version`,
+        [
+          user.id, operation.collection, operation.recordId,
+          operation.data?.id === undefined || operation.data?.id === null ? null : String(operation.data.id),
+          payload, nextVersion, operation.type
+        ]
+      );
+      const event = await client.query(
+        `INSERT INTO user_sync_events(user_id,collection,record_id,version,operation,payload)
+         VALUES($1,$2,$3,$4,$5,$6::jsonb) RETURNING event_id`,
+        [user.id, operation.collection, operation.recordId, nextVersion, operation.type, payload]
+      );
+      const accepted = {
+        operationId: operation.operationId,
+        status: "accepted",
+        version: Number(saved.rows[0].version),
+        eventId: Number(event.rows[0].event_id)
+      };
+      await client.query(
+        "INSERT INTO user_sync_operations(user_id,operation_id,result) VALUES($1,$2,$3::jsonb)",
+        [user.id, operation.operationId, JSON.stringify(accepted)]
+      );
+      results.push(accepted);
+    }
+    await client.query("COMMIT");
+    res.set("Cache-Control", "no-store");
+    res.json({ results });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}));
+
 app.get("/data/:collection", asyncRoute(async (req, res) => {
   const collection = String(req.params.collection || "");
   if (!financeCollections.has(collection)) return res.status(404).json({ error: "এই data collection পাওয়া যায়নি।" });

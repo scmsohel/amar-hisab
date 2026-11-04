@@ -86,8 +86,6 @@ class _AuthApi {
 
   static String? get baseUrl => _baseUrl;
 
-  static String? get syncCookie => _sessionCookie;
-
   static Future<void> cacheTransactions(List<dynamic> items) =>
       OfflineSyncStore.instance.cacheRemoteRecords('transactions', items);
 
@@ -3644,7 +3642,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       var previousMonthIncome = 0.0;
       var previousMonthExpense = 0.0;
       for (final item in transactions) {
-        if (item is! Map) continue;
         final amount = _amount(item['amount']);
         final kind = (item['kind'] ?? '').toString();
         final rawDate = item['dateInput'] ?? item['date_input'] ?? item['date'] ?? item['createdAt'] ?? item['created_at'];
@@ -5103,7 +5100,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     ));
     if (ok != true || !mounted) return;
     try {
-      final next = _transactions.where((item) => item['id'].toString() != tx['id'].toString()).toList();
       await _AuthApi.deleteTransactionOffline(tx);
       await _load();
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('লেনদেন ডিলিট হয়েছে।')));

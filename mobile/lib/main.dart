@@ -2049,7 +2049,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               boxShadow: [BoxShadow(color: const Color(0xFF22B86B).withValues(alpha: .13), blurRadius: 18, spreadRadius: 2)]),
                             child: Container(
                               decoration: BoxDecoration(shape: BoxShape.circle, color: dark ? const Color(0xFF203B50) : const Color(0xFFE8F5EF),
-                                border: Border.all(color: surface, width: 4)),
+                                border: Border.all(color: surface, width: 1)),
                               clipBehavior: Clip.antiAlias,
                               child: photo.isNotEmpty
                                   ? Image.network(

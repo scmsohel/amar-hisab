@@ -1,6 +1,7 @@
 import express from "express";
 import pg from "pg";
-import { randomBytes, randomUUID, scrypt as scryptCallback, timingSafeEqual, createHmac } from "node:crypto";
+import { randomBytes, randomUUID, randomInt, scrypt as scryptCallback, timingSafeEqual, createHmac } from "node:crypto";
+import nodemailer from "nodemailer";
 import { promisify } from "node:util";
 
 const scrypt = promisify(scryptCallback);
@@ -13,6 +14,8 @@ const adminEmail = (process.env.ADMIN_EMAIL || "").trim().toLowerCase();
 const adminPassword = process.env.ADMIN_PASSWORD || "";
 const adminName = process.env.ADMIN_NAME || "Amar Hisab Admin";
 const setupKey = process.env.ADMIN_SETUP_KEY || "";
+const mailer = process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS ? nodemailer.createTransport({host:process.env.SMTP_HOST,port:Number(process.env.SMTP_PORT||587),secure:Number(process.env.SMTP_PORT||587)===465,auth:{user:process.env.SMTP_USER,pass:process.env.SMTP_PASS}}) : null;
+const resetMessage = "অ্যাকাউন্ট থাকলে Email-এ OTP পাঠানো হয়েছে।";
 
 if (!process.env.DATABASE_URL || !sessionSecret || sessionSecret.length < 32) {
   throw new Error("DATABASE_URL and SESSION_SECRET (at least 32 characters) are required");
@@ -27,7 +30,7 @@ app.use(express.json({ limit: "10mb" }));
 const cookieName = "amar_hisab_session";
 const sign = (value) => createHmac("sha256", sessionSecret).update(value).digest("base64url");
 function setSession(res, user) {
-  const payload = Buffer.from(JSON.stringify({ id: user.id, role: user.role, exp: Date.now() + 7 * 86400000 })).toString("base64url");
+  const payload = Buffer.from(JSON.stringify({ id: user.id, role: user.role, tokenVersion: Number(user.token_version || 0), exp: Date.now() + 7 * 86400000 })).toString("base64url");
   const token = payload + "." + sign(payload);
   res.cookie(cookieName, token, { httpOnly: true, secure: cookieSecure, sameSite: "lax", path: "/", maxAge: 7 * 86400000 });
 }
@@ -46,6 +49,9 @@ function readSession(req) {
 }
 const asyncRoute = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 const cleanUser = ({ id, name, email, mobile, role }) => ({ id, name, email, mobile, role });
+async function getSessionUser(req) { const session=readSession(req); if(!session)return null; const result=await pool.query("SELECT id,name,email,mobile,role,token_version FROM app_users WHERE id=$1",[session.id]); const user=result.rows[0]; return user && Number(session.tokenVersion||0)===Number(user.token_version||0) ? user : null; }
+function otpDigest(email,otp){return createHmac("sha256",sessionSecret).update(email.toLowerCase()+":"+otp).digest("hex");}
+function safeDigestEqual(a,b){const x=Buffer.from(String(a||""),"hex"),y=Buffer.from(String(b||""),"hex");return x.length===y.length&&x.length>0&&timingSafeEqual(x,y);}
 async function hashPassword(password) {
   const salt = randomBytes(16).toString("hex");
   const key = await scrypt(password, salt, 64);
@@ -73,6 +79,8 @@ async function init() {
       role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('admin','user')),
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+    ALTER TABLE app_users ADD COLUMN IF NOT EXISTS token_version INTEGER NOT NULL DEFAULT 0;
+    CREATE TABLE IF NOT EXISTS password_reset_otps (user_id BIGINT PRIMARY KEY REFERENCES app_users(id) ON DELETE CASCADE, otp_hash TEXT NOT NULL, expires_at TIMESTAMPTZ NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, last_sent_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
     CREATE TABLE IF NOT EXISTS user_finance_data (
       user_id BIGINT NOT NULL REFERENCES app_users(id) ON DELETE CASCADE,
       collection TEXT NOT NULL CHECK (collection IN ('transactions','debts','bills','goals','wallets','settings','categories')),

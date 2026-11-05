@@ -3942,23 +3942,38 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
   String _recentTransactionsCategory = 'সব';
   Map<String, double> _walletBalances = {'ক্যাশ': 0, 'ব্যাংক': 0, 'বিকাশ': 0, 'নগদ': 0};
   bool _showAddTransactionFab = true;
+  Timer? _autoSyncTimer;
+  bool _refreshing = false;
+
+  void _startAutoSyncTimer() {
+    _autoSyncTimer?.cancel();
+    _autoSyncTimer = Timer.periodic(const Duration(seconds: 15), (_) {
+      if (mounted) unawaited(_load(quiet: true));
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _startAutoSyncTimer();
     _load();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed && mounted) {
+      _startAutoSyncTimer();
       _load();
+    } else if (state == AppLifecycleState.paused || state == AppLifecycleState.inactive || state == AppLifecycleState.detached) {
+      _autoSyncTimer?.cancel();
+      _autoSyncTimer = null;
     }
   }
 
   @override
   void dispose() {
+    _autoSyncTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -3988,8 +4003,10 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
     return DateTime.tryParse('${match.group(3)}-${(month + 1).toString().padLeft(2, '0')}-${match.group(1)!.padLeft(2, '0')}');
   }
 
-  Future<void> _load() async {
-    setState(() { _loading = true; _error = null; });
+  Future<void> _load({bool quiet = false}) async {
+    if (_refreshing) return;
+    _refreshing = true;
+    if (!quiet) setState(() { _loading = true; _error = null; });
     try {
       // A manual refresh or app resume must flush the durable outbox first.
       await _AuthApi.trySyncPending();
@@ -4106,6 +4123,8 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
         }
         _loading = false;
       });
+    } finally {
+      _refreshing = false;
     }
   }
 

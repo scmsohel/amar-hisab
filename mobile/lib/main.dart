@@ -78,38 +78,79 @@ Future<void> _setAppThemeMode(ThemeMode mode) async {
 class _AuthApi {
   static const String _baseUrlPreferenceKey = 'amar_hisab_server_url';
   static const String _sessionCookieKey = 'amar_hisab_session_cookie';
+  static const String _activeUserIdKey = 'amar_hisab_active_user_id';
   static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
   static final HttpClient _client = HttpClient()
     ..connectionTimeout = const Duration(seconds: 12);
   static String? _baseUrl;
   static String? _sessionCookie;
+  static String? _activeUserId;
   static final ValueNotifier<String> syncStatus = ValueNotifier<String>('এখনো Sync হয়নি');
   static final ValueNotifier<int> syncPendingCount = ValueNotifier<int>(0);
 
   static String? get baseUrl => _baseUrl;
+  static String? get activeUserId => _activeUserId;
 
-  static Future<void> cacheTransactions(List<dynamic> items) =>
-      OfflineSyncStore.instance.cacheRemoteRecords('transactions', items);
+  static String _requireActiveUserId() {
+    final id = _activeUserId;
+    if (id == null || id.isEmpty) {
+      throw Exception('বর্তমান অ্যাকাউন্ট যাচাই করা যায়নি। আবার লগইন করুন।');
+    }
+    return id;
+  }
 
-  static Future<List<Map<String, dynamic>>> localTransactions() =>
-      OfflineSyncStore.instance.records('transactions');
+  static Future<void> _setActiveUser(dynamic user) async {
+    if (user is! Map) throw Exception('সার্ভার থেকে অ্যাকাউন্টের তথ্য পাওয়া যায়নি।');
+    final id = (user['id'] ?? '').toString().trim();
+    if (id.isEmpty) throw Exception('অ্যাকাউন্ট ID পাওয়া যায়নি।');
+    _activeUserId = id;
+    await _secureStorage.write(key: _activeUserIdKey, value: id);
+  }
+
+  static Future<void> cacheTransactions(List<dynamic> items) {
+    final accountId = _requireActiveUserId();
+    return OfflineSyncStore.instance.cacheRemoteRecords(accountId, 'transactions', items);
+  }
+
+  static Future<List<Map<String, dynamic>>> localTransactions() {
+    final accountId = _requireActiveUserId();
+    return OfflineSyncStore.instance.records(accountId, 'transactions');
+  }
 
   static Future<void> saveTransactionOffline(Map<String, dynamic> item) async {
-    await OfflineSyncStore.instance.save('transactions', item);
+    final accountId = _requireActiveUserId();
+    await OfflineSyncStore.instance.save(accountId, 'transactions', item);
     await trySyncPending();
   }
 
   static Future<void> deleteTransactionOffline(Map<String, dynamic> item) async {
+    final accountId = _requireActiveUserId();
     final id = (item['_syncId'] ?? item['id'] ?? '').toString();
     if (id.isEmpty) throw Exception('লেনদেনের পরিচয় পাওয়া যায়নি।');
-    await OfflineSyncStore.instance.delete('transactions', id);
+    await OfflineSyncStore.instance.delete(accountId, 'transactions', id);
     await trySyncPending();
   }
 
   static Future<void> trySyncPending() async {
     final cookie = _sessionCookie;
     final base = _baseUrl;
-    syncPendingCount.value = await OfflineSyncStore.instance.pendingCount();
+    var accountId = _activeUserId;
+    if (cookie != null && cookie.isNotEmpty && (accountId == null || accountId.isEmpty)) {
+      try {
+        final me = await _get('/auth/me');
+        await _setActiveUser(me['user']);
+        accountId = _activeUserId;
+      } catch (_) {
+        syncStatus.value = 'Login session যাচাই করা যায়নি';
+        return;
+      }
+    }
+    if (accountId == null || accountId.isEmpty) {
+      syncPendingCount.value = 0;
+      syncStatus.value = 'বর্তমান অ্যাকাউন্ট পাওয়া যায়নি';
+      return;
+    }
+    syncPendingCount.value = await OfflineSyncStore.instance.pendingCount(accountId);
     if (cookie == null || cookie.isEmpty) {
       syncStatus.value = 'Login session পাওয়া যায়নি';
       return;
@@ -118,18 +159,18 @@ class _AuthApi {
       syncStatus.value = 'Server URL সেট করা নেই';
       return;
     }
-    final engine = OfflineSyncEngine(baseUrl: base, sessionCookie: cookie);
+    final engine = OfflineSyncEngine(baseUrl: base, sessionCookie: cookie, accountId: accountId);
     syncStatus.value = 'Sync হচ্ছে...';
     try {
       await engine.syncOnce();
-      syncPendingCount.value = await OfflineSyncStore.instance.pendingCount();
+      syncPendingCount.value = await OfflineSyncStore.instance.pendingCount(accountId);
       if (syncPendingCount.value == 0) {
         syncStatus.value = 'সব তথ্য Server-এ Sync হয়েছে';
       } else {
         syncStatus.value = '${syncPendingCount.value}টি Pending / Conflict আছে';
       }
     } catch (error) {
-      syncPendingCount.value = await OfflineSyncStore.instance.pendingCount();
+      syncPendingCount.value = await OfflineSyncStore.instance.pendingCount(accountId);
       syncStatus.value = 'Sync ব্যর্থ: ${error.toString().replaceFirst('HttpException: ', '').replaceFirst('Exception: ', '')}';
     } finally {
       engine.dispose();
@@ -141,6 +182,7 @@ class _AuthApi {
     final saved = preferences.getString(_baseUrlPreferenceKey);
     _baseUrl = saved == null || saved.trim().isEmpty ? null : _normalizeUrl(saved);
     _sessionCookie = await _secureStorage.read(key: _sessionCookieKey);
+    _activeUserId = await _secureStorage.read(key: _activeUserIdKey);
   }
 
   static String _normalizeUrl(String value) => value.trim().replaceFirst(RegExp(r'/+$'), '');
@@ -192,7 +234,9 @@ class _AuthApi {
     final preferences = await SharedPreferences.getInstance();
     if (_baseUrl != normalized) {
       _sessionCookie = null;
+      _activeUserId = null;
       await _secureStorage.delete(key: _sessionCookieKey);
+      await _secureStorage.delete(key: _activeUserIdKey);
     }
     await preferences.setString(_baseUrlPreferenceKey, normalized);
     _baseUrl = normalized;
@@ -298,7 +342,8 @@ class _AuthApi {
       return false;
     }
     try {
-      await _get('/auth/me');
+      final me = await _get('/auth/me');
+      await _setActiveUser(me['user']);
       return true;
     } catch (_) {
       await clearSession();
@@ -308,12 +353,15 @@ class _AuthApi {
 
   static Future<void> clearSession() async {
     _sessionCookie = null;
+    _activeUserId = null;
     await _secureStorage.delete(key: _sessionCookieKey);
+    await _secureStorage.delete(key: _activeUserIdKey);
   }
 
   static Future<Map<String, dynamic>> loadDashboardData() async {
+    final me = await _get('/auth/me');
+    await _setActiveUser(me['user']);
     final results = await Future.wait([
-      _get('/auth/me'),
       _get('/data/wallets'),
       _get('/data/transactions'),
       _get('/data/debts'),
@@ -321,17 +369,23 @@ class _AuthApi {
       _get('/data/goals'),
     ]);
     return {
-      'user': results[0]['user'], 'wallets': results[1]['data'],
-      'transactions': results[2]['data'], 'debts': results[3]['data'],
-      'bills': results[4]['data'], 'goals': results[5]['data'],
+      'user': me['user'], 'wallets': results[0]['data'],
+      'transactions': results[1]['data'], 'debts': results[2]['data'],
+      'bills': results[3]['data'], 'goals': results[4]['data'],
     };
   }
 
   static Future<Map<String, dynamic>> login({
     required String identity,
     required String password,
-  }) =>
-      _post('/auth/login', {'identity': identity.trim(), 'password': password});
+  }) async {
+    final result = await _post('/auth/login', {
+      'identity': identity.trim(),
+      'password': password,
+    });
+    await _setActiveUser(result['user']);
+    return result;
+  }
 
   static Future<Map<String, dynamic>> verifyInvite(String invite) =>
       _post('/auth/invite/verify', {'invite': invite.trim()});

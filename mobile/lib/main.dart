@@ -1570,10 +1570,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 10),
                   passwordField(
                     controller: next,
-                    label: 'নতুন পাসওয়ার্ড (কমপক্ষে ১২ অক্ষর)',
+                    label: 'নতুন পাসওয়ার্ড (কমপক্ষে ৬ অক্ষর)',
                     hidden: hideNext,
                     toggleVisibility: () => setDialogState(() => hideNext = !hideNext),
-                    validator: (v) => (v ?? '').length < 12 ? 'নতুন পাসওয়ার্ড কমপক্ষে ১২ অক্ষরের হতে হবে।' : null,
+                    validator: (v) => (v ?? '').length < 6 ? 'নতুন পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।' : null,
                   ),
                   const SizedBox(height: 10),
                   passwordField(

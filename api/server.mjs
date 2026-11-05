@@ -259,7 +259,7 @@ app.post("/auth/profile/avatar", asyncRoute(async (req, res, next) => {
   if (!["jpeg", "png", "webp"].includes(metadata.format || "")) return res.status(400).json({ error: "ছবির ফরম্যাট সঠিক নয়।" });
   const filename = String(user.id) + ".webp";
   const destination = path.join(profileUploadDir, filename);
-  const temporary = path.join(profileUploadDir, String(user.id) + "." + randomUUID() + ".tmp");
+  const temporary = path.join(profileUploadDir, String(user.id) + "." + randomUUID() + ".tmp.webp");
   try {
     await sharp(req.file.buffer, { limitInputPixels: 40000000 })
       .rotate()

@@ -85,7 +85,7 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
     FocusScope.of(context).unfocus();
     if (_submitting) return;
     final email = _email.text.trim();
-    if (!RegExp(r'^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$').hasMatch(email)) {
+    if (!RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email)) {
       _notice('সঠিক Email Address দিন।');
       return;
     }
@@ -265,7 +265,7 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
                                 decoration: _decoration('ইমেইল ঠিকানা', Icons.mail_outline_rounded),
                                 validator: (value) {
                                   final email = (value ?? '').trim();
-                                  return RegExp(r'^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$').hasMatch(email)
+                                  return RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(email)
                                       ? null : 'সঠিক Email Address দিন।';
                                 },
                               ),

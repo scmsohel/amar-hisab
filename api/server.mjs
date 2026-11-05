@@ -239,16 +239,23 @@ app.get("/auth/profile/avatar", asyncRoute(async (req, res) => {
   res.set("Cache-Control", "private, max-age=300");
   res.sendFile(imagePath, error => { if (error && !res.headersSent) res.status(404).end(); });
 }));
-app.post("/auth/profile/avatar", (req, res, next) => {
+app.post("/auth/profile/avatar", asyncRoute(async (req, res, next) => {
+  const user = await getSessionUser(req);
+  if (!user) return res.status(401).json({ error: "লগইন প্রয়োজন।" });
+  req.profileAvatarUser = user;
   profileUpload.single("avatar")(req, res, error => {
     if (error) return res.status(error.code === "LIMIT_FILE_SIZE" ? 413 : 400).json({ error: error.code === "LIMIT_FILE_SIZE" ? "ছবির আকার সর্বোচ্চ ৫ MB হতে পারবে।" : "শুধু JPEG, PNG অথবা WebP ছবি আপলোড করুন।" });
     next();
   });
-}, asyncRoute(async (req, res) => {
-  const user = await getSessionUser(req);
-  if (!user) return res.status(401).json({ error: "লগইন প্রয়োজন।" });
+}), asyncRoute(async (req, res) => {
+  const user = req.profileAvatarUser;
   if (!req.file) return res.status(400).json({ error: "একটি ছবি নির্বাচন করুন।" });
-  const metadata = await sharp(req.file.buffer, { limitInputPixels: 40000000 }).metadata();
+  let metadata;
+  try {
+    metadata = await sharp(req.file.buffer, { limitInputPixels: 40000000 }).metadata();
+  } catch {
+    return res.status(400).json({ error: "ছবিটি খোলা যাচ্ছে না। অন্য ছবি নির্বাচন করুন।" });
+  }
   if (!["jpeg", "png", "webp"].includes(metadata.format || "")) return res.status(400).json({ error: "ছবির ফরম্যাট সঠিক নয়।" });
   const filename = String(user.id) + ".webp";
   const destination = path.join(profileUploadDir, filename);

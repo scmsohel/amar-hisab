@@ -1440,9 +1440,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             toolbarColor: const Color(0xFF087A5B),
             toolbarWidgetColor: Colors.white,
             lockAspectRatio: true,
+            cropStyle: CropStyle.circle,
             hideBottomControls: false,
           ),
-          IOSUiSettings(title: 'প্রোফাইল ছবি Crop করুন', aspectRatioLockEnabled: true),
+          IOSUiSettings(
+            title: 'প্রোফাইল ছবি Crop করুন',
+            cropStyle: CropStyle.circle,
+            aspectRatioLockEnabled: true,
+          ),
         ],
       );
       if (cropped == null || !mounted) return;

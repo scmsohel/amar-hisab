@@ -19,7 +19,6 @@ export default function LoginPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [resendSeconds, setResendSeconds] = useState(0);
-  const [resetDone, setResetDone] = useState(false);
 
   useEffect(() => {
     if (resendSeconds <= 0) return;
@@ -58,7 +57,6 @@ export default function LoginPage() {
       setSent(true);
       setOtp("");
       setOtpVerified(false);
-      setResetDone(false);
       setResendSeconds(Number(data.retryAfter || 60));
     } catch (err) {
       setError(err instanceof Error ? err.message : "সার্ভারের সঙ্গে যোগাযোগ করা যায়নি।");
@@ -77,7 +75,6 @@ export default function LoginPage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Password পরিবর্তন করা যায়নি।");
       setOtpVerified(true);
-      setResetDone(true);
       setError("");
     } catch (err) {
       setError(err instanceof Error ? err.message : "সার্ভারের সঙ্গে যোগাযোগ করা যায়নি।");

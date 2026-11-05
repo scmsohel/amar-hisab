@@ -289,7 +289,7 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
                                   obscureText: !_showPassword,
                                   style: const TextStyle(color: _ink, fontSize: 14, fontWeight: FontWeight.w600),
                                   decoration: _decoration(
-                                    'নতুন Password (কমপক্ষে ১২ অক্ষর)',
+                                    'নতুন Password (কমপক্ষে ৬ অক্ষর)',
                                     Icons.lock_outline_rounded,
                                     suffix: IconButton(
                                       onPressed: () => setState(() => _showPassword = !_showPassword),
@@ -297,8 +297,8 @@ class _PasswordResetScreenState extends State<PasswordResetScreen> {
                                           color: _hint),
                                     ),
                                   ),
-                                  validator: (value) => (value == null || value.length < 12)
-                                      ? 'Password কমপক্ষে ১২ অক্ষরের হতে হবে।' : null,
+                                  validator: (value) => (value == null || value.length < 6)
+                                      ? 'Password কমপক্ষে ৬ অক্ষরের হতে হবে।' : null,
                                 ),
                                 const SizedBox(height: 13),
                                 TextFormField(

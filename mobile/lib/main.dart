@@ -187,6 +187,8 @@ class _AuthApi {
     syncStatus.value = 'Sync হচ্ছে...';
     try {
       await engine.syncOnce();
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setString('amar_hisab_last_successful_sync', DateTime.now().toIso8601String());
       syncPendingCount.value = await OfflineSyncStore.instance.pendingCount(accountId);
       if (syncPendingCount.value == 0) {
         syncStatus.value = 'সব তথ্য Server-এ Sync হয়েছে';
@@ -1229,8 +1231,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic> _user = {};
   DateTime? _joinedAt;
   DateTime? _lastSyncAt;
-  int _pendingCount = 0;
-  String _syncLabel = 'Sync Status';
 
   @override
   void initState() {
@@ -1243,12 +1243,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final prefs = await SharedPreferences.getInstance();
     final saved = prefs.getString('amar_hisab_last_successful_sync');
     final lastSync = saved == null ? null : DateTime.tryParse(saved);
-    final pending = await OfflineSyncStore.instance.pendingCount(_AuthApi.activeAccountId);
     if (!mounted) return;
     setState(() {
       _lastSyncAt = lastSync;
-      _pendingCount = pending;
-      _syncLabel = pending > 0 ? '$_pendingCount Pending' : 'সব ডেটা';
     });
   }
 

@@ -1229,11 +1229,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic> _user = {};
   DateTime? _joinedAt;
   DateTime? _lastSyncAt;
+  int _pendingCount = 0;
+  String _syncLabel = 'Sync Status';
 
   @override
   void initState() {
     super.initState();
+    _refreshLocalSyncInfo();
     _loadProfile();
+  }
+
+  Future<void> _refreshLocalSyncInfo() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getString('amar_hisab_last_successful_sync');
+    final lastSync = saved == null ? null : DateTime.tryParse(saved);
+    final pending = await OfflineSyncStore.instance.pendingCount(_AuthApi.activeAccountId);
+    if (!mounted) return;
+    setState(() {
+      _lastSyncAt = lastSync;
+      _pendingCount = pending;
+      _syncLabel = pending > 0 ? '$_pendingCount Pending' : 'সব ডেটা';
+    });
   }
 
   Future<void> _loadProfile() async {
@@ -1253,6 +1269,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _lastSyncAt = synced == null ? null : DateTime.tryParse(synced.toString());
         _loading = false;
       });
+    } on SocketException {
+      if (!mounted) return;
+      setState(() { _error = null; _loading = false; });
+      _AuthApi.syncStatus.value = 'Offline · Server unavailable';
     } catch (e) {
       if (!mounted) return;
       setState(() { _error = e.toString().replaceFirst('Exception: ', ''); _loading = false; });
@@ -1878,7 +1898,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             _infoDivider(dark),
                             Expanded(child: _info(Icons.cloud_done_rounded, 'সর্বশেষ Sync', _lastSync, dark)),
                             _infoDivider(dark),
-                            Expanded(child: _info(Icons.check_circle_rounded, 'সব ডেটা', _loading ? 'যাচাই হচ্ছে' : 'Sync Status', dark)),
+                            Expanded(child: ValueListenableBuilder<int>(
+                              valueListenable: _AuthApi.syncPendingCount,
+                              builder: (context, pending, _) => _info(
+                                pending > 0 ? Icons.cloud_upload_rounded : Icons.check_circle_rounded,
+                                'Sync Status',
+                                _loading ? 'যাচাই হচ্ছে' : pending > 0 ? '$pending Pending' : _AuthApi.syncStatus.value == 'Offline · Server unavailable' ? 'Offline' : 'সব ডেটা',
+                                dark,
+                              ),
+                            )),
                           ]),
                         ),
                         if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 12))),

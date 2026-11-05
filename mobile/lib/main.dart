@@ -196,8 +196,9 @@ class _AuthApi {
         syncStatus.value = '${syncPendingCount.value}টি Pending / Conflict আছে';
       }
     } catch (error) {
+      debugPrint('Offline sync failed: $error');
       syncPendingCount.value = await OfflineSyncStore.instance.pendingCount(accountId);
-      syncStatus.value = 'Sync ব্যর্থ: ${error.toString().replaceFirst('HttpException: ', '').replaceFirst('Exception: ', '')}';
+      syncStatus.value = 'Sync ব্যর্থ';
     } finally {
       engine.dispose();
     }
@@ -2000,7 +2001,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   : offline
                       ? 'ইন্টারনেট সংযোগ ফিরে এলে আবার Sync করতে পারবেন।'
                       : failed
-                          ? status
+                          ? 'সার্ভারের সাথে সংযোগ করা যাচ্ছে না। আপনার ইন্টারনেট সংযোগ পরীক্ষা করে আবার চেষ্টা করুন।'
                           : pending > 0
                               ? 'ইন্টারনেট সংযোগ পেলে বাকি তথ্যগুলো Server-এ Sync করুন।'
                               : 'আপনার সব তথ্য সফলভাবে Server-এ সংরক্ষিত আছে।';

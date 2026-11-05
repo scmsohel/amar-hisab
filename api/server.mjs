@@ -203,7 +203,7 @@ app.post("/auth/password/reset", allowOtpRequest, asyncRoute(async (req, res) =>
   const email = String(req.body?.email || "").trim().toLowerCase();
   const otp = String(req.body?.otp || "").trim();
   const newPassword = String(req.body?.newPassword || "");
-  if (!validEmail(email) || !/^\\d{6}$/.test(otp)) {
+  if (!validEmail(email) || !/^\d{6}$/.test(otp)) {
     return res.status(400).json({ error: "Email এবং ৬ সংখ্যার OTP সঠিকভাবে দিন।" });
   }
   if (newPassword.length < 12 || newPassword.length > 128) {

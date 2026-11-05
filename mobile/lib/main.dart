@@ -4529,7 +4529,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                             ),
                             const Spacer(),
                             Transform.translate(
-                              offset: const Offset(0, -3),
+                              offset: const Offset(0, -5),
                               child: Stack(
                                 clipBehavior: Clip.none,
                                 children: [

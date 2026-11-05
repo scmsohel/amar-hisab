@@ -4106,6 +4106,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
   bool _showAddTransactionFab = true;
   Timer? _autoSyncTimer;
   bool _refreshing = false;
+  String _dashboardAvatarUrl = '';
 
   void _startAutoSyncTimer() {
     _autoSyncTimer?.cancel();
@@ -4120,6 +4121,21 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
     WidgetsBinding.instance.addObserver(this);
     _startAutoSyncTimer();
     _load();
+    _loadDashboardAvatar();
+  }
+
+  Future<void> _loadDashboardAvatar() async {
+    try {
+      final response = await _AuthApi._get('/auth/me');
+      final user = response['user'];
+      if (!mounted) return;
+      final avatar = user is Map
+          ? (user['avatarUrl'] ?? user['avatar_url'] ?? user['photoUrl'] ?? user['photo_url'] ?? '').toString()
+          : '';
+      setState(() => _dashboardAvatarUrl = avatar);
+    } catch (_) {
+      // Keep the default dashboard avatar when profile data is unavailable.
+    }
   }
 
   @override
@@ -4540,7 +4556,10 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                               offset: const Offset(0, -5),
                               child: InkWell(
                                 customBorder: const CircleBorder(),
-                                onTap: () => Navigator.of(context).push(_route(const ProfileScreen())),
+                                onTap: () async {
+                                  await Navigator.of(context).push(_route(const ProfileScreen()));
+                                  if (mounted) await _loadDashboardAvatar();
+                                },
                                 child: Container(
                                 width: 38,
                                 height: 38,
@@ -4556,7 +4575,19 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                                     BoxShadow(color: const Color(0xFF4ABEFF).withValues(alpha: .14), blurRadius: 8),
                                   ],
                                 ),
-                                child: const Icon(Icons.person_rounded, color: Colors.white, size: 26),
+                                child: ClipOval(
+                                  child: _dashboardAvatarUrl.isNotEmpty
+                                      ? Image.network(
+                                          _AuthApi.resolveApiUrl(_dashboardAvatarUrl),
+                                          key: ValueKey(_dashboardAvatarUrl),
+                                          headers: _AuthApi.avatarHeaders,
+                                          width: 38,
+                                          height: 38,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.person_rounded, color: Colors.white, size: 26),
+                                        )
+                                      : const Icon(Icons.person_rounded, color: Colors.white, size: 26),
+                                ),
                                 ),
                               ),
                             ),

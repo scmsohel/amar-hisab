@@ -66,7 +66,7 @@ export default function LoginPage() {
   const submitOtp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
-    if (!/^\\d{6}$/.test(otp.trim())) return setError("৬ সংখ্যার OTP লিখুন।");
+    if (!/^\d{6}$/.test(otp.trim())) return setError("৬ সংখ্যার OTP লিখুন।");
     if (newPassword.length < 12) return setError("নতুন Password কমপক্ষে ১২ অক্ষরের হতে হবে।");
     if (newPassword !== confirmPassword) return setError("দুটি Password মিলছে না।");
     setBusy(true);
@@ -141,7 +141,7 @@ export default function LoginPage() {
                   <p><strong>{identity}</strong>-এ OTP পাঠানো হয়েছে। Email-এর ৬ সংখ্যার OTP দিয়ে নতুন Password সেট করুন।</p>
                   <form className="login-fields login-otp-form" onSubmit={submitOtp}>
                     <label className="signup-field">৬ সংখ্যার OTP
-                      <span className="signup-input"><LockKeyhole size={18}/><input inputMode="numeric" autoComplete="one-time-code" aria-label="৬ সংখ্যার OTP" value={otp} onChange={e=>setOtp(e.target.value.replace(/\\D/g,"").slice(0,6))} placeholder="123456" maxLength={6}/></span>
+                      <span className="signup-input"><LockKeyhole size={18}/><input inputMode="numeric" autoComplete="one-time-code" aria-label="৬ সংখ্যার OTP" value={otp} onChange={e=>setOtp(e.target.value.replace(/\D/g,"").slice(0,6))} placeholder="123456" maxLength={6}/></span>
                     </label>
                     <label className="signup-field">নতুন Password
                       <span className="signup-input"><LockKeyhole size={18}/><input autoComplete="new-password" aria-label="নতুন Password" type="password" value={newPassword} onChange={e=>setNewPassword(e.target.value)} placeholder="কমপক্ষে ১২ অক্ষর"/></span>

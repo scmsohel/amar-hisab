@@ -239,7 +239,7 @@ app.post("/auth/password", asyncRoute(async (req, res) => {
   if (!session) return res.status(401).json({ error: "লগইন প্রয়োজন।" });
   const currentPassword = String(req.body?.currentPassword || "");
   const newPassword = String(req.body?.newPassword || "");
-  if (newPassword.length < 12) return res.status(400).json({ error: "নতুন পাসওয়ার্ড কমপক্ষে ১২ অক্ষরের হতে হবে।" });
+  if (newPassword.length < 6) return res.status(400).json({ error: "নতুন পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।" });
   const found = await pool.query("SELECT password_hash FROM app_users WHERE id=$1", [session.id]);
   if (!found.rowCount || !(await verifyPassword(currentPassword, found.rows[0].password_hash))) {
     return res.status(400).json({ error: "বর্তমান পাসওয়ার্ড সঠিক নয়।" });
@@ -363,7 +363,7 @@ app.post("/auth/password/reset", asyncRoute(async (req, res) => {
   const otp = String(req.body?.otp || "").trim();
   const newPassword = String(req.body?.newPassword || "");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^\d{6}$/.test(otp)) return res.status(400).json({ error: "Email এবং ৬ সংখ্যার OTP সঠিকভাবে দিন।" });
-  if (newPassword.length < 12) return res.status(400).json({ error: "নতুন Password কমপক্ষে ১২ অক্ষরের হতে হবে।" });
+  if (newPassword.length < 6) return res.status(400).json({ error: "নতুন Password কমপক্ষে ৬ অক্ষরের হতে হবে।" });
   const client = await pool.connect();
   try {
     await client.query("BEGIN");

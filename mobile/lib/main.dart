@@ -4809,20 +4809,17 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
         : isTransfer
             ? const Color(0xFFEAF4FF)
             : const Color(0xFFFFF7F8);
-    final cardDarkBase = isIncome
-        ? const Color(0xFF142F27)
-        : isTransfer
-            ? const Color(0xFF142B40)
-            : const Color(0xFF351F28);
     final prefix = isIncome ? '+' : isTransfer ? '↔' : '−';
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.fromLTRB(8, 3, 2, 3),
       decoration: BoxDecoration(
-        color: isDark ? cardDarkBase : cardTint,
+        color: isDark ? const Color(0xFF0B2030) : cardTint,
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: style.accent.withValues(alpha: isDark ? .24 : .05)),
-
+        border: Border.all(
+          color: style.accent.withValues(alpha: isDark ? .78 : .05),
+          width: isDark ? 1.1 : 1,
+        ),
       ),
       child: InkWell(
         onTap: () => _showTransactionDetails(tx),

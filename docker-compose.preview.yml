@@ -37,6 +37,8 @@ services:
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASS: ${SMTP_PASS:-}
       SMTP_FROM: ${SMTP_FROM:-Amar Hisab <noreply@schome.my.id>}
+    volumes:
+      - amar_hisab_profile_uploads:/app/uploads/profile
     depends_on:
       db:
         condition: service_healthy
@@ -75,3 +77,5 @@ networks:
 volumes:
   amar_hisab_pgdata:
     name: amar-hisab-pgdata
+  amar_hisab_profile_uploads:
+    name: amar-hisab-profile-uploads

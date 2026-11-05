@@ -186,7 +186,7 @@ app.post("/auth/password/forgot", allowOtpRequest, asyncRoute(async (req, res) =
       from: smtpFrom,
       to: email,
       subject: "Amar Hisab — Password Reset Code",
-      text: "আপনার Amar Hisab Password Reset Code: " + otp + "\\nএই কোড ৫ মিনিটের মধ্যে ব্যবহার করুন। আপনি অনুরোধ না করলে এই Email উপেক্ষা করুন।",
+      text: "আপনার Amar Hisab Password Reset Code: " + otp + "\nএই কোড ৫ মিনিটের মধ্যে ব্যবহার করুন। আপনি অনুরোধ না করলে এই Email উপেক্ষা করুন।",
       html: `<!doctype html><html><body style="margin:0;background:#f1f8f4;padding:32px 12px;font-family:Arial,sans-serif;color:#173b35"><div style="max-width:480px;margin:auto;background:#fff;border:1px solid #dceee4;border-radius:18px;padding:28px"><h2 style="margin:0 0 12px;color:#087a5b">Amar Hisab</h2><p>হ্যালো ${escapeHtml(user.name)},</p><p>আপনার Password Reset Code:</p><div style="margin:22px 0;padding:18px;background:#f2faf5;border-radius:12px;text-align:center;font-size:30px;font-weight:700;letter-spacing:8px;color:#087a5b">${otp}</div><p>এই কোড ৫ মিনিটের মধ্যে ব্যবহার করুন। আপনি অনুরোধ না করলে এই Email উপেক্ষা করুন।</p><p style="font-size:12px;color:#71847c">নিরাপত্তার জন্য এই কোড কারও সঙ্গে শেয়ার করবেন না।</p></div></body></html>`,
     });
   } catch (error) {

@@ -79,6 +79,7 @@ int? _transactionTimeMinutes(dynamic value) {
   return hour * 60 + minute;
 }
 
+const _blue = Color(0xFF287FCB);
 const _deepBlue = Color(0xFF1C5F9D);
 const _ink = Color(0xFF174A72);
 const _muted = Color(0xFF687C78);
@@ -4422,8 +4423,8 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
       if (bDate == null) return -1;
       final byDate = bDate.compareTo(aDate);
       if (byDate != 0) return byDate;
-      final aTime = _transactionTimeMinutes(a['timeInput'] ?? a['time'] ?? a['createdAt'] ?? a['created_at']);
-      final bTime = _transactionTimeMinutes(b['timeInput'] ?? b['time'] ?? b['createdAt'] ?? b['created_at']);
+      final aTime = _transactionTimeMinutes(a['timeInput'] ?? a['time']);
+      final bTime = _transactionTimeMinutes(b['timeInput'] ?? b['time']);
       if (aTime == null && bTime == null) return 0;
       if (aTime == null) return 1;
       if (bTime == null) return -1;
@@ -6236,8 +6237,8 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
       if(y==null)return -1;
       final byDate=sort=='সর্বশেষ আগে'?y.compareTo(x):x.compareTo(y);
       if(byDate!=0)return byDate;
-      final xt=_transactionTimeMinutes(a['timeInput']??a['time']??a['createdAt']??a['created_at']);
-      final yt=_transactionTimeMinutes(b['timeInput']??b['time']??b['createdAt']??b['created_at']);
+      final xt=_transactionTimeMinutes(a['timeInput']??a['time']);
+      final yt=_transactionTimeMinutes(b['timeInput']??b['time']);
       if(xt==null&&yt==null)return 0;
       if(xt==null)return 1;
       if(yt==null)return -1;
@@ -7377,141 +7378,4 @@ class _OrDivider extends StatelessWidget {
 
 void _notice(BuildContext context, String message) {
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), behavior: SnackBarBehavior.floating));
-}).firstMatch(raw);
-  if (match == null) return null;
-  var hour = int.parse(match.group(1)!);
-  final minute = int.parse(match.group(2)!);
-  if (minute > 59 || hour > 23) return null;
-  final meridiem = match.group(3);
-  if (meridiem != null) {
-    if (hour < 1 || hour > 12) return null;
-    if (meridiem == 'AM' && hour == 12) hour = 0;
-    if (meridiem == 'PM' && hour != 12) hour += 12;
-  }
-  return hour * 60 + minute;
 }
-
-const _blue = Color(0xFF287FCB);
-const _deepBlue = Color(0xFF1C5F9D);
-const _ink = Color(0xFF174A72);
-const _muted = Color(0xFF687C78);
-const _line = Color(0xFFDCE6F0);
-
-const String _themePreferenceKey = 'amar_hisab_theme_mode';
-final ValueNotifier<ThemeMode> _appThemeMode = ValueNotifier<ThemeMode>(ThemeMode.dark);
-
-Future<void> _setAppThemeMode(ThemeMode mode) async {
-  _appThemeMode.value = mode;
-  final preferences = await SharedPreferences.getInstance();
-  await preferences.setString(_themePreferenceKey, mode == ThemeMode.light ? 'light' : 'dark');
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: mode == ThemeMode.dark ? const Color(0xFF071827) : const Color(0xFFF3F8F5),
-    statusBarIconBrightness: mode == ThemeMode.dark ? Brightness.light : Brightness.dark,
-    systemNavigationBarColor: mode == ThemeMode.dark ? const Color(0xFF071827) : const Color(0xFFF3F8F5),
-    systemNavigationBarIconBrightness: mode == ThemeMode.dark ? Brightness.light : Brightness.dark,
-  ));
-}
-
-class _AuthApi {
-  static const String _baseUrlPreferenceKey = 'amar_hisab_server_url';
-  static const String _sessionCookieKey = 'amar_hisab_session_cookie';
-  static const String _activeUserIdKey = 'amar_hisab_active_user_id';
-  static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
-  static final HttpClient _client = HttpClient()
-    ..connectionTimeout = const Duration(seconds: 12);
-  static String? _baseUrl;
-  static String? _sessionCookie;
-  static String? _activeUserId;
-  static final ValueNotifier<String> syncStatus = ValueNotifier<String>('এখনো Sync হয়নি');
-  static final ValueNotifier<int> syncPendingCount = ValueNotifier<int>(0);
-
-  static String? get baseUrl => _baseUrl;
-
-  static String _requireActiveUserId() {
-    final id = _activeUserId;
-    if (id == null || id.isEmpty) {
-      throw Exception('বর্তমান অ্যাকাউন্ট যাচাই করা যায়নি। আবার লগইন করুন।');
-    }
-    return id;
-  }
-
-  static Future<void> _setActiveUser(dynamic user) async {
-    if (user is! Map) throw Exception('সার্ভার থেকে অ্যাকাউন্টের তথ্য পাওয়া যায়নি।');
-    final id = (user['id'] ?? '').toString().trim();
-    if (id.isEmpty) throw Exception('অ্যাকাউন্ট ID পাওয়া যায়নি।');
-    _activeUserId = id;
-    await _secureStorage.write(key: _activeUserIdKey, value: id);
-  }
-
-  static Future<void> cacheTransactions(List<dynamic> items) {
-    final accountId = _requireActiveUserId();
-    return OfflineSyncStore.instance.cacheRemoteRecords(accountId, 'transactions', items);
-  }
-
-  static Future<List<Map<String, dynamic>>> localTransactions() {
-    final accountId = _requireActiveUserId();
-    return OfflineSyncStore.instance.records(accountId, 'transactions');
-  }
-
-  static Future<void> saveTransactionOffline(Map<String, dynamic> item) async {
-    final accountId = _requireActiveUserId();
-    await OfflineSyncStore.instance.save(accountId, 'transactions', item);
-    await trySyncPending();
-  }
-
-  static Future<void> deleteTransactionOffline(Map<String, dynamic> item) async {
-    final accountId = _requireActiveUserId();
-    final id = (item['_syncId'] ?? item['id'] ?? '').toString();
-    if (id.isEmpty) throw Exception('লেনদেনের পরিচয় পাওয়া যায়নি।');
-    await OfflineSyncStore.instance.delete(accountId, 'transactions', id);
-    await trySyncPending();
-  }
-
-  static Future<void> trySyncPending() async {
-    final cookie = _sessionCookie;
-    final base = _baseUrl;
-    var accountId = _activeUserId;
-    if (cookie != null && cookie.isNotEmpty && (accountId == null || accountId.isEmpty)) {
-      try {
-        final me = await _get('/auth/me');
-        await _setActiveUser(me['user']);
-        accountId = _activeUserId;
-      } catch (_) {
-        syncStatus.value = 'Login session যাচাই করা যায়নি';
-        return;
-      }
-    }
-    if (accountId == null || accountId.isEmpty) {
-      syncPendingCount.value = 0;
-      syncStatus.value = 'বর্তমান অ্যাকাউন্ট পাওয়া যায়নি';
-      return;
-    }
-    syncPendingCount.value = await OfflineSyncStore.instance.pendingCount(accountId);
-    if (cookie == null || cookie.isEmpty) {
-      syncStatus.value = 'Login session পাওয়া যায়নি';
-      return;
-    }
-    if (base == null || base.isEmpty) {
-      syncStatus.value = 'Server URL সেট করা নেই';
-      return;
-    }
-    final engine = OfflineSyncEngine(baseUrl: base, sessionCookie: cookie, accountId: accountId);
-    syncStatus.value = 'Sync হচ্ছে...';
-    try {
-      await engine.syncOnce();
-      syncPendingCount.value = await OfflineSyncStore.instance.pendingCount(accountId);
-      if (syncPendingCount.value == 0) {
-        syncStatus.value = 'সব তথ্য Server-এ Sync হয়েছে';
-      } else {
-        syncStatus.value = '${syncPendingCount.value}টি Pending / Conflict আছে';
-      }
-    } catch (error) {
-      syncPendingCount.value = await OfflineSyncStore.instance.pendingCount(accountId);
-      syncStatus.value = 'Sync ব্যর্থ: ${error.toString().replaceFirst('HttpException: ', '').replaceFirst('Exception: ', '')}';
-    } finally {
-      engine.dispose();
-    }
-  }
-
-  static Future<void> loadBaseUrl() async {
-    final preferences = await SharedPreferences.getInstance();

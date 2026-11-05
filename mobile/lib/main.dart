@@ -2052,17 +2052,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 border: Border.all(color: surface, width: 4)),
                               clipBehavior: Clip.antiAlias,
                               child: photo.isNotEmpty
-                                  ? Transform.scale(
-                                      scale: 1.5,
-                                      child: Image.network(
-                                        _AuthApi.resolveApiUrl(photo),
-                                        headers: _AuthApi.avatarHeaders,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (context, error, stackTrace) => Icon(
-                                          Icons.person_rounded,
-                                          size: 64,
-                                          color: dark ? const Color(0xFF9CCDEB) : const Color(0xFF1688F8),
-                                        ),
+                                  ? Image.network(
+                                      _AuthApi.resolveApiUrl(photo),
+                                      headers: _AuthApi.avatarHeaders,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) => Icon(
+                                        Icons.person_rounded,
+                                        size: 64,
+                                        color: dark ? const Color(0xFF9CCDEB) : const Color(0xFF1688F8),
                                       ),
                                     )
                                   : Icon(Icons.person_rounded, size: 64, color: dark ? const Color(0xFF9CCDEB) : const Color(0xFF1688F8)),

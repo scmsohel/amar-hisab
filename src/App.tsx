@@ -392,6 +392,45 @@ if(active==="ওয়ালেট"){const wallets=[{name:"ক্যাশ",base
   </section>;
  }
  return <section className={"feature-page"+(active==="বিল"?" bills-page":"")}><div className="feature-heading"><div><h2>{config?.title||active}</h2><p>{config?.description||"আপনার আর্থিক তথ্য ব্যবস্থাপনা করুন।"}</p></div><button className="btn primary" onClick={()=>{reset();setShowForm(true)}}><Plus/> {config?.add||"নতুন রেকর্ড"}</button></div>{active==="বাজেট"&&<div className="feature-metrics"><article><small>এই মাসের ব্যয়</small><strong>{money(totalExpense)}</strong></article><article><small>রেকর্ড করা বাজেট</small><strong>{money(items.reduce((s,x)=>s+x.amount,0))}</strong></article><article><small>বাজেটের বাইরে</small><strong>{money(Math.max(totalExpense-items.reduce((s,x)=>s+x.amount,0),0))}</strong></article></div>}{active==="বিল"&&<div className="feature-metrics bill-metrics"><article><small>মোট বিল</small><strong>{money(items.reduce((sum,x)=>sum+x.amount,0))}</strong><span>{items.length.toLocaleString("bn-BD")}টি বিল</span></article><article><small>বকেয়া বিল</small><strong>{money(items.filter(x=>!["পরিশোধিত","সম্পন্ন"].includes(x.status)).reduce((sum,x)=>sum+x.amount,0))}</strong><span>{items.filter(x=>!["পরিশোধিত","সম্পন্ন"].includes(x.status)).length.toLocaleString("bn-BD")}টি বিল</span></article><article><small>এই মাসের বিল</small><strong>{money(items.filter(x=>x.date?.slice(0,7)===dhakaDateTime().date.slice(0,7)).reduce((sum,x)=>sum+x.amount,0))}</strong><span>{items.filter(x=>x.date?.slice(0,7)===dhakaDateTime().date.slice(0,7)).length.toLocaleString("bn-BD")}টি বিল</span></article><article><small>পরিশোধিত বিল</small><strong>{money(items.filter(x=>["পরিশোধিত","সম্পন্ন"].includes(x.status)).reduce((sum,x)=>sum+x.amount,0))}</strong><span>{items.filter(x=>["পরিশোধিত","সম্পন্ন"].includes(x.status)).length.toLocaleString("bn-BD")}টি বিল</span></article></div>}<section className="panel feature-panel">{active==="বিল"?<><div className="bill-toolbar"><div className="bill-search-row"><label className="table-search"><Search/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="বিলের নাম, প্রদানকারী বা বিবরণ লিখে খুঁজুন..."/></label><span className="tag bill-count">{shown.length.toLocaleString("bn-BD")}টি রেকর্ড</span></div><div className="bill-filter-row">{["সব","বাকি","পরিশোধিত","এই মাসে"].map(filter=><button key={filter} className={"bill-filter"+(billStatusFilter===filter?" active":"")} onClick={()=>setBillStatusFilter(filter)}>{filter} ({(filter==="সব"?items:filter==="বাকি"?items.filter(x=>!["পরিশোধিত","সম্পন্ন"].includes(x.status)):filter==="পরিশোধিত"?items.filter(x=>["পরিশোধিত","সম্পন্ন"].includes(x.status)):items.filter(x=>x.date?.slice(0,7)===dhakaDateTime().date.slice(0,7))).length.toLocaleString("bn-BD")})</button>)}<select className="bill-sort" aria-label="বিল সাজান" defaultValue="newest"><option value="newest">সর্বশেষ প্রথম</option><option value="oldest">পুরোনো প্রথম</option><option value="amount">পরিমাণ অনুযায়ী</option></select></div></div><BillRecords items={shown} edit={edit} remove={remove}/>{shown.length===0&&<div className="bill-empty-state"><div className="bill-empty-icon"><ReceiptText size={28}/></div><h3>{items.length===0?"এখনো কোনো বিল যোগ করা হয়নি":"কোনো বিল পাওয়া যায়নি"}</h3><p>বিদ্যুৎ, পানি, ইন্টারনেট, ভাড়া বা অন্যান্য নিয়মিত বিল যোগ করে পরিশোধের তারিখ ও অবস্থা সহজে ট্র্যাক করুন।</p><button className="btn primary" onClick={()=>{reset();setShowForm(true)}}><Plus size={16}/> প্রথম বিল যোগ করুন</button></div>}</>:<><div className="toolbar"><label className="table-search"><Search/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="রেকর্ড খুঁজুন..."/></label><span className="tag">{shown.length.toLocaleString("bn-BD")}টি রেকর্ড</span></div><FeatureRecords items={shown} edit={edit} remove={remove}/>{shown.length===0&&<div className="empty">এখনো কোনো রেকর্ড নেই। “{config?.add||"নতুন রেকর্ড"}” বাটনে চাপ দিয়ে যোগ করুন।</div>}</>}</section><FeatureForm config={config||{key:active,title:active,description:"",add:"নতুন রেকর্ড",fields:["নাম","পরিমাণ","তারিখ","অবস্থা","নোট"]}} icon={recordIcon} setIcon={setRecordIcon} show={showForm} title={title} setTitle={setTitle} amount={amount} setAmount={setAmount} date={date} setDate={setDate} status={status} setStatus={setStatus} notes={notes} setNotes={setNotes} save={save} reset={reset} editing={editing}/></section>;
+ useEffect(()=>{
+  let disposed=false;
+  const refreshCollection=async(collection:string)=>{
+   try{
+    const response=await fetch("/api/data/"+encodeURIComponent(collection),{credentials:"same-origin",cache:"no-store"});
+    if(!response.ok)throw new Error("refresh failed");
+    const result=await response.json();
+    if(disposed)return;
+    const data=result?.data;
+    if(collection==="transactions"&&Array.isArray(data)){setTx(data);setFinanceTxReady(true);}
+    else if(collection==="wallets"&&Array.isArray(data)){const wallets=data.filter((item:unknown)=>!!item&&typeof item==="object"&&"name" in item);setCustomWallets(wallets);setDashboardCustomWallets(wallets);}
+    else if(collection==="settings"){
+     const settings=data&&typeof data==="object"?data:{};
+     setChartRange(typeof settings.chartRange==="string"?settings.chartRange:"৬ মাস");
+     setBudgetLimit(Number.isFinite(Number(settings.budgetLimit))?Number(settings.budgetLimit):0);
+     const names=settings.walletNames&&typeof settings.walletNames==="object"?settings.walletNames:{};
+     const hidden=Array.isArray(settings.hiddenWallets)?settings.hiddenWallets:[];
+     setWalletNames(names);setHiddenWallets(hidden);setDashboardWalletNames(names);setDashboardHiddenWallets(hidden);
+    }else if(collection==="debts"&&Array.isArray(data)){
+     setSharedDebts(data as FeatureItem[]);
+     window.dispatchEvent(new CustomEvent("amar-hisab-debts-updated",{detail:data}));
+    }else if((collection==="bills"||collection==="goals")&&Array.isArray(data)){
+     if((collection==="bills"&&active==="বিল")||(collection==="goals"&&active==="সঞ্চয়"))setLocalItems(data as FeatureItem[]);
+     window.dispatchEvent(new CustomEvent("amar-hisab-"+collection+"-updated",{detail:data}));
+    }else if(collection==="categories"&&Array.isArray(data)){
+     window.dispatchEvent(new CustomEvent("amar-hisab-categories-updated",{detail:data}));
+    }
+   }catch(error){if(!disposed)console.warn("Auto Sync refresh failed:",collection,error);}
+  };
+  const stream=new EventSource("/api/sync/events");
+  stream.addEventListener("sync",(event:MessageEvent)=>{
+   try{
+    const payload=JSON.parse(event.data);
+    if(typeof payload?.collection==="string")void refreshCollection(payload.collection);
+   }catch(error){console.warn("Auto Sync event could not be read",error);}
+  });
+  return()=>{disposed=true;stream.close();};
+ },[active]);
+
 }
 
 

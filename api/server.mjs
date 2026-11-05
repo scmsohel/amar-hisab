@@ -247,6 +247,101 @@ app.post("/auth/password", asyncRoute(async (req, res) => {
   await pool.query("UPDATE app_users SET password_hash=$1 WHERE id=$2", [await hashPassword(newPassword), session.id]);
   res.json({ ok: true });
 }));
+app.post("/auth/password/forgot", asyncRoute(async (req, res) => {
+  const email = String(req.body?.email || "").trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: "সঠিক Email address দিন।" });
+  const generic = "অ্যাকাউন্ট থাকলে Email-এ OTP পাঠানো হয়েছে।";
+  if (!mailer) {
+    console.error("Password reset SMTP is not configured.");
+    return res.json({ message: generic });
+  }
+  const client = await pool.connect();
+  let user = null;
+  let otp = null;
+  try {
+    await client.query("BEGIN");
+    const found = await client.query("SELECT id,name,email FROM app_users WHERE lower(email)=lower($1) FOR UPDATE", [email]);
+    if (found.rowCount) {
+      user = found.rows[0];
+      const previous = await client.query("SELECT last_sent_at FROM password_reset_otps WHERE user_id=$1 FOR UPDATE", [user.id]);
+      if (previous.rowCount && Date.now() - new Date(previous.rows[0].last_sent_at).getTime() < 60000) {
+        await client.query("COMMIT");
+        return res.json({ message: generic, retryAfter: 60 });
+      }
+      otp = String(randomInt(100000, 1000000));
+      await client.query(
+        "INSERT INTO password_reset_otps(user_id,otp_hash,expires_at,attempts,last_sent_at,created_at) VALUES($1,$2,NOW()+INTERVAL '5 minutes',0,NOW(),NOW()) ON CONFLICT(user_id) DO UPDATE SET otp_hash=EXCLUDED.otp_hash,expires_at=EXCLUDED.expires_at,attempts=0,last_sent_at=NOW(),created_at=NOW()",
+        [user.id, createHmac("sha256", sessionSecret).update(email + ":" + otp).digest("hex")]
+      );
+    }
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+  if (user && otp) {
+    try {
+      await mailer.sendMail({
+        from: process.env.SMTP_FROM || "Amar Hisab <noreply@schome.my.id>",
+        to: user.email,
+        subject: "Amar Hisab - Password Reset OTP",
+        text: "প্রিয় " + user.name + ", আপনার Password reset OTP: " + otp + "। কোডটি ৫ মিনিটের মধ্যে ব্যবহার করুন।",
+        html: "<h2>Amar Hisab</h2><p>আপনার Password reset OTP:</p><h1 style='letter-spacing:8px'>" + otp + "</h1><p>এই OTP ৫ মিনিট কার্যকর থাকবে।</p>"
+      });
+    } catch (error) {
+      console.error("Password reset email delivery failed:", error?.message || error);
+      const hash = createHmac("sha256", sessionSecret).update(email + ":" + otp).digest("hex");
+      await pool.query("DELETE FROM password_reset_otps WHERE user_id=$1 AND otp_hash=$2", [user.id, hash]);
+    }
+  }
+  return res.json({ message: generic });
+}));
+
+app.post("/auth/password/reset", asyncRoute(async (req, res) => {
+  const email = String(req.body?.email || "").trim().toLowerCase();
+  const otp = String(req.body?.otp || "").trim();
+  const newPassword = String(req.body?.newPassword || "");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^\d{6}$/.test(otp)) return res.status(400).json({ error: "Email এবং ৬ সংখ্যার OTP সঠিকভাবে দিন।" });
+  if (newPassword.length < 12) return res.status(400).json({ error: "নতুন Password কমপক্ষে ১২ অক্ষরের হতে হবে।" });
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    const found = await client.query("SELECT id FROM app_users WHERE lower(email)=lower($1) FOR UPDATE", [email]);
+    if (!found.rowCount) {
+      await client.query("ROLLBACK");
+      return res.status(400).json({ error: "OTP ভুল অথবা মেয়াদ শেষ। নতুন OTP নিন।" });
+    }
+    const userId = found.rows[0].id;
+    const result = await client.query("SELECT otp_hash,expires_at,attempts FROM password_reset_otps WHERE user_id=$1 FOR UPDATE", [userId]);
+    if (!result.rowCount || new Date(result.rows[0].expires_at).getTime() <= Date.now() || Number(result.rows[0].attempts) >= 5) {
+      await client.query("DELETE FROM password_reset_otps WHERE user_id=$1", [userId]);
+      await client.query("COMMIT");
+      return res.status(400).json({ error: "OTP ভুল অথবা মেয়াদ শেষ। নতুন OTP নিন।" });
+    }
+    const expected = createHmac("sha256", sessionSecret).update(email + ":" + otp).digest("hex");
+    const a = Buffer.from(result.rows[0].otp_hash, "hex");
+    const b = Buffer.from(expected, "hex");
+    if (a.length !== b.length || !timingSafeEqual(a, b)) {
+      const attempts = Number(result.rows[0].attempts) + 1;
+      if (attempts >= 5) await client.query("DELETE FROM password_reset_otps WHERE user_id=$1", [userId]);
+      else await client.query("UPDATE password_reset_otps SET attempts=$1 WHERE user_id=$2", [attempts, userId]);
+      await client.query("COMMIT");
+      return res.status(400).json({ error: attempts >= 5 ? "অনেকবার ভুল OTP দেওয়া হয়েছে। নতুন OTP নিন।" : "OTP সঠিক নয়। আবার চেষ্টা করুন।" });
+    }
+    await client.query("UPDATE app_users SET password_hash=$1,token_version=token_version+1 WHERE id=$2", [await hashPassword(newPassword), userId]);
+    await client.query("DELETE FROM password_reset_otps WHERE user_id=$1", [userId]);
+    await client.query("COMMIT");
+    return res.json({ ok: true, message: "Password পরিবর্তন হয়েছে। নতুন Password দিয়ে Login করুন।" });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}));
+
 app.post("/auth/logout", (_req, res) => {
   res.clearCookie(cookieName, { httpOnly: true, secure: cookieSecure, sameSite: "lax", path: "/" });
   res.json({ ok: true });

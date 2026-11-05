@@ -4529,7 +4529,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                             ),
                             const Spacer(),
                             Transform.translate(
-                              offset: const Offset(0, -5),
+                              offset: const Offset(0, 0),
                               child: Stack(
                                 clipBehavior: Clip.none,
                                 children: [
@@ -4553,7 +4553,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                               ),
                             ),
                             Transform.translate(
-                              offset: const Offset(0, -5),
+                              offset: const Offset(0, 0),
                               child: InkWell(
                                 customBorder: const CircleBorder(),
                                 onTap: () async {

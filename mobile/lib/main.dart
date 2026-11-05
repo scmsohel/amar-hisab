@@ -1979,7 +1979,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   status.toLowerCase().contains('unavailable');
               final syncing = status.contains('Sync হচ্ছে');
               final failed = status.contains('ব্যর্থ') || status.contains('Error');
-              final complete = pending == 0 && !offline && !syncing && !failed;
               final accent = offline || failed
                   ? const Color(0xFFE35D67)
                   : syncing

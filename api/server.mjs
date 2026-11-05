@@ -2,6 +2,10 @@ import express from "express";
 import pg from "pg";
 import { randomBytes, randomUUID, randomInt, scrypt as scryptCallback, timingSafeEqual, createHmac } from "node:crypto";
 import nodemailer from "nodemailer";
+import multer from "multer";
+import sharp from "sharp";
+import path from "node:path";
+import { mkdir, rename, unlink } from "node:fs/promises";
 import { promisify } from "node:util";
 
 const scrypt = promisify(scryptCallback);
@@ -14,6 +18,8 @@ const adminEmail = (process.env.ADMIN_EMAIL || "").trim().toLowerCase();
 const adminPassword = process.env.ADMIN_PASSWORD || "";
 const adminName = process.env.ADMIN_NAME || "Amar Hisab Admin";
 const setupKey = process.env.ADMIN_SETUP_KEY || "";
+const profileUploadDir = process.env.PROFILE_UPLOAD_DIR || "/app/uploads/profile";
+const profileUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 }, fileFilter: (_req, file, callback) => callback(null, ["image/jpeg", "image/png", "image/webp"].includes(file.mimetype)) });
 const mailer = process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS ? nodemailer.createTransport({host:process.env.SMTP_HOST,port:Number(process.env.SMTP_PORT||587),secure:Number(process.env.SMTP_PORT||587)===465,auth:{user:process.env.SMTP_USER,pass:process.env.SMTP_PASS}}) : null;
 const resetMessage = "অ্যাকাউন্ট থাকলে Email-এ OTP পাঠানো হয়েছে।";
 
@@ -48,8 +54,8 @@ function readSession(req) {
   } catch { return null; }
 }
 const asyncRoute = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
-const cleanUser = ({ id, name, email, mobile, role }) => ({ id, name, email, mobile, role });
-async function getSessionUser(req) { const session=readSession(req); if(!session)return null; const result=await pool.query("SELECT id,name,email,mobile,role,token_version FROM app_users WHERE id=$1",[session.id]); const user=result.rows[0]; return user && Number(session.tokenVersion||0)===Number(user.token_version||0) ? user : null; }
+const cleanUser = ({ id, name, email, mobile, role, avatar_path, avatar_updated_at }) => ({ id, name, email, mobile, role, avatarUrl: avatar_path ? "/auth/profile/avatar?v=" + new Date(avatar_updated_at || 0).getTime() : null });
+async function getSessionUser(req) { const session=readSession(req); if(!session)return null; const result=await pool.query("SELECT id,name,email,mobile,role,token_version,avatar_path,avatar_updated_at FROM app_users WHERE id=$1",[session.id]); const user=result.rows[0]; return user && Number(session.tokenVersion||0)===Number(user.token_version||0) ? user : null; }
 function otpDigest(email,otp){return createHmac("sha256",sessionSecret).update(email.toLowerCase()+":"+otp).digest("hex");}
 function safeDigestEqual(a,b){const x=Buffer.from(String(a||""),"hex"),y=Buffer.from(String(b||""),"hex");return x.length===y.length&&x.length>0&&timingSafeEqual(x,y);}
 async function hashPassword(password) {
@@ -65,6 +71,7 @@ async function verifyPassword(password, stored) {
   return actual.length === expected.length && timingSafeEqual(actual, expected);
 }
 async function init() {
+  await mkdir(profileUploadDir, { recursive: true });
   const schemaClient = await pool.connect();
   try {
     await schemaClient.query("BEGIN");
@@ -80,6 +87,8 @@ async function init() {
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
     ALTER TABLE app_users ADD COLUMN IF NOT EXISTS token_version INTEGER NOT NULL DEFAULT 0;
+    ALTER TABLE app_users ADD COLUMN IF NOT EXISTS avatar_path TEXT;
+    ALTER TABLE app_users ADD COLUMN IF NOT EXISTS avatar_updated_at TIMESTAMPTZ;
     CREATE TABLE IF NOT EXISTS password_reset_otps (user_id BIGINT PRIMARY KEY REFERENCES app_users(id) ON DELETE CASCADE, otp_hash TEXT NOT NULL, expires_at TIMESTAMPTZ NOT NULL, attempts INTEGER NOT NULL DEFAULT 0, last_sent_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
     CREATE TABLE IF NOT EXISTS user_finance_data (
       user_id BIGINT NOT NULL REFERENCES app_users(id) ON DELETE CASCADE,
@@ -211,7 +220,7 @@ app.post("/auth/login", asyncRoute(async (req, res) => {
   const identity = String(req.body?.identity || "").trim();
   const password = String(req.body?.password || "");
   if (!identity || !password) return res.status(400).json({ error: "Email/Mobile এবং Password দিন।" });
-  const result = await pool.query("SELECT id,name,email,mobile,password_hash,role,token_version FROM app_users WHERE lower(email)=lower($1) OR mobile=$1 LIMIT 1", [identity]);
+  const result = await pool.query("SELECT id,name,email,mobile,password_hash,role,token_version,avatar_path,avatar_updated_at FROM app_users WHERE lower(email)=lower($1) OR mobile=$1 LIMIT 1", [identity]);
   const user = result.rows[0];
   if (!user || !(await verifyPassword(password, user.password_hash))) return res.status(401).json({ error: "Email/Mobile অথবা Password সঠিক নয়।" });
   setSession(res, user);
@@ -222,6 +231,54 @@ app.get("/auth/me", asyncRoute(async (req, res) => {
   if (!user) return res.status(401).json({ error: "লগইন প্রয়োজন।" });
   res.json({ user: cleanUser(user) });
 }));
+app.get("/auth/profile/avatar", asyncRoute(async (req, res) => {
+  const user = await getSessionUser(req);
+  if (!user || !user.avatar_path) return res.status(user ? 404 : 401).end();
+  const imagePath = path.join(profileUploadDir, String(user.id) + ".webp");
+  res.set("Content-Type", "image/webp");
+  res.set("Cache-Control", "private, max-age=300");
+  res.sendFile(imagePath, error => { if (error && !res.headersSent) res.status(404).end(); });
+}));
+app.post("/auth/profile/avatar", (req, res, next) => {
+  profileUpload.single("avatar")(req, res, error => {
+    if (error) return res.status(error.code === "LIMIT_FILE_SIZE" ? 413 : 400).json({ error: error.code === "LIMIT_FILE_SIZE" ? "ছবির আকার সর্বোচ্চ ৫ MB হতে পারবে।" : "শুধু JPEG, PNG অথবা WebP ছবি আপলোড করুন।" });
+    next();
+  });
+}, asyncRoute(async (req, res) => {
+  const user = await getSessionUser(req);
+  if (!user) return res.status(401).json({ error: "লগইন প্রয়োজন।" });
+  if (!req.file) return res.status(400).json({ error: "একটি ছবি নির্বাচন করুন।" });
+  const metadata = await sharp(req.file.buffer, { limitInputPixels: 40000000 }).metadata();
+  if (!["jpeg", "png", "webp"].includes(metadata.format || "")) return res.status(400).json({ error: "ছবির ফরম্যাট সঠিক নয়।" });
+  const filename = String(user.id) + ".webp";
+  const destination = path.join(profileUploadDir, filename);
+  const temporary = path.join(profileUploadDir, String(user.id) + "." + randomUUID() + ".tmp");
+  try {
+    await sharp(req.file.buffer, { limitInputPixels: 40000000 })
+      .rotate()
+      .resize(512, 512, { fit: "cover", position: "attention", withoutEnlargement: true })
+      .webp({ quality: 84, effort: 4 })
+      .toFile(temporary);
+    await rename(temporary, destination);
+    const updated = await pool.query(
+      "UPDATE app_users SET avatar_path=$1,avatar_updated_at=NOW() WHERE id=$2 RETURNING id,name,email,mobile,role,avatar_path,avatar_updated_at",
+      [filename, user.id]
+    );
+    res.set("Cache-Control", "no-store");
+    res.json({ user: cleanUser(updated.rows[0]) });
+  } catch (error) {
+    await unlink(temporary).catch(() => {});
+    throw error;
+  }
+}));
+app.delete("/auth/profile/avatar", asyncRoute(async (req, res) => {
+  const user = await getSessionUser(req);
+  if (!user) return res.status(401).json({ error: "লগইন প্রয়োজন।" });
+  await pool.query("UPDATE app_users SET avatar_path=NULL,avatar_updated_at=NULL WHERE id=$1", [user.id]);
+  await unlink(path.join(profileUploadDir, String(user.id) + ".webp")).catch(error => { if (error.code !== "ENOENT") throw error; });
+  res.set("Cache-Control", "no-store");
+  res.json({ user: cleanUser({ ...user, avatar_path: null, avatar_updated_at: null }) });
+}));
 app.put("/auth/profile", asyncRoute(async (req, res) => {
   const session = await getSessionUser(req);
   if (!session) return res.status(401).json({ error: "লগইন প্রয়োজন।" });
@@ -230,7 +287,7 @@ app.put("/auth/profile", asyncRoute(async (req, res) => {
   if (name.length < 2 || name.length > 100 || mobile.length > 30) {
     return res.status(400).json({ error: "নাম কমপক্ষে ২ অক্ষরের হতে হবে এবং মোবাইল নম্বর সঠিক দিন।" });
   }
-  const result = await pool.query("UPDATE app_users SET name=$1,mobile=$2 WHERE id=$3 RETURNING id,name,email,mobile,role", [name, mobile, session.id]);
+  const result = await pool.query("UPDATE app_users SET name=$1,mobile=$2 WHERE id=$3 RETURNING id,name,email,mobile,role,avatar_path,avatar_updated_at", [name, mobile, session.id]);
   if (!result.rowCount) return res.status(404).json({ error: "অ্যাকাউন্ট পাওয়া যায়নি।" });
   res.json({ user: cleanUser(result.rows[0]) });
 }));

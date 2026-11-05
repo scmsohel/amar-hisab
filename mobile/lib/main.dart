@@ -1897,11 +1897,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             _infoDivider(dark),
                             Expanded(child: ValueListenableBuilder<int>(
                               valueListenable: _AuthApi.syncPendingCount,
-                              builder: (context, pending, _) => _info(
-                                pending > 0 ? Icons.cloud_upload_rounded : Icons.check_circle_rounded,
-                                'Sync Status',
-                                _loading ? 'যাচাই হচ্ছে' : pending > 0 ? '$pending Pending' : _AuthApi.syncStatus.value == 'Offline · Server unavailable' ? 'Offline' : 'সব ডেটা',
-                                dark,
+                              builder: (context, pending, _) => InkWell(
+                                borderRadius: BorderRadius.circular(16),
+                                onTap: _showSyncStatusDialog,
+                                child: _info(
+                                  pending > 0 ? Icons.cloud_upload_rounded : Icons.check_circle_rounded,
+                                  'Sync Status',
+                                  _loading ? 'যাচাই হচ্ছে' : pending > 0 ? '${_bn(pending.toString())} Pending' : _AuthApi.syncStatus.value == 'Offline · Server unavailable' ? 'Offline' : 'সব ডেটা',
+                                  dark,
+                                ),
                               ),
                             )),
                           ]),
@@ -1952,6 +1956,189 @@ class _ProfileScreenState extends State<ProfileScreen> {
     child: InkWell(customBorder: const CircleBorder(), onTap: onTap,
       child: SizedBox(width: 36, height: 36, child: Icon(icon, color: color, size: 20))),
   );
+
+  Future<void> _showSyncStatusDialog() async {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final surface = dark ? const Color(0xFF142C3D) : Colors.white;
+    final ink = dark ? Colors.white : const Color(0xFF172B3D);
+    final muted = dark ? const Color(0xFFABC0D0) : const Color(0xFF718096);
+    final border = dark ? const Color(0xFF35536A) : const Color(0xFFE6EDF2);
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (dialogContext) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 24),
+        child: ValueListenableBuilder<int>(
+          valueListenable: _AuthApi.syncPendingCount,
+          builder: (context, pending, _) => ValueListenableBuilder<String>(
+            valueListenable: _AuthApi.syncStatus,
+            builder: (context, status, _) {
+              final offline = status.toLowerCase().contains('offline') ||
+                  status.toLowerCase().contains('unavailable');
+              final syncing = status.contains('Sync হচ্ছে');
+              final failed = status.contains('ব্যর্থ') || status.contains('Error');
+              final complete = pending == 0 && !offline && !syncing && !failed;
+              final accent = offline || failed
+                  ? const Color(0xFFE35D67)
+                  : syncing
+                      ? const Color(0xFF347FF5)
+                      : pending > 0
+                          ? const Color(0xFFE5A02B)
+                          : const Color(0xFF08A66A);
+              final title = syncing
+                  ? 'Sync হচ্ছে'
+                  : offline
+                      ? 'ইন্টারনেট সংযোগ নেই'
+                      : failed
+                          ? 'Sync সম্পন্ন হয়নি'
+                          : pending > 0
+                              ? 'Sync বাকি আছে'
+                              : 'সব তথ্য Sync হয়েছে';
+              final description = syncing
+                  ? 'আপনার তথ্য Server-এ পাঠানো হচ্ছে।'
+                  : offline
+                      ? 'ইন্টারনেট সংযোগ ফিরে এলে আবার Sync করতে পারবেন।'
+                      : failed
+                          ? status
+                          : pending > 0
+                              ? 'ইন্টারনেট সংযোগ পেলে বাকি তথ্যগুলো Server-এ Sync করুন।'
+                              : 'আপনার সব তথ্য সফলভাবে Server-এ সংরক্ষিত আছে।';
+              return Container(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+                decoration: BoxDecoration(
+                  color: surface,
+                  borderRadius: BorderRadius.circular(26),
+                  border: Border.all(color: border),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: dark ? .28 : .12),
+                      blurRadius: 28,
+                      offset: const Offset(0, 12),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text('Sync Status', style: TextStyle(
+                            color: ink, fontSize: 19, fontWeight: FontWeight.w900,
+                          )),
+                        ),
+                        IconButton(
+                          visualDensity: VisualDensity.compact,
+                          onPressed: () => Navigator.pop(dialogContext),
+                          icon: Icon(Icons.close_rounded, color: muted),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      width: 66,
+                      height: 66,
+                      decoration: BoxDecoration(
+                        color: accent.withValues(alpha: .12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: syncing
+                            ? SizedBox(
+                                width: 30,
+                                height: 30,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                  color: accent,
+                                ),
+                              )
+                            : Icon(
+                                offline
+                                    ? Icons.cloud_off_rounded
+                                    : failed
+                                        ? Icons.error_outline_rounded
+                                        : pending > 0
+                                            ? Icons.cloud_upload_rounded
+                                            : Icons.cloud_done_rounded,
+                                color: accent,
+                                size: 32,
+                              ),
+                      ),
+                    ),
+                    const SizedBox(height: 13),
+                    Text(title, textAlign: TextAlign.center, style: TextStyle(
+                      color: ink, fontSize: 17, fontWeight: FontWeight.w900,
+                    )),
+                    const SizedBox(height: 6),
+                    Text(description, textAlign: TextAlign.center, style: TextStyle(
+                      color: muted, fontSize: 12, height: 1.45,
+                    )),
+                    const SizedBox(height: 17),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: dark ? const Color(0xFF0E2231) : const Color(0xFFF5F8FA),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: border),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(child: Text('Pending Entries', style: TextStyle(
+                            color: muted, fontSize: 12, fontWeight: FontWeight.w700,
+                          ))),
+                          Text(_bn(pending.toString()), style: TextStyle(
+                            color: pending > 0 ? accent : ink,
+                            fontSize: 17, fontWeight: FontWeight.w900,
+                          )),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 17),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.pop(dialogContext),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: muted,
+                              side: BorderSide(color: border),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
+                            ),
+                            child: const Text('বন্ধ'),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: FilledButton(
+                            onPressed: pending == 0 || offline || syncing
+                                ? null
+                                : () async {
+                                    await _AuthApi.trySyncPending();
+                                  },
+                            style: FilledButton.styleFrom(
+                              backgroundColor: const Color(0xFF08A66A),
+                              disabledBackgroundColor: dark ? const Color(0xFF294354) : const Color(0xFFE4E9ED),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(13)),
+                            ),
+                            child: const Text('আবার Sync করুন', maxLines: 1, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
 
   Widget _info(IconData icon, String heading, String value, bool dark) => Padding(
     padding: const EdgeInsets.symmetric(horizontal: 2),
@@ -6085,7 +6272,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                                   menuItem(
                                     icon: Icons.account_balance_wallet_rounded,
                                     color: const Color(0xFF08B63C),
-                                    title: 'ওয়ালেট ম্যানেজমেন্ট',
+                                    title: 'ওয়ালেট',
                                     onTap: () {
                                       Navigator.pop(popupContext);
                                       _openWalletManagement();
@@ -6101,12 +6288,34 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                                     },
                                   ),
                                   menuItem(
-                                    icon: Icons.format_list_bulleted_rounded,
-                                    color: const Color(0xFF087A55),
-                                    title: 'সব লেনদেন',
+                                    icon: Icons.handshake_rounded,
+                                    color: const Color(0xFF347FF5),
+                                    title: 'দেনা-পাওনা',
                                     onTap: () {
                                       Navigator.pop(popupContext);
-                                      _openTransactionsPage();
+                                      Navigator.of(context).push(_route(_DebtsScreen(
+                                        debts: _debts,
+                                        wallets: _walletBalances.keys.toList(),
+                                        onReload: () async {
+                                          await _load();
+                                          return List<Map<String, dynamic>>.from(_debts);
+                                        },
+                                      )));
+                                    },
+                                  ),
+                                  menuItem(
+                                    icon: Icons.receipt_long_rounded,
+                                    color: const Color(0xFFE56B78),
+                                    title: 'বিল',
+                                    onTap: () {
+                                      Navigator.pop(popupContext);
+                                      Navigator.of(context).push(_route(_BillsScreen(
+                                        bills: _bills,
+                                        onReload: () async {
+                                          await _load();
+                                          return List<Map<String, dynamic>>.from(_bills);
+                                        },
+                                      )));
                                     },
                                   ),
                                   menuItem(
@@ -6130,55 +6339,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                                       setPopupState(() {});
                                     },
                                   ),
-                                  ValueListenableBuilder<String>(
-                                    valueListenable: _AuthApi.syncStatus,
-                                    builder: (context, status, _) => ValueListenableBuilder<int>(
-                                      valueListenable: _AuthApi.syncPendingCount,
-                                      builder: (context, pending, _) => menuItem(
-                                        icon: pending > 0 ? Icons.sync_problem_rounded : Icons.cloud_done_rounded,
-                                        color: pending > 0 ? const Color(0xFFE39A24) : const Color(0xFF08A66A),
-                                        title: pending > 0 ? 'Sync Status · $pending Pending' : 'Sync Status',
-                                        trailing: Icon(Icons.chevron_right_rounded, color: ink, size: 21),
-                                        onTap: () {
-                                          Navigator.pop(popupContext);
-                                          showDialog<void>(
-                                            context: context,
-                                            builder: (dialog) => AlertDialog(
-                                              title: const Text('Sync Status'),
-                                              content: ValueListenableBuilder<String>(
-                                                valueListenable: _AuthApi.syncStatus,
-                                                builder: (_, value, _) => Text(value),
-                                              ),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () async {
-                                                    Navigator.pop(dialog);
-                                                    await _AuthApi.trySyncPending();
-                                                    if (mounted) setState(() {});
-                                                  },
-                                                  child: const Text('আবার Sync করুন'),
-                                                ),
-                                                TextButton(
-                                                  onPressed: () => Navigator.pop(dialog),
-                                                  child: const Text('বন্ধ'),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  menuItem(
-                                    icon: Icons.dns_rounded,
-                                    color: const Color(0xFF0868D9),
-                                    title: 'Server Settings',
-                                    last: true,
-                                    onTap: () {
-                                      Navigator.pop(popupContext);
-                                      Navigator.of(context).push(_route(const ServerSettingsScreen()));
-                                    },
-                                  ),
+
                                 ],
                               ),
                             ),

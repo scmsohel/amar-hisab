@@ -89,7 +89,6 @@ class _AuthApi {
   static final ValueNotifier<int> syncPendingCount = ValueNotifier<int>(0);
 
   static String? get baseUrl => _baseUrl;
-  static String? get activeUserId => _activeUserId;
 
   static String _requireActiveUserId() {
     final id = _activeUserId;

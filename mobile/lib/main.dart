@@ -1263,7 +1263,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         _user = data is Map ? Map<String, dynamic>.from(data) : <String, dynamic>{};
         _joinedAt = joined == null ? null : DateTime.tryParse(joined.toString());
-        _lastSyncAt = synced == null ? null : DateTime.tryParse(synced.toString());
+        _lastSyncAt = synced == null ? _lastSyncAt : DateTime.tryParse(synced.toString()) ?? _lastSyncAt;
         _loading = false;
       });
     } on SocketException {

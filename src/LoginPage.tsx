@@ -48,7 +48,7 @@ export default function LoginPage() {
     event.preventDefault();
     setError("");
     const email = identity.trim();
-    if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return setError("Password recovery-এর জন্য সঠিক Email address দিন।");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setError("Password recovery-এর জন্য সঠিক Email address দিন।");
     setBusy(true);
     try {
       const response = await fetch("/api/auth/password/forgot", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin", body: JSON.stringify({ email }) });

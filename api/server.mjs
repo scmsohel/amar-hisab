@@ -471,6 +471,60 @@ app.get("/sync/pull", asyncRoute(async (req, res) => {
   res.json({ events, nextCursor, hasMore: events.length === limit });
 }));
 
+app.get("/sync/events", asyncRoute(async (req, res) => {
+  const user = await requireUser(req, res);
+  if (!user) return;
+  const lastEventId = Number(req.get("last-event-id") || req.query.cursor || 0);
+  if (!Number.isSafeInteger(lastEventId) || lastEventId < 0) {
+    return res.status(400).json({ error: "Sync event cursor সঠিক নয়।" });
+  }
+  let cursor = lastEventId;
+  if (!req.get("last-event-id") && req.query.cursor === undefined) {
+    const latest = await pool.query(
+      "SELECT COALESCE(MAX(event_id),0) AS cursor FROM user_sync_events WHERE user_id=$1",
+      [user.id]
+    );
+    cursor = Number(latest.rows[0]?.cursor || 0);
+  }
+  res.status(200);
+  res.set({
+    "Content-Type": "text/event-stream; charset=utf-8",
+    "Cache-Control": "no-cache, no-transform",
+    "Connection": "keep-alive",
+    "X-Accel-Buffering": "no"
+  });
+  res.flushHeaders?.();
+  res.write("retry: 3000\n\n");
+  let closed = false;
+  let lastHeartbeat = Date.now();
+  res.on("close", () => { closed = true; });
+  while (!closed) {
+    const result = await pool.query(
+      `SELECT event_id,collection,operation
+       FROM user_sync_events
+       WHERE user_id=$1 AND event_id>$2
+       ORDER BY event_id ASC
+       LIMIT 100`,
+      [user.id, cursor]
+    );
+    for (const row of result.rows) {
+      cursor = Number(row.event_id);
+      res.write("id: " + cursor + "\nevent: sync\ndata: " + JSON.stringify({
+        eventId: cursor,
+        collection: row.collection,
+        operation: row.operation
+      }) + "\n\n");
+    }
+    if (Date.now() - lastHeartbeat >= 20000) {
+      res.write(": keep-alive\n\n");
+      lastHeartbeat = Date.now();
+    }
+    if (!result.rows.length) {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+  }
+}));
+
 async function refreshLegacyCollectionSnapshot(client, userId, collection) {
   const records = await client.query(
     "SELECT payload FROM user_finance_records WHERE user_id=$1 AND collection=$2 AND deleted_at IS NULL ORDER BY updated_at ASC,record_id ASC",

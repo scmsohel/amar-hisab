@@ -328,7 +328,7 @@ function FeaturePage({active,tx,setTx,dark,setDark,setActive,setNotice,sharedDeb
     if(disposed)return;
     const data=result?.data;
     if(collection==="transactions"&&Array.isArray(data)){setTx(data);setFinanceTxReady(true);}
-    else if(collection==="wallets"&&Array.isArray(data)){const wallets=data.filter((item:unknown)=>!!item&&typeof item==="object"&&"name" in item);setCustomWallets(wallets);setDashboardCustomWallets(wallets);}
+    else if(collection==="wallets"&&Array.isArray(data)){const wallets=data.filter((item:unknown)=>!!item&&typeof item==="object"&&"name" in item) as typeof customWallets;setCustomWallets(wallets);setDashboardCustomWallets(wallets);}
     else if(collection==="settings"){
      const settings=data&&typeof data==="object"?data:{};
      setChartRange(typeof settings.chartRange==="string"?settings.chartRange:"৬ মাস");

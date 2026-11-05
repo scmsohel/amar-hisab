@@ -11,6 +11,7 @@ import 'package:lottie/lottie.dart';
 import 'offline_sync.dart';
 import 'wallet_management_screen.dart';
 import 'savings_management_screen.dart';
+import 'password_reset_screen.dart';
 
 class _ControllerDisposalScope extends StatefulWidget {
   const _ControllerDisposalScope({
@@ -417,6 +418,20 @@ class _AuthApi {
     await _setActiveUser(result['user']);
     return result;
   }
+
+  static Future<Map<String, dynamic>> requestPasswordReset(String email) =>
+      _post('/auth/password/forgot', {'email': email.trim()});
+
+  static Future<Map<String, dynamic>> resetPassword({
+    required String email,
+    required String otp,
+    required String newPassword,
+  }) =>
+      _post('/auth/password/reset', {
+        'email': email.trim(),
+        'otp': otp.trim(),
+        'newPassword': newPassword,
+      });
 
   static Future<Map<String, dynamic>> verifyInvite(String invite) =>
       _post('/auth/invite/verify', {'invite': invite.trim()});
@@ -1066,7 +1081,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       Row(children: [
                         Checkbox(value: _remember, onChanged: (v) => setState(() => _remember = v ?? false), visualDensity: VisualDensity.compact, side: const BorderSide(color: Color(0xFF9AA8BC))),
                         const Expanded(child: Text('আমাকে মনে রাখুন', style: TextStyle(color: _muted, fontSize: 12))),
-                        TextButton(onPressed: () => _notice(context, 'পাসওয়ার্ড পুনরুদ্ধারের API এখনো সংযুক্ত করা হয়নি।'), child: const Text('পাসওয়ার্ড ভুলে গেছেন?', style: TextStyle(color: _authGreen, fontSize: 11.5, fontWeight: FontWeight.w700))),
+                        TextButton(
+                          onPressed: _submitting
+                              ? null
+                              : () => Navigator.of(context).push(_route(
+                                    PasswordResetScreen(
+                                      initialEmail: _identity.text.trim(),
+                                      onRequestCode: _AuthApi.requestPasswordReset,
+                                      onResetPassword: _AuthApi.resetPassword,
+                                    ),
+                                  )),
+                          child: const Text('পাসওয়ার্ড ভুলে গেছেন?', style: TextStyle(color: _authGreen, fontSize: 11.5, fontWeight: FontWeight.w700)),
+                        ),
                       ]),
                       const SizedBox(height: 8),
                       _PrimaryButton(label: _submitting ? 'লগইন হচ্ছে...' : 'লগইন করুন', onPressed: _submitting ? null : _submit),

@@ -59,6 +59,12 @@ class OfflineSyncStore {
 
   Future<void> _createAccountScopedTables(DatabaseExecutor db) async {
     await db.execute('''
+      CREATE TABLE IF NOT EXISTS sync_metadata (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+      )
+    ''');
+    await db.execute('''
       CREATE TABLE local_records (
         account_id TEXT NOT NULL,
         collection TEXT NOT NULL,

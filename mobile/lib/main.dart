@@ -81,6 +81,10 @@ int? _transactionTimeMinutes(dynamic value) {
 
 const _blue = Color(0xFF287FCB);
 const _deepBlue = Color(0xFF1C5F9D);
+const _authGreen = Color(0xFF078B62);
+const _authGreenDark = Color(0xFF056B4C);
+const _authText = Color(0xFF173B35);
+const _authHint = Color(0xFF71847C);
 const _ink = Color(0xFF174A72);
 const _muted = Color(0xFF687C78);
 const _line = Color(0xFFDCE6F0);
@@ -1021,7 +1025,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
-                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: .94), borderRadius: BorderRadius.circular(30), border: Border.all(color: Colors.white, width: 1.5), boxShadow: [BoxShadow(color: const Color(0xFF244A88).withValues(alpha: .07), blurRadius: 30, offset: const Offset(0, 12))]),
+                    decoration: BoxDecoration(color: Colors.white.withValues(alpha: .94), borderRadius: BorderRadius.circular(30), border: Border.all(color: Colors.white, width: 1.5), boxShadow: [BoxShadow(color: const Color(0xFF087A5B).withValues(alpha: .07), blurRadius: 30, offset: const Offset(0, 12))]),
                     child: Form(key: _formKey, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                       const Text('লগইন করুন', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: _ink)),
                       const SizedBox(height: 6),
@@ -1030,21 +1034,39 @@ class _LoginScreenState extends State<LoginScreen> {
                       TextFormField(
                         controller: _identity,
                         keyboardType: TextInputType.emailAddress,
-                        decoration: const InputDecoration(prefixIcon: Icon(Icons.mail_outline_rounded), hintText: 'ইমেইল ঠিকানা'),
+                        style: const TextStyle(color: _authText, fontSize: 14, fontWeight: FontWeight.w600),
+                        decoration: const InputDecoration(
+                          prefixIcon: Icon(Icons.mail_outline_rounded, color: _authGreen),
+                          hintText: 'ইমেইল ঠিকানা',
+                          hintStyle: TextStyle(color: _authHint, fontSize: 14),
+                          filled: true,
+                          fillColor: Color(0xFFF5FBF8),
+                        ),
                         validator: (v) => (v == null || v.trim().isEmpty) ? 'ইমেইল অথবা মোবাইল নম্বর দিন।' : null,
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: _password,
                         obscureText: !_showPassword,
-                        decoration: InputDecoration(prefixIcon: const Icon(Icons.lock_outline_rounded), hintText: 'পাসওয়ার্ড', suffixIcon: IconButton(onPressed: () => setState(() => _showPassword = !_showPassword), icon: Icon(_showPassword ? Icons.visibility_off_rounded : Icons.visibility_rounded))),
+                        style: const TextStyle(color: _authText, fontSize: 14, fontWeight: FontWeight.w600),
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.lock_outline_rounded, color: _authGreen),
+                          hintText: 'পাসওয়ার্ড',
+                          hintStyle: const TextStyle(color: _authHint, fontSize: 14),
+                          filled: true,
+                          fillColor: const Color(0xFFF5FBF8),
+                          suffixIcon: IconButton(
+                            onPressed: () => setState(() => _showPassword = !_showPassword),
+                            icon: Icon(_showPassword ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: _authHint),
+                          ),
+                        ),
                         validator: (v) => (v == null || v.isEmpty) ? 'পাসওয়ার্ড দিন।' : null,
                       ),
                       const SizedBox(height: 8),
                       Row(children: [
                         Checkbox(value: _remember, onChanged: (v) => setState(() => _remember = v ?? false), visualDensity: VisualDensity.compact, side: const BorderSide(color: Color(0xFF9AA8BC))),
                         const Expanded(child: Text('আমাকে মনে রাখুন', style: TextStyle(color: _muted, fontSize: 12))),
-                        TextButton(onPressed: () => _notice(context, 'পাসওয়ার্ড পুনরুদ্ধারের API এখনো সংযুক্ত করা হয়নি।'), child: const Text('পাসওয়ার্ড ভুলে গেছেন?', style: TextStyle(color: _blue, fontSize: 11.5, fontWeight: FontWeight.w700))),
+                        TextButton(onPressed: () => _notice(context, 'পাসওয়ার্ড পুনরুদ্ধারের API এখনো সংযুক্ত করা হয়নি।'), child: const Text('পাসওয়ার্ড ভুলে গেছেন?', style: TextStyle(color: _authGreen, fontSize: 11.5, fontWeight: FontWeight.w700))),
                       ]),
                       const SizedBox(height: 8),
                       _PrimaryButton(label: _submitting ? 'লগইন হচ্ছে...' : 'লগইন করুন', onPressed: _submitting ? null : _submit),
@@ -1053,9 +1075,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 14),
                       OutlinedButton.icon(
                         onPressed: () => Navigator.of(context).push(_route(const InviteVerificationScreen())),
-                        icon: const Icon(Icons.groups_2_outlined, color: Color(0xFF00834A), size: 24),
+                        icon: const Icon(Icons.groups_2_outlined, color: _authGreen, size: 24),
                         label: const Text('ইনভাইট কোড দিয়ে যোগ দিন', style: TextStyle(color: _ink, fontWeight: FontWeight.w700, fontSize: 13)),
-                        style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48), side: const BorderSide(color: _line), shape: const StadiumBorder()),
+                        style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48), foregroundColor: _authGreen, side: const BorderSide(color: Color(0xFFD5EDE3)), shape: const StadiumBorder()),
                       ),
 
                     ])),
@@ -1171,7 +1193,7 @@ class _ServerSettingsScreenState extends State<ServerSettingsScreen> {
                     color: Colors.white.withValues(alpha: .95),
                     borderRadius: BorderRadius.circular(30),
                     border: Border.all(color: Colors.white, width: 1.5),
-                    boxShadow: [BoxShadow(color: const Color(0xFF244A88).withValues(alpha: .07), blurRadius: 30, offset: const Offset(0, 12))],
+                    boxShadow: [BoxShadow(color: const Color(0xFF087A5B).withValues(alpha: .07), blurRadius: 30, offset: const Offset(0, 12))],
                   ),
                   child: Form(key: _formKey, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                     const Icon(Icons.cloud_done_outlined, size: 44, color: _blue),
@@ -7033,7 +7055,7 @@ class _InviteVerificationScreenState extends State<InviteVerificationScreen> {
                 constraints: const BoxConstraints(maxWidth: 430),
                 child: Container(
                   padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
-                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: .95), borderRadius: BorderRadius.circular(30), border: Border.all(color: Colors.white, width: 1.5), boxShadow: [BoxShadow(color: const Color(0xFF244A88).withValues(alpha: .07), blurRadius: 30, offset: const Offset(0, 12))]),
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: .95), borderRadius: BorderRadius.circular(30), border: Border.all(color: Colors.white, width: 1.5), boxShadow: [BoxShadow(color: const Color(0xFF087A5B).withValues(alpha: .07), blurRadius: 30, offset: const Offset(0, 12))]),
                   child: Form(key: _formKey, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                     const Icon(Icons.verified_user_outlined, size: 42, color: _blue),
                     const SizedBox(height: 12),
@@ -7044,7 +7066,14 @@ class _InviteVerificationScreenState extends State<InviteVerificationScreen> {
                     TextFormField(
                       controller: _invite,
                       textCapitalization: TextCapitalization.characters,
-                      decoration: const InputDecoration(prefixIcon: Icon(Icons.groups_2_outlined), hintText: 'ইনভাইট কোড লিখুন'),
+                      style: const TextStyle(color: _authText, fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 1.1),
+                      decoration: const InputDecoration(
+                        prefixIcon: Icon(Icons.groups_2_outlined, color: _authGreen),
+                        hintText: 'ইনভাইট কোড লিখুন',
+                        hintStyle: TextStyle(color: _authHint, fontSize: 14, fontWeight: FontWeight.w500, letterSpacing: 0),
+                        filled: true,
+                        fillColor: Color(0xFFF5FBF8),
+                      ),
                       validator: (v) => (v == null || v.trim().isEmpty) ? 'ইনভাইট কোড দিন।' : null,
                     ),
                     const SizedBox(height: 18),
@@ -7151,9 +7180,13 @@ class _SignupScreenState extends State<SignupScreen> {
         TextFormField(
           controller: _invite,
           readOnly: widget.verifiedInvite.isNotEmpty,
+          style: const TextStyle(color: _authText, fontSize: 14, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
-            prefixIcon: const Icon(Icons.groups_2_outlined),
+            prefixIcon: const Icon(Icons.groups_2_outlined, color: _authGreen),
             hintText: 'ইনভাইট কোড',
+            hintStyle: const TextStyle(color: _authHint, fontSize: 14),
+            filled: true,
+            fillColor: const Color(0xFFF5FBF8),
             suffixIcon: widget.verifiedInvite.isNotEmpty
                 ? const Icon(Icons.verified_rounded, color: _blue)
                 : null,
@@ -7165,9 +7198,13 @@ class _SignupScreenState extends State<SignupScreen> {
         TextFormField(
           controller: _name,
           textCapitalization: TextCapitalization.words,
+          style: const TextStyle(color: _authText, fontSize: 14, fontWeight: FontWeight.w600),
           decoration: const InputDecoration(
-            prefixIcon: Icon(Icons.person_outline_rounded),
+            prefixIcon: Icon(Icons.person_outline_rounded, color: _authGreen),
             hintText: 'আপনার নাম লিখুন',
+            hintStyle: TextStyle(color: _authHint, fontSize: 14),
+            filled: true,
+            fillColor: Color(0xFFF5FBF8),
           ),
           validator: (v) =>
               (v == null || v.trim().length < 2) ? 'সঠিক নাম লিখুন।' : null,
@@ -7176,9 +7213,13 @@ class _SignupScreenState extends State<SignupScreen> {
         TextFormField(
           controller: _email,
           keyboardType: TextInputType.emailAddress,
+          style: const TextStyle(color: _authText, fontSize: 14, fontWeight: FontWeight.w600),
           decoration: const InputDecoration(
-            prefixIcon: Icon(Icons.mail_outline_rounded),
+            prefixIcon: Icon(Icons.mail_outline_rounded, color: _authGreen),
             hintText: 'ইমেইল লিখুন',
+            hintStyle: TextStyle(color: _authHint, fontSize: 14),
+            filled: true,
+            fillColor: Color(0xFFF5FBF8),
           ),
           validator: (v) {
             final s = (v ?? '').trim();
@@ -7191,9 +7232,13 @@ class _SignupScreenState extends State<SignupScreen> {
         TextFormField(
           controller: _mobile,
           keyboardType: TextInputType.phone,
+          style: const TextStyle(color: _authText, fontSize: 14, fontWeight: FontWeight.w600),
           decoration: const InputDecoration(
-            prefixIcon: Icon(Icons.phone_iphone_rounded),
+            prefixIcon: Icon(Icons.phone_iphone_rounded, color: _authGreen),
             hintText: 'মোবাইল নম্বর লিখুন',
+            hintStyle: TextStyle(color: _authHint, fontSize: 14),
+            filled: true,
+            fillColor: Color(0xFFF5FBF8),
           ),
           validator: (v) =>
               (v ?? '').replaceAll(RegExp(r'\D'), '').length >= 10
@@ -7206,9 +7251,13 @@ class _SignupScreenState extends State<SignupScreen> {
         TextFormField(
           controller: _password,
           obscureText: !_showPassword,
+          style: const TextStyle(color: _authText, fontSize: 14, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
-            prefixIcon: const Icon(Icons.lock_outline_rounded),
+            prefixIcon: const Icon(Icons.lock_outline_rounded, color: _authGreen),
             hintText: 'পাসওয়ার্ড লিখুন',
+            hintStyle: const TextStyle(color: _authHint, fontSize: 14),
+            filled: true,
+            fillColor: const Color(0xFFF5FBF8),
             suffixIcon: IconButton(
               onPressed: () =>
                   setState(() => _showPassword = !_showPassword),
@@ -7225,9 +7274,13 @@ class _SignupScreenState extends State<SignupScreen> {
         TextFormField(
           controller: _confirm,
           obscureText: !_showConfirm,
+          style: const TextStyle(color: _authText, fontSize: 14, fontWeight: FontWeight.w600),
           decoration: InputDecoration(
-            prefixIcon: const Icon(Icons.lock_outline_rounded),
+            prefixIcon: const Icon(Icons.lock_outline_rounded, color: _authGreen),
             hintText: 'পাসওয়ার্ড আবার লিখুন',
+            hintStyle: const TextStyle(color: _authHint, fontSize: 14),
+            filled: true,
+            fillColor: const Color(0xFFF5FBF8),
             suffixIcon: IconButton(
               onPressed: () => setState(() => _showConfirm = !_showConfirm),
               icon: Icon(_showConfirm
@@ -7355,7 +7408,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: const Color(0xFF244A88)
+                                  color: const Color(0xFF087A5B)
                                       .withValues(alpha: .06),
                                   blurRadius: 26,
                                   offset: const Offset(0, 10),
@@ -7409,7 +7462,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                         child: const Text(
                                           'লগইন করুন',
                                           style: TextStyle(
-                                            color: _blue,
+                                            color: _authGreen,
                                             fontWeight: FontWeight.w800,
                                             fontSize: 12,
                                           ),
@@ -7534,9 +7587,9 @@ class _PrimaryButton extends StatelessWidget {
         height: 52,
         child: DecoratedBox(
           decoration: BoxDecoration(
-            gradient: const LinearGradient(colors: [_blue, _deepBlue]),
+            gradient: const LinearGradient(colors: [_authGreen, _authGreenDark]),
             borderRadius: BorderRadius.circular(18),
-            boxShadow: [BoxShadow(color: _blue.withValues(alpha: .18), blurRadius: 14, offset: const Offset(0, 6))],
+            boxShadow: [BoxShadow(color: _authGreen.withValues(alpha: .20), blurRadius: 14, offset: const Offset(0, 6))],
           ),
           child: FilledButton(
             onPressed: onPressed,

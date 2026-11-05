@@ -152,34 +152,54 @@ app.get("/health", asyncRoute(async (_req, res) => {
   res.json({ status: "ok" });
 }));
 app.post("/auth/password/forgot", allowOtpRequest, asyncRoute(async (req, res) => {
+  res.set("Cache-Control", "no-store");
   const email = String(req.body?.email || "").trim().toLowerCase();
   if (!validEmail(email)) return res.status(400).json({ error: "সঠিক Email Address দিন।" });
   if (!mailer) return res.status(503).json({ error: "Password Reset Email Service এখনো Configure করা হয়নি।" });
 
-  const userResult = await pool.query("SELECT id,name,email FROM app_users WHERE lower(email)=lower($1) LIMIT 1", [email]);
-  if (!userResult.rowCount) return res.status(202).json({ message: genericResetMessage });
+  const client = await pool.connect();
+  let user = null;
+  let otp = null;
+  try {
+    await client.query("BEGIN");
+    const userResult = await client.query(
+      "SELECT id,name,email FROM app_users WHERE lower(email)=lower($1) LIMIT 1 FOR UPDATE",
+      [email]
+    );
+    if (!userResult.rowCount) {
+      await client.query("COMMIT");
+      return res.status(202).json({ message: genericResetMessage });
+    }
+    user = userResult.rows[0];
 
-  const user = userResult.rows[0];
-  const recent = await pool.query(
-    "SELECT COUNT(*)::int AS count, MAX(created_at) AS last_sent FROM password_reset_otps WHERE user_id=$1 AND created_at>NOW()-INTERVAL '1 hour'",
-    [user.id]
-  );
-  const recentCount = recent.rows[0].count;
-  const lastSent = recent.rows[0].last_sent ? new Date(recent.rows[0].last_sent).getTime() : 0;
-  if (recentCount >= 5 || (lastSent && Date.now() - lastSent < 60 * 1000)) {
-    return res.status(202).json({ message: genericResetMessage });
+    const recent = await client.query(
+      "SELECT COUNT(*)::int AS count, MAX(created_at) AS last_sent FROM password_reset_otps WHERE user_id=$1 AND created_at>NOW()-INTERVAL '1 hour'",
+      [user.id]
+    );
+    const recentCount = recent.rows[0].count;
+    const lastSent = recent.rows[0].last_sent ? new Date(recent.rows[0].last_sent).getTime() : 0;
+    if (recentCount >= 5 || (lastSent && Date.now() - lastSent < 60 * 1000)) {
+      await client.query("COMMIT");
+      return res.status(202).json({ message: genericResetMessage });
+    }
+
+    otp = String(randomInt(0, 1000000)).padStart(6, "0");
+    const otpHash = otpDigest(email, otp);
+    await client.query(
+      "UPDATE password_reset_otps SET consumed_at=NOW() WHERE user_id=$1 AND consumed_at IS NULL",
+      [user.id]
+    );
+    await client.query(
+      "INSERT INTO password_reset_otps(user_id,email,otp_hash,expires_at) VALUES($1,$2,$3,NOW()+INTERVAL '5 minutes')",
+      [user.id, email, otpHash]
+    );
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
   }
-
-  const otp = String(randomInt(0, 1000000)).padStart(6, "0");
-  const otpHash = otpDigest(email, otp);
-  await pool.query(
-    "UPDATE password_reset_otps SET consumed_at=NOW() WHERE user_id=$1 AND consumed_at IS NULL",
-    [user.id]
-  );
-  await pool.query(
-    "INSERT INTO password_reset_otps(user_id,email,otp_hash,expires_at) VALUES($1,$2,$3,NOW()+INTERVAL '5 minutes')",
-    [user.id, email, otpHash]
-  );
 
   try {
     await mailer.sendMail({

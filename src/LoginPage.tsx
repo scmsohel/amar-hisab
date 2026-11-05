@@ -67,7 +67,7 @@ export default function LoginPage() {
     event.preventDefault();
     setError("");
     if (!/^\d{6}$/.test(otp.trim())) return setError("৬ সংখ্যার OTP লিখুন।");
-    if (newPassword.length < 12) return setError("নতুন Password কমপক্ষে ১২ অক্ষরের হতে হবে।");
+    if (newPassword.length < 6) return setError("নতুন Password কমপক্ষে ৬ অক্ষরের হতে হবে।");
     if (newPassword !== confirmPassword) return setError("দুটি Password মিলছে না।");
     setBusy(true);
     try {
@@ -144,7 +144,7 @@ export default function LoginPage() {
                       <span className="signup-input"><LockKeyhole size={18}/><input inputMode="numeric" autoComplete="one-time-code" aria-label="৬ সংখ্যার OTP" value={otp} onChange={e=>setOtp(e.target.value.replace(/\D/g,"").slice(0,6))} placeholder="123456" maxLength={6}/></span>
                     </label>
                     <label className="signup-field">নতুন Password
-                      <span className="signup-input"><LockKeyhole size={18}/><input autoComplete="new-password" aria-label="নতুন Password" type="password" value={newPassword} onChange={e=>setNewPassword(e.target.value)} placeholder="কমপক্ষে ১২ অক্ষর"/></span>
+                      <span className="signup-input"><LockKeyhole size={18}/><input autoComplete="new-password" aria-label="নতুন Password" type="password" value={newPassword} onChange={e=>setNewPassword(e.target.value)} placeholder="কমপক্ষে ৬ অক্ষর"/></span>
                     </label>
                     <label className="signup-field">নতুন Password নিশ্চিত করুন
                       <span className="signup-input"><LockKeyhole size={18}/><input autoComplete="new-password" aria-label="নতুন Password নিশ্চিত করুন" type="password" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} placeholder="আবার Password লিখুন"/></span>

@@ -223,7 +223,7 @@ app.get("/auth/me", asyncRoute(async (req, res) => {
   res.json({ user: cleanUser(user) });
 }));
 app.put("/auth/profile", asyncRoute(async (req, res) => {
-  const session = readSession(req);
+  const session = await getSessionUser(req);
   if (!session) return res.status(401).json({ error: "লগইন প্রয়োজন।" });
   const name = String(req.body?.name || "").trim();
   const mobile = String(req.body?.mobile || "").trim();
@@ -235,7 +235,7 @@ app.put("/auth/profile", asyncRoute(async (req, res) => {
   res.json({ user: cleanUser(result.rows[0]) });
 }));
 app.post("/auth/password", asyncRoute(async (req, res) => {
-  const session = readSession(req);
+  const session = await getSessionUser(req);
   if (!session) return res.status(401).json({ error: "লগইন প্রয়োজন।" });
   const currentPassword = String(req.body?.currentPassword || "");
   const newPassword = String(req.body?.newPassword || "");
@@ -244,7 +244,7 @@ app.post("/auth/password", asyncRoute(async (req, res) => {
   if (!found.rowCount || !(await verifyPassword(currentPassword, found.rows[0].password_hash))) {
     return res.status(400).json({ error: "বর্তমান পাসওয়ার্ড সঠিক নয়।" });
   }
-  await pool.query("UPDATE app_users SET password_hash=$1 WHERE id=$2", [await hashPassword(newPassword), session.id]);
+  await pool.query("UPDATE app_users SET password_hash=$1, token_version=token_version+1 WHERE id=$2", [await hashPassword(newPassword), session.id]);
   res.json({ ok: true });
 }));
 app.post("/auth/password/forgot", asyncRoute(async (req, res) => {
@@ -377,17 +377,9 @@ app.post("/auth/register", asyncRoute(async (req, res) => {
 
 const financeCollections = new Set(["transactions", "debts", "bills", "goals", "wallets", "settings", "categories"]);
 async function requireUser(req, res) {
-  const session = readSession(req);
-  if (!session) {
-    res.status(401).json({ error: "লগইন প্রয়োজন।" });
-    return null;
-  }
-  const result = await pool.query("SELECT id,name,email,mobile,role FROM app_users WHERE id=$1", [session.id]);
-  if (!result.rowCount) {
-    res.status(401).json({ error: "অ্যাকাউন্ট পাওয়া যায়নি।" });
-    return null;
-  }
-  return result.rows[0];
+  const user = await getSessionUser(req);
+  if (!user) { res.status(401).json({ error: "লগইন প্রয়োজন।" }); return null; }
+  return user;
 }
 app.get("/sync/pull", asyncRoute(async (req, res) => {
   const user = await requireUser(req, res);
@@ -756,7 +748,7 @@ app.post("/data/restore", asyncRoute(async (req, res) => {
 }));
 
 app.post("/admin/invitations", asyncRoute(async (req, res) => {
-  const session = readSession(req);
+  const session = await getSessionUser(req);
   const isAdmin = session?.role === "admin";
   const setupAuthorized = setupKey && req.get("x-admin-setup-key") === setupKey;
   if (!isAdmin && !setupAuthorized) return res.status(403).json({ error: "Admin access required." });

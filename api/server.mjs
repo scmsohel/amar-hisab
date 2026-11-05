@@ -66,7 +66,7 @@ function readSession(req) {
 const asyncRoute = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 const cleanUser = ({ id, name, email, mobile, role }) => ({ id, name, email, mobile, role });
 const genericResetMessage = "অ্যাকাউন্ট থাকলে Password Reset Code আপনার Email-এ পাঠানো হয়েছে।";
-const validEmail = value => /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value);
+const validEmail = value => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 const otpDigest = (email, otp) => createHmac("sha256", sessionSecret).update(email + ":" + otp).digest();
 function allowOtpRequest(req, res, next) {
   const now = Date.now();

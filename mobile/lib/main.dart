@@ -2048,7 +2048,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               clipBehavior: Clip.antiAlias,
                               child: photo.isNotEmpty
                                   ? Transform.scale(
-                                      scale: 1.2,
+                                      scale: 1.5,
                                       child: Image.network(
                                         _AuthApi.resolveApiUrl(photo),
                                         headers: _AuthApi.avatarHeaders,

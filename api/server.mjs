@@ -283,12 +283,71 @@ app.post("/auth/password/forgot", asyncRoute(async (req, res) => {
   }
   if (user && otp) {
     try {
+      const safeName = String(user.name || "ব্যবহারকারী").replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[char]);
+      const plainText = [
+        "প্রিয় " + (user.name || "ব্যবহারকারী") + ",",
+        "",
+        "আপনার Amar Hisab অ্যাকাউন্টের Password পরিবর্তনের অনুরোধ পাওয়া গেছে।",
+        "আপনার ৬ সংখ্যার OTP: " + otp,
+        "এই কোডটি ৫ মিনিটের মধ্যে ব্যবহার করুন।",
+        "",
+        "নিরাপত্তা নির্দেশনা:",
+        "• এই OTP কাউকে জানাবেন না।",
+        "• আপনি অনুরোধ না করলে এই ইমেইলটি উপেক্ষা করুন।",
+        "• Amar Hisab-এর কেউ আপনার OTP চাইবে না।",
+        "",
+        "এটি একটি স্বয়ংক্রিয় নিরাপত্তা ইমেইল।",
+        "Amar Hisab · schome.my.id"
+      ].join("\n");
+      const html = `<!doctype html>
+<html lang="bn">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:24px 12px;background:#f3f6f4;font-family:Arial,'Noto Sans Bengali',sans-serif;color:#24332d;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;">
+    <tr><td style="background:#173b32;padding:26px 28px;text-align:center;">
+      <div style="font-size:25px;font-weight:700;letter-spacing:-.5px;color:#ffffff;">◈ Amar Hisab</div>
+      <div style="margin-top:7px;font-size:10px;letter-spacing:2px;color:#d8e9df;">YOUR PERSONAL FINANCE COMPANION</div>
+    </td></tr>
+    <tr><td style="padding:30px 28px 12px;text-align:center;">
+      <div style="font-size:30px;line-height:1;color:#21845b;">&#10003;</div>
+      <h1 style="margin:13px 0 6px;font-size:22px;color:#24332d;">Password Reset Request</h1>
+      <p style="margin:0;font-size:14px;line-height:1.7;color:#718078;">আপনার অ্যাকাউন্টের নিরাপত্তা যাচাই</p>
+    </td></tr>
+    <tr><td style="padding:18px 28px 8px;font-size:15px;line-height:1.8;color:#34443c;">
+      <p style="margin:0 0 12px;">প্রিয় <strong>${safeName}</strong>,</p>
+      <p style="margin:0;">আপনার Amar Hisab অ্যাকাউন্টের Password পরিবর্তনের অনুরোধ পাওয়া গেছে। অনুরোধটি সম্পন্ন করতে নিচের OTP ব্যবহার করুন।</p>
+    </td></tr>
+    <tr><td style="padding:18px 28px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f1f6f3;border:1px solid #dce9e1;border-radius:12px;">
+        <tr><td style="padding:22px 12px;text-align:center;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:#718078;">YOUR 6-DIGIT VERIFICATION CODE</div>
+          <div style="padding:12px 0 8px;font-size:36px;font-weight:700;letter-spacing:10px;color:#173b32;font-family:Arial,sans-serif;">${otp}</div>
+          <span style="display:inline-block;padding:6px 12px;background:#fff1d6;border-radius:20px;font-size:12px;font-weight:700;color:#8a5a12;">৫ মিনিটের মধ্যে মেয়াদ শেষ</span>
+        </td></tr>
+      </table>
+    </td></tr>
+    <tr><td style="padding:0 28px 22px;font-size:13px;line-height:1.8;color:#53645b;">
+      <p style="margin:0 0 8px;"><strong>নিরাপত্তা নির্দেশনা</strong></p>
+      <ul style="margin:0;padding-left:20px;">
+        <li>এই OTP কাউকে জানাবেন না।</li>
+        <li>আপনি অনুরোধ না করলে ইমেইলটি উপেক্ষা করুন।</li>
+        <li>Amar Hisab-এর কেউ আপনার OTP চাইবে না।</li>
+      </ul>
+    </td></tr>
+    <tr><td style="padding:18px 28px;background:#f7f9f8;border-top:1px solid #e8eeea;text-align:center;">
+      <p style="margin:0 0 6px;font-size:12px;line-height:1.6;color:#718078;">এটি একটি স্বয়ংক্রিয় নিরাপত্তা ইমেইল। এই ইমেইলের উত্তর দেওয়ার প্রয়োজন নেই।</p>
+      <p style="margin:0;font-size:11px;color:#8a9890;">© Amar Hisab · schome.my.id</p>
+    </td></tr>
+  </table>
+</body></html>`;
       await mailer.sendMail({
         from: process.env.SMTP_FROM || "Amar Hisab <noreply@schome.my.id>",
         to: user.email,
         subject: "Amar Hisab - Password Reset OTP",
-        text: "প্রিয় " + user.name + ", আপনার Password reset OTP: " + otp + "। কোডটি ৫ মিনিটের মধ্যে ব্যবহার করুন।",
-        html: "<h2>Amar Hisab</h2><p>আপনার Password reset OTP:</p><h1 style='letter-spacing:8px'>" + otp + "</h1><p>এই OTP ৫ মিনিট কার্যকর থাকবে।</p>"
+        text: plainText,
+        html
       });
     } catch (error) {
       console.error("Password reset email delivery failed:", error?.message || error);

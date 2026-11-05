@@ -211,18 +211,16 @@ app.post("/auth/login", asyncRoute(async (req, res) => {
   const identity = String(req.body?.identity || "").trim();
   const password = String(req.body?.password || "");
   if (!identity || !password) return res.status(400).json({ error: "Email/Mobile এবং Password দিন।" });
-  const result = await pool.query("SELECT id,name,email,mobile,password_hash,role FROM app_users WHERE lower(email)=lower($1) OR mobile=$1 LIMIT 1", [identity]);
+  const result = await pool.query("SELECT id,name,email,mobile,password_hash,role,token_version FROM app_users WHERE lower(email)=lower($1) OR mobile=$1 LIMIT 1", [identity]);
   const user = result.rows[0];
   if (!user || !(await verifyPassword(password, user.password_hash))) return res.status(401).json({ error: "Email/Mobile অথবা Password সঠিক নয়।" });
   setSession(res, user);
   res.json({ user: cleanUser(user) });
 }));
 app.get("/auth/me", asyncRoute(async (req, res) => {
-  const session = readSession(req);
-  if (!session) return res.status(401).json({ error: "লগইন প্রয়োজন।" });
-  const result = await pool.query("SELECT id,name,email,mobile,role FROM app_users WHERE id=$1", [session.id]);
-  if (!result.rowCount) return res.status(401).json({ error: "অ্যাকাউন্ট পাওয়া যায়নি।" });
-  res.json({ user: cleanUser(result.rows[0]) });
+  const user = await getSessionUser(req);
+  if (!user) return res.status(401).json({ error: "লগইন প্রয়োজন।" });
+  res.json({ user: cleanUser(user) });
 }));
 app.put("/auth/profile", asyncRoute(async (req, res) => {
   const session = readSession(req);

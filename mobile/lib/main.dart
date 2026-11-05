@@ -7,6 +7,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:lottie/lottie.dart';
 import 'offline_sync.dart';
 import 'wallet_management_screen.dart';
@@ -341,6 +343,52 @@ class _AuthApi {
     Map<String, dynamic> data = {};
     if (text.isNotEmpty) {
       try { final decoded = jsonDecode(text); if (decoded is Map<String, dynamic>) data = decoded; }
+      on FormatException { data = {'error': 'সার্ভার থেকে সঠিক উত্তর পাওয়া যায়নি।'}; }
+    }
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(data['error']?.toString() ?? 'অনুরোধ ব্যর্থ হয়েছে (${response.statusCode})।');
+    }
+    return data;
+  }
+
+  static String resolveApiUrl(String path) => path.startsWith('http') ? path : '$_baseUrl$path';
+  static Map<String, String> get avatarHeaders => _sessionCookie == null
+      ? const <String, String>{}
+      : <String, String>{HttpHeaders.cookieHeader: _sessionCookie!};
+
+  static Future<Map<String, dynamic>> uploadProfileAvatar(File file) async {
+    await _ensureConfigured();
+    final boundary = '----AmarHisab${DateTime.now().microsecondsSinceEpoch}';
+    final request = await _client.postUrl(Uri.parse('$_baseUrl/auth/profile/avatar'));
+    request.headers.set(HttpHeaders.contentTypeHeader, 'multipart/form-data; boundary=$boundary');
+    request.headers.set(HttpHeaders.acceptHeader, 'application/json');
+    if (_sessionCookie != null) request.headers.set(HttpHeaders.cookieHeader, _sessionCookie!);
+    request.add(utf8.encode('--$boundary\r\nContent-Disposition: form-data; name="avatar"; filename="profile.jpg"\r\nContent-Type: image/jpeg\r\n\r\n'));
+    request.add(await file.readAsBytes());
+    request.add(utf8.encode('\r\n--$boundary--\r\n'));
+    final response = await request.close().timeout(const Duration(seconds: 45));
+    final body = await response.transform(utf8.decoder).join();
+    Map<String, dynamic> data = {};
+    if (body.isNotEmpty) {
+      try { final decoded = jsonDecode(body); if (decoded is Map<String, dynamic>) data = decoded; }
+      on FormatException { data = {'error': 'সার্ভার থেকে সঠিক উত্তর পাওয়া যায়নি।'}; }
+    }
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(data['error']?.toString() ?? 'ছবি আপলোড করা যায়নি (${response.statusCode})।');
+    }
+    return data;
+  }
+
+  static Future<Map<String, dynamic>> _delete(String path) async {
+    await _ensureConfigured();
+    final request = await _client.deleteUrl(Uri.parse('$_baseUrl$path'));
+    request.headers.set(HttpHeaders.acceptHeader, 'application/json');
+    if (_sessionCookie != null) request.headers.set(HttpHeaders.cookieHeader, _sessionCookie!);
+    final response = await request.close().timeout(const Duration(seconds: 20));
+    final body = await response.transform(utf8.decoder).join();
+    Map<String, dynamic> data = {};
+    if (body.isNotEmpty) {
+      try { final decoded = jsonDecode(body); if (decoded is Map<String, dynamic>) data = decoded; }
       on FormatException { data = {'error': 'সার্ভার থেকে সঠিক উত্তর পাওয়া যায়নি।'}; }
     }
     if (response.statusCode < 200 || response.statusCode >= 300) {
@@ -1280,6 +1328,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   bool _loading = true;
+  bool _avatarUploading = false;
   String? _error;
   Map<String, dynamic> _user = {};
   DateTime? _joinedAt;
@@ -1348,6 +1397,99 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (d.inHours < 1) return '${_bn(d.inMinutes.toString())} মিনিট আগে';
     if (d.inDays < 1) return '${_bn(d.inHours.toString())} ঘণ্টা আগে';
     return '${_bn(d.inDays.toString())} দিন আগে';
+  }
+
+  Future<void> _editAvatar() async {
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: Theme.of(context).cardColor,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          ListTile(leading: const Icon(Icons.photo_library_outlined), title: const Text('গ্যালারি থেকে নির্বাচন'), onTap: () => Navigator.pop(sheetContext, 'gallery')),
+          ListTile(leading: const Icon(Icons.camera_alt_outlined), title: const Text('ক্যামেরা দিয়ে ছবি তুলুন'), onTap: () => Navigator.pop(sheetContext, 'camera')),
+          if ((_user['avatarUrl'] ?? '').toString().isNotEmpty)
+            ListTile(leading: const Icon(Icons.delete_outline_rounded, color: Colors.red), title: const Text('বর্তমান ছবি সরান', style: TextStyle(color: Colors.red)), onTap: () => Navigator.pop(sheetContext, 'remove')),
+          const SizedBox(height: 8),
+        ]),
+      ),
+    );
+    if (!mounted || choice == null) return;
+    if (choice == 'remove') {
+      await _removeAvatar();
+      return;
+    }
+    try {
+      final picked = await ImagePicker().pickImage(
+        source: choice == 'camera' ? ImageSource.camera : ImageSource.gallery,
+        imageQuality: 95,
+        maxWidth: 1600,
+        maxHeight: 1600,
+      );
+      if (picked == null || !mounted) return;
+      final cropped = await ImageCropper().cropImage(
+        sourcePath: picked.path,
+        aspectRatio: const CropAspectRatio(ratioX: 1, ratioY: 1),
+        compressFormat: ImageCompressFormat.jpg,
+        compressQuality: 90,
+        maxWidth: 1200,
+        maxHeight: 1200,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'প্রোফাইল ছবি Crop করুন',
+            toolbarColor: const Color(0xFF087A5B),
+            toolbarWidgetColor: Colors.white,
+            lockAspectRatio: true,
+            hideBottomControls: false,
+          ),
+          IOSUiSettings(title: 'প্রোফাইল ছবি Crop করুন', aspectRatioLockEnabled: true),
+        ],
+      );
+      if (cropped == null || !mounted) return;
+      setState(() => _avatarUploading = true);
+      final result = await _AuthApi.uploadProfileAvatar(File(cropped.path));
+      if (!mounted) return;
+      setState(() {
+        _user = result['user'] is Map ? Map<String, dynamic>.from(result['user']) : _user;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('প্রোফাইল ছবি সংরক্ষণ হয়েছে।')));
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString().replaceFirst('Exception: ', ''))));
+      }
+    } finally {
+      if (mounted) setState(() => _avatarUploading = false);
+    }
+  }
+
+  Future<void> _removeAvatar() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('প্রোফাইল ছবি সরাবেন?'),
+        content: const Text('আপনার বর্তমান প্রোফাইল ছবি মুছে ফেলা হবে।'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('বাতিল')),
+          TextButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('সরিয়ে ফেলুন')),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    setState(() => _avatarUploading = true);
+    try {
+      final result = await _AuthApi._delete('/auth/profile/avatar');
+      if (!mounted) return;
+      setState(() {
+        _user = result['user'] is Map ? Map<String, dynamic>.from(result['user']) : _user;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('প্রোফাইল ছবি সরানো হয়েছে।')));
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString().replaceFirst('Exception: ', ''))));
+      }
+    } finally {
+      if (mounted) setState(() => _avatarUploading = false);
+    }
   }
 
   Future<void> _editPersonalInfo() async {
@@ -1902,15 +2044,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               boxShadow: [BoxShadow(color: const Color(0xFF22B86B).withValues(alpha: .13), blurRadius: 18, spreadRadius: 2)]),
                             child: Container(
                               decoration: BoxDecoration(shape: BoxShape.circle, color: dark ? const Color(0xFF203B50) : const Color(0xFFE8F5EF),
-                                border: Border.all(color: surface, width: 4),
-                                image: photo.isNotEmpty ? DecorationImage(image: NetworkImage(photo), fit: BoxFit.cover) : null),
-                              child: photo.isEmpty ? Icon(Icons.person_rounded, size: 64, color: dark ? const Color(0xFF9CCDEB) : const Color(0xFF1688F8)) : null,
+                                border: Border.all(color: surface, width: 4)),
+                              clipBehavior: Clip.antiAlias,
+                              child: photo.isNotEmpty
+                                  ? Image.network(_AuthApi.resolveApiUrl(photo), headers: _AuthApi.avatarHeaders, fit: BoxFit.cover,
+                                      errorBuilder: (context, error, stackTrace) => Icon(Icons.person_rounded, size: 64, color: dark ? const Color(0xFF9CCDEB) : const Color(0xFF1688F8)))
+                                  : Icon(Icons.person_rounded, size: 64, color: dark ? const Color(0xFF9CCDEB) : const Color(0xFF1688F8)),
                             ),
                           ),
                           Positioned(right: 0, bottom: 4, child: Material(
                             color: const Color(0xFF08B83D), shape: const CircleBorder(side: BorderSide(color: Colors.white, width: 3)), elevation: 3,
-                            child: InkWell(customBorder: const CircleBorder(), onTap: () => _notice(context, 'প্রোফাইল ছবি আপলোডের জন্য Backend Upload API প্রয়োজন।'),
-                              child: const SizedBox(width: 32, height: 32, child: Icon(Icons.edit_rounded, color: Colors.white, size: 17))),
+                            child: InkWell(customBorder: const CircleBorder(), onTap: _avatarUploading ? null : _editAvatar,
+                              child: SizedBox(width: 32, height: 32, child: _avatarUploading ? const Padding(padding: EdgeInsets.all(8), child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Icon(Icons.edit_rounded, color: Colors.white, size: 17))),
                           )),
                         ])),
                         const SizedBox(height: 10),

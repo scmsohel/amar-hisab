@@ -117,6 +117,7 @@ class _AuthApi {
   static String? _activeUserId;
   static final ValueNotifier<String> syncStatus = ValueNotifier<String>('এখনো Sync হয়নি');
   static final ValueNotifier<int> syncPendingCount = ValueNotifier<int>(0);
+  static bool _syncInProgress = false;
 
   static String? get baseUrl => _baseUrl;
 
@@ -188,6 +189,8 @@ class _AuthApi {
       syncStatus.value = 'Server URL সেট করা নেই';
       return;
     }
+    if (_syncInProgress) return;
+    _syncInProgress = true;
     final engine = OfflineSyncEngine(baseUrl: base, sessionCookie: cookie, accountId: accountId);
     syncStatus.value = 'Sync হচ্ছে...';
     try {
@@ -206,6 +209,7 @@ class _AuthApi {
       syncStatus.value = 'Sync ব্যর্থ';
     } finally {
       engine.dispose();
+      _syncInProgress = false;
     }
   }
 

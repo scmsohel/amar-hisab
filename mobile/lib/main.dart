@@ -4079,10 +4079,10 @@ class _BillsScreenState extends State<_BillsScreen> {
             return Container(
               padding:const EdgeInsets.symmetric(horizontal:8,vertical:8),
               decoration:BoxDecoration(
-                color:dark?Color.lerp(surface,accent,.09):tint,
+                color:surface,
                 borderRadius:BorderRadius.circular(18),
-                border:Border.all(color:accent.withValues(alpha:dark ? .24 : .15)),
-                boxShadow:dark?[]:[BoxShadow(color:accent.withValues(alpha:.045),blurRadius:7,offset:const Offset(0,2))],
+                border:Border.all(color:line),
+                boxShadow:dark?[]:[BoxShadow(color:Colors.black.withValues(alpha:.035),blurRadius:7,offset:const Offset(0,2))],
               ),
               child:Row(children:[
                 Container(
@@ -4114,7 +4114,7 @@ class _BillsScreenState extends State<_BillsScreen> {
                       crossAxisAlignment:CrossAxisAlignment.start,
                       mainAxisSize:MainAxisSize.min,
                       children:[
-                        Text(_money(_left(e)),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:15,fontWeight:FontWeight.w900,color:done?muted:accent)),
+                        Text(_money(_left(e)),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:15,fontWeight:FontWeight.w900,color:accent)),
                         const SizedBox(height:3),
                         Container(
                           padding:const EdgeInsets.symmetric(horizontal:8,vertical:4),

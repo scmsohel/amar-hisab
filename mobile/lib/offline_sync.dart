@@ -235,6 +235,46 @@ class OfflineSyncStore {
     });
   }
 
+  /// Replaces a legacy array-based collection locally and queues record-level
+  /// upserts/deletes. Existing sync IDs are retained so edits never become
+  /// duplicate records when older screens submit complete collection arrays.
+  Future<void> replaceCollection(
+    String accountId,
+    String collection,
+    List<dynamic> items,
+  ) async {
+    final current = await records(accountId, collection);
+    final byLegacyId = <String, Map<String, dynamic>>{};
+    for (final item in current) {
+      final id = (item['id'] ?? '').toString();
+      final syncId = (item['_syncId'] ?? '').toString();
+      if (id.isNotEmpty) byLegacyId[id] = item;
+      if (syncId.isNotEmpty) byLegacyId[syncId] = item;
+    }
+
+    final retained = <String>{};
+    for (final raw in items) {
+      if (raw is! Map) continue;
+      final item = Map<String, dynamic>.from(raw);
+      final legacyId = (item['id'] ?? '').toString();
+      if ((item['_syncId'] ?? '').toString().trim().isEmpty &&
+          legacyId.isNotEmpty &&
+          byLegacyId.containsKey(legacyId)) {
+        item['_syncId'] = byLegacyId[legacyId]!['_syncId'];
+      }
+      await save(accountId, collection, item);
+      final syncId = (item['_syncId'] ?? '').toString();
+      if (syncId.isNotEmpty) retained.add(syncId);
+    }
+
+    for (final item in current) {
+      final syncId = (item['_syncId'] ?? item['id'] ?? '').toString();
+      if (syncId.isNotEmpty && !retained.contains(syncId)) {
+        await delete(accountId, collection, syncId);
+      }
+    }
+  }
+
   Future<List<Map<String, Object?>>> pending(String accountId, {int limit = 200}) async {
     final db = await database;
     return db.query(

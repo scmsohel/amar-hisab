@@ -335,7 +335,22 @@ class _AuthApi {
   }
 
   static Future<Map<String, dynamic>> _put(String path, Map<String, dynamic> body) async {
-    final match = RegExp(r'^/data/([a-z_]+)
+    final segments = path.split('/');
+    final collection = segments.length == 3 && segments[1] == 'data' ? segments[2] : null;
+    const offlineCollections = {'transactions', 'debts', 'bills', 'goals', 'wallets', 'settings', 'categories'};
+    if (collection != null && offlineCollections.contains(collection)) {
+      final accountId = _requireActiveUserId();
+      final items = body['data'];
+      if (items is! List) throw Exception('সংরক্ষণের ডেটা সঠিক নয়।');
+      await OfflineSyncStore.instance.replaceCollection(accountId, collection, items);
+      await trySyncPending();
+      return {
+        'data': await OfflineSyncStore.instance.records(accountId, collection),
+        'offline': syncPendingCount.value > 0,
+      };
+    }
+
+    await _ensureConfigured();
     final request = await _client.putUrl(Uri.parse('$_baseUrl$path'));
     request.headers.contentType = ContentType.json;
     request.headers.set(HttpHeaders.acceptHeader, 'application/json');
@@ -345,11 +360,15 @@ class _AuthApi {
     final text = await response.transform(utf8.decoder).join();
     Map<String, dynamic> data = {};
     if (text.isNotEmpty) {
-      try { final decoded = jsonDecode(text); if (decoded is Map<String, dynamic>) data = decoded; }
-      on FormatException { data = {'error': 'সার্ভার থেকে সঠিক উত্তর পাওয়া যায়নি।'}; }
+      try {
+        final decoded = jsonDecode(text);
+        if (decoded is Map<String, dynamic>) data = decoded;
+      } on FormatException {
+        data = {'error': 'সার্ভার থেকে সঠিক উত্তর পাওয়া যায়নি۔'};
+      }
     }
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception(data['error']?.toString() ?? 'অনুরোধ ব্যর্থ হয়েছে (${response.statusCode})।');
+      throw Exception(data['error']?.toString() ?? 'অনুরোধ ব্যর্থ হয়েছে (${response.statusCode})۔');
     }
     return data;
   }

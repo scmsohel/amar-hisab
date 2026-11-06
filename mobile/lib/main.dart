@@ -2456,6 +2456,21 @@ class _DebtsScreenState extends State<_DebtsScreen> {
     return p.whereType<Map>().where((b) => (b['eventType'] ?? '') != 'withdrawal').fold<double>(0, (a,b) => a + _num(b['amount']));
   }
   double _left(Map<String,dynamic> e) => (_num(e['amount']) - _paid(e)).clamp(0,double.infinity).toDouble();
+  String _installmentProgressLabel(Map<String,dynamic> e) {
+    final per = _num(e['installmentAmount'] ?? e['installment_amount']);
+    final totalAmount = _num(e['amount']);
+    if (per <= 0 || totalAmount <= 0) return '';
+    final total = (_num(e['totalInstallments'] ?? e['total_installments']).toInt() > 0)
+        ? _num(e['totalInstallments'] ?? e['total_installments']).toInt()
+        : (totalAmount / per).ceil();
+    if (total <= 0) return '';
+    final paidCount = (_paid(e) / per).floor();
+    final current = _paid(e) >= totalAmount ? total : (paidCount + 1).clamp(1, total);
+    String bn(int value) => value.toString().replaceAllMapped(
+      RegExp(r'[0-9]'), (m) => '০১২৩৪৫৬৭৮৯'[int.parse(m.group(0)!)]
+    );
+    return '${bn(current)} / ${bn(total)}';
+  }
   DateTime? _due(Map<String,dynamic> e) => _date(e['nextDate'] ?? e['dueDate'] ?? e['nextPaymentDate'] ?? e['due_date']);
   bool _done(Map<String,dynamic> e) => ['পরিশোধিত','সম্পন্ন'].contains((e['status'] ?? '').toString());
   String _dateLabel(DateTime? d) {
@@ -3230,7 +3245,7 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                   const SizedBox(height:2),
                   Row(children:[Icon(Icons.calendar_today_outlined,size:11,color:muted),const SizedBox(width:3),Flexible(child:Text(_dateLabel(date),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,color:muted)))]),
                   const SizedBox(height:3),
-                  Wrap(spacing:4,runSpacing:3,children:[_pill(_kindOf(e),accent,debt?const Color(0xFFFFE9EB):const Color(0xFFE1F8EC)),_pill(((e['debtRule']??e['debt_rule'])=='installment'||_num(e['installmentAmount']??e['installment_amount'])>0)?'কিস্তি':(e['debtRule']??e['debt_rule'])=='one-time'?'সহজ হিসাব':(e['accountType']??e['debtType']??e['type']??'সহজ হিসাব').toString(),blue,const Color(0xFFEAF2FF))]),
+                  Wrap(spacing:4,runSpacing:3,children:[_pill(_kindOf(e),accent,debt?const Color(0xFFFFE9EB):const Color(0xFFE1F8EC)),_pill(((e['debtRule']??e['debt_rule'])=='installment'||_num(e['installmentAmount']??e['installment_amount'])>0)?'কিস্তি':(e['debtRule']??e['debt_rule'])=='one-time'?'সহজ হিসাব':(e['accountType']??e['debtType']??e['type']??'সহজ হিসাব').toString(),blue,const Color(0xFFEAF2FF)),if(_installmentProgressLabel(e).isNotEmpty)_pill(_installmentProgressLabel(e),const Color(0xFF287FF5),const Color(0xFFEAF2FF))]),
                 ])),
                 Container(width:1,height:54,color:line,margin:const EdgeInsets.symmetric(horizontal:5)),
                 SizedBox(width:150,child:Row(

@@ -3278,9 +3278,18 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                         _pill(done?'সম্পন্ন':'●  চলমান',done?muted:green,const Color(0xFFE1F8EC)),
                         if(due!=null)...[
                            const SizedBox(height:4),
-                           Text(_dateLabel(due),maxLines:2,softWrap:true,style:TextStyle(fontSize:9,fontWeight:FontWeight.w700,height:1.15,color:overdue?red:muted)),
-                           const SizedBox(height:1),
-                           Text(due.difference(DateTime.now()).inDays < 0 ? 'ওভারডিউ' : due.difference(DateTime.now()).inDays == 0 ? 'আজ' : '${_bengaliDigits(due.difference(DateTime.now()).inDays.toString())} দিন বাকি',maxLines:1,style:TextStyle(fontSize:9,height:1.1,color:overdue?red:muted)),
+                           Builder(builder:(context){
+                             final now=DateTime.now();
+                             final days=DateTime(due.year,due.month,due.day).difference(DateTime(now.year,now.month,now.day)).inDays;
+                             final Color dueColor=days<0?const Color(0xFFDC4545):days<=3?const Color(0xFFB7791F):const Color(0xFF159568);
+                             final Color dueBg=days<0?const Color(0xFFFFE8E8):days<=3?const Color(0xFFFFF4DB):const Color(0xFFE1F8EC);
+                             final label=days<0?'ওভারডিউ':days==0?'আজ':'${_bengaliDigits(days.toString())} দিন বাকি';
+                             return Container(
+                               padding:const EdgeInsets.symmetric(horizontal:7,vertical:4),
+                               decoration:BoxDecoration(color:dueBg,borderRadius:BorderRadius.circular(8)),
+                               child:Text(label,maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,fontWeight:FontWeight.w700,height:1.1,color:dueColor)),
+                             );
+                           }),
                          ],
                       ],
                     )),

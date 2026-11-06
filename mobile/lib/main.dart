@@ -3057,6 +3057,8 @@ class _DebtsScreenState extends State<_DebtsScreen> {
     }
   }
 
+  String _debtMoney(double value) => '৳ ${value.round().toString().replaceAllMapped(RegExp(r'\B(?=(\d{3})+(?!\d))'), (m) => ',')}';
+
   Future<void> _openPaymentModal(Map<String,dynamic> debt) async {
     final amount=TextEditingController(), note=TextEditingController();
     final payments=(debt['payments'] is List?(debt['payments'] as List).whereType<Map>().map((p)=>Map<String,dynamic>.from(p)).toList():<Map<String,dynamic>>[]);
@@ -3119,14 +3121,14 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                 final hintInk=dark?const Color(0xFFE7F2EE):const Color(0xFF263B35);
                 return Container(padding:const EdgeInsets.all(10),decoration:BoxDecoration(color:hintBg,borderRadius:BorderRadius.circular(11),border:Border.all(color:hintBorder)),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
                   Row(children:[
-                    Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text('প্রতি কিস্তি',style:TextStyle(fontSize:10,color:hintText)),const SizedBox(height:3),Text(_money(per),style:TextStyle(fontSize:13,fontWeight:FontWeight.w900,color:hintInk))])),
-                    Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text('বর্তমান কিস্তি বাকি',style:TextStyle(fontSize:10,color:hintText)),const SizedBox(height:3),Text(_money(currentInstallmentRemaining),style:TextStyle(fontSize:13,fontWeight:FontWeight.w900,color:hintInk))])),
+                    Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text('প্রতি কিস্তি',style:TextStyle(fontSize:10,color:hintText)),const SizedBox(height:3),Text(_debtMoney(per),style:TextStyle(fontSize:13,fontWeight:FontWeight.w900,color:hintInk))])),
+                    Expanded(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text('বর্তমান কিস্তি বাকি',style:TextStyle(fontSize:10,color:hintText)),const SizedBox(height:3),Text(_debtMoney(currentInstallmentRemaining),style:TextStyle(fontSize:13,fontWeight:FontWeight.w900,color:hintInk))])),
                   ]),
                   if(amount.text.trim().isNotEmpty)...[
                     const SizedBox(height:7),
                     Divider(height:1,color:hintBorder),
                     const SizedBox(height:6),
-                    Text(currentLeft>0?'এই কিস্তি পূর্ণ করতে আরও ${_money(currentLeft)} বাকি':extra>0?'এই কিস্তি পূর্ণ হবে; অতিরিক্ত ${_money(extra)} পরের কিস্তিতে গণনা হবে':'এই কিস্তি পূর্ণ হবে।',style:TextStyle(fontSize:10,fontWeight:FontWeight.w700,color:hintInk)),
+                    Text(currentLeft>0?'এই কিস্তি পূর্ণ করতে আরও ${_debtMoney(currentLeft)} বাকি':extra>0?'এই কিস্তি পূর্ণ হবে; অতিরিক্ত ${_debtMoney(extra)} পরের কিস্তিতে গণনা হবে':'এই কিস্তি পূর্ণ হবে।',style:TextStyle(fontSize:10,fontWeight:FontWeight.w700,color:hintInk)),
                   ],
                 ]));
               }),

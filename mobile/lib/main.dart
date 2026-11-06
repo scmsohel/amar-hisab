@@ -3252,7 +3252,6 @@ class _DebtsScreenState extends State<_DebtsScreen> {
           itemBuilder:(context,index){
             final e=rows[index], debt=_kindOf(e)=='দেনা', done=_done(e), due=_due(e);
             final date=_date(e['date']??e['dateInput']??e['createdAt']);
-            final overdue=!done&&due!=null&&due.isBefore(DateTime.now());
             final accent=debt?red:green;
             return Container(padding:const EdgeInsets.symmetric(horizontal:8,vertical:8),decoration:BoxDecoration(color:surface,borderRadius:BorderRadius.circular(18),border:Border.all(color:line),boxShadow:dark?[]:[BoxShadow(color:const Color(0xFF1D3557).withValues(alpha:.04),blurRadius:7,offset:const Offset(0,2))]),
               child:Row(children:[

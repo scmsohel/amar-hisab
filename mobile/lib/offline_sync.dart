@@ -120,7 +120,14 @@ class OfflineSyncStore {
       for (final raw in items) {
         if (raw is! Map) continue;
         final data = Map<String, dynamic>.from(raw);
-        final id = (data['_syncId'] ?? data['id'] ?? '').toString();
+        final id = (data['_syncId'] ??
+                data['id'] ??
+                data['name'] ??
+                data['key'] ??
+                data['settingKey'] ??
+                '')
+            .toString()
+            .trim();
         if (id.isEmpty) continue;
         data['_syncId'] = id;
         final existing = await txn.query(

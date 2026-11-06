@@ -3102,10 +3102,10 @@ class _DebtsScreenState extends State<_DebtsScreen> {
               const SizedBox(width:7),
               Expanded(child:TextField(controller:note,maxLines:1,decoration:const InputDecoration(labelText:'নোট (ঐচ্ছিক)'))),
             ]),
-            if(debt['debtRule']=='installment'&&_num(debt['installmentAmount'])>0&&!withdrawalMode)...[
+            if(_num(debt['installmentAmount']??debt['installment_amount'])>0&&!withdrawalMode)...[
               const SizedBox(height:9),
               Builder(builder:(context){
-                final per=_num(debt['installmentAmount']);
+                final per=_num(debt['installmentAmount']??debt['installment_amount']);
                 final oldPayment=editing==null?null:payments.where((p)=>p['id'].toString()==editing.toString()).firstOrNull;
                 final paidBefore=(paid()-_num(oldPayment?['amount'])).clamp(0,double.infinity).toDouble();
                 final remainingBefore=(_num(debt['amount'])-paidBefore).clamp(0,double.infinity).toDouble();

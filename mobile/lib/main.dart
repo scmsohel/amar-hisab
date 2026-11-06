@@ -1285,12 +1285,44 @@ class _ServerSettingsScreenState extends State<ServerSettingsScreen> {
                       keyboardType: TextInputType.url,
                       autocorrect: false,
                       enableSuggestions: false,
+                      style: const TextStyle(
+                        color: _authText,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
                       decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.link_rounded),
+                        prefixIcon: Icon(Icons.link_rounded, color: _authGreenDark),
                         prefixText: 'https://',
+                        prefixStyle: TextStyle(
+                          color: _authGreenDark,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
                         suffixText: '/api',
+                        suffixStyle: TextStyle(
+                          color: _authGreenDark,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
                         hintText: 'your-domain.example',
+                        hintStyle: TextStyle(
+                          color: Color(0xFF9AA9A3),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
                         labelText: 'Server Domain',
+                        labelStyle: TextStyle(
+                          color: _authGreenDark,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        floatingLabelStyle: TextStyle(
+                          color: _authGreenDark,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        filled: true,
+                        fillColor: Color(0xFFF7FBF9),
                       ),
                       validator: _validateDomain,
                     ),
@@ -1303,8 +1335,19 @@ class _ServerSettingsScreenState extends State<ServerSettingsScreen> {
                     const SizedBox(height: 14),
                     OutlinedButton.icon(
                       onPressed: () => setState(() => _showHelp = !_showHelp),
-                      icon: const Icon(Icons.info_outline_rounded),
-                      label: Text(_showHelp ? 'নির্দেশনা লুকান' : 'কোন URL ব্যবহার করব?'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: _authGreenDark,
+                        side: BorderSide(color: _authGreen.withValues(alpha: .55)),
+                        textStyle: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      icon: const Icon(Icons.info_outline_rounded, color: _authGreenDark),
+                      label: Text(
+                        _showHelp ? 'নির্দেশনা লুকান' : 'কোন URL ব্যবহার করব?',
+                        style: const TextStyle(color: _authGreenDark),
+                      ),
                     ),
                     if (_showHelp) ...[
                       const SizedBox(height: 8),

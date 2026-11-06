@@ -262,9 +262,11 @@ class OfflineSyncStore {
           byLegacyId.containsKey(legacyId)) {
         item['_syncId'] = byLegacyId[legacyId]!['_syncId'];
       }
-      await save(accountId, collection, item);
       final syncId = (item['_syncId'] ?? '').toString();
       if (syncId.isNotEmpty) retained.add(syncId);
+      final previous = syncId.isNotEmpty ? byLegacyId[syncId] ?? byLegacyId[legacyId] : null;
+      if (previous != null && jsonEncode(previous) == jsonEncode(item)) continue;
+      await save(accountId, collection, item);
     }
 
     for (final item in current) {

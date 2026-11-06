@@ -6909,3 +6909,27 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
     height: 145px;
   }
 }
+
+/* Dashboard side debt widget: reserve full columns for date and due status */
+.dashboard-side-column>.hero-debts .debt-person{
+  display:grid!important;
+  grid-template-columns:36px minmax(0,1fr) minmax(96px,auto) minmax(92px,auto)!important;
+  align-items:center;
+  column-gap:8px!important;
+  width:100%;min-width:0;box-sizing:border-box;
+}
+.dashboard-side-column>.hero-debts .debt-person>div{
+  grid-column:2;min-width:0;width:auto;overflow:hidden;
+}
+.dashboard-side-column>.hero-debts .debt-date{
+  grid-column:3;display:block!important;
+  width:auto;min-width:0;max-width:none!important;flex:none!important;
+  padding:0!important;text-align:center;
+  white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;
+}
+.dashboard-side-column>.hero-debts .debt-person .due{
+  grid-column:4;justify-self:stretch;
+  width:auto;min-width:0;max-width:none!important;flex:none!important;
+  margin:0!important;padding:7px 8px!important;box-sizing:border-box;
+  white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;
+}

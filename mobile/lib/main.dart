@@ -2471,7 +2471,21 @@ class _DebtsScreenState extends State<_DebtsScreen> {
     );
     return '${bn(current)} / ${bn(total)}';
   }
-  DateTime? _due(Map<String,dynamic> e) => _date(e['nextDate'] ?? e['dueDate'] ?? e['nextPaymentDate'] ?? e['due_date']);
+  DateTime? _due(Map<String,dynamic> e) {
+    final saved = _date(e['nextDate'] ?? e['dueDate'] ?? e['nextPaymentDate'] ?? e['due_date']);
+    if (saved != null) return saved;
+    final per = _num(e['installmentAmount'] ?? e['installment_amount']);
+    final first = _date(e['firstInstallmentDate'] ?? e['first_installment_date']);
+    if (per <= 0 || first == null || _left(e) <= 0) return null;
+    final paidCount = (_paid(e) / per).floor();
+    final frequency = (e['installmentFrequency'] ?? e['installment_frequency'] ?? 'monthly').toString();
+    if (frequency == 'weekly') return first.add(Duration(days: paidCount * 7));
+    final monthIndex = first.month - 1 + paidCount;
+    final year = first.year + monthIndex ~/ 12;
+    final month = monthIndex % 12 + 1;
+    final lastDay = DateTime(year, month + 1, 0).day;
+    return DateTime(year, month, first.day > lastDay ? lastDay : first.day);
+  }
   bool _done(Map<String,dynamic> e) => ['পরিশোধিত','সম্পন্ন'].contains((e['status'] ?? '').toString());
   String _dateLabel(DateTime? d) {
     if (d == null) return 'তারিখ নেই';
@@ -3258,7 +3272,7 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                         Text('৳ ${_left(e).round()}',maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:16,fontWeight:FontWeight.w900,color:done?muted:accent)),
                         const SizedBox(height:3),
                         _pill(done?'সম্পন্ন':'●  চলমান',done?muted:green,const Color(0xFFE1F8EC)),
-                        if(due!=null)...[const SizedBox(height:3),_pill('${_dateLabel(due)}${overdue ? ' ওভারডিউ' : ''}',overdue?red:muted,overdue?const Color(0xFFFFE8EA):const Color(0xFFF0F3F7))],
+                        if(due!=null)...[const SizedBox(height:3),_pill('${_dateLabel(due)} · ${due.difference(DateTime.now()).inDays < 0 ? 'ওভারডিউ' : due.difference(DateTime.now()).inDays == 0 ? 'আজ' : '${_bengaliDigits(due.difference(DateTime.now()).inDays.toString())} দিন বাকি'}',overdue?red:muted,overdue?const Color(0xFFFFE8EA):const Color(0xFFF0F3F7))],
                       ],
                     )),
                     const SizedBox(width:3),

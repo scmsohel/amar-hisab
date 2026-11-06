@@ -2512,6 +2512,7 @@ class _DebtsScreenState extends State<_DebtsScreen> {
     RegExp(r'[0-9]'),
     (match) => '০১২৩৪৫৬৭৮৯'[int.parse(match.group(0)!)],
   );
+  String _bengaliDigits(String value) => value.replaceAllMapped(RegExp(r'[0-9]'), (m) => '০১২৩৪৫৬৭৮৯'[int.parse(m.group(0)!)]);
   double _num(dynamic v) => v is num ? v.toDouble() : double.tryParse((v ?? '').toString()) ?? 0;
   DateTime? _date(dynamic v) => v == null ? null : DateTime.tryParse(v.toString());
   String _kindOf(Map<String,dynamic> e) => (e['debtKind'] ?? e['kind'] ?? e['status'] ?? '').toString();

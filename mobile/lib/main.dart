@@ -3230,7 +3230,7 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                   const SizedBox(height:2),
                   Row(children:[Icon(Icons.calendar_today_outlined,size:11,color:muted),const SizedBox(width:3),Flexible(child:Text(_dateLabel(date),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,color:muted)))]),
                   const SizedBox(height:3),
-                  Wrap(spacing:4,runSpacing:3,children:[_pill(_kindOf(e),accent,debt?const Color(0xFFFFE9EB):const Color(0xFFE1F8EC)),_pill((e['accountType']??e['debtType']??e['type']??'সহজ হিসাব').toString(),blue,const Color(0xFFEAF2FF))]),
+                  Wrap(spacing:4,runSpacing:3,children:[_pill(_kindOf(e),accent,debt?const Color(0xFFFFE9EB):const Color(0xFFE1F8EC)),_pill(((e['debtRule']??e['debt_rule'])=='installment'||_num(e['installmentAmount']??e['installment_amount'])>0)?'কিস্তি':(e['debtRule']??e['debt_rule'])=='one-time'?'সহজ হিসাব':(e['accountType']??e['debtType']??e['type']??'সহজ হিসাব').toString(),blue,const Color(0xFFEAF2FF))]),
                 ])),
                 Container(width:1,height:54,color:line,margin:const EdgeInsets.symmetric(horizontal:5)),
                 SizedBox(width:150,child:Row(

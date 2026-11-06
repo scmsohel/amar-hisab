@@ -469,14 +469,8 @@ class _AuthApi {
       await _setActiveUser(me['user']);
       return true;
     } catch (_) {
-      final accountId = _activeUserId;
-      final preferences = await SharedPreferences.getInstance();
-      final cached = preferences.getString(_cachedUserKey);
-      if (accountId != null && accountId.isNotEmpty && cached != null && cached.isNotEmpty) {
-        syncStatus.value = 'Offline · Server unavailable';
-        syncPendingCount.value = await OfflineSyncStore.instance.pendingCount(accountId);
-        return true;
-      }
+      // Network failures are handled by _get using the account-scoped cache.
+      // Other failures (for example an expired session) must not keep access.
       await clearSession();
       return false;
     }

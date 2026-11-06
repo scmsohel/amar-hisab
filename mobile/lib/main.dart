@@ -364,11 +364,11 @@ class _AuthApi {
         final decoded = jsonDecode(text);
         if (decoded is Map<String, dynamic>) data = decoded;
       } on FormatException {
-        data = {'error': 'সার্ভার থেকে সঠিক উত্তর পাওয়া যায়নি۔'};
+        data = {'error': 'সার্ভার থেকে সঠিক উত্তর পাওয়া যায়নি।'};
       }
     }
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception(data['error']?.toString() ?? 'অনুরোধ ব্যর্থ হয়েছে (${response.statusCode})۔');
+      throw Exception(data['error']?.toString() ?? 'অনুরোধ ব্যর্থ হয়েছে (${response.statusCode})।');
     }
     return data;
   }

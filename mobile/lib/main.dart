@@ -1094,7 +1094,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
                     decoration: BoxDecoration(color: Colors.white.withValues(alpha: .94), borderRadius: BorderRadius.circular(30), border: Border.all(color: Colors.white, width: 1.5), boxShadow: [BoxShadow(color: const Color(0xFF087A5B).withValues(alpha: .07), blurRadius: 30, offset: const Offset(0, 12))]),
                     child: Form(key: _formKey, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                      const Text('লগইন করুন', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: _ink)),
+                      const Text('লগইন করুন', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: _authGreenDark)),
                       const SizedBox(height: 6),
                       const Text('আপনার অ্যাকাউন্টে প্রবেশ করুন', style: TextStyle(fontSize: 13.5, height: 1.5, color: _muted)),
                       const SizedBox(height: 22),
@@ -1154,7 +1154,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       OutlinedButton.icon(
                         onPressed: () => Navigator.of(context).push(_route(const InviteVerificationScreen())),
                         icon: const Icon(Icons.groups_2_outlined, color: _authGreen, size: 24),
-                        label: const Text('ইনভাইট কোড দিয়ে যোগ দিন', style: TextStyle(color: _ink, fontWeight: FontWeight.w700, fontSize: 13)),
+                        label: const Text('ইনভাইট কোড দিয়ে যোগ দিন', style: TextStyle(color: _authGreenDark, fontWeight: FontWeight.w700, fontSize: 13)),
                         style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48), foregroundColor: _authGreen, side: const BorderSide(color: Color(0xFFD5EDE3)), shape: const StadiumBorder()),
                       ),
 
@@ -7295,9 +7295,9 @@ class _InviteVerificationScreenState extends State<InviteVerificationScreen> {
                   padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
                   decoration: BoxDecoration(color: Colors.white.withValues(alpha: .95), borderRadius: BorderRadius.circular(30), border: Border.all(color: Colors.white, width: 1.5), boxShadow: [BoxShadow(color: const Color(0xFF087A5B).withValues(alpha: .07), blurRadius: 30, offset: const Offset(0, 12))]),
                   child: Form(key: _formKey, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                    const Icon(Icons.verified_user_outlined, size: 42, color: _blue),
+                    const Icon(Icons.verified_user_outlined, size: 42, color: _authGreen),
                     const SizedBox(height: 12),
-                    const Text('ইনভাইট কোড যাচাই', textAlign: TextAlign.center, style: TextStyle(fontSize: 23, fontWeight: FontWeight.w900, color: _ink)),
+                    const Text('ইনভাইট কোড যাচাই', textAlign: TextAlign.center, style: TextStyle(fontSize: 23, fontWeight: FontWeight.w900, color: _authGreenDark)),
                     const SizedBox(height: 8),
                     const Text('আপনার পাওয়া ইনভাইট কোডটি লিখে যাচাই করুন। কোড সঠিক হলে পরের ধাপে অ্যাকাউন্ট তৈরি করতে পারবেন।', textAlign: TextAlign.center, style: TextStyle(fontSize: 13, height: 1.6, color: _muted)),
                     const SizedBox(height: 22),

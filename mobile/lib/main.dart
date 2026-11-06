@@ -4071,7 +4071,7 @@ class _BillsScreenState extends State<_BillsScreen> {
           padding:const EdgeInsets.fromLTRB(13,2,13,18),itemCount:rows.length,separatorBuilder:(_,_)=>const SizedBox(height:7),
           itemBuilder:(context,index){
             final e=rows[index],done=_done(e),late=_overdue(e),due=_due(e);
-            final accent=done?green:late?red:blue;
+            final accent=done?green:late?red:const Color(0xFFE99A2E);
             final category=_category(e).toLowerCase();
             final icon=category.contains('বিদ্যুৎ')?Icons.bolt_rounded:category.contains('ইন্টারনেট')?Icons.wifi_rounded:category.contains('ভাড়া')?Icons.home_work_outlined:Icons.receipt_long_rounded;
             final dueText=due==null?'তারিখ নেই':_dateLabel(due);

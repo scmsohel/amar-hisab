@@ -7574,6 +7574,8 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
         const SizedBox(height: 12),
         CheckboxListTile(
+          activeColor: _authGreenDark,
+          checkColor: Colors.white,
           value: _acceptedTerms,
           onChanged: (v) => setState(() => _acceptedTerms = v ?? false),
           contentPadding: EdgeInsets.zero,
@@ -7585,6 +7587,8 @@ class _SignupScreenState extends State<SignupScreen> {
           ),
         ),
         CheckboxListTile(
+          activeColor: _authGreenDark,
+          checkColor: Colors.white,
           value: _marketing,
           onChanged: (v) => setState(() => _marketing = v ?? false),
           contentPadding: EdgeInsets.zero,
@@ -7719,11 +7723,22 @@ class _SignupScreenState extends State<SignupScreen> {
                                   if (_step == 1)
                                     TextButton.icon(
                                       onPressed: _previousStep,
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: _authGreenDark,
+                                        textStyle: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                                       icon: const Icon(
                                         Icons.arrow_back_rounded,
                                         size: 17,
+                                        color: _authGreenDark,
                                       ),
-                                      label: const Text('আগের ধাপে ফিরে যান'),
+                                      label: const Text(
+                                        'আগের ধাপে ফিরে যান',
+                                        style: TextStyle(color: _authGreenDark),
+                                      ),
                                     ),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,

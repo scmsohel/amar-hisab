@@ -903,6 +903,7 @@
 .hero-debts .debt-person b{font-size:11px}
 .hero-debts .debt-person div small{font-size:9px;margin-top:2px;color:var(--muted)}
 .hero-debts .debt-person .due{font-size:9px;padding:5px 7px;border-radius:7px;white-space:nowrap}
+.hero-debts .debt-person .debt-date,.hero-debts .debt-person .due{transform:translateX(-12px)}
 .hero-debts .debt-person:last-child{border-bottom:0}
 .dark .hero-debts .debt-total.receivable{background:#193b30}
 .dark .hero-debts .debt-total.payable{background:#40272c}

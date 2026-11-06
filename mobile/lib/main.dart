@@ -4107,7 +4107,15 @@ class _BillsScreenState extends State<_BillsScreen> {
                     const SizedBox(height:2),
                     Text(_category(e),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:10,color:muted)),
                     const SizedBox(height:2),
-                    Text(billType,maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,fontWeight:FontWeight.w700,color:muted)),
+                    Container(
+                      padding:const EdgeInsets.symmetric(horizontal:6,vertical:2),
+                      decoration:BoxDecoration(
+                        color:blue.withValues(alpha:.055),
+                        borderRadius:BorderRadius.circular(7),
+                        border:Border.all(color:blue.withValues(alpha:.18)),
+                      ),
+                      child:Text(billType,maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:8.5,fontWeight:FontWeight.w700,color:blue)),
+                    ),
                     const SizedBox(height:2),
                     Row(children:[
                       Icon(Icons.calendar_today_outlined,size:11,color:muted),
@@ -4132,7 +4140,15 @@ class _BillsScreenState extends State<_BillsScreen> {
                           child:Text(done?'●  পরিশোধিত':late?'●  ওভারডিউ':'●  বাকি',maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,fontWeight:FontWeight.w800,color:accent)),
                         ),
                         const SizedBox(height:3),
-                        Text(dueText,maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,color:muted)),
+                        Container(
+                          padding:const EdgeInsets.symmetric(horizontal:6,vertical:3),
+                          decoration:BoxDecoration(
+                            color:accent.withValues(alpha:.07),
+                            borderRadius:BorderRadius.circular(7),
+                            border:Border.all(color:accent.withValues(alpha:.20)),
+                          ),
+                          child:Text(dueText,maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:8.5,fontWeight:FontWeight.w700,color:accent)),
+                        ),
                       ],
                     )),
                     const SizedBox(width:2),

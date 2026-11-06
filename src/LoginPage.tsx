@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowRight, Eye, EyeOff, Leaf, LockKeyhole, Mail, Moon, Smartphone, Sun, WalletCards } from "lucide-react";
@@ -15,6 +15,16 @@ export default function LoginPage() {
   const [identity, setIdentity] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [resendSeconds, setResendSeconds] = useState(0);
+
+  useEffect(() => {
+    if (resendSeconds <= 0) return;
+    const timer = window.setTimeout(() => setResendSeconds(value => Math.max(0, value - 1)), 1000);
+    return () => window.clearTimeout(timer);
+  }, [resendSeconds]);
 
   const submitLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -34,26 +44,56 @@ export default function LoginPage() {
     }
   };
 
-  const submitRecovery = (event: FormEvent<HTMLFormElement>) => {
+  const submitRecovery = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identity.trim())) {
-      setError("Password recovery-এর জন্য সঠিক Email address দিন।");
-      return;
-    }
-    setSent(true);
-    setOtp("");
-    setOtpVerified(false);
+    const email = identity.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setError("Password recovery-এর জন্য সঠিক Email address দিন।");
+    setBusy(true);
+    try {
+      const response = await fetch("/api/auth/password/forgot", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin", body: JSON.stringify({ email }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "OTP পাঠানো যায়নি।");
+      setSent(true);
+      setOtp("");
+      setOtpVerified(false);
+      setResendSeconds(Number(data.retryAfter || 60));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "সার্ভারের সঙ্গে যোগাযোগ করা যায়নি।");
+    } finally { setBusy(false); }
   };
 
-  const submitOtp = (event: FormEvent<HTMLFormElement>) => {
+  const submitOtp = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
-    if (!/^\\d{6}$/.test(otp.trim())) {
-      setError("৬ সংখ্যার OTP লিখুন।");
-      return;
-    }
-    setOtpVerified(true);
+    if (!/^\d{6}$/.test(otp.trim())) return setError("৬ সংখ্যার OTP লিখুন।");
+    if (newPassword.length < 6) return setError("নতুন Password কমপক্ষে ৬ অক্ষরের হতে হবে।");
+    if (newPassword !== confirmPassword) return setError("দুটি Password মিলছে না।");
+    setBusy(true);
+    try {
+      const response = await fetch("/api/auth/password/reset", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin", body: JSON.stringify({ email: identity.trim(), otp: otp.trim(), newPassword }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Password পরিবর্তন করা যায়নি।");
+      setOtpVerified(true);
+      setError("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "সার্ভারের সঙ্গে যোগাযোগ করা যায়নি।");
+    } finally { setBusy(false); }
+  };
+
+  const resendOtp = async () => {
+    if (resendSeconds > 0 || busy) return;
+    setError("");
+    setBusy(true);
+    try {
+      const response = await fetch("/api/auth/password/forgot", { method: "POST", headers: { "Content-Type": "application/json" }, credentials: "same-origin", body: JSON.stringify({ email: identity.trim() }) });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "OTP পাঠানো যায়নি।");
+      setResendSeconds(Number(data.retryAfter || 60));
+      setOtp("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "OTP পাঠানো যায়নি।");
+    } finally { setBusy(false); }
   };
 
   return (
@@ -90,23 +130,30 @@ export default function LoginPage() {
               {otpVerified ? (
                 <>
                   <span className="login-message-icon"><LockKeyhole size={30}/></span>
-                  <h2>OTP যাচাইয়ের preview</h2>
-                  <p>OTP format ঠিক আছে। বাস্তবে OTP যাচাই ও নতুন Password সেট করতে backend authentication এবং email service লাগবে।</p>
-                  <button className="signup-primary login-main-button" onClick={()=>{setSent(false);setRecovery(false);setError("");setIdentity("");setPassword("");setOtp("");setOtpVerified(false);}}>Login-এ ফিরে যান <ArrowRight size={17}/></button>
+                  <h2>Password পরিবর্তন হয়েছে</h2>
+                  <p>আপনার Password সফলভাবে পরিবর্তন হয়েছে। এখন নতুন Password দিয়ে Login করুন।</p>
+                  <button type="button" className="signup-primary login-main-button" onClick={()=>{setSent(false);setRecovery(false);setError("");setPassword("");setOtp("");setOtpVerified(false);setNewPassword("");setConfirmPassword("");setIdentity("");}}>Login-এ ফিরে যান <ArrowRight size={17}/></button>
                 </>
               ) : (
                 <>
                   <span className="login-message-icon"><Mail size={30}/></span>
                   <h2>Email OTP যাচাই করুন</h2>
-                  <p><strong>{identity}</strong>-এ OTP পাঠানোর ধাপটি preview হিসেবে দেখানো হচ্ছে। বাস্তবে OTP পাঠাতে backend ও email service যুক্ত করতে হবে।</p>
+                  <p><strong>{identity}</strong>-এ OTP পাঠানো হয়েছে। Email-এর ৬ সংখ্যার OTP দিয়ে নতুন Password সেট করুন।</p>
                   <form className="login-fields login-otp-form" onSubmit={submitOtp}>
                     <label className="signup-field">৬ সংখ্যার OTP
                       <span className="signup-input"><LockKeyhole size={18}/><input inputMode="numeric" autoComplete="one-time-code" aria-label="৬ সংখ্যার OTP" value={otp} onChange={e=>setOtp(e.target.value.replace(/\D/g,"").slice(0,6))} placeholder="123456" maxLength={6}/></span>
                     </label>
+                    <label className="signup-field">নতুন Password
+                      <span className="signup-input"><LockKeyhole size={18}/><input autoComplete="new-password" aria-label="নতুন Password" type="password" value={newPassword} onChange={e=>setNewPassword(e.target.value)} placeholder="কমপক্ষে ৬ অক্ষর"/></span>
+                    </label>
+                    <label className="signup-field">নতুন Password নিশ্চিত করুন
+                      <span className="signup-input"><LockKeyhole size={18}/><input autoComplete="new-password" aria-label="নতুন Password নিশ্চিত করুন" type="password" value={confirmPassword} onChange={e=>setConfirmPassword(e.target.value)} placeholder="আবার Password লিখুন"/></span>
+                    </label>
                     {error && <motion.p className="signup-error" initial={{opacity:0,y:-4}} animate={{opacity:1,y:0}}>{error}</motion.p>}
-                    <button className="signup-primary login-main-button" type="submit">OTP যাচাই করুন <ArrowRight size={17}/></button>
+                    <button className="signup-primary login-main-button" type="submit" disabled={busy}>{busy?"অপেক্ষা করুন…":"Password পরিবর্তন করুন"} <ArrowRight size={17}/></button>
                   </form>
-                  <button className="login-back" onClick={()=>{setSent(false);setRecovery(true);setError("");}}>Email পরিবর্তন করুন</button>
+                  <button type="button" className="login-back" disabled={busy || resendSeconds>0} onClick={resendOtp}>{resendSeconds>0?("আবার OTP পাঠান ("+resendSeconds+"s)"):"আবার OTP পাঠান"}</button>
+                  <button type="button" className="login-back" onClick={()=>{setSent(false);setRecovery(true);setError("");}}>Email পরিবর্তন করুন</button>
                 </>
               )}
             </motion.div>
@@ -120,7 +167,7 @@ export default function LoginPage() {
                 {!recovery && <label className="signup-field">Password<span className="signup-input"><LockKeyhole size={18}/><input autoComplete="current-password" aria-label="Password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="আপনার Password" type={showPassword?"text":"password"}/><button type="button" className="signup-eye" onClick={()=>setShowPassword(v=>!v)} aria-label="Password দেখুন">{showPassword?<EyeOff size={17}/>:<Eye size={17}/>}</button></span></label>}
                 {!recovery && <div className="login-forgot"><button type="button" onClick={()=>{setRecovery(true);setError("");}}>Password ভুলে গেছেন?</button></div>}
                 {error && <motion.p className="signup-error" initial={{opacity:0,y:-4}} animate={{opacity:1,y:0}}>{error}</motion.p>}
-                <motion.button type="submit" className="signup-primary login-main-button" whileHover={{y:-2}} whileTap={{scale:.98}}>{recovery?"Email OTP পাঠানোর ধাপ দেখুন":"Login করুন"} <ArrowRight size={17}/></motion.button>
+                <motion.button type="submit" className="signup-primary login-main-button" whileHover={{y:-2}} whileTap={{scale:.98}} disabled={busy}>{busy?"অপেক্ষা করুন…":recovery?"Email-এ OTP পাঠান":"Login করুন"} <ArrowRight size={17}/></motion.button>
               </form>
               {recovery && <button type="button" className="login-back" onClick={()=>{setRecovery(false);setError("");}}>Login-এ ফিরে যান</button>}
               <p className="signup-login">নতুন account প্রয়োজন? <a href="/signup">Signup করুন</a></p>

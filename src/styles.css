@@ -5099,8 +5099,8 @@ input,button,select,textarea{
 
 /* Debt & receivables: restore readable text and center the date between details and due status */
 .dashboard-top>.hero-debts .debt-person{
-  grid-template-columns:36px minmax(0,1fr) minmax(86px,104px) minmax(76px,92px)!important;
-  gap:8px!important;
+  grid-template-columns:36px minmax(0,1fr) minmax(112px,124px) minmax(96px,108px)!important;
+  gap:6px!important;
   min-height:62px;
   padding:8px 0!important;
 }
@@ -5115,7 +5115,7 @@ input,button,select,textarea{
   width:100%;min-width:0;max-width:100%;
   text-align:center!important;
   font-size:12px!important;line-height:1.4;
-  white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap!important;overflow:visible;text-overflow:clip;
 }
 .dashboard-top>.hero-debts .debt-person .due{
   grid-column:4;
@@ -5123,7 +5123,7 @@ input,button,select,textarea{
   justify-self:stretch;
   padding:8px 5px!important;
   font-size:12px!important;line-height:1.35;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;overflow:visible;text-overflow:clip;
 }
 @media(max-width:1250px){
   .dashboard-top>.hero-debts .debt-person{
@@ -6908,4 +6908,28 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
   .dashboard-main .charts > .chart-panel .chart {
     height: 145px;
   }
+}
+
+/* Dashboard side debt widget: reserve full columns for date and due status */
+.dashboard-side-column>.hero-debts .debt-person{
+  display:grid!important;
+  grid-template-columns:36px minmax(0,1fr) minmax(96px,auto) minmax(92px,auto)!important;
+  align-items:center;
+  column-gap:8px!important;
+  width:100%;min-width:0;box-sizing:border-box;
+}
+.dashboard-side-column>.hero-debts .debt-person>div{
+  grid-column:2;min-width:0;width:auto;overflow:hidden;
+}
+.dashboard-side-column>.hero-debts .debt-date{
+  grid-column:3;display:block!important;
+  width:auto;min-width:0;max-width:none!important;flex:none!important;
+  padding:0!important;text-align:center;
+  white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;
+}
+.dashboard-side-column>.hero-debts .debt-person .due{
+  grid-column:4;justify-self:stretch;
+  width:auto;min-width:0;max-width:none!important;flex:none!important;
+  margin:0!important;padding:7px 8px!important;box-sizing:border-box;
+  white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important;
 }

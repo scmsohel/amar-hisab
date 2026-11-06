@@ -1,0 +1,490 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:path/path.dart' as p;
+import 'package:sqflite/sqflite.dart';
+import 'package:uuid/uuid.dart';
+
+/// SQLite-backed record cache and durable outbox isolated by server account.
+class OfflineSyncStore {
+  OfflineSyncStore._();
+  static final OfflineSyncStore instance = OfflineSyncStore._();
+
+  static const _uuid = Uuid();
+  static const legacyAccountId = '__legacy_unassigned__';
+  Database? _database;
+
+  Future<Database> get database async {
+    if (_database != null) return _database!;
+    final root = await getDatabasesPath();
+    _database = await openDatabase(
+      p.join(root, 'amar_hisab_offline.db'),
+      version: 2,
+      onCreate: (db, version) async {
+        await _createAccountScopedTables(db);
+        await db.insert('sync_metadata', {'key': 'cursor', 'value': '0'});
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          // Preserve every v1 row and queued operation, but quarantine it:
+          // v1 had no account identity, so assigning it to any user is unsafe.
+          await db.execute('ALTER TABLE local_records RENAME TO local_records_v1');
+          await db.execute('ALTER TABLE pending_operations RENAME TO pending_operations_v1');
+          await _createAccountScopedTables(db);
+          await db.execute('''
+            INSERT INTO local_records (
+              account_id, collection, record_id, data, version, is_deleted,
+              is_dirty, has_conflict, updated_at
+            )
+            SELECT ?, collection, record_id, data, version, is_deleted,
+                   is_dirty, has_conflict, updated_at
+            FROM local_records_v1
+          ''', [legacyAccountId]);
+          await db.execute('''
+            INSERT INTO pending_operations (
+              account_id, operation_id, collection, record_id, operation_type,
+              base_version, data, created_at
+            )
+            SELECT ?, operation_id, collection, record_id, operation_type,
+                   base_version, data, created_at
+            FROM pending_operations_v1
+          ''', [legacyAccountId]);
+          // Keep the original v1 tables until the migrated database has been
+          // verified in the field. They are intentionally not queried or synced.
+        }
+      },
+    );
+    return _database!;
+  }
+
+  Future<void> _createAccountScopedTables(DatabaseExecutor db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS sync_metadata (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE local_records (
+        account_id TEXT NOT NULL,
+        collection TEXT NOT NULL,
+        record_id TEXT NOT NULL,
+        data TEXT,
+        version INTEGER NOT NULL DEFAULT 0,
+        is_deleted INTEGER NOT NULL DEFAULT 0,
+        is_dirty INTEGER NOT NULL DEFAULT 0,
+        has_conflict INTEGER NOT NULL DEFAULT 0,
+        updated_at TEXT NOT NULL,
+        PRIMARY KEY(account_id, collection, record_id)
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE pending_operations (
+        account_id TEXT NOT NULL,
+        operation_id TEXT PRIMARY KEY,
+        collection TEXT NOT NULL,
+        record_id TEXT NOT NULL,
+        operation_type TEXT NOT NULL CHECK(operation_type IN ('upsert','delete')),
+        base_version INTEGER NOT NULL,
+        data TEXT,
+        created_at TEXT NOT NULL,
+        UNIQUE(account_id, collection, record_id)
+      )
+    ''');
+  }
+
+  String newRecordId() => _uuid.v4();
+
+  String _cursorKey(String accountId) => 'cursor:$accountId';
+
+  Future<List<Map<String, dynamic>>> records(String accountId, String collection) async {
+    final db = await database;
+    final rows = await db.query(
+      'local_records',
+      where: 'account_id = ? AND collection = ? AND is_deleted = 0 AND data IS NOT NULL',
+      whereArgs: [accountId, collection],
+      orderBy: 'updated_at DESC',
+    );
+    return rows
+        .map((row) => jsonDecode(row['data']! as String) as Map<String, dynamic>)
+        .toList();
+  }
+
+  Future<void> cacheRemoteRecords(
+    String accountId,
+    String collection,
+    List<dynamic> items,
+  ) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      for (final raw in items) {
+        if (raw is! Map) continue;
+        final data = Map<String, dynamic>.from(raw);
+        final id = (data['_syncId'] ??
+                data['id'] ??
+                data['name'] ??
+                data['key'] ??
+                data['settingKey'] ??
+                '')
+            .toString()
+            .trim();
+        if (id.isEmpty) continue;
+        data['_syncId'] = id;
+        final existing = await txn.query(
+          'local_records',
+          where: 'account_id = ? AND collection = ? AND record_id = ?',
+          whereArgs: [accountId, collection, id],
+          limit: 1,
+        );
+        if (existing.isNotEmpty &&
+            (existing.first['is_dirty'] == 1 || existing.first['has_conflict'] == 1)) {
+          continue;
+        }
+        await txn.insert('local_records', {
+          'account_id': accountId,
+          'collection': collection,
+          'record_id': id,
+          'data': jsonEncode(data),
+          'version': existing.isEmpty ? 0 : existing.first['version'],
+          'is_deleted': 0,
+          'is_dirty': 0,
+          'has_conflict': 0,
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        }, conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+    });
+  }
+
+  Future<void> save(String accountId, String collection, Map<String, dynamic> input) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      final data = Map<String, dynamic>.from(input);
+      final id = (data['_syncId'] ?? '').toString().trim().isNotEmpty
+          ? data['_syncId'].toString()
+          : newRecordId();
+      data['_syncId'] = id;
+      final now = DateTime.now().toUtc().toIso8601String();
+      final existing = await txn.query(
+        'local_records',
+        where: 'account_id = ? AND collection = ? AND record_id = ?',
+        whereArgs: [accountId, collection, id],
+        limit: 1,
+      );
+      final version = existing.isEmpty ? 0 : existing.first['version'] as int;
+      await txn.insert('local_records', {
+        'account_id': accountId,
+        'collection': collection,
+        'record_id': id,
+        'data': jsonEncode(data),
+        'version': version,
+        'is_deleted': 0,
+        'is_dirty': 1,
+        'has_conflict': 0,
+        'updated_at': now,
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
+
+      final queued = await txn.query(
+        'pending_operations',
+        where: 'account_id = ? AND collection = ? AND record_id = ?',
+        whereArgs: [accountId, collection, id],
+        limit: 1,
+      );
+      final operationId = queued.isEmpty ? _uuid.v4() : queued.first['operation_id'] as String;
+      final baseVersion = queued.isEmpty ? version : queued.first['base_version'] as int;
+      await txn.insert('pending_operations', {
+        'account_id': accountId,
+        'operation_id': operationId,
+        'collection': collection,
+        'record_id': id,
+        'operation_type': 'upsert',
+        'base_version': baseVersion,
+        'data': jsonEncode(data),
+        'created_at': now,
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
+    });
+  }
+
+  Future<void> delete(String accountId, String collection, String recordId) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      final rows = await txn.query(
+        'local_records',
+        where: 'account_id = ? AND collection = ? AND record_id = ?',
+        whereArgs: [accountId, collection, recordId],
+        limit: 1,
+      );
+      if (rows.isEmpty) return;
+      final now = DateTime.now().toUtc().toIso8601String();
+      final queued = await txn.query(
+        'pending_operations',
+        where: 'account_id = ? AND collection = ? AND record_id = ?',
+        whereArgs: [accountId, collection, recordId],
+        limit: 1,
+      );
+      final operationId = queued.isEmpty ? _uuid.v4() : queued.first['operation_id'] as String;
+      final baseVersion = queued.isEmpty ? rows.first['version'] as int : queued.first['base_version'] as int;
+      await txn.update(
+        'local_records',
+        {'is_deleted': 1, 'is_dirty': 1, 'updated_at': now},
+        where: 'account_id = ? AND collection = ? AND record_id = ?',
+        whereArgs: [accountId, collection, recordId],
+      );
+      await txn.insert('pending_operations', {
+        'account_id': accountId,
+        'operation_id': operationId,
+        'collection': collection,
+        'record_id': recordId,
+        'operation_type': 'delete',
+        'base_version': baseVersion,
+        'data': null,
+        'created_at': now,
+      }, conflictAlgorithm: ConflictAlgorithm.replace);
+    });
+  }
+
+  /// Replaces a legacy array-based collection locally and queues record-level
+  /// upserts/deletes. Existing sync IDs are retained so edits never become
+  /// duplicate records when older screens submit complete collection arrays.
+  Future<void> replaceCollection(
+    String accountId,
+    String collection,
+    List<dynamic> items,
+  ) async {
+    final current = await records(accountId, collection);
+    final byLegacyId = <String, Map<String, dynamic>>{};
+    for (final item in current) {
+      final id = (item['id'] ?? '').toString();
+      final syncId = (item['_syncId'] ?? '').toString();
+      if (id.isNotEmpty) byLegacyId[id] = item;
+      if (syncId.isNotEmpty) byLegacyId[syncId] = item;
+    }
+
+    final retained = <String>{};
+    for (final raw in items) {
+      if (raw is! Map) continue;
+      final item = Map<String, dynamic>.from(raw);
+      final legacyId = (item['id'] ?? '').toString();
+      if ((item['_syncId'] ?? '').toString().trim().isEmpty &&
+          legacyId.isNotEmpty &&
+          byLegacyId.containsKey(legacyId)) {
+        item['_syncId'] = byLegacyId[legacyId]!['_syncId'];
+      }
+      final syncId = (item['_syncId'] ?? '').toString();
+      if (syncId.isNotEmpty) retained.add(syncId);
+      final previous = syncId.isNotEmpty ? byLegacyId[syncId] ?? byLegacyId[legacyId] : null;
+      if (previous != null && jsonEncode(previous) == jsonEncode(item)) continue;
+      await save(accountId, collection, item);
+    }
+
+    for (final item in current) {
+      final syncId = (item['_syncId'] ?? item['id'] ?? '').toString();
+      if (syncId.isNotEmpty && !retained.contains(syncId)) {
+        await delete(accountId, collection, syncId);
+      }
+    }
+  }
+
+  Future<List<Map<String, Object?>>> pending(String accountId, {int limit = 200}) async {
+    final db = await database;
+    return db.query(
+      'pending_operations',
+      where: 'account_id = ?',
+      whereArgs: [accountId],
+      orderBy: 'created_at ASC',
+      limit: limit.clamp(1, 200),
+    );
+  }
+
+  Future<int> cursor(String accountId) async {
+    final db = await database;
+    final rows = await db.query(
+      'sync_metadata',
+      where: 'key = ?',
+      whereArgs: [_cursorKey(accountId)],
+      limit: 1,
+    );
+    return rows.isEmpty ? 0 : int.tryParse(rows.first['value'] as String) ?? 0;
+  }
+
+  Future<void> applyPushResults(String accountId, List<dynamic> results) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      for (final item in results) {
+        if (item is! Map<String, dynamic>) continue;
+        final id = item['operationId']?.toString();
+        if (id == null) continue;
+        final ops = await txn.query(
+          'pending_operations',
+          where: 'account_id = ? AND operation_id = ?',
+          whereArgs: [accountId, id],
+          limit: 1,
+        );
+        if (ops.isEmpty) continue;
+        final op = ops.first;
+        if (item['status'] == 'accepted') {
+          await txn.delete(
+            'pending_operations',
+            where: 'account_id = ? AND operation_id = ?',
+            whereArgs: [accountId, id],
+          );
+          await txn.update(
+            'local_records',
+            {'version': item['version'], 'is_dirty': 0, 'has_conflict': 0},
+            where: 'account_id = ? AND collection = ? AND record_id = ?',
+            whereArgs: [accountId, op['collection'], op['record_id']],
+          );
+        } else if (item['status'] == 'conflict') {
+          await txn.update(
+            'local_records',
+            {'has_conflict': 1},
+            where: 'account_id = ? AND collection = ? AND record_id = ?',
+            whereArgs: [accountId, op['collection'], op['record_id']],
+          );
+        }
+      }
+    });
+  }
+
+  Future<void> applyRemoteEvents(
+    String accountId,
+    List<dynamic> events,
+    int nextCursor,
+  ) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      for (final event in events) {
+        if (event is! Map<String, dynamic>) continue;
+        final collection = event['collection']?.toString();
+        final id = event['recordId']?.toString();
+        if (collection == null || id == null) continue;
+        final local = await txn.query(
+          'local_records',
+          where: 'account_id = ? AND collection = ? AND record_id = ?',
+          whereArgs: [accountId, collection, id],
+          limit: 1,
+        );
+        if (local.isNotEmpty &&
+            (local.first['is_dirty'] == 1 || local.first['has_conflict'] == 1)) {
+          continue;
+        }
+        final deleted = event['operation'] == 'delete';
+        final data = event['data'];
+        await txn.insert('local_records', {
+          'account_id': accountId,
+          'collection': collection,
+          'record_id': id,
+          'data': deleted || data == null ? null : jsonEncode(data),
+          'version': event['version'] ?? 0,
+          'is_deleted': deleted ? 1 : 0,
+          'is_dirty': 0,
+          'has_conflict': 0,
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
+        }, conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+      await txn.insert(
+        'sync_metadata',
+        {'key': _cursorKey(accountId), 'value': '$nextCursor'},
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    });
+  }
+
+  Future<int> pendingCount(String accountId) async {
+    final rows = await (await database).rawQuery(
+      'SELECT COUNT(*) AS count FROM pending_operations WHERE account_id = ?',
+      [accountId],
+    );
+    return Sqflite.firstIntValue(rows) ?? 0;
+  }
+
+  Future<void> close() async {
+    await _database?.close();
+    _database = null;
+  }
+}
+
+/// Uses the authenticated session cookie and account identity held by the app.
+class OfflineSyncEngine {
+  OfflineSyncEngine({
+    required this.baseUrl,
+    required this.sessionCookie,
+    required this.accountId,
+    OfflineSyncStore? store,
+  }) : store = store ?? OfflineSyncStore.instance;
+
+  final String baseUrl;
+  final String sessionCookie;
+  final String accountId;
+  final OfflineSyncStore store;
+  final HttpClient _client = HttpClient()..connectionTimeout = const Duration(seconds: 12);
+  bool _running = false;
+
+  Future<Map<String, dynamic>> _request(String method, String path, [Object? body]) async {
+    final uri = Uri.parse('${baseUrl.replaceFirst(RegExp(r'/+$'), '')}$path');
+    final request = method == 'POST' ? await _client.postUrl(uri) : await _client.getUrl(uri);
+    request.headers.set(HttpHeaders.acceptHeader, 'application/json');
+    request.headers.set(HttpHeaders.cookieHeader, sessionCookie);
+    if (body != null) {
+      request.headers.contentType = ContentType.json;
+      request.write(jsonEncode(body));
+    }
+    final response = await request.close().timeout(const Duration(seconds: 25));
+    final text = await response.transform(utf8.decoder).join();
+    final decoded = text.isEmpty ? <String, dynamic>{} : jsonDecode(text);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw HttpException(
+        decoded is Map ? (decoded['error']?.toString() ?? 'Sync request failed') : 'Sync request failed',
+        uri: uri,
+      );
+    }
+    if (decoded is! Map<String, dynamic>) throw const FormatException('Invalid sync response');
+    return decoded;
+  }
+
+  Future<void> syncOnce() async {
+    if (_running) return;
+    _running = true;
+    try {
+      var cursor = await store.cursor(accountId);
+      for (var page = 0; page < 10; page++) {
+        final pulled = await _request('GET', '/sync/pull?cursor=$cursor&limit=500');
+        final events = (pulled['events'] as List?) ?? const [];
+        final next = pulled['nextCursor'] is int ? pulled['nextCursor'] as int : cursor;
+        await store.applyRemoteEvents(accountId, events, next);
+        cursor = next;
+        if (pulled['hasMore'] != true || events.isEmpty) break;
+      }
+
+      final operations = await store.pending(accountId);
+      if (operations.isNotEmpty) {
+        final payload = operations.map((op) {
+          final item = <String, dynamic>{
+            'operationId': op['operation_id'],
+            'collection': op['collection'],
+            'recordId': op['record_id'],
+            'type': op['operation_type'],
+            'baseVersion': op['base_version'],
+          };
+          if (op['operation_type'] == 'upsert') item['data'] = jsonDecode(op['data']! as String);
+          return item;
+        }).toList();
+        final pushed = await _request('POST', '/sync/push', {'operations': payload});
+        await store.applyPushResults(accountId, (pushed['results'] as List?) ?? const []);
+      }
+
+      cursor = await store.cursor(accountId);
+      for (var page = 0; page < 10; page++) {
+        final pulled = await _request('GET', '/sync/pull?cursor=$cursor&limit=500');
+        final events = (pulled['events'] as List?) ?? const [];
+        final next = pulled['nextCursor'] is int ? pulled['nextCursor'] as int : cursor;
+        await store.applyRemoteEvents(accountId, events, next);
+        cursor = next;
+        if (pulled['hasMore'] != true || events.isEmpty) break;
+      }
+    } finally {
+      _running = false;
+    }
+  }
+
+  void dispose() => _client.close(force: true);
+}

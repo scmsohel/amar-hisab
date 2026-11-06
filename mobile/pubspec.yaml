@@ -1,0 +1,58 @@
+name: amar_hisab_mobile
+description: Amar Hisab personal income and expense management mobile app.
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  lottie: ^3.3.1
+  shared_preferences: ^2.5.3
+  sqflite: ^2.4.2
+  path: ^1.9.1
+  uuid: ^4.5.1
+  flutter_secure_storage: ^9.2.4
+  image_picker: ^1.1.2
+  image_cropper: ^10.0.0+1
+  flutter_svg: ^2.0.17
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.6
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/ic_launcher_foreground_large.png"
+  adaptive_icon_foreground: "assets/ic_launcher_foreground_large.png"
+  adaptive_icon_background: "#00000000"
+  min_sdk_android: 21
+
+flutter_native_splash:
+  color: "#F5FFF9"
+  image: "assets/ic_launcher_foreground.png"
+  android: true
+  ios: false
+  web: false
+  android_12:
+    color: "#F5FFF9"
+    image: "assets/ic_launcher_foreground.png"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/animations/loading_spinner.json
+    - assets/animations/logo.png
+    - assets/animations/Minimal Mint Leaf Wave Background.png
+    - assets/animations/Cheerful Countryside Lake Retreat.png
+    - assets/animations/Moonlit Lakeside Cottage.png
+    - assets/animations/Glossy Green Corner Plant.png
+    - assets/wallets/bkash-mark.svg
+    - assets/wallets/nagad-mark.svg

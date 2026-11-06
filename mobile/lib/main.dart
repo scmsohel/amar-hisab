@@ -4074,7 +4074,15 @@ class _BillsScreenState extends State<_BillsScreen> {
             final accent=done?green:late?red:const Color(0xFFE87500);
             final category=_category(e).toLowerCase();
             final icon=category.contains('বিদ্যুৎ')?Icons.bolt_rounded:category.contains('ইন্টারনেট')?Icons.wifi_rounded:category.contains('ভাড়া')?Icons.home_work_outlined:Icons.receipt_long_rounded;
-            final dueText=due==null?'তারিখ নেই':_dateLabel(due);
+            final rule=(e['billRule'] ?? 'one-time').toString();
+            final billType=switch(rule){
+              'weekly'=>'সাপ্তাহিক বিল',
+              'monthly'=>'নিয়মিত বিল',
+              'yearly'=>'বাৎসরিক বিল',
+              _=>'এককালীন বিল',
+            };
+            final dueDay=due==null?null:DateTime(due.year,due.month,due.day).difference(DateTime(DateTime.now().year,DateTime.now().month,DateTime.now().day)).inDays;
+            final dueText=dueDay==null?'তারিখ নির্ধারিত নয়':dueDay<0?'${_bengaliDigits(dueDay.abs().toString())} দিন পেরিয়েছে':dueDay==0?'আজ পরিশোধের শেষ দিন':'${_bengaliDigits(dueDay.toString())} দিন বাকি';
             return Container(
               padding:const EdgeInsets.symmetric(horizontal:8,vertical:8),
               decoration:BoxDecoration(
@@ -4097,7 +4105,9 @@ class _BillsScreenState extends State<_BillsScreen> {
                     Text(_name(e),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:14,fontWeight:FontWeight.w900,color:ink,height:1.1)),
                     const SizedBox(height:2),
                     Text(_category(e),maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:10,color:muted)),
-                    const SizedBox(height:3),
+                    const SizedBox(height:2),
+                    Text(billType,maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:9,fontWeight:FontWeight.w700,color:muted)),
+                    const SizedBox(height:2),
                     Row(children:[
                       Icon(Icons.calendar_today_outlined,size:11,color:muted),
                       const SizedBox(width:3),

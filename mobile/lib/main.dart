@@ -3276,7 +3276,12 @@ class _DebtsScreenState extends State<_DebtsScreen> {
                         Text('৳ ${_left(e).round()}',maxLines:1,overflow:TextOverflow.ellipsis,style:TextStyle(fontSize:16,fontWeight:FontWeight.w900,color:done?muted:accent)),
                         const SizedBox(height:3),
                         _pill(done?'সম্পন্ন':'●  চলমান',done?muted:green,const Color(0xFFE1F8EC)),
-                        if(due!=null)...[const SizedBox(height:3),_pill('${_dateLabel(due)} · ${due.difference(DateTime.now()).inDays < 0 ? 'ওভারডিউ' : due.difference(DateTime.now()).inDays == 0 ? 'আজ' : '${_bengaliDigits(due.difference(DateTime.now()).inDays.toString())} দিন বাকি'}',overdue?red:muted,overdue?const Color(0xFFFFE8EA):const Color(0xFFF0F3F7))],
+                        if(due!=null)...[
+                           const SizedBox(height:4),
+                           Text(_dateLabel(due),maxLines:2,softWrap:true,style:TextStyle(fontSize:9,fontWeight:FontWeight.w700,height:1.15,color:overdue?red:muted)),
+                           const SizedBox(height:1),
+                           Text(due.difference(DateTime.now()).inDays < 0 ? 'ওভারডিউ' : due.difference(DateTime.now()).inDays == 0 ? 'আজ' : '${_bengaliDigits(due.difference(DateTime.now()).inDays.toString())} দিন বাকি',maxLines:1,style:TextStyle(fontSize:9,height:1.1,color:overdue?red:muted)),
+                         ],
                       ],
                     )),
                     const SizedBox(width:3),

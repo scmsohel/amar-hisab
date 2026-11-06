@@ -2447,6 +2447,10 @@ class _DebtsScreenState extends State<_DebtsScreen> {
   void initState() { super.initState(); _items = List<Map<String, dynamic>>.from(widget.debts); }
   @override
   void dispose() { _search.dispose(); super.dispose(); }
+  String _bengaliDigits(String value) => value.replaceAllMapped(
+    RegExp(r'[0-9]'),
+    (match) => '০১২৩৪৫৬৭৮৯'[int.parse(match.group(0)!)],
+  );
   double _num(dynamic v) => v is num ? v.toDouble() : double.tryParse((v ?? '').toString()) ?? 0;
   DateTime? _date(dynamic v) => v == null ? null : DateTime.tryParse(v.toString());
   String _kindOf(Map<String,dynamic> e) => (e['debtKind'] ?? e['kind'] ?? e['status'] ?? '').toString();

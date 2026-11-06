@@ -2,12 +2,12 @@ name: Flutter Android Checks
 
 on:
   push:
-    branches: [android-flutter]
+    branches: [android-flutter, stable-integration]
     paths:
       - "mobile/**"
       - ".github/workflows/flutter-android-check.yml"
   pull_request:
-    branches: [android-flutter]
+    branches: [android-flutter, stable-integration]
     paths:
       - "mobile/**"
       - ".github/workflows/flutter-android-check.yml"

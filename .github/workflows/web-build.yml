@@ -2,9 +2,9 @@ name: Web prototype build
 
 on:
   push:
-    branches: [web-prototype]
+    branches: [web-prototype, stable-integration]
   pull_request:
-    branches: [main]
+    branches: [main, stable-integration]
 
 permissions:
   contents: read

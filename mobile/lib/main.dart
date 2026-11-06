@@ -111,6 +111,7 @@ class _AuthApi {
   static const String _baseUrlPreferenceKey = 'amar_hisab_server_url';
   static const String _sessionCookieKey = 'amar_hisab_session_cookie';
   static const String _activeUserIdKey = 'amar_hisab_active_user_id';
+  static const String _cachedUserKey = 'amar_hisab_cached_user';
   static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
   static final HttpClient _client = HttpClient()
     ..connectionTimeout = const Duration(seconds: 12);
@@ -137,6 +138,8 @@ class _AuthApi {
     if (id.isEmpty) throw Exception('অ্যাকাউন্ট ID পাওয়া যায়নি।');
     _activeUserId = id;
     await _secureStorage.write(key: _activeUserIdKey, value: id);
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString(_cachedUserKey, jsonEncode(Map<String, dynamic>.from(user)));
   }
 
   static Future<void> cacheTransactions(List<dynamic> items) {
@@ -332,6 +335,20 @@ class _AuthApi {
   }
 
   static Future<Map<String, dynamic>> _put(String path, Map<String, dynamic> body) async {
+    final segments = path.split('/');
+    final collection = segments.length == 3 && segments[1] == 'data' ? segments[2] : null;
+    const offlineCollections = {'transactions', 'debts', 'bills', 'goals', 'wallets', 'settings', 'categories'};
+    if (collection != null && offlineCollections.contains(collection)) {
+      final accountId = _requireActiveUserId();
+      final items = body['data'];
+      if (items is! List) throw Exception('সংরক্ষণের ডেটা সঠিক নয়।');
+      await OfflineSyncStore.instance.replaceCollection(accountId, collection, items);
+      await trySyncPending();
+      return {
+        'data': await OfflineSyncStore.instance.records(accountId, collection),
+        'offline': syncPendingCount.value > 0,
+      };
+    }
     await _ensureConfigured();
     final request = await _client.putUrl(Uri.parse('$_baseUrl$path'));
     request.headers.contentType = ContentType.json;
@@ -342,8 +359,12 @@ class _AuthApi {
     final text = await response.transform(utf8.decoder).join();
     Map<String, dynamic> data = {};
     if (text.isNotEmpty) {
-      try { final decoded = jsonDecode(text); if (decoded is Map<String, dynamic>) data = decoded; }
-      on FormatException { data = {'error': 'সার্ভার থেকে সঠিক উত্তর পাওয়া যায়নি।'}; }
+      try {
+        final decoded = jsonDecode(text);
+        if (decoded is Map<String, dynamic>) data = decoded;
+      } on FormatException {
+        data = {'error': 'সার্ভার থেকে সঠিক উত্তর পাওয়া যায়নি।'};
+      }
     }
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw Exception(data['error']?.toString() ?? 'অনুরোধ ব্যর্থ হয়েছে (${response.statusCode})।');
@@ -397,34 +418,72 @@ class _AuthApi {
     return data;
   }
 
-  static Future<Map<String, dynamic>> _get(String path) async {
-    await _ensureConfigured();
-    final request = await _client.getUrl(Uri.parse('$_baseUrl$path'));
-    request.headers.set(HttpHeaders.acceptHeader, 'application/json');
-    if (_sessionCookie != null) {
-      request.headers.set(HttpHeaders.cookieHeader, _sessionCookie!);
+  static Future<Map<String, dynamic>> _offlineGet(String path) async {
+    final segments = path.split('/');
+    final collection = segments.length == 3 && segments[1] == 'data' ? segments[2] : null;
+    const offlineCollections = {'transactions', 'debts', 'bills', 'goals', 'wallets', 'settings', 'categories'};
+    if (collection != null && offlineCollections.contains(collection)) {
+      final accountId = _requireActiveUserId();
+      syncStatus.value = 'Offline · Server unavailable';
+      final items = await OfflineSyncStore.instance.records(accountId, collection);
+      syncPendingCount.value = await OfflineSyncStore.instance.pendingCount(accountId);
+      return {'data': items, 'offline': true};
     }
-    final response = await request.close().timeout(const Duration(seconds: 20));
-    final body = await response.transform(utf8.decoder).join();
-    Map<String, dynamic> data = {};
-    if (body.isNotEmpty) {
-      try {
-        final decoded = jsonDecode(body);
-        if (decoded is Map<String, dynamic>) data = decoded;
-      } on FormatException {
-        data = {'error': 'সার্ভার থেকে সঠিক উত্তর পাওয়া যায়নি।'};
+    if (path == '/auth/me') {
+      final preferences = await SharedPreferences.getInstance();
+      final cached = preferences.getString(_cachedUserKey);
+      if (cached != null && cached.isNotEmpty) {
+        final user = jsonDecode(cached);
+        if (user is Map<String, dynamic>) {
+          syncStatus.value = 'Offline · Server unavailable';
+          return {'user': user, 'offline': true};
+        }
       }
     }
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception(data['error']?.toString() ?? 'ডেটা আনা যায়নি।');
+    throw Exception('ইন্টারনেট সংযোগ নেই এবং এই তথ্য ডিভাইসে সংরক্ষিত নেই।');
+  }
+
+  static Future<Map<String, dynamic>> _get(String path) async {
+    await _ensureConfigured();
+    try {
+      final request = await _client.getUrl(Uri.parse('$_baseUrl$path')).timeout(const Duration(seconds: 12));
+      request.headers.set(HttpHeaders.acceptHeader, 'application/json');
+      if (_sessionCookie != null) request.headers.set(HttpHeaders.cookieHeader, _sessionCookie!);
+      final response = await request.close().timeout(const Duration(seconds: 20));
+      final body = await response.transform(utf8.decoder).join();
+      Map<String, dynamic> data = {};
+      if (body.isNotEmpty) {
+        try {
+          final decoded = jsonDecode(body);
+          if (decoded is Map<String, dynamic>) data = decoded;
+        } on FormatException {
+          data = {'error': 'সার্ভার থেকে সঠিক উত্তর পাওয়া যায়নি।'};
+        }
+      }
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        throw Exception(data['error']?.toString() ?? 'ডেটা আনা যায়নি।');
+      }
+      if (path == '/auth/me' && data['user'] is Map) await _setActiveUser(data['user']);
+      final segments = path.split('/');
+      final collection = segments.length == 3 && segments[1] == 'data' ? segments[2] : null;
+      const offlineCollections = {'transactions', 'debts', 'bills', 'goals', 'wallets', 'settings', 'categories'};
+      if (collection != null && offlineCollections.contains(collection) && data['data'] is List) {
+        final accountId = _requireActiveUserId();
+        await OfflineSyncStore.instance.cacheRemoteRecords(accountId, collection, data['data'] as List);
+        data['data'] = await OfflineSyncStore.instance.records(accountId, collection);
+      }
+      return data;
+    } on SocketException {
+      return _offlineGet(path);
+    } on TimeoutException {
+      return _offlineGet(path);
+    } on HandshakeException {
+      return _offlineGet(path);
     }
-    return data;
   }
 
   static Future<bool> restoreSession() async {
-    if (_sessionCookie == null || _sessionCookie!.isEmpty || _baseUrl == null) {
-      return false;
-    }
+    if (_sessionCookie == null || _sessionCookie!.isEmpty || _baseUrl == null) return false;
     try {
       final me = await _get('/auth/me');
       await _setActiveUser(me['user']);
@@ -440,6 +499,8 @@ class _AuthApi {
     _activeUserId = null;
     await _secureStorage.delete(key: _sessionCookieKey);
     await _secureStorage.delete(key: _activeUserIdKey);
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.remove(_cachedUserKey);
   }
 
   static Future<Map<String, dynamic>> loadDashboardData() async {

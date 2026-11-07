@@ -1496,6 +1496,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       .replaceAll('4','৪').replaceAll('5','৫').replaceAll('6','৬').replaceAll('7','৭')
       .replaceAll('8','৮').replaceAll('9','৯');
 
+  String get _todayLabel {
+    final now = DateTime.now();
+    const months = [
+      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
+      'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর',
+    ];
+    return 'আজ ${_bn(now.day.toString())} ${months[now.month - 1]}';
+  }
+
   Future<void> _createAdminInvitation({VoidCallback? refreshDialog}) async {
     if (_inviteLoading) return;
     setState(() {
@@ -5509,6 +5518,16 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                                     icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFB8E3FF) : const Color(0xFF168565), size: 18),
                                   ),
                                   const Spacer(),
+                                  Text(
+                                    _todayLabel,
+                                    style: TextStyle(
+                                      color: Theme.of(context).brightness == Brightness.dark
+                                          ? const Color(0xFFD9ECFF)
+                                          : const Color(0xFF155A45),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
                                 ],
                               ),
                               const SizedBox(height: 0),

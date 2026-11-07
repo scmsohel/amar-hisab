@@ -1834,6 +1834,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           raw[collection] = value ?? <dynamic>[];
         }
       }
+      if (!mounted) return;
       final confirmed = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(

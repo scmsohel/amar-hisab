@@ -4944,6 +4944,7 @@ class _CategoryManagerScreen extends StatefulWidget {
 class _CategoryManagerScreenState extends State<_CategoryManagerScreen> {
   bool _loading=true,_saving=false;
   List<Map<String,dynamic>> _categories=[];
+  List<Map<String,dynamic>> _transactions=[];
   String _filter='সব',_search='';
   static const _colors=['#08a66b','#ff5b60','#4385f5','#8b5cf6','#fb923c','#fbbf24','#94a3b8','#22c5c5'];
   static const _defaults=[
@@ -4968,6 +4969,10 @@ class _CategoryManagerScreenState extends State<_CategoryManagerScreen> {
       final result=await _AuthApi._get('/data/categories');
       final data=result['data'];
       final loaded=data is List?data.whereType<Map>().map((e)=>Map<String,dynamic>.from(e)).toList():<Map<String,dynamic>>[];
+      try {
+        final txResult=await _AuthApi._get('/data/transactions');
+        if(txResult['data'] is List) _transactions=(txResult['data'] as List).whereType<Map>().map((e)=>Map<String,dynamic>.from(e)).toList();
+      } catch (_) {}
       if(!mounted)return;
       setState((){_categories=loaded.isEmpty?_defaults.map((e)=>Map<String,dynamic>.from(e)).toList():loaded;_loading=false;});
       if(loaded.isEmpty)await _persist(_categories,showMessage:false);
@@ -5031,6 +5036,8 @@ class _CategoryManagerScreenState extends State<_CategoryManagerScreen> {
   }
   Future<void> _delete(Map<String,dynamic> item) async {
     final name=(item['name']??'').toString();
+    final used=_transactions.any((tx)=>(tx['categoryName']??tx['category_name']??tx['category']??'').toString()==name);
+    if(used){ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('এই ক্যাটাগরিতে লেনদেন আছে, তাই এখন মুছতে পারবেন না।')));return;}
     final ok=await showDialog<bool>(context:context,builder:(c)=>AlertDialog(title:const Text('ক্যাটাগরি মুছুন?'),content:Text('“'+name+'” ক্যাটাগরিটি মুছে ফেলবেন?'),actions:[TextButton(onPressed:()=>Navigator.pop(c,false),child:const Text('বাতিল')),FilledButton(onPressed:()=>Navigator.pop(c,true),child:const Text('মুছুন'))]));
     if(ok==true&&mounted)await _persist(_categories.where((c)=>(c['id']??'').toString()!=(item['id']??'').toString()).toList());
   }
@@ -5048,8 +5055,20 @@ class _CategoryManagerScreenState extends State<_CategoryManagerScreen> {
         ...rows.map((c)=>Padding(padding:const EdgeInsets.symmetric(vertical:4),child:Row(children:[
           Container(width:39,height:39,decoration:BoxDecoration(color:_color(c['color']).withValues(alpha:.12),borderRadius:BorderRadius.circular(12)),child:Icon(_icon(c['icon']),color:_color(c['color']),size:20)),
           const SizedBox(width:10),Expanded(child:Text((c['name']??'').toString(),style:const TextStyle(fontWeight:FontWeight.w800,fontSize:14))),
+          Text(_transactions.where((tx)=>(tx['categoryName']??tx['category_name']??tx['category']??'').toString()==(c['name']??'').toString()).length.toString(),style:TextStyle(fontSize:12,color:Theme.of(context).hintColor,fontWeight:FontWeight.w700)),
           IconButton(tooltip:'সম্পাদনা',visualDensity:VisualDensity.compact,onPressed:_saving?null:()=>_edit(item:c),icon:const Icon(Icons.edit_outlined,size:19)),
-          IconButton(tooltip:'মুছুন',visualDensity:VisualDensity.compact,onPressed:_saving?null:()=>_delete(c),icon:const Icon(Icons.delete_outline_rounded,color:Colors.red,size:20)),
+          PopupMenuButton<String>(padding:EdgeInsets.zero,onSelected:(action)async{
+            if(action=='delete'){await _delete(c);return;}
+            final index=_categories.indexWhere((x)=>(x['id']??'').toString()==(c['id']??'').toString());
+            if(action=='copy'){final copy={...c,'id':DateTime.now().millisecondsSinceEpoch,'name':(c['name']??'').toString()+' (কপি)'};await _persist([..._categories,copy]);}
+            if(action=='up'&&index>0){final next=List<Map<String,dynamic>>.from(_categories);final value=next.removeAt(index);next.insert(index-1,value);await _persist(next);}
+            if(action=='down'&&index>=0&&index<_categories.length-1){final next=List<Map<String,dynamic>>.from(_categories);final value=next.removeAt(index);next.insert(index+1,value);await _persist(next);}
+          },itemBuilder:(_)=>const [
+            PopupMenuItem(value:'copy',child:Text('কপি/ডুপ্লিকেট')),
+            PopupMenuItem(value:'up',child:Text('উপরে নিন')),
+            PopupMenuItem(value:'down',child:Text('নিচে নামান')),
+            PopupMenuItem(value:'delete',child:Text('মুছে ফেলুন')),
+          ]),
         ]))),
       ]));
     }

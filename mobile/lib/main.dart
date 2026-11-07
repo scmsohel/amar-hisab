@@ -8152,10 +8152,10 @@ class _BalanceNeonChartPainter extends CustomPainter {
     // to a modest peak, descend to a shallow valley, then lift slightly.
     final path = Path()
       ..moveTo(0, size.height * .96)
-      ..cubicTo(size.width * .14, size.height * .96, size.width * .23, size.height * .92, size.width * .34, size.height * .82)
-      ..cubicTo(size.width * .44, size.height * .71, size.width * .52, size.height * .48, size.width * .60, size.height * .46)
-      ..cubicTo(size.width * .68, size.height * .44, size.width * .74, size.height * .70, size.width * .82, size.height * .78)
-      ..cubicTo(size.width * .90, size.height * .85, size.width * .95, size.height * .72, size.width, size.height * .65);
+      ..cubicTo(size.width * .14, size.height * .98, size.width * .23, size.height * .96, size.width * .34, size.height * .89)
+      ..cubicTo(size.width * .44, size.height * .80, size.width * .52, size.height * .62, size.width * .60, size.height * .60)
+      ..cubicTo(size.width * .68, size.height * .59, size.width * .74, size.height * .76, size.width * .82, size.height * .82)
+      ..cubicTo(size.width * .90, size.height * .88, size.width * .95, size.height * .79, size.width, size.height * .73);
 
     final fillPath = Path.from(path)
       ..lineTo(size.width, size.height)
@@ -8168,42 +8168,42 @@ class _BalanceNeonChartPainter extends CustomPainter {
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: isDark
-              ? const [Color(0x3033FFD0), Color(0x0010AFC7)]
-              : const [Color(0x4533D9A0), Color(0x00FFFFFF)],
+              ? const [Color(0x2033FFD0), Color(0x0010AFC7)]
+              : const [Color(0x2433D9A0), Color(0x00FFFFFF)],
         ).createShader(Offset.zero & size),
     );
 
     final secondary = Path()
       ..moveTo(0, size.height * .99)
-      ..cubicTo(size.width * .18, size.height * .99, size.width * .28, size.height * .95, size.width * .39, size.height * .88)
-      ..cubicTo(size.width * .49, size.height * .80, size.width * .56, size.height * .57, size.width * .63, size.height * .56)
-      ..cubicTo(size.width * .72, size.height * .54, size.width * .78, size.height * .77, size.width * .85, size.height * .84)
-      ..cubicTo(size.width * .92, size.height * .89, size.width * .97, size.height * .80, size.width, size.height * .74);
+      ..cubicTo(size.width * .18, size.height * .99, size.width * .28, size.height * .98, size.width * .39, size.height * .93)
+      ..cubicTo(size.width * .49, size.height * .86, size.width * .56, size.height * .70, size.width * .63, size.height * .69)
+      ..cubicTo(size.width * .72, size.height * .67, size.width * .78, size.height * .82, size.width * .85, size.height * .88)
+      ..cubicTo(size.width * .92, size.height * .92, size.width * .97, size.height * .85, size.width, size.height * .80);
     canvas.drawPath(
       secondary,
       Paint()
-        ..color = (isDark ? const Color(0xFF3BADEB) : const Color(0xFF13C58B)).withValues(alpha: isDark ? .16 : .08)
+        ..color = (isDark ? const Color(0xFF3BADEB) : const Color(0xFF13C58B)).withValues(alpha: isDark ? .09 : .045)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 6
+        ..strokeWidth = 4
         ..strokeCap = StrokeCap.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 6),
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4),
     );
     canvas.drawPath(
       path,
       Paint()
-        ..color = (isDark ? const Color(0xFF4ABEFF) : const Color(0xFF00B981)).withValues(alpha: isDark ? .60 : .28)
+        ..color = (isDark ? const Color(0xFF4ABEFF) : const Color(0xFF00B981)).withValues(alpha: isDark ? .38 : .16)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 3
+        ..strokeWidth = 2
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 2),
     );
     canvas.drawPath(
       path,
       Paint()
-        ..color = isDark ? const Color(0xFF9AD9FF) : const Color(0xFF00B981)
+        ..color = (isDark ? const Color(0xFF9AD9FF) : const Color(0xFF00B981)).withValues(alpha: isDark ? .72 : .58)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.6
+        ..strokeWidth = 1.25
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round,
     );

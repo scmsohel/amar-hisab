@@ -5157,25 +5157,17 @@ class _CategoryManagerScreenState extends State<_CategoryManagerScreen> {
         surfaceTintColor:Colors.transparent,
         leading:IconButton(icon:const Icon(Icons.arrow_back_rounded),onPressed:()=>Navigator.pop(context)),
         title:const Text('ক্যাটাগরি ম্যানেজার',style:TextStyle(fontWeight:FontWeight.w900)),
-        actions:[IconButton(onPressed:_loading||_saving?null:_load,icon:_loading?const SizedBox(width:18,height:18,child:CircularProgressIndicator(strokeWidth:2)):const Icon(Icons.refresh_rounded)),const SizedBox(width:5)],
+        actions:[TextButton.icon(onPressed:_saving?null:()=>_edit(),icon:const Icon(Icons.add_rounded,size:19),label:const Text('নতুন',style:TextStyle(fontWeight:FontWeight.w800)),style:TextButton.styleFrom(foregroundColor:const Color(0xFF00A875),visualDensity:VisualDensity.compact,padding:const EdgeInsets.symmetric(horizontal:8))),IconButton(onPressed:_loading||_saving?null:_load,tooltip:'রিফ্রেশ',icon:_loading?const SizedBox(width:18,height:18,child:CircularProgressIndicator(strokeWidth:2)):const Icon(Icons.refresh_rounded)),const SizedBox(width:5)],
       ),
       body:SafeArea(top:false,child:_loading?const Center(child:CircularProgressIndicator()):ListView(
         padding:const EdgeInsets.fromLTRB(13,8,13,22),
         children:[
-          Text('আপনার আয় ও ব্যয়ের ক্যাটাগরি তৈরি, সম্পাদনা ও পরিচালনা করুন',style:TextStyle(color:muted,fontSize:12)),
-          const SizedBox(height:11),
           Row(children:[
             summary('মোট আয় ক্যাটাগরি',income.length,green,const Color(0xFFEAF8F2)),
             const SizedBox(width:8),
             summary('মোট ব্যয় ক্যাটাগরি',expense.length,red,const Color(0xFFFFEFF0)),
           ]),
           const SizedBox(height:10),
-          SizedBox(width:double.infinity,child:FilledButton.icon(
-            onPressed:_saving?null:()=>_edit(),
-            icon:const Icon(Icons.add_rounded,size:19),
-            label:const Text('নতুন ক্যাটাগরি যোগ করুন'),
-            style:FilledButton.styleFrom(backgroundColor:green,foregroundColor:Colors.white,elevation:0,padding:const EdgeInsets.symmetric(vertical:12),shape:RoundedRectangleBorder(borderRadius:BorderRadius.circular(24))),
-          )),
           const SizedBox(height:10),
           TextField(
             onChanged:(v)=>setState(()=>_search=v),

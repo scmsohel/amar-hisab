@@ -7299,18 +7299,44 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
     var value = (raw ?? '').toString().trim();
     if (value.isEmpty) return '';
     value = value
-        .replaceAll('০','0').replaceAll('১','1').replaceAll('২','2')
-        .replaceAll('৩','3').replaceAll('৪','4').replaceAll('৫','5')
-        .replaceAll('৬','6').replaceAll('৭','7').replaceAll('৮','8')
-        .replaceAll('৯','9');
-    final match = RegExp(r'^(\d{1,2}):(\d{2})(?:\s*(AM|PM))?
-        titleOf(x),
-        catOf(x),
-        walletOf(x),
-        amount(x['amount']).toStringAsFixed(2),
-        (x['note'] ?? '').toString(),
-      ],
-  ];
+        .replaceAll('০', '0').replaceAll('১', '1').replaceAll('২', '2')
+        .replaceAll('৩', '3').replaceAll('৪', '4').replaceAll('৫', '5')
+        .replaceAll('৬', '6').replaceAll('৭', '7').replaceAll('৮', '8')
+        .replaceAll('৯', '9');
+    final match = RegExp(
+      r'^(\d{1,2}):(\d{2})(?:\s*(AM|PM))?$',
+      caseSensitive: false,
+    ).firstMatch(value);
+    if (match == null) return value;
+    var hour = int.parse(match.group(1)!);
+    final minute = int.parse(match.group(2)!);
+    final suffix = match.group(3)?.toUpperCase();
+    if (suffix == 'AM' && hour == 12) hour = 0;
+    if (suffix == 'PM' && hour < 12) hour += 12;
+    final formatted =
+        '\${hour.toString().padLeft(2, '0')}:\${minute.toString().padLeft(2, '0')}';
+    return formatted
+        .replaceAll('0', '০').replaceAll('1', '১')
+        .replaceAll('2', '২').replaceAll('3', '৩')
+        .replaceAll('4', '৪').replaceAll('5', '৫')
+        .replaceAll('6', '৬').replaceAll('7', '৭')
+        .replaceAll('8', '৮').replaceAll('9', '৯');
+  }
+
+  List<List<String>> _exportRows(List<Map<String, dynamic>> rows) => [
+        ['তারিখ', 'সময়', 'ধরন', 'বিবরণ', 'ক্যাটাগরি', 'ওয়ালেট', 'পরিমাণ', 'নোট'],
+        for (final x in rows)
+          [
+            dateOf(x)?.toIso8601String().split('T').first ?? '',
+            _exportTime(x['timeInput'] ?? x['time_input'] ?? x['time']),
+            kindOf(x),
+            titleOf(x),
+            catOf(x),
+            walletOf(x),
+            amount(x['amount']).toStringAsFixed(2),
+            (x['note'] ?? '').toString(),
+          ],
+      ];
 
   Future<void> _exportCsv() async {
     final rows = filtered;

@@ -1686,9 +1686,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   String get _memberSince {
     if (_joinedAt == null) return 'তথ্য পাওয়া যায়নি';
-    var years = DateTime.now().year - _joinedAt!.year;
-    if (DateTime(DateTime.now().year, _joinedAt!.month, _joinedAt!.day).isAfter(DateTime.now())) years--;
-    return years <= 0 ? '১ বছরের কম আগে' : '${_bn(years.toString())} বছর আগে';
+    final now = DateTime.now();
+    final joined = _joinedAt!.toLocal();
+    if (joined.isAfter(now)) return 'আজই';
+    final days = now.difference(joined).inDays;
+    if (days < 1) return 'আজই';
+    if (days < 30) return '${_bn(days.toString())} দিন';
+    if (days < 365) {
+      final months = (days / 30).floor();
+      return '${_bn(months.toString())} মাস';
+    }
+    final years = (days / 365).floor();
+    final remainingMonths = ((days % 365) / 30).floor();
+    return remainingMonths > 0
+        ? '${_bn(years.toString())} বছর ${_bn(remainingMonths.toString())} মাস'
+        : '${_bn(years.toString())} বছর';
   }
 
   String get _lastSync {
@@ -2726,7 +2738,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             borderRadius: BorderRadius.circular(25), border: Border.all(color: dark ? const Color(0xFF38556A) : const Color(0xFFE8C9DD)),
                             boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: .04), blurRadius: 12, offset: const Offset(0, 4))]),
                           child: Row(children: [
-                            Expanded(child: _info(Icons.calendar_month_rounded, 'সদস্য হয়েছেন', _memberSince, dark)),
+                            Expanded(child: _info(Icons.calendar_month_rounded, 'অ্যাকাউন্টের বয়স', _memberSince, dark)),
                             _infoDivider(dark),
                             Expanded(child: _info(Icons.cloud_done_rounded, 'সর্বশেষ Sync', _lastSync, dark)),
                             _infoDivider(dark),

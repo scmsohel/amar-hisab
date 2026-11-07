@@ -1857,6 +1857,113 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _showDataBackupDialog() async {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final dialogSurface = dark ? const Color(0xFF172B3D) : Colors.white;
+    final dialogText = dark ? const Color(0xFFEAF2FA) : const Color(0xFF17212B);
+    final dialogMuted = dark ? const Color(0xFFB5C4D3) : const Color(0xFF64748B);
+    final panel = dark ? const Color(0xFF20384B) : const Color(0xFFF4F7FA);
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: dialogSurface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 18,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+        titlePadding: const EdgeInsets.fromLTRB(22, 22, 22, 8),
+        contentPadding: const EdgeInsets.fromLTRB(22, 8, 22, 8),
+        actionsPadding: const EdgeInsets.fromLTRB(18, 4, 18, 16),
+        title: Row(children: [
+          Container(
+            width: 44, height: 44,
+            decoration: BoxDecoration(color: const Color(0xFF64748B).withValues(alpha: .12), borderRadius: BorderRadius.circular(14)),
+            child: const Icon(Icons.cloud_sync_rounded, color: Color(0xFF64748B), size: 24),
+          ),
+          const SizedBox(width: 12),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('ডেটা এক্সপোর্ট ও ব্যাকআপ', style: TextStyle(color: dialogText, fontSize: 17, fontWeight: FontWeight.w800)),
+            const SizedBox(height: 3),
+            Text('আপনার হিসাব নিরাপদে রাখুন', style: TextStyle(color: dialogMuted, fontSize: 11)),
+          ])),
+        ]),
+        content: Column(mainAxisSize: MainAxisSize.min, children: [
+          _backupActionTile(
+            icon: Icons.download_rounded,
+            color: const Color(0xFF1688F8),
+            title: 'এক্সপোর্ট / ব্যাকআপ',
+            subtitle: 'সব হিসাব JSON ফাইলে সংরক্ষণ করুন',
+            panel: panel,
+            titleColor: dialogText,
+            subtitleColor: dialogMuted,
+            onTap: () {
+              Navigator.pop(dialogContext);
+              _exportBackup();
+            },
+          ),
+          const SizedBox(height: 10),
+          _backupActionTile(
+            icon: Icons.upload_rounded,
+            color: const Color(0xFF08A66A),
+            title: 'রিস্টোর',
+            subtitle: 'আগের JSON ব্যাকআপ থেকে হিসাব ফিরিয়ে আনুন',
+            panel: panel,
+            titleColor: dialogText,
+            subtitleColor: dialogMuted,
+            onTap: () {
+              Navigator.pop(dialogContext);
+              _restoreBackup();
+            },
+          ),
+        ]),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            style: TextButton.styleFrom(foregroundColor: dialogMuted, shape: const StadiumBorder()),
+            child: const Text('বন্ধ করুন', style: TextStyle(fontWeight: FontWeight.w700)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _backupActionTile({
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String subtitle,
+    required Color panel,
+    required Color titleColor,
+    required Color subtitleColor,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: panel,
+      borderRadius: BorderRadius.circular(17),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(17),
+        child: Padding(
+          padding: const EdgeInsets.all(13),
+          child: Row(children: [
+            Container(
+              width: 42, height: 42,
+              decoration: BoxDecoration(color: color.withValues(alpha: .12), borderRadius: BorderRadius.circular(13)),
+              child: Icon(icon, color: color, size: 22),
+            ),
+            const SizedBox(width: 12),
+            Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(title, style: TextStyle(color: titleColor, fontSize: 13, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 3),
+              Text(subtitle, style: TextStyle(color: subtitleColor, fontSize: 10.5, height: 1.35)),
+            ])),
+            Icon(Icons.chevron_right_rounded, color: subtitleColor, size: 22),
+          ]),
+        ),
+      ),
+    );
+  }
+
   Future<void> _resetAccount() async {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final dialogSurface = dark ? const Color(0xFF172B3D) : const Color(0xFFFFFFFF);
@@ -2483,21 +2590,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               OutlinedButton(onPressed: _resetAccount, child: const Text('হিসাব রিসেট')),
                             ]),
                             Divider(height: 20, color: line),
-                            Row(children: [
-                              Container(width: 38, height: 38, decoration: BoxDecoration(color: const Color(0xFF64748B).withValues(alpha: .10), borderRadius: BorderRadius.circular(12)),
-                                child: const Icon(Icons.download_rounded, color: Color(0xFF334155), size: 21)),
-                              const SizedBox(width: 11),
-                              const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                Text('ডেটা এক্সপোর্ট ও ব্যাকআপ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-                                SizedBox(height: 2),
-                                Text('আপনার সংরক্ষিত হিসাব JSON ফাইলে সংরক্ষণ করুন', style: TextStyle(fontSize: 11, color: Colors.blueGrey)),
-                              ])),
-                            ]),
-                            const SizedBox(height: 10),
-                            Wrap(spacing: 8, runSpacing: 8, alignment: WrapAlignment.end, children: [
-                              OutlinedButton.icon(onPressed: _exportBackup, icon: const Icon(Icons.download_rounded, size: 17), label: const Text('এক্সপোর্ট / ব্যাকআপ')),
-                              OutlinedButton.icon(onPressed: _restoreBackup, icon: const Icon(Icons.upload_rounded, size: 17), label: const Text('রিস্টোর')),
-                            ]),
+                            Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                borderRadius: BorderRadius.circular(14),
+                                onTap: _showDataBackupDialog,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 5),
+                                  child: Row(children: [
+                                    Container(width: 38, height: 38, decoration: BoxDecoration(color: const Color(0xFF64748B).withValues(alpha: .10), borderRadius: BorderRadius.circular(12)),
+                                      child: const Icon(Icons.download_rounded, color: Color(0xFF334155), size: 21)),
+                                    const SizedBox(width: 11),
+                                    const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                      Text('ডেটা এক্সপোর্ট ও ব্যাকআপ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+                                      SizedBox(height: 2),
+                                      Text('ব্যাকআপ ও রিস্টোর অপশন দেখতে চাপ দিন', style: TextStyle(fontSize: 11, color: Colors.blueGrey)),
+                                    ])),
+                                    const Icon(Icons.chevron_right_rounded, color: Colors.blueGrey, size: 23),
+                                  ]),
+                                ),
+                              ),
+                            ),
                           ]),
                         ),
                         const SizedBox(height: 12),

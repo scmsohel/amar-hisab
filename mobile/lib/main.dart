@@ -2480,8 +2480,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 SizedBox(height: 2),
                                 Text('হিসাব মুছে নতুন করে শুরু করুন।', style: TextStyle(fontSize: 11, color: Colors.blueGrey)),
                               ])),
-                              OutlinedButton(onPressed: _resetAccount, child: const Text('হিসাব রিসেট')),
                             ]),
+                            const SizedBox(height: 9),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: OutlinedButton(
+                                onPressed: _resetAccount,
+                                child: const Text('হিসাব রিসেট'),
+                              ),
+                            ),
                             Divider(height: 20, color: line),
                             Row(children: [
                               Container(width: 38, height: 38, decoration: BoxDecoration(color: const Color(0xFF64748B).withValues(alpha: .10), borderRadius: BorderRadius.circular(12)),
@@ -2493,11 +2500,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Text('আপনার সংরক্ষিত হিসাব JSON ফাইলে সংরক্ষণ করুন', style: TextStyle(fontSize: 11, color: Colors.blueGrey)),
                               ])),
                             ]),
-                            const SizedBox(height: 10),
-                            Wrap(spacing: 8, runSpacing: 8, alignment: WrapAlignment.end, children: [
-                              OutlinedButton.icon(onPressed: _exportBackup, icon: const Icon(Icons.download_rounded, size: 17), label: const Text('এক্সপোর্ট / ব্যাকআপ')),
-                              OutlinedButton.icon(onPressed: _restoreBackup, icon: const Icon(Icons.upload_rounded, size: 17), label: const Text('রিস্টোর')),
-                            ]),
+                            const SizedBox(height: 9),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Flexible(child: OutlinedButton.icon(
+                                  onPressed: _exportBackup,
+                                  icon: const Icon(Icons.download_rounded, size: 17),
+                                  label: const Text('এক্সপোর্ট / ব্যাকআপ'),
+                                )),
+                                const SizedBox(width: 8),
+                                OutlinedButton.icon(
+                                  onPressed: _restoreBackup,
+                                  icon: const Icon(Icons.upload_rounded, size: 17),
+                                  label: const Text('রিস্টোর'),
+                                ),
+                              ],
+                            ),
                           ]),
                         ),
                         const SizedBox(height: 12),

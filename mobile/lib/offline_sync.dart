@@ -397,6 +397,19 @@ class OfflineSyncStore {
     return Sqflite.firstIntValue(rows) ?? 0;
   }
 
+  Future<void> clearAccountState(String accountId) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      await txn.delete('pending_operations', where: 'account_id = ?', whereArgs: [accountId]);
+      await txn.delete('local_records', where: 'account_id = ?', whereArgs: [accountId]);
+      await txn.insert(
+        'sync_metadata',
+        {'key': _cursorKey(accountId), 'value': '0'},
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    });
+  }
+
   Future<void> close() async {
     await _database?.close();
     _database = null;

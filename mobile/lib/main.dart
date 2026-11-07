@@ -5081,7 +5081,7 @@ class _CategoryManagerScreenState extends State<_CategoryManagerScreen> {
         Expanded(child:Container(padding:const EdgeInsets.all(13),decoration:BoxDecoration(color:const Color(0xFFEF4760).withValues(alpha:.08),borderRadius:BorderRadius.circular(15)),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[const Text('মোট ব্যয় ক্যাটাগরি',style:TextStyle(fontSize:11)),Text(expense.length.toString(),style:const TextStyle(fontSize:24,fontWeight:FontWeight.w900,color:Color(0xFFEF4760)))]))),
       ]),
       const SizedBox(height:14),
-      Wrap(spacing:8,children:['সব','আয়','ব্যয়'].map((v)=>ChoiceChip(label:Text(v=='সব'?'সব ('+_categories.length.toString()+')':v+' ('+_categories.where((c)=>c['type']==v).length.toString()+')'),selected:_filter==v,onSelected:(_)=>setState(()=>_filter=v)).toList()),
+      Wrap(spacing:8,children:['সব','আয়','ব্যয়'].map((v)=>ChoiceChip(label:Text(v=='সব'?'সব ('+_categories.length.toString()+')':v+' ('+_categories.where((c)=>c['type']==v).length.toString()+')'),selected:_filter==v,onSelected:(_)=>setState(()=>_filter=v))).toList()),
       const SizedBox(height:12),
       TextField(onChanged:(v)=>setState(()=>_search=v),decoration:InputDecoration(prefixIcon:const Icon(Icons.search_rounded),hintText:'ক্যাটাগরি খুঁজুন...',filled:true,border:OutlineInputBorder(borderRadius:BorderRadius.circular(13),borderSide:BorderSide.none))),
       const SizedBox(height:14),
@@ -6463,6 +6463,7 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
       managedCategories = _CategoryManagerScreenState._defaults
           .map((item) => Map<String, dynamic>.from(item)).toList();
     }
+    if (!mounted) return;
     await showDialog<void>(
         context: context,
         barrierDismissible: !saving,

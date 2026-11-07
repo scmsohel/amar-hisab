@@ -2589,7 +2589,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ])),
                               OutlinedButton(onPressed: _resetAccount, child: const Text('হিসাব রিসেট')),
                             ]),
-                            Divider(height: 8, thickness: 1, color: line),
+                            Padding(padding: const EdgeInsets.only(left: 55), child: Divider(height: 8, thickness: 1, color: line)),
                             Material(
                               color: Colors.transparent,
                               child: InkWell(
@@ -2611,7 +2611,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                             ),
-                            Divider(height: 8, thickness: 1, color: line),
+                            Padding(padding: const EdgeInsets.only(left: 55), child: Divider(height: 8, thickness: 1, color: line)),
                             _menuRow(Icons.person_rounded, const Color(0xFF1688F8), 'ব্যক্তিগত তথ্য', 'নাম, মোবাইল নম্বর ও ইমেইল', _editPersonalInfo, dark, ink, muted, line),
                             _menuRow(Icons.verified_user_rounded, const Color(0xFF10B83F), 'নিরাপত্তা', 'পাসওয়ার্ড পরিবর্তন', _changePassword, dark, ink, muted, line),
                             _menuRow(Icons.notifications_active_rounded, const Color(0xFFFFB000), 'নোটিফিকেশন', 'লেনদেন, বিল ও অন্যান্য সতর্কতা', _notificationSettings, dark, ink, muted, line),

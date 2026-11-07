@@ -2,12 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:excel/excel.dart' as xl;
-import 'package:path_provider/path_provider.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
@@ -6914,76 +6908,6 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
     });
     return list;
   }
-  String _exportStamp() {
-    final now = DateTime.now();
-    String two(int v) => v.toString().padLeft(2, '0');
-    return '${now.year}${two(now.month)}${two(now.day)}_${two(now.hour)}${two(now.minute)}';
-  }
-
-  List<List<String>> _exportRows(List<Map<String, dynamic>> rows) => [
-    ['তারিখ', 'সময়', 'ধরন', 'বিবরণ', 'ক্যাটাগরি', 'ওয়ালেট', 'পরিমাণ', 'নোট'],
-    for (final x in rows)
-      [dateOf(x)?.toIso8601String().split('T').first ?? '', (x['timeInput'] ?? x['time_input'] ?? x['time'] ?? '').toString(), kindOf(x), titleOf(x), catOf(x), walletOf(x), amount(x['amount']).toStringAsFixed(2), (x['note'] ?? '').toString()],
-  ];
-
-  Future<void> _shareExportFile(String extension, List<int> bytes) async {
-    final dir = await getTemporaryDirectory();
-    final file = File('${dir.path}/amar_hisab_transactions_${_exportStamp()}.$extension');
-    await file.writeAsBytes(bytes, flush: true);
-    await SharePlus.instance.share(ShareParams(files: [XFile(file.path)], text: 'Amar Hisab — লেনদেনের রিপোর্ট'));
-  }
-
-  Future<void> _exportCsv(List<Map<String, dynamic>> rows) async {
-    String quote(String value) => '\"${value.replaceAll('\"', '\"\"')}\"';
-    final csv = '\uFEFF${_exportRows(rows).map((r) => r.map(quote).join(',')).join('\r\n')}';
-    await _shareExportFile('csv', utf8.encode(csv));
-  }
-
-  Future<void> _exportExcel(List<Map<String, dynamic>> rows) async {
-    final workbook = xl.Excel.createExcel();
-    final summarySheet = workbook['সারাংশ'];
-    final income = rows.where((x) => kindOf(x) == 'আয়').fold<double>(0, (s, x) => s + amount(x['amount']));
-    final expense = rows.where((x) => kindOf(x) == 'ব্যয়').fold<double>(0, (s, x) => s + amount(x['amount']));
-    summarySheet.appendRow([xl.TextCellValue('বিবরণ'), xl.TextCellValue('পরিমাণ')]);
-    summarySheet.appendRow([xl.TextCellValue('মোট আয়'), xl.TextCellValue(income.toStringAsFixed(2))]);
-    summarySheet.appendRow([xl.TextCellValue('মোট ব্যয়'), xl.TextCellValue(expense.toStringAsFixed(2))]);
-    summarySheet.appendRow([xl.TextCellValue('নিট পার্থক্য'), xl.TextCellValue((income - expense).toStringAsFixed(2))]);
-    summarySheet.appendRow([xl.TextCellValue('মোট লেনদেন'), xl.IntCellValue(rows.length)]);
-    final transactionSheet = workbook['লেনদেন'];
-    for (final row in _exportRows(rows)) { transactionSheet.appendRow(row.map((v) => xl.TextCellValue(v)).toList()); }
-    final bytes = workbook.save();
-    if (bytes == null) throw Exception('Excel ফাইল তৈরি করা যায়নি।');
-    await _shareExportFile('xlsx', bytes);
-  }
-
-  Future<void> _exportPdf(List<Map<String, dynamic>> rows) async {
-    const paths = ['/system/fonts/NotoSansBengali-VF.ttf', '/system/fonts/NotoSansBengali-Regular.ttf', '/system/fonts/NotoSansBengaliUI-Regular.ttf'];
-    File? fontFile;
-    for (final path in paths) { final file = File(path); if (await file.exists()) { fontFile = file; break; } }
-    if (fontFile == null) throw Exception('ডিভাইসে বাংলা PDF ফন্ট পাওয়া যায়নি।');
-    final font = pw.Font.ttf(await fontFile.readAsBytes());
-    final doc = pw.Document();
-    final income = rows.where((x) => kindOf(x) == 'আয়').fold<double>(0, (s, x) => s + amount(x['amount']));
-    final expense = rows.where((x) => kindOf(x) == 'ব্যয়').fold<double>(0, (s, x) => s + amount(x['amount']));
-    final tableRows = _exportRows(rows);
-    doc.addPage(pw.MultiPage(pageFormat: PdfPageFormat.a4, theme: pw.ThemeData.withFont(base: font, bold: font), margin: const pw.EdgeInsets.all(24), build: (context) => [
-      pw.Text('আমার হিসাব — লেনদেন রিপোর্ট', style: pw.TextStyle(font: font, fontSize: 17)),
-      pw.SizedBox(height: 5),
-      pw.Text('রিপোর্ট তৈরি: ${dateLabel(DateTime.now())}', style: const pw.TextStyle(fontSize: 9)),
-      pw.SizedBox(height: 12),
-      pw.Wrap(spacing: 16, runSpacing: 8, children: [pw.Text('মোট আয়: ${money(income)}'), pw.Text('মোট ব্যয়: ${money(expense)}'), pw.Text('নিট: ${money(income - expense)}'), pw.Text('লেনদেন: ${bn(rows.length.toString())}টি')]),
-      pw.SizedBox(height: 14),
-      pw.TableHelper.fromTextArray(headers: tableRows.first, data: tableRows.skip(1).toList(), headerStyle: pw.TextStyle(font: font, fontSize: 8), cellStyle: pw.TextStyle(font: font, fontSize: 7), headerDecoration: const pw.BoxDecoration(color: PdfColors.grey300), cellAlignment: pw.Alignment.centerLeft, cellPadding: const pw.EdgeInsets.all(4), border: pw.TableBorder.all(color: PdfColors.grey400, width: .4)),
-    ]));
-    await Printing.sharePdf(bytes: await doc.save(), filename: 'amar_hisab_transactions_${_exportStamp()}.pdf');
-  }
-
-  Future<void> _handleExport(String format) async {
-    final rows = filtered;
-    if (rows.isEmpty) { ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('এক্সপোর্ট করার মতো কোনো লেনদেন নেই।'))); return; }
-    try { if (format == 'csv') { await _exportCsv(rows); } else if (format == 'excel') { await _exportExcel(rows); } else { await _exportPdf(rows); } }
-    catch (error) { if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('এক্সপোর্ট করা যায়নি: $error'))); }
-  }
   Future<void> reload()async{setState(()=>loading=true);try{final fresh=await widget.onReload();if(mounted)setState(()=>data=fresh);}finally{if(mounted)setState(()=>loading=false);}}
   String dateLabel(DateTime? d){if(d==null)return 'তারিখ পাওয়া যায়নি';const m=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];return '${bn(d.day.toString())} ${m[d.month-1]}, ${bn(d.year.toString())}';}
   Widget summary(String label,double value,Color color,IconData icon)=>Expanded(child:Container(padding:const EdgeInsets.all(10),decoration:BoxDecoration(color:color.withValues(alpha:.07),borderRadius:BorderRadius.circular(14),border:Border.all(color:color.withValues(alpha:.2))),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Icon(icon,color:color,size:18),const SizedBox(height:4),Text(label,style:const TextStyle(fontSize:10)),FittedBox(child:Text(money(value),style:TextStyle(fontSize:14,fontWeight:FontWeight.w900,color:color)))])));
@@ -7197,7 +7121,7 @@ const icons = <String, IconData>{
     final shown=items;
     final cats=data.map(catOf).toSet().toList()..sort(),wallets=data.map(walletOf).where((x)=>x.isNotEmpty).toSet().toList()..sort();
     final groups=<String,List<Map<String,dynamic>>>{};for(final x in shown){final d=dateOf(x),key=d==null?'unknown':d.toString().substring(0,10);groups.putIfAbsent(key,()=>[]).add(x);}
-    return Scaffold(backgroundColor:bg,appBar:AppBar(backgroundColor:bg,foregroundColor:ink,elevation:0,title:const Text('লেনদেন',style:TextStyle(fontWeight:FontWeight.w900)),actions:[PopupMenuButton<String>(tooltip:'এক্সপোর্ট',icon:const Icon(Icons.file_download_outlined),onSelected:_handleExport,itemBuilder:(_)=>const[PopupMenuItem(value:'pdf',child:Text('PDF')),PopupMenuItem(value:'excel',child:Text('Excel (.xlsx)')),PopupMenuItem(value:'csv',child:Text('CSV'))]),IconButton(onPressed:loading?null:reload,icon:const Icon(Icons.refresh_rounded)),IconButton(onPressed:()async{await widget.onAdd();await reload();},icon:const Icon(Icons.add_rounded))]),body:SafeArea(child:Column(children:[
+    return Scaffold(backgroundColor:bg,appBar:AppBar(backgroundColor:bg,foregroundColor:ink,elevation:0,title:const Text('লেনদেন',style:TextStyle(fontWeight:FontWeight.w900)),actions:[IconButton(onPressed:loading?null:reload,icon:const Icon(Icons.refresh_rounded)),IconButton(onPressed:()async{await widget.onAdd();await reload();},icon:const Icon(Icons.add_rounded))]),body:SafeArea(child:Column(children:[
       Padding(padding:const EdgeInsets.fromLTRB(12,4,12,7),child:Row(children:[summary('মোট আয়',income,const Color(0xFF00A875),Icons.trending_up_rounded),const SizedBox(width:7),summary('মোট ব্যয়',expense,const Color(0xFFEF4444),Icons.trending_down_rounded)])),
       Padding(padding:const EdgeInsets.fromLTRB(12,0,12,7),child:Row(children:[summary('নিট ব্যালেন্স',income-expense,const Color(0xFF2588F5),Icons.account_balance_wallet_outlined),const SizedBox(width:7),summary('মোট লেনদেন',items.length.toDouble(),const Color(0xFF8B5CF6),Icons.receipt_long_rounded)])),
       Padding(padding:const EdgeInsets.fromLTRB(12,0,12,7),child:TextField(controller:search,onChanged: (_) => setState(() {}),decoration:InputDecoration(prefixIcon:const Icon(Icons.search_rounded),hintText:'বিবরণ, ক্যাটাগরি, ওয়ালেট খুঁজুন...',filled:true,fillColor:dark?const Color(0xFF12283A):Colors.white,border:OutlineInputBorder(borderRadius:BorderRadius.circular(12))))),

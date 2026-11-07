@@ -6456,13 +6456,11 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
       final response = await _AuthApi._get('/data/categories');
       if (response['data'] is List) {
         managedCategories = (response['data'] as List).whereType<Map>()
-            .map((item) => Map<String, dynamic>.from(item))
-            .where((item) => item['type'] == kind).toList();
+            .map((item) => Map<String, dynamic>.from(item)).toList();
       }
     } catch (_) {}
     if (managedCategories.isEmpty) {
       managedCategories = _CategoryManagerScreenState._defaults
-          .where((item) => item['type'] == kind)
           .map((item) => Map<String, dynamic>.from(item)).toList();
     }
     await showDialog<void>(

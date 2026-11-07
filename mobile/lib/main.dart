@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
+import 'package:bangla_pdf/widgets.dart' as pw;
 import 'package:open_filex/open_filex.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -7348,26 +7348,6 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
     }
 
     try {
-      // Android-এর Noto Bengali system font embed করা হয়, যাতে PDF-এ বাংলা ঠিক থাকে।
-      const fontPaths = [
-        '/system/fonts/NotoSansBengali-VF.ttf',
-        '/system/fonts/NotoSansBengali-Regular.ttf',
-        '/system/fonts/NotoSansBengaliUI-Regular.ttf',
-      ];
-      File? fontFile;
-      for (final path in fontPaths) {
-        final candidate = File(path);
-        if (await candidate.exists()) {
-          fontFile = candidate;
-          break;
-        }
-      }
-      if (fontFile == null) {
-        throw Exception('এই ডিভাইসে বাংলা PDF font পাওয়া যায়নি।');
-      }
-
-      final fontBytes = await fontFile.readAsBytes();
-      final bengaliFont = pw.Font.ttf(ByteData.sublistView(fontBytes));
       final document = pw.Document();
       final income = rows
           .where((item) => kindOf(item) == 'আয়')
@@ -7381,19 +7361,15 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
         pw.MultiPage(
           pageFormat: PdfPageFormat.a4.landscape,
           margin: const pw.EdgeInsets.all(22),
-          theme: pw.ThemeData.withFont(
-            base: bengaliFont,
-            bold: bengaliFont,
-          ),
           build: (context) => [
             pw.Text(
               'আমার হিসাব — লেনদেন রিপোর্ট',
-              style: pw.TextStyle(font: bengaliFont, fontSize: 17),
+              style: pw.TextStyle(fontSize: 17),
             ),
             pw.SizedBox(height: 5),
             pw.Text(
               'রিপোর্ট তৈরি: ${dateLabel(DateTime.now())}',
-              style: pw.TextStyle(font: bengaliFont, fontSize: 9),
+              style: pw.TextStyle(fontSize: 9),
             ),
             pw.SizedBox(height: 12),
             pw.Wrap(
@@ -7410,8 +7386,8 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
             pw.TableHelper.fromTextArray(
               headers: tableRows.first,
               data: tableRows.skip(1).toList(),
-              headerStyle: pw.TextStyle(font: bengaliFont, fontSize: 8),
-              cellStyle: pw.TextStyle(font: bengaliFont, fontSize: 7),
+              headerStyle: pw.TextStyle(fontSize: 8),
+              cellStyle: pw.TextStyle(fontSize: 7),
               headerDecoration: const pw.BoxDecoration(color: PdfColors.grey300),
               cellAlignment: pw.Alignment.centerLeft,
               cellPadding: const pw.EdgeInsets.all(4),

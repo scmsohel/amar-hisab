@@ -1442,6 +1442,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic> _user = {};
   DateTime? _joinedAt;
   DateTime? _lastSyncAt;
+  bool _inviteLoading = false;
+  String? _inviteCode;
+  String? _inviteExpiry;
+  String? _inviteError;
 
   @override
   void initState() {
@@ -1491,6 +1495,119 @@ class _ProfileScreenState extends State<ProfileScreen> {
       .replaceAll('0','০').replaceAll('1','১').replaceAll('2','২').replaceAll('3','৩')
       .replaceAll('4','৪').replaceAll('5','৫').replaceAll('6','৬').replaceAll('7','৭')
       .replaceAll('8','৮').replaceAll('9','৯');
+
+  Future<void> _createAdminInvitation({VoidCallback? refreshDialog}) async {
+    if (_inviteLoading) return;
+    setState(() {
+      _inviteLoading = true;
+      _inviteCode = null;
+      _inviteExpiry = null;
+      _inviteError = null;
+    });
+    refreshDialog?.call();
+    try {
+      // Same endpoint used by the web app: POST /api/admin/invitations.
+      final result = await _AuthApi._post('/admin/invitations', {});
+      if (!mounted) return;
+      final expiresAt = result['expiresAt']?.toString();
+      final expiryDate = expiresAt == null ? null : DateTime.tryParse(expiresAt)?.toLocal();
+      setState(() {
+        _inviteCode = (result['code'] ?? '').toString();
+        _inviteExpiry = expiryDate == null
+            ? '৭ দিনের মধ্যে'
+            : '${_bn(expiryDate.day.toString().padLeft(2, '0'))}/${_bn(expiryDate.month.toString().padLeft(2, '0'))}/${_bn(expiryDate.year.toString())}';
+        if (_inviteCode!.isEmpty) _inviteError = 'সার্ভার থেকে Invitation Code পাওয়া যায়নি।';
+      });
+      refreshDialog?.call();
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _inviteError = error.toString().replaceFirst('Exception: ', ''));
+      refreshDialog?.call();
+    } finally {
+      if (mounted) {
+        setState(() => _inviteLoading = false);
+        refreshDialog?.call();
+      }
+    }
+  }
+
+  Future<void> _showInvitationDialog() async {
+    if ((_user['role'] ?? '').toString().toLowerCase() != 'admin') return;
+    setState(() {
+      _inviteCode = null;
+      _inviteExpiry = null;
+      _inviteError = null;
+    });
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, refreshDialog) => AlertDialog(
+          title: const Text('নতুন ব্যবহারকারী যোগ করুন'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('একটি Invitation Code তৈরি করুন। কোডটি ৭ দিন বৈধ থাকবে এবং একবারই ব্যবহার করা যাবে।'),
+              if (_inviteCode != null && _inviteCode!.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(13),
+                  decoration: BoxDecoration(
+                    color: Theme.of(dialogContext).brightness == Brightness.dark
+                        ? const Color(0xFF1B3548)
+                        : const Color(0xFFF3F5F4),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('নতুন Invitation Code · বৈধ: $_inviteExpiry', style: const TextStyle(fontSize: 12)),
+                      const SizedBox(height: 8),
+                      SelectableText(_inviteCode!, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, letterSpacing: .5)),
+                    ],
+                  ),
+                ),
+              ],
+              if (_inviteError != null) ...[
+                const SizedBox(height: 10),
+                Text(_inviteError!, style: TextStyle(
+                  color: _inviteError!.contains('কপি হয়েছে') ? Colors.green : Colors.red,
+                  fontSize: 12,
+                )),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: _inviteLoading ? null : () => Navigator.of(dialogContext).pop(),
+              child: const Text('বন্ধ করুন'),
+            ),
+            if (_inviteCode != null && _inviteCode!.isNotEmpty)
+              OutlinedButton.icon(
+                onPressed: () async {
+                  await Clipboard.setData(ClipboardData(text: _inviteCode!));
+                  if (!mounted) return;
+                  setState(() => _inviteError = 'Invitation code কপি হয়েছে।');
+                  refreshDialog(() {});
+                },
+                icon: const Icon(Icons.copy_rounded, size: 16),
+                label: const Text('কোড কপি করুন'),
+              ),
+            FilledButton.icon(
+              onPressed: _inviteLoading
+                  ? null
+                  : () => _createAdminInvitation(refreshDialog: () => refreshDialog(() {})),
+              icon: _inviteLoading
+                  ? const SizedBox(width: 15, height: 15, child: CircularProgressIndicator(strokeWidth: 2))
+                  : const Icon(Icons.add_rounded, size: 18),
+              label: Text(_inviteLoading ? 'তৈরি হচ্ছে...' : 'Invitation তৈরি করুন'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   String get _memberSince {
     if (_joinedAt == null) return 'তথ্য পাওয়া যায়নি';
@@ -2543,6 +2660,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           )),
                           const SizedBox(height: 10),
                         ],
+                        if ((_user['role'] ?? '').toString().toLowerCase() == 'admin')
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.fromLTRB(14, 13, 12, 13),
+                            decoration: BoxDecoration(
+                              color: surface,
+                              borderRadius: BorderRadius.circular(18),
+                              border: Border.all(color: line),
+                              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: .025), blurRadius: 10, offset: const Offset(0, 3))],
+                            ),
+                            child: Row(children: [
+                              Container(
+                                width: 40, height: 40,
+                                decoration: BoxDecoration(color: const Color(0xFF08A66A).withValues(alpha: .10), borderRadius: BorderRadius.circular(12)),
+                                child: const Icon(Icons.person_add_alt_1_rounded, color: Color(0xFF08A66A), size: 21),
+                              ),
+                              const SizedBox(width: 12),
+                              const Expanded(child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('নতুন ব্যবহারকারী যোগ করুন', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+                                  SizedBox(height: 3),
+                                  Text('Invitation Code তৈরি ও কপি করুন', style: TextStyle(fontSize: 11, color: Colors.blueGrey)),
+                                ],
+                              )),
+                              const SizedBox(width: 8),
+                              FilledButton.icon(
+                                onPressed: _showInvitationDialog,
+                                icon: const Icon(Icons.add_rounded, size: 16),
+                                label: const Text('Invite'),
+                                style: FilledButton.styleFrom(
+                                  backgroundColor: const Color(0xFF079B6B),
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                ),
+                              ),
+                            ]),
+                          ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
                           decoration: BoxDecoration(color: dark ? const Color(0xFF142C3D) : const Color(0xFFFFFCF9),

@@ -2611,16 +2611,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                               ),
                             ),
-                          ]),
-                        ),
-                        const SizedBox(height: 12),
-
-                        const SizedBox(height: 12),
-                        Container(
-                          padding: const EdgeInsets.fromLTRB(8, 3, 8, 3),
-                          decoration: BoxDecoration(color: surface, borderRadius: BorderRadius.circular(28),
-                            boxShadow: [BoxShadow(color: const Color(0xFF345A64).withValues(alpha: dark ? .10 : .12), blurRadius: 18, offset: const Offset(0, 8))]),
-                          child: Column(children: [
+                            Divider(height: 20, color: line),
                             _menuRow(Icons.person_rounded, const Color(0xFF1688F8), 'ব্যক্তিগত তথ্য', 'নাম, মোবাইল নম্বর ও ইমেইল', _editPersonalInfo, dark, ink, muted, line),
                             _menuRow(Icons.verified_user_rounded, const Color(0xFF10B83F), 'নিরাপত্তা', 'পাসওয়ার্ড পরিবর্তন', _changePassword, dark, ink, muted, line),
                             _menuRow(Icons.notifications_active_rounded, const Color(0xFFFFB000), 'নোটিফিকেশন', 'লেনদেন, বিল ও অন্যান্য সতর্কতা', _notificationSettings, dark, ink, muted, line),

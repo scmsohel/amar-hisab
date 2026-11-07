@@ -5003,7 +5003,7 @@ class _CategoryManagerScreenState extends State<_CategoryManagerScreen> {
     final name=TextEditingController(text:(item?['name']??'').toString());
     final desc=TextEditingController(text:(item?['description']??'').toString());
     String type=(item?['type']??'আয়').toString(),icon=(item?['icon']??'Briefcase').toString(),color=(item?['color']??'#08a66b').toString();
-    const icons=['Briefcase','Banknote','Coins','Wallet','Store','Gift','ChartNoAxesCombined','ShoppingCart','ShoppingBasket','House','BedDouble','ReceiptText','Car','Bus','Train','Utensils','Coffee','HeartPulse','Hospital','GraduationCap','BookOpen','Film','Music','Gamepad2','Smartphone','Laptop','Wifi','Shirt','Dumbbell','Ellipsis'];
+    final icons=_transactionIconOptions.keys.toList(growable:false);
     final result=await showDialog<Map<String,dynamic>>(context:context,builder:(dialogContext)=>StatefulBuilder(builder:(context,setDialog)=>AlertDialog(
       title:Text(item==null?'নতুন ক্যাটাগরি যোগ করুন':'ক্যাটাগরি সম্পাদনা',style:const TextStyle(fontWeight:FontWeight.w800)),
       content:SingleChildScrollView(child:Column(mainAxisSize:MainAxisSize.min,crossAxisAlignment:CrossAxisAlignment.start,children:[
@@ -5015,7 +5015,7 @@ class _CategoryManagerScreenState extends State<_CategoryManagerScreen> {
         const SizedBox(height:14),
         const Text('আইকন নির্বাচন',style:TextStyle(fontWeight:FontWeight.w700)),
         const SizedBox(height:8),
-        Wrap(spacing:7,runSpacing:7,children:icons.map((v)=>InkWell(onTap:()=>setDialog(()=>icon=v),child:Container(width:42,height:42,decoration:BoxDecoration(color:icon==v?const Color(0xFFDCFCEB):Theme.of(context).colorScheme.surfaceContainerHighest,borderRadius:BorderRadius.circular(12),border:Border.all(color:icon==v?const Color(0xFF08A66B):Colors.transparent,width:2)),child:Icon(_icon(v),color:icon==v?const Color(0xFF08A66B):null,size:20)))).toList()),
+        SizedBox(height:140,child:GridView.builder(primary:false,physics:const ClampingScrollPhysics(),itemCount:icons.length,gridDelegate:const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount:6,crossAxisSpacing:7,mainAxisSpacing:7,childAspectRatio:1),itemBuilder:(context,index){final v=icons[index];return InkWell(onTap:()=>setDialog(()=>icon=v),child:Container(decoration:BoxDecoration(color:icon==v?const Color(0xFFDCFCEB):Theme.of(context).colorScheme.surfaceContainerHighest,borderRadius:BorderRadius.circular(12),border:Border.all(color:icon==v?const Color(0xFF08A66B):Colors.transparent,width:2)),child:Icon(_icon(v),color:icon==v?const Color(0xFF08A66B):null,size:20)));})),
         const SizedBox(height:14),
         const Text('রং',style:TextStyle(fontWeight:FontWeight.w700)),
         const SizedBox(height:8),

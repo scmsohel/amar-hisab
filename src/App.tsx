@@ -168,7 +168,7 @@ const exportTransactions=(format:"csv"|"xlsx"|"pdf")=>{
  const headers=["তারিখ","সময়","ধরন","বিবরণ","ক্যাটাগরি","ওয়ালেট","গন্তব্য ওয়ালেট","পরিমাণ","লেনদেনের পর ব্যালেন্স","নোট"];
  const rows=items.map(t=>[t.date,t.time,t.kind,t.title,t.category,t.wallet,t.transferTo,t.amount,t.balance,t.note]);
  if(format==="csv"){
-  const csv="\\uFEFF"+[headers,...rows].map(row=>row.map(cell=>`"${String(cell??"").replace(/"/g,'""')}"`).join(",")).join("\\r\\n");
+  const csv="\uFEFF"+[headers,...rows].map(row=>row.map(cell=>`"${String(cell??"").replace(/"/g,'""')}"`).join(",")).join("\r\n");
   const url=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8;"}));const link=document.createElement("a");link.href=url;link.download=`amar-hisab-transactions-${stamp}.csv`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);setNotice("CSV ফাইল ডাউনলোড শুরু হয়েছে।");
   return;
  }

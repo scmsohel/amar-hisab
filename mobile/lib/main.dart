@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
@@ -7425,27 +7426,20 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
       );
 
       final pdfBytes = await document.save();
-      if (!mounted) return;
       final fileName = 'amar_hisab_transactions_${_exportStamp()}.pdf';
-      await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (previewContext) => Scaffold(
-            appBar: AppBar(
-              title: const Text('PDF প্রিভিউ'),
-              centerTitle: true,
-            ),
-            body: PdfPreview(
-              build: (format) async => pdfBytes,
-              pdfFileName: fileName,
-              allowPrinting: true,
-              allowSharing: true,
-              canChangePageFormat: false,
-              canChangeOrientation: false,
-              canDebug: false,
-            ),
-          ),
-        ),
+      final exportDir = await Directory.systemTemp.createTemp('amar_hisab_pdf_');
+      final pdfFile = File('${exportDir.path}/$fileName');
+      await pdfFile.writeAsBytes(pdfBytes, flush: true);
+      if (!mounted) return;
+      final result = await OpenFilex.open(
+        pdfFile.path,
+        type: 'application/pdf',
       );
+      if (mounted && result.type != ResultType.done) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('PDF খোলার অ্যাপ পাওয়া যায়নি: ${result.message}')),
+        );
+      }
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

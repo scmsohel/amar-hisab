@@ -6432,14 +6432,30 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
     final line = dark ? const Color(0xFF29465A) : const Color(0xFFE1EAF0);
     final wallets = <String>{'ক্যাশ', 'ব্যাংক', 'বিকাশ', 'নগদ', ..._walletBalances.keys,
       ..._transactions.map((tx) => (tx['wallet'] ?? tx['walletName'] ?? '').toString()).where((v) => v.isNotEmpty)}.toList();
+    List<Map<String, dynamic>> managedCategories = [];
+    try {
+      final response = await _AuthApi._get('/data/categories');
+      if (response['data'] is List) {
+        managedCategories = (response['data'] as List).whereType<Map>()
+            .map((item) => Map<String, dynamic>.from(item))
+            .where((item) => item['type'] == kind).toList();
+      }
+    } catch (_) {}
+    if (managedCategories.isEmpty) {
+      managedCategories = _CategoryManagerScreenState._defaults
+          .where((item) => item['type'] == kind)
+          .map((item) => Map<String, dynamic>.from(item)).toList();
+    }
     await showDialog<void>(
         context: context,
         barrierDismissible: !saving,
         barrierColor: Colors.black.withValues(alpha: dark ? .62 : .30),
         builder: (sheetContext) => StatefulBuilder(builder: (context, setSheetState) {
           final accent = kind == 'আয়' ? const Color(0xFF10B981) : const Color(0xFFEF4760);
-          final defaults = kind == 'আয়' ? <String>['বেতন', 'ব্যবসার আয়', 'অন্যান্য'] : <String>['খাবার', 'বাসা ও ইউটিলিটি', 'যাতায়াত', 'বিল', 'স্বাস্থ্য', 'শিক্ষা', 'কেনাকাটা', 'অন্যান্য'];
-          final categories = <String>{...defaults, ..._transactions.where((tx) => tx['kind'] == kind).map(_transactionCategoryLabel)}.toList();
+          final categories = <String>{
+            ...managedCategories.where((item) => item['type'] == kind).map((item) => (item['name'] ?? '').toString()),
+            ..._transactions.where((tx) => tx['kind'] == kind).map(_transactionCategoryLabel),
+          }.where((value) => value.isNotEmpty).toList();
           InputDecoration deco({String? hint, Widget? suffix}) => InputDecoration(
             hintText: hint, suffixIcon: suffix, filled: true,
             hintStyle: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w600),

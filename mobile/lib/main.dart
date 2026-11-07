@@ -4934,6 +4934,145 @@ const Map<String, IconData> _transactionIconOptions = {
     'Ellipsis': Icons.more_horiz_rounded,
 };
 
+
+class _CategoryManagerScreen extends StatefulWidget {
+  const _CategoryManagerScreen();
+  @override
+  State<_CategoryManagerScreen> createState() => _CategoryManagerScreenState();
+}
+
+class _CategoryManagerScreenState extends State<_CategoryManagerScreen> {
+  bool _loading=true,_saving=false;
+  List<Map<String,dynamic>> _categories=[];
+  String _filter='সব',_search='';
+  static const _colors=['#08a66b','#ff5b60','#4385f5','#8b5cf6','#fb923c','#fbbf24','#94a3b8','#22c5c5'];
+  static const _defaults=[
+    {'id':1,'name':'বেতন','type':'আয়','icon':'Briefcase','color':'#08a66b','description':''},
+    {'id':2,'name':'ব্যবসার আয়','type':'আয়','icon':'Store','color':'#08a66b','description':''},
+    {'id':3,'name':'উপহার','type':'আয়','icon':'Gift','color':'#08a66b','description':''},
+    {'id':4,'name':'বিনিয়োগ লাভ','type':'আয়','icon':'ChartNoAxesCombined','color':'#08a66b','description':''},
+    {'id':5,'name':'অন্যান্য','type':'আয়','icon':'Ellipsis','color':'#08a66b','description':''},
+    {'id':6,'name':'বাজার','type':'ব্যয়','icon':'ShoppingBasket','color':'#ef4444','description':''},
+    {'id':7,'name':'বাসা ও ইউটিলিটি','type':'ব্যয়','icon':'House','color':'#ef4444','description':''},
+    {'id':8,'name':'বিল','type':'ব্যয়','icon':'ReceiptText','color':'#ef4444','description':''},
+    {'id':9,'name':'পরিবহন','type':'ব্যয়','icon':'Car','color':'#ef4444','description':''},
+    {'id':10,'name':'স্বাস্থ্য','type':'ব্যয়','icon':'HeartPulse','color':'#ef4444','description':''},
+    {'id':11,'name':'শিক্ষা','type':'ব্যয়','icon':'GraduationCap','color':'#ef4444','description':''},
+    {'id':12,'name':'বিনোদন','type':'ব্যয়','icon':'Film','color':'#ef4444','description':''},
+    {'id':13,'name':'অন্যান্য','type':'ব্যয়','icon':'Ellipsis','color':'#ef4444','description':''},
+  ];
+  @override
+  void initState(){super.initState();_load();}
+  Future<void> _load() async {
+    try{
+      final result=await _AuthApi._get('/data/categories');
+      final data=result['data'];
+      final loaded=data is List?data.whereType<Map>().map((e)=>Map<String,dynamic>.from(e)).toList():<Map<String,dynamic>>[];
+      if(!mounted)return;
+      setState((){_categories=loaded.isEmpty?_defaults.map((e)=>Map<String,dynamic>.from(e)).toList():loaded;_loading=false;});
+      if(loaded.isEmpty)await _persist(_categories,showMessage:false);
+    }catch(e){
+      if(!mounted)return;
+      setState((){_categories=_defaults.map((e)=>Map<String,dynamic>.from(e)).toList();_loading=false;});
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text('ক্যাটাগরি লোড হয়নি: '+e.toString().replaceFirst('Exception: ',''))));
+    }
+  }
+  Future<void> _persist(List<Map<String,dynamic>> next,{bool showMessage=true}) async {
+    if(_saving)return;
+    setState(()=>_saving=true);
+    try{
+      await _AuthApi._put('/data/categories',{'data':next});
+      if(!mounted)return;
+      setState(()=>_categories=next);
+      if(showMessage)ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('ক্যাটাগরি সংরক্ষণ হয়েছে।')));
+    }catch(e){
+      if(mounted)ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text('সংরক্ষণ হয়নি: '+e.toString().replaceFirst('Exception: ',''))));
+    }finally{if(mounted)setState(()=>_saving=false);}
+  }
+  Color _color(dynamic value){
+    final raw=(value??'#08a66b').toString().replaceFirst('#','');
+    try{return Color(int.parse('FF'+raw,radix:16));}catch(_){return const Color(0xFF08A66B);}
+  }
+  IconData _icon(dynamic value)=>_transactionIconOptions[value?.toString()]??Icons.category_outlined;
+  Future<void> _edit({Map<String,dynamic>? item}) async {
+    final name=TextEditingController(text:(item?['name']??'').toString());
+    final desc=TextEditingController(text:(item?['description']??'').toString());
+    String type=(item?['type']??'আয়').toString(),icon=(item?['icon']??'Briefcase').toString(),color=(item?['color']??'#08a66b').toString();
+    const icons=['Briefcase','Banknote','Coins','Wallet','Store','Gift','ChartNoAxesCombined','ShoppingCart','ShoppingBasket','House','BedDouble','ReceiptText','Car','Bus','Train','Utensils','Coffee','HeartPulse','Hospital','GraduationCap','BookOpen','Film','Music','Gamepad2','Smartphone','Laptop','Wifi','Shirt','Dumbbell','Ellipsis'];
+    final result=await showDialog<Map<String,dynamic>>(context:context,builder:(dialogContext)=>StatefulBuilder(builder:(context,setDialog)=>AlertDialog(
+      title:Text(item==null?'নতুন ক্যাটাগরি যোগ করুন':'ক্যাটাগরি সম্পাদনা',style:const TextStyle(fontWeight:FontWeight.w800)),
+      content:SingleChildScrollView(child:Column(mainAxisSize:MainAxisSize.min,crossAxisAlignment:CrossAxisAlignment.start,children:[
+        const Text('ক্যাটাগরির ধরন',style:TextStyle(fontWeight:FontWeight.w700)),
+        const SizedBox(height:8),
+        SegmentedButton<String>(segments:const [ButtonSegment(value:'আয়',label:Text('↗ আয়')),ButtonSegment(value:'ব্যয়',label:Text('↘ ব্যয়'))],selected:{type},onSelectionChanged:(v)=>setDialog(()=>type=v.first)),
+        const SizedBox(height:14),
+        TextField(controller:name,decoration:const InputDecoration(labelText:'ক্যাটাগরির নাম *',hintText:'যেমন: বেতন, বাজার, ভাড়া',border:OutlineInputBorder())),
+        const SizedBox(height:14),
+        const Text('আইকন নির্বাচন',style:TextStyle(fontWeight:FontWeight.w700)),
+        const SizedBox(height:8),
+        Wrap(spacing:7,runSpacing:7,children:icons.map((v)=>InkWell(onTap:()=>setDialog(()=>icon=v),child:Container(width:42,height:42,decoration:BoxDecoration(color:icon==v?const Color(0xFFDCFCEB):Theme.of(context).colorScheme.surfaceContainerHighest,borderRadius:BorderRadius.circular(12),border:Border.all(color:icon==v?const Color(0xFF08A66B):Colors.transparent,width:2)),child:Icon(_icon(v),color:icon==v?const Color(0xFF08A66B):null,size:20)))).toList()),
+        const SizedBox(height:14),
+        const Text('রং',style:TextStyle(fontWeight:FontWeight.w700)),
+        const SizedBox(height:8),
+        Wrap(spacing:12,children:_colors.map((v)=>InkWell(onTap:()=>setDialog(()=>color=v),child:Container(width:28,height:28,decoration:BoxDecoration(color:_color(v),shape:BoxShape.circle,border:Border.all(color:color==v?Theme.of(context).colorScheme.onSurface:Colors.transparent,width:3))))).toList()),
+        const SizedBox(height:14),
+        TextField(controller:desc,maxLines:2,decoration:const InputDecoration(labelText:'বিবরণ (ঐচ্ছিক)',border:OutlineInputBorder())),
+      ])),
+      actions:[TextButton(onPressed:()=>Navigator.pop(dialogContext),child:const Text('বাতিল')),FilledButton(onPressed:(){if(name.text.trim().isEmpty)return;Navigator.pop(dialogContext,{'name':name.text.trim(),'type':type,'icon':icon,'color':color,'description':desc.text.trim()});},child:const Text('সংরক্ষণ'))],
+    )));
+    name.dispose();desc.dispose();
+    if(result==null||!mounted)return;
+    final clean=result['name'].toString();
+    if(_categories.any((c)=>c['type']==result['type']&&(c['name']??'').toString().toLowerCase()==clean.toLowerCase()&&(c['id']??'').toString()!=(item?['id']??'').toString())){
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('এই ক্যাটাগরিটি আগে থেকেই আছে।')));return;
+    }
+    final next=item==null?[..._categories,{...result,'id':DateTime.now().millisecondsSinceEpoch}]:_categories.map((c)=>(c['id']??'').toString()==(item['id']??'').toString()?{...c,...result}:c).toList();
+    await _persist(next);
+  }
+  Future<void> _delete(Map<String,dynamic> item) async {
+    final name=(item['name']??'').toString();
+    final ok=await showDialog<bool>(context:context,builder:(c)=>AlertDialog(title:const Text('ক্যাটাগরি মুছুন?'),content:Text('“'+name+'” ক্যাটাগরিটি মুছে ফেলবেন?'),actions:[TextButton(onPressed:()=>Navigator.pop(c,false),child:const Text('বাতিল')),FilledButton(onPressed:()=>Navigator.pop(c,true),child:const Text('মুছুন'))]));
+    if(ok==true&&mounted)await _persist(_categories.where((c)=>(c['id']??'').toString()!=(item['id']??'').toString()).toList());
+  }
+  @override
+  Widget build(BuildContext context){
+    final income=_categories.where((c)=>c['type']=='আয়').toList(),expense=_categories.where((c)=>c['type']=='ব্যয়').toList();
+    final query=_search.trim().toLowerCase();
+    final filtered=_categories.where((c)=>(_filter=='সব'||c['type']==_filter)&&(c['name']??'').toString().toLowerCase().contains(query)).toList();
+    Widget section(String type,List<Map<String,dynamic>> items,Color accent){
+      final rows=items.where((c)=>filtered.contains(c)).toList();
+      return Container(margin:const EdgeInsets.only(bottom:14),padding:const EdgeInsets.all(13),decoration:BoxDecoration(color:Theme.of(context).colorScheme.surface,borderRadius:BorderRadius.circular(18),border:Border.all(color:accent.withValues(alpha:.18))),child:Column(children:[
+        Row(children:[CircleAvatar(radius:17,backgroundColor:accent.withValues(alpha:.10),child:Icon(type=='আয়'?Icons.trending_up_rounded:Icons.trending_down_rounded,color:accent,size:19)),const SizedBox(width:9),Expanded(child:Text(type+' ক্যাটাগরি ('+items.length.toString()+')',style:TextStyle(fontSize:15,fontWeight:FontWeight.w900,color:accent))),Icon(Icons.keyboard_arrow_up_rounded,color:accent)]),
+        const Divider(height:18),
+        if(rows.isEmpty)Padding(padding:const EdgeInsets.all(16),child:Text('কোনো ক্যাটাগরি পাওয়া যায়নি।',style:TextStyle(color:Theme.of(context).hintColor))),
+        ...rows.map((c)=>Padding(padding:const EdgeInsets.symmetric(vertical:4),child:Row(children:[
+          Container(width:39,height:39,decoration:BoxDecoration(color:_color(c['color']).withValues(alpha:.12),borderRadius:BorderRadius.circular(12)),child:Icon(_icon(c['icon']),color:_color(c['color']),size:20)),
+          const SizedBox(width:10),Expanded(child:Text((c['name']??'').toString(),style:const TextStyle(fontWeight:FontWeight.w800,fontSize:14))),
+          IconButton(tooltip:'সম্পাদনা',visualDensity:VisualDensity.compact,onPressed:_saving?null:()=>_edit(item:c),icon:const Icon(Icons.edit_outlined,size:19)),
+          IconButton(tooltip:'মুছুন',visualDensity:VisualDensity.compact,onPressed:_saving?null:()=>_delete(c),icon:const Icon(Icons.delete_outline_rounded,color:Colors.red,size:20)),
+        ]))),
+      ]));
+    }
+    return Scaffold(appBar:AppBar(title:const Text('ক্যাটাগরি ম্যানেজার',style:TextStyle(fontWeight:FontWeight.w900))),floatingActionButton:FloatingActionButton(onPressed:_saving?null:()=>_edit(),backgroundColor:const Color(0xFF08A66B),foregroundColor:Colors.white,child:const Icon(Icons.add_rounded)),body:_loading?const Center(child:CircularProgressIndicator()):ListView(padding:const EdgeInsets.fromLTRB(14,10,14,90),children:[
+      Text('আপনার আয় ও ব্যয়ের ক্যাটাগরি তৈরি, সম্পাদনা ও পরিচালনা করুন',style:TextStyle(color:Theme.of(context).hintColor)),
+      const SizedBox(height:14),
+      Row(children:[
+        Expanded(child:Container(padding:const EdgeInsets.all(13),decoration:BoxDecoration(color:const Color(0xFF08A66B).withValues(alpha:.08),borderRadius:BorderRadius.circular(15)),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[const Text('মোট আয় ক্যাটাগরি',style:TextStyle(fontSize:11)),Text(income.length.toString(),style:const TextStyle(fontSize:24,fontWeight:FontWeight.w900,color:Color(0xFF07834F)))]))),
+        const SizedBox(width:10),
+        Expanded(child:Container(padding:const EdgeInsets.all(13),decoration:BoxDecoration(color:const Color(0xFFEF4760).withValues(alpha:.08),borderRadius:BorderRadius.circular(15)),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[const Text('মোট ব্যয় ক্যাটাগরি',style:TextStyle(fontSize:11)),Text(expense.length.toString(),style:const TextStyle(fontSize:24,fontWeight:FontWeight.w900,color:Color(0xFFEF4760)))]))),
+      ]),
+      const SizedBox(height:14),
+      Wrap(spacing:8,children:['সব','আয়','ব্যয়'].map((v)=>ChoiceChip(label:Text(v=='সব'?'সব ('+_categories.length.toString()+')':v+' ('+_categories.where((c)=>c['type']==v).length.toString()+')'),selected:_filter==v,onSelected:(_)=>setState(()=>_filter=v)).toList()),
+      const SizedBox(height:12),
+      TextField(onChanged:(v)=>setState(()=>_search=v),decoration:InputDecoration(prefixIcon:const Icon(Icons.search_rounded),hintText:'ক্যাটাগরি খুঁজুন...',filled:true,border:OutlineInputBorder(borderRadius:BorderRadius.circular(13),borderSide:BorderSide.none))),
+      const SizedBox(height:14),
+      if(_filter!='ব্যয়')section('আয়',income,const Color(0xFF08A66B)),
+      if(_filter!='আয়')section('ব্যয়',expense,const Color(0xFFEF4760)),
+      if(_saving)const LinearProgressIndicator(),
+    ]));
+  }
+}
+
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
   @override
@@ -7430,6 +7569,15 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                                           return List<Map<String, dynamic>>.from(_bills);
                                         },
                                       )));
+                                    },
+                                  ),
+                                  menuItem(
+                                    icon: Icons.category_outlined,
+                                    color: const Color(0xFF08A66B),
+                                    title: 'ক্যাটাগরি',
+                                    onTap: () {
+                                      Navigator.pop(popupContext);
+                                      Navigator.of(context).push(_route(const _CategoryManagerScreen()));
                                     },
                                   ),
                                   menuItem(

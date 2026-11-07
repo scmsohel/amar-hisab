@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
@@ -6959,6 +6962,104 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
     }
   }
 
+  Future<void> _exportPdf() async {
+    final rows = filtered;
+    if (rows.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('এক্সপোর্ট করার মতো কোনো লেনদেন নেই।')),
+      );
+      return;
+    }
+
+    try {
+      // Android-এর Noto Bengali system font embed করা হয়, যাতে PDF-এ বাংলা ঠিক থাকে।
+      const fontPaths = [
+        '/system/fonts/NotoSansBengali-VF.ttf',
+        '/system/fonts/NotoSansBengali-Regular.ttf',
+        '/system/fonts/NotoSansBengaliUI-Regular.ttf',
+      ];
+      File? fontFile;
+      for (final path in fontPaths) {
+        final candidate = File(path);
+        if (await candidate.exists()) {
+          fontFile = candidate;
+          break;
+        }
+      }
+      if (fontFile == null) {
+        throw Exception('এই ডিভাইসে বাংলা PDF font পাওয়া যায়নি।');
+      }
+
+      final bengaliFont = pw.Font.ttf(await fontFile.readAsBytes());
+      final document = pw.Document();
+      final income = rows
+          .where((item) => kindOf(item) == 'আয়')
+          .fold<double>(0, (sum, item) => sum + amount(item['amount']));
+      final expense = rows
+          .where((item) => kindOf(item) == 'ব্যয়')
+          .fold<double>(0, (sum, item) => sum + amount(item['amount']));
+      final tableRows = _exportRows(rows);
+
+      document.addPage(
+        pw.MultiPage(
+          pageFormat: PdfPageFormat.a4.landscape,
+          margin: const pw.EdgeInsets.all(22),
+          theme: pw.ThemeData.withFont(
+            base: bengaliFont,
+            bold: bengaliFont,
+          ),
+          build: (context) => [
+            pw.Text(
+              'আমার হিসাব — লেনদেন রিপোর্ট',
+              style: pw.TextStyle(font: bengaliFont, fontSize: 17),
+            ),
+            pw.SizedBox(height: 5),
+            pw.Text(
+              'রিপোর্ট তৈরি: ${dateLabel(DateTime.now())}',
+              style: pw.TextStyle(font: bengaliFont, fontSize: 9),
+            ),
+            pw.SizedBox(height: 12),
+            pw.Wrap(
+              spacing: 18,
+              runSpacing: 8,
+              children: [
+                pw.Text('মোট আয়: ${money(income)}'),
+                pw.Text('মোট ব্যয়: ${money(expense)}'),
+                pw.Text('নিট: ${money(income - expense)}'),
+                pw.Text('লেনদেন: ${bn(rows.length.toString())}টি'),
+              ],
+            ),
+            pw.SizedBox(height: 14),
+            pw.TableHelper.fromTextArray(
+              headers: tableRows.first,
+              data: tableRows.skip(1).toList(),
+              headerStyle: pw.TextStyle(font: bengaliFont, fontSize: 8),
+              cellStyle: pw.TextStyle(font: bengaliFont, fontSize: 7),
+              headerDecoration: const pw.BoxDecoration(color: PdfColors.grey300),
+              cellAlignment: pw.Alignment.centerLeft,
+              cellPadding: const pw.EdgeInsets.all(4),
+              border: pw.TableBorder.all(
+                color: PdfColors.grey400,
+                width: .4,
+              ),
+            ),
+          ],
+        ),
+      );
+
+      await Printing.sharePdf(
+        bytes: await document.save(),
+        filename: 'amar_hisab_transactions_${_exportStamp()}.pdf',
+      );
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('PDF এক্সপোর্ট করা যায়নি: $error')),
+        );
+      }
+    }
+  }
+
   Future<void> reload()async{setState(()=>loading=true);try{final fresh=await widget.onReload();if(mounted)setState(()=>data=fresh);}finally{if(mounted)setState(()=>loading=false);}}
   String dateLabel(DateTime? d){if(d==null)return 'তারিখ পাওয়া যায়নি';const m=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];return '${bn(d.day.toString())} ${m[d.month-1]}, ${bn(d.year.toString())}';}
   Widget summary(String label,double value,Color color,IconData icon)=>Expanded(child:Container(padding:const EdgeInsets.all(10),decoration:BoxDecoration(color:color.withValues(alpha:.07),borderRadius:BorderRadius.circular(14),border:Border.all(color:color.withValues(alpha:.2))),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Icon(icon,color:color,size:18),const SizedBox(height:4),Text(label,style:const TextStyle(fontSize:10)),FittedBox(child:Text(money(value),style:TextStyle(fontSize:14,fontWeight:FontWeight.w900,color:color)))])));
@@ -7172,7 +7273,7 @@ const icons = <String, IconData>{
     final shown=items;
     final cats=data.map(catOf).toSet().toList()..sort(),wallets=data.map(walletOf).where((x)=>x.isNotEmpty).toSet().toList()..sort();
     final groups=<String,List<Map<String,dynamic>>>{};for(final x in shown){final d=dateOf(x),key=d==null?'unknown':d.toString().substring(0,10);groups.putIfAbsent(key,()=>[]).add(x);}
-    return Scaffold(backgroundColor:bg,appBar:AppBar(backgroundColor:bg,foregroundColor:ink,elevation:0,title:const Text('লেনদেন',style:TextStyle(fontWeight:FontWeight.w900)),actions:[PopupMenuButton<String>(tooltip:'এক্সপোর্ট',icon:const Icon(Icons.file_download_outlined),onSelected:(value){if(value=='csv')_exportCsv();},itemBuilder:(_)=>const[PopupMenuItem(value:'csv',child:Text('CSV'))]),IconButton(onPressed:loading?null:reload,icon:const Icon(Icons.refresh_rounded)),IconButton(onPressed:()async{await widget.onAdd();await reload();},icon:const Icon(Icons.add_rounded))]),body:SafeArea(child:Column(children:[
+    return Scaffold(backgroundColor:bg,appBar:AppBar(backgroundColor:bg,foregroundColor:ink,elevation:0,title:const Text('লেনদেন',style:TextStyle(fontWeight:FontWeight.w900)),actions:[PopupMenuButton<String>(tooltip:'এক্সপোর্ট',icon:const Icon(Icons.file_download_outlined),onSelected:(value){if(value=='csv')_exportCsv();else if(value=='pdf')_exportPdf();},itemBuilder:(_)=>const[PopupMenuItem(value:'pdf',child:Text('PDF')),PopupMenuItem(value:'csv',child:Text('CSV'))]),IconButton(onPressed:loading?null:reload,icon:const Icon(Icons.refresh_rounded)),IconButton(onPressed:()async{await widget.onAdd();await reload();},icon:const Icon(Icons.add_rounded))]),body:SafeArea(child:Column(children:[
       Padding(padding:const EdgeInsets.fromLTRB(12,4,12,7),child:Row(children:[summary('মোট আয়',income,const Color(0xFF00A875),Icons.trending_up_rounded),const SizedBox(width:7),summary('মোট ব্যয়',expense,const Color(0xFFEF4444),Icons.trending_down_rounded)])),
       Padding(padding:const EdgeInsets.fromLTRB(12,0,12,7),child:Row(children:[summary('নিট ব্যালেন্স',income-expense,const Color(0xFF2588F5),Icons.account_balance_wallet_outlined),const SizedBox(width:7),summary('মোট লেনদেন',items.length.toDouble(),const Color(0xFF8B5CF6),Icons.receipt_long_rounded)])),
       Padding(padding:const EdgeInsets.fromLTRB(12,0,12,7),child:TextField(controller:search,onChanged: (_) => setState(() {}),decoration:InputDecoration(prefixIcon:const Icon(Icons.search_rounded),hintText:'বিবরণ, ক্যাটাগরি, ওয়ালেট খুঁজুন...',filled:true,fillColor:dark?const Color(0xFF12283A):Colors.white,border:OutlineInputBorder(borderRadius:BorderRadius.circular(12))))),

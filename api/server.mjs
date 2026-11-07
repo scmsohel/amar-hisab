@@ -54,8 +54,8 @@ function readSession(req) {
   } catch { return null; }
 }
 const asyncRoute = fn => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
-const cleanUser = ({ id, name, email, mobile, role, avatar_path, avatar_updated_at }) => ({ id, name, email, mobile, role, avatarUrl: avatar_path ? "/auth/profile/avatar?v=" + new Date(avatar_updated_at || 0).getTime() : null });
-async function getSessionUser(req) { const session=readSession(req); if(!session)return null; const result=await pool.query("SELECT id,name,email,mobile,role,token_version,avatar_path,avatar_updated_at FROM app_users WHERE id=$1",[session.id]); const user=result.rows[0]; return user && Number(session.tokenVersion||0)===Number(user.token_version||0) ? user : null; }
+const cleanUser = ({ id, name, email, mobile, role, created_at, avatar_path, avatar_updated_at }) => ({ id, name, email, mobile, role, createdAt: created_at, avatarUrl: avatar_path ? "/auth/profile/avatar?v=" + new Date(avatar_updated_at || 0).getTime() : null });
+async function getSessionUser(req) { const session=readSession(req); if(!session)return null; const result=await pool.query("SELECT id,name,email,mobile,role,created_at,token_version,avatar_path,avatar_updated_at FROM app_users WHERE id=$1",[session.id]); const user=result.rows[0]; return user && Number(session.tokenVersion||0)===Number(user.token_version||0) ? user : null; }
 function otpDigest(email,otp){return createHmac("sha256",sessionSecret).update(email.toLowerCase()+":"+otp).digest("hex");}
 function safeDigestEqual(a,b){const x=Buffer.from(String(a||""),"hex"),y=Buffer.from(String(b||""),"hex");return x.length===y.length&&x.length>0&&timingSafeEqual(x,y);}
 async function hashPassword(password) {

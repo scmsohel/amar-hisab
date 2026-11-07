@@ -1491,19 +1491,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  String _bn(String value) => value
-      .replaceAll('0','০').replaceAll('1','১').replaceAll('2','২').replaceAll('3','৩')
-      .replaceAll('4','৪').replaceAll('5','৫').replaceAll('6','৬').replaceAll('7','৭')
-      .replaceAll('8','৮').replaceAll('9','৯');
-
-  String get _todayLabel {
-    final now = DateTime.now();
-    const months = [
-      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
-      'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর',
-    ];
-    return 'আজ ${_bn(now.day.toString())} ${months[now.month - 1]}';
-  }
 
   Future<void> _createAdminInvitation({VoidCallback? refreshDialog}) async {
     if (_inviteLoading) return;
@@ -4971,6 +4958,17 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
   Timer? _autoSyncTimer;
   bool _refreshing = false;
   String _dashboardAvatarUrl = '';
+
+  String get _todayLabel {
+    final now = DateTime.now();
+    const months = [
+      'জানুয়ারি', 'ফেব্রুয়ারি', 'মার্চ', 'এপ্রিল', 'মে', 'জুন',
+      'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর',
+    ];
+    const digits = '০১২৩৪৫৬৭৮৯';
+    final day = now.day.toString().split('').map((digit) => digits[int.parse(digit)]).join();
+    return 'আজ $day ${months[now.month - 1]}';
+  }
 
   void _startAutoSyncTimer() {
     _autoSyncTimer?.cancel();

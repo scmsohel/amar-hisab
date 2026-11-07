@@ -2,7 +2,7 @@ name: Web prototype build
 
 on:
   push:
-    branches: [web-prototype, stable-integration]
+    branches: [web-prototype, stable-integration, feature/web-transaction-export]
   pull_request:
     branches: [main, stable-integration]
 

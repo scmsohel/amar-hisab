@@ -5082,6 +5082,7 @@ class _CategoryManagerScreenState extends State<_CategoryManagerScreen> {
                   const SizedBox(width:9),
                   Expanded(child:FilledButton(onPressed:(){if(name.text.trim().isEmpty){ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('ক্যাটাগরির নাম লিখুন।')));return;}Navigator.pop(dialogContext,{'name':name.text.trim(),'type':type,'icon':icon,'color':color,'description':desc.text.trim()});},style:FilledButton.styleFrom(backgroundColor:const Color(0xFF08A66B),foregroundColor:Colors.white,shape:RoundedRectangleBorder(borderRadius:BorderRadius.circular(24)),padding:const EdgeInsets.symmetric(vertical:13)),child:const Text('সংরক্ষণ',style:TextStyle(fontWeight:FontWeight.w800)))),
                 ]),
+              ]),
             ),
           ),
         );

@@ -5015,7 +5015,7 @@ class _CategoryManagerScreenState extends State<_CategoryManagerScreen> {
         const SizedBox(height:14),
         const Text('আইকন নির্বাচন',style:TextStyle(fontWeight:FontWeight.w700)),
         const SizedBox(height:8),
-        SizedBox(height:140,child:GridView.builder(primary:false,physics:const ClampingScrollPhysics(),itemCount:icons.length,gridDelegate:const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount:6,crossAxisSpacing:7,mainAxisSpacing:7,childAspectRatio:1),itemBuilder:(context,index){final v=icons[index];return InkWell(onTap:()=>setDialog(()=>icon=v),child:Container(decoration:BoxDecoration(color:icon==v?const Color(0xFFDCFCEB):Theme.of(context).colorScheme.surfaceContainerHighest,borderRadius:BorderRadius.circular(12),border:Border.all(color:icon==v?const Color(0xFF08A66B):Colors.transparent,width:2)),child:Icon(_icon(v),color:icon==v?const Color(0xFF08A66B):null,size:20)));})),
+        SizedBox(height:140,child:SingleChildScrollView(physics:const ClampingScrollPhysics(),child:Wrap(spacing:7,runSpacing:7,children:icons.map((v)=>SizedBox(width:40,height:40,child:InkWell(onTap:()=>setDialog(()=>icon=v),child:Container(decoration:BoxDecoration(color:icon==v?const Color(0xFFDCFCEB):Theme.of(context).colorScheme.surfaceContainerHighest,borderRadius:BorderRadius.circular(12),border:Border.all(color:icon==v?const Color(0xFF08A66B):Colors.transparent,width:2)),child:Icon(_icon(v),color:icon==v?const Color(0xFF08A66B):null,size:20))))).toList()))),
         const SizedBox(height:14),
         const Text('রং',style:TextStyle(fontWeight:FontWeight.w700)),
         const SizedBox(height:8),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:pdf/pdf.dart';
@@ -6990,7 +6991,8 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
         throw Exception('এই ডিভাইসে বাংলা PDF font পাওয়া যায়নি।');
       }
 
-      final bengaliFont = pw.Font.ttf(await fontFile.readAsBytes());
+      final fontBytes = await fontFile.readAsBytes();
+      final bengaliFont = pw.Font.ttf(ByteData.sublistView(fontBytes));
       final document = pw.Document();
       final income = rows
           .where((item) => kindOf(item) == 'আয়')
@@ -7273,7 +7275,13 @@ const icons = <String, IconData>{
     final shown=items;
     final cats=data.map(catOf).toSet().toList()..sort(),wallets=data.map(walletOf).where((x)=>x.isNotEmpty).toSet().toList()..sort();
     final groups=<String,List<Map<String,dynamic>>>{};for(final x in shown){final d=dateOf(x),key=d==null?'unknown':d.toString().substring(0,10);groups.putIfAbsent(key,()=>[]).add(x);}
-    return Scaffold(backgroundColor:bg,appBar:AppBar(backgroundColor:bg,foregroundColor:ink,elevation:0,title:const Text('লেনদেন',style:TextStyle(fontWeight:FontWeight.w900)),actions:[PopupMenuButton<String>(tooltip:'এক্সপোর্ট',icon:const Icon(Icons.file_download_outlined),onSelected:(value){if(value=='csv')_exportCsv();else if(value=='pdf')_exportPdf();},itemBuilder:(_)=>const[PopupMenuItem(value:'pdf',child:Text('PDF')),PopupMenuItem(value:'csv',child:Text('CSV'))]),IconButton(onPressed:loading?null:reload,icon:const Icon(Icons.refresh_rounded)),IconButton(onPressed:()async{await widget.onAdd();await reload();},icon:const Icon(Icons.add_rounded))]),body:SafeArea(child:Column(children:[
+    return Scaffold(backgroundColor:bg,appBar:AppBar(backgroundColor:bg,foregroundColor:ink,elevation:0,title:const Text('লেনদেন',style:TextStyle(fontWeight:FontWeight.w900)),actions:[PopupMenuButton<String>(tooltip:'এক্সপোর্ট',icon:const Icon(Icons.file_download_outlined),onSelected: (value) {
+            if (value == 'csv') {
+              _exportCsv();
+            } else if (value == 'pdf') {
+              _exportPdf();
+            }
+          },itemBuilder:(_)=>const[PopupMenuItem(value:'pdf',child:Text('PDF')),PopupMenuItem(value:'csv',child:Text('CSV'))]),IconButton(onPressed:loading?null:reload,icon:const Icon(Icons.refresh_rounded)),IconButton(onPressed:()async{await widget.onAdd();await reload();},icon:const Icon(Icons.add_rounded))]),body:SafeArea(child:Column(children:[
       Padding(padding:const EdgeInsets.fromLTRB(12,4,12,7),child:Row(children:[summary('মোট আয়',income,const Color(0xFF00A875),Icons.trending_up_rounded),const SizedBox(width:7),summary('মোট ব্যয়',expense,const Color(0xFFEF4444),Icons.trending_down_rounded)])),
       Padding(padding:const EdgeInsets.fromLTRB(12,0,12,7),child:Row(children:[summary('নিট ব্যালেন্স',income-expense,const Color(0xFF2588F5),Icons.account_balance_wallet_outlined),const SizedBox(width:7),summary('মোট লেনদেন',items.length.toDouble(),const Color(0xFF8B5CF6),Icons.receipt_long_rounded)])),
       Padding(padding:const EdgeInsets.fromLTRB(12,0,12,7),child:TextField(controller:search,onChanged: (_) => setState(() {}),decoration:InputDecoration(prefixIcon:const Icon(Icons.search_rounded),hintText:'বিবরণ, ক্যাটাগরি, ওয়ালেট খুঁজুন...',filled:true,fillColor:dark?const Color(0xFF12283A):Colors.white,border:OutlineInputBorder(borderRadius:BorderRadius.circular(12))))),

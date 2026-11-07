@@ -5509,28 +5509,6 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                                     icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFB8E3FF) : const Color(0xFF168565), size: 18),
                                   ),
                                   const Spacer(),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).brightness == Brightness.dark
-                                          ? const Color(0xFF55BFFF).withValues(alpha: .12)
-                                          : const Color(0xFFBDF5DF).withValues(alpha: .48),
-                                      border: Border.all(
-                                        color: Theme.of(context).brightness == Brightness.dark
-                                            ? const Color(0xFF67C7FF).withValues(alpha: .34)
-                                            : const Color(0xFF6FD9B2).withValues(alpha: .58),
-                                      ),
-                                      borderRadius: BorderRadius.circular(28),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text('এই মাস', style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : const Color(0xFF155A45), fontSize: 12, fontWeight: FontWeight.w700)),
-                                        SizedBox(width: 5),
-                                        Icon(Icons.keyboard_arrow_down_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFD9ECFF) : const Color(0xFF155A45), size: 17),
-                                      ],
-                                    ),
-                                  ),
                                 ],
                               ),
                               const SizedBox(height: 0),

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -1739,6 +1740,159 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<Map<String, dynamic>> _readAllBackupCollections() async {
+    const collections = ['transactions', 'debts', 'bills', 'goals', 'wallets', 'settings', 'categories'];
+    final result = <String, dynamic>{};
+    for (final collection in collections) {
+      final response = await _AuthApi._get('/data/$collection');
+      if (response['offline'] == true) {
+        throw Exception('Backup বা Reset করতে ইন্টারনেট সংযোগ প্রয়োজন।');
+      }
+      final data = response['data'];
+      if (collection == 'settings') {
+        if (data != null && (data is! Map || data is List)) {
+          throw Exception('Settings ডেটার format সঠিক নয়।');
+        }
+        result[collection] = data ?? <String, dynamic>{};
+      } else {
+        if (data != null && data is! List) {
+          throw Exception('$collection ডেটার format সঠিক নয়।');
+        }
+        result[collection] = data ?? <dynamic>[];
+      }
+    }
+    return result;
+  }
+
+  Future<void> _clearLocalSnapshotAfterServerChange() async {
+    final accountId = _AuthApi._requireActiveUserId();
+    await OfflineSyncStore.instance.clearAccountState(accountId);
+    for (final collection in ['transactions', 'debts', 'bills', 'goals', 'wallets', 'categories']) {
+      await _AuthApi._get('/data/$collection');
+    }
+    _AuthApi.syncPendingCount.value = 0;
+    _AuthApi.syncStatus.value = 'সব ডেটা';
+  }
+
+  Future<void> _exportBackup() async {
+    try {
+      final data = await _readAllBackupCollections();
+      final exportedAt = DateTime.now().toUtc().toIso8601String();
+      final backup = <String, dynamic>{
+        'app': 'Amar Hisab',
+        'version': 1,
+        'exportedAt': exportedAt,
+        'data': data,
+      };
+      final fileName = 'amar-hisab-backup-${DateTime.now().toIso8601String().substring(0, 10)}.json';
+      final bytes = Uint8List.fromList(utf8.encode(const JsonEncoder.withIndent('  ').convert(backup)));
+      await SharePlus.instance.share(ShareParams(
+        files: [XFile.fromData(bytes, mimeType: 'application/json', name: fileName)],
+        fileNameOverrides: [fileName],
+        subject: 'Amar Hisab Backup',
+        text: 'Amar Hisab-এর হিসাবের ব্যাকআপ',
+      ));
+      if (mounted) _notice(context, 'JSON ব্যাকআপ প্রস্তুত হয়েছে।');
+    } catch (error) {
+      if (mounted) _notice(context, error.toString().replaceFirst('Exception: ', ''));
+    }
+  }
+
+  Future<void> _restoreBackup() async {
+    try {
+      final picked = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+        withData: true,
+      );
+      if (picked == null || picked.files.isEmpty) return;
+      final file = picked.files.single;
+      final bytes = file.bytes;
+      if (bytes == null || bytes.isEmpty || bytes.length > 8 * 1024 * 1024) {
+        throw Exception('ব্যাকআপ ফাইল খালি অথবা ৮ MB-এর বেশি।');
+      }
+      final parsed = jsonDecode(utf8.decode(bytes));
+      if (parsed is! Map || parsed['app'] != 'Amar Hisab' || parsed['data'] is! Map) {
+        throw Exception('এটি Amar Hisab-এর বৈধ ব্যাকআপ ফাইল নয়।');
+      }
+      final raw = Map<String, dynamic>.from(parsed['data'] as Map);
+      const collections = ['transactions', 'debts', 'bills', 'goals', 'wallets', 'settings', 'categories'];
+      if (raw.length != collections.length || collections.any((key) => !raw.containsKey(key))) {
+        throw Exception('ব্যাকআপে প্রয়োজনীয় collection নেই।');
+      }
+      for (final collection in collections) {
+        final value = raw[collection];
+        if (collection == 'settings') {
+          if (value != null && (value is! Map || value is List)) {
+            throw Exception('Settings ডেটার format সঠিক নয়।');
+          }
+          raw[collection] = value ?? <String, dynamic>{};
+        } else {
+          if (value != null && value is! List) {
+            throw Exception('$collection ডেটার format সঠিক নয়।');
+          }
+          raw[collection] = value ?? <dynamic>[];
+        }
+      }
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('ব্যাকআপ রিস্টোর'),
+          content: const Text('বর্তমান অ্যাকাউন্টের ডেটা ব্যাকআপ ফাইলের ডেটা দিয়ে প্রতিস্থাপন হবে। এই কাজ Undo করা যাবে না। চালিয়ে যাবেন?'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('বাতিল')),
+            FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('রিস্টোর করুন')),
+          ],
+        ),
+      );
+      if (confirmed != true || !mounted) return;
+      await _AuthApi._post('/data/restore', {'data': raw});
+      await _clearLocalSnapshotAfterServerChange();
+      if (!mounted) return;
+      _notice(context, 'ব্যাকআপ সফলভাবে রিস্টোর হয়েছে।');
+      await _loadProfile();
+    } catch (error) {
+      if (mounted) _notice(context, error.toString().replaceFirst('Exception: ', ''));
+    }
+  }
+
+  Future<void> _resetAccount() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('হিসাব রিসেট করবেন?'),
+        content: const Text('সব লেনদেন, দেনা-পাওনা, বিল ও সঞ্চয়ের রেকর্ড মুছে যাবে। Wallet-এর নাম ও ডিজাইন থাকবে, তবে Opening Balance ৳০ হবে। এই কাজ Undo করা যাবে না।'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('বাতিল')),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('রিসেট করুন'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    try {
+      final data = await _readAllBackupCollections();
+      for (final collection in ['transactions', 'debts', 'bills', 'goals']) {
+        data[collection] = <dynamic>[];
+      }
+      final wallets = data['wallets'] as List;
+      data['wallets'] = wallets.map((wallet) {
+        if (wallet is! Map) return wallet;
+        return <String, dynamic>{...Map<String, dynamic>.from(wallet), 'base': 0};
+      }).toList();
+      await _AuthApi._post('/data/restore', {'data': data});
+      await _clearLocalSnapshotAfterServerChange();
+      if (!mounted) return;
+      _notice(context, 'আপনার হিসাবের রেকর্ড সফলভাবে রিসেট হয়েছে।');
+      await _loadProfile();
+    } catch (error) {
+      if (mounted) _notice(context, error.toString().replaceFirst('Exception: ', ''));
+    }
+  }
+
   Future<void> _changePassword() async {
     final current = TextEditingController();
     final next = TextEditingController();
@@ -2230,6 +2384,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ]),
                         ),
                         if (_error != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_error!, style: const TextStyle(color: Colors.red, fontSize: 12))),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                          decoration: BoxDecoration(
+                            color: surface,
+                            borderRadius: BorderRadius.circular(22),
+                            boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: .035), blurRadius: 12, offset: const Offset(0, 4))],
+                          ),
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Row(children: [
+                              Container(width: 38, height: 38, decoration: BoxDecoration(color: const Color(0xFFEF4444).withValues(alpha: .09), borderRadius: BorderRadius.circular(12)),
+                                child: const Icon(Icons.monitor_heart_outlined, color: Color(0xFFEF4444), size: 21)),
+                              const SizedBox(width: 11),
+                              const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                Text('হিসাব রিসেট', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+                                SizedBox(height: 2),
+                                Text('হিসাব মুছে নতুন করে শুরু করুন।', style: TextStyle(fontSize: 11, color: Colors.blueGrey)),
+                              ])),
+                              OutlinedButton(onPressed: _resetAccount, child: const Text('হিসাব রিসেট')),
+                            ]),
+                            Divider(height: 20, color: line),
+                            Row(children: [
+                              Container(width: 38, height: 38, decoration: BoxDecoration(color: const Color(0xFF64748B).withValues(alpha: .10), borderRadius: BorderRadius.circular(12)),
+                                child: const Icon(Icons.download_rounded, color: Color(0xFF334155), size: 21)),
+                              const SizedBox(width: 11),
+                              const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                Text('ডেটা এক্সপোর্ট ও ব্যাকআপ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
+                                SizedBox(height: 2),
+                                Text('আপনার সংরক্ষিত হিসাব JSON ফাইলে সংরক্ষণ করুন', style: TextStyle(fontSize: 11, color: Colors.blueGrey)),
+                              ])),
+                            ]),
+                            const SizedBox(height: 10),
+                            Wrap(spacing: 8, runSpacing: 8, alignment: WrapAlignment.end, children: [
+                              OutlinedButton.icon(onPressed: _exportBackup, icon: const Icon(Icons.download_rounded, size: 17), label: const Text('এক্সপোর্ট / ব্যাকআপ')),
+                              OutlinedButton.icon(onPressed: _restoreBackup, icon: const Icon(Icons.upload_rounded, size: 17), label: const Text('রিস্টোর')),
+                            ]),
+                          ]),
+                        ),
+                        const SizedBox(height: 12),
+
                         const SizedBox(height: 12),
                         Container(
                           padding: const EdgeInsets.fromLTRB(8, 3, 8, 3),

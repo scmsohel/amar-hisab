@@ -5795,14 +5795,41 @@ class _DashboardScreenState extends State<DashboardScreen> with WidgetsBindingOb
                                     icon: Icon(_hidden ? Icons.visibility_off_rounded : Icons.visibility_rounded, color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFFB8E3FF) : const Color(0xFF168565), size: 18),
                                   ),
                                   const Spacer(),
-                                  Text(
-                                    _todayLabel,
-                                    style: TextStyle(
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+                                    decoration: BoxDecoration(
                                       color: Theme.of(context).brightness == Brightness.dark
-                                          ? const Color(0xFFD9ECFF)
-                                          : const Color(0xFF155A45),
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w700,
+                                          ? const Color(0xFF4ABEFF).withValues(alpha: .16)
+                                          : const Color(0xFFE7F5EE),
+                                      border: Border.all(
+                                        color: Theme.of(context).brightness == Brightness.dark
+                                            ? const Color(0xFF4ABEFF).withValues(alpha: .62)
+                                            : const Color(0xFFC6E5D5),
+                                      ),
+                                      borderRadius: BorderRadius.circular(24),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          Icons.calendar_today_rounded,
+                                          size: 12,
+                                          color: Theme.of(context).brightness == Brightness.dark
+                                              ? const Color(0xFF65C8FF)
+                                              : const Color(0xFF579779),
+                                        ),
+                                        const SizedBox(width: 5),
+                                        Text(
+                                          _todayLabel,
+                                          style: TextStyle(
+                                            color: Theme.of(context).brightness == Brightness.dark
+                                                ? const Color(0xFFD6EEFF)
+                                                : const Color(0xFF527D69),
+                                            fontSize: 10.5,
+                                            fontWeight: FontWeight.w800,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],

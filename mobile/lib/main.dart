@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
@@ -6908,6 +6909,56 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
     });
     return list;
   }
+  String _exportStamp() {
+    final now = DateTime.now();
+    String two(int value) => value.toString().padLeft(2, '0');
+    return '${now.year}${two(now.month)}${two(now.day)}_${two(now.hour)}${two(now.minute)}';
+  }
+
+  List<List<String>> _exportRows(List<Map<String, dynamic>> rows) => [
+    ['তারিখ', 'সময়', 'ধরন', 'বিবরণ', 'ক্যাটাগরি', 'ওয়ালেট', 'পরিমাণ', 'নোট'],
+    for (final x in rows)
+      [
+        dateOf(x)?.toIso8601String().split('T').first ?? '',
+        (x['timeInput'] ?? x['time_input'] ?? x['time'] ?? '').toString(),
+        kindOf(x),
+        titleOf(x),
+        catOf(x),
+        walletOf(x),
+        amount(x['amount']).toStringAsFixed(2),
+        (x['note'] ?? '').toString(),
+      ],
+  ];
+
+  Future<void> _exportCsv() async {
+    final rows = filtered;
+    if (rows.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('এক্সপোর্ট করার মতো কোনো লেনদেন নেই।')),
+      );
+      return;
+    }
+    try {
+      String quote(String value) => '"${value.replaceAll('"', '""')}"';
+      final csv = '\uFEFF${_exportRows(rows).map((row) => row.map(quote).join(',')).join('\r\n')}';
+      final file = XFile.fromData(
+        utf8.encode(csv),
+        mimeType: 'text/csv',
+        name: 'amar_hisab_transactions_${_exportStamp()}.csv',
+      );
+      await SharePlus.instance.share(ShareParams(
+        files: [file],
+        text: 'Amar Hisab — লেনদেনের রিপোর্ট',
+      ));
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('CSV এক্সপোর্ট করা যায়নি: $error')),
+        );
+      }
+    }
+  }
+
   Future<void> reload()async{setState(()=>loading=true);try{final fresh=await widget.onReload();if(mounted)setState(()=>data=fresh);}finally{if(mounted)setState(()=>loading=false);}}
   String dateLabel(DateTime? d){if(d==null)return 'তারিখ পাওয়া যায়নি';const m=['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];return '${bn(d.day.toString())} ${m[d.month-1]}, ${bn(d.year.toString())}';}
   Widget summary(String label,double value,Color color,IconData icon)=>Expanded(child:Container(padding:const EdgeInsets.all(10),decoration:BoxDecoration(color:color.withValues(alpha:.07),borderRadius:BorderRadius.circular(14),border:Border.all(color:color.withValues(alpha:.2))),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Icon(icon,color:color,size:18),const SizedBox(height:4),Text(label,style:const TextStyle(fontSize:10)),FittedBox(child:Text(money(value),style:TextStyle(fontSize:14,fontWeight:FontWeight.w900,color:color)))])));
@@ -7121,7 +7172,7 @@ const icons = <String, IconData>{
     final shown=items;
     final cats=data.map(catOf).toSet().toList()..sort(),wallets=data.map(walletOf).where((x)=>x.isNotEmpty).toSet().toList()..sort();
     final groups=<String,List<Map<String,dynamic>>>{};for(final x in shown){final d=dateOf(x),key=d==null?'unknown':d.toString().substring(0,10);groups.putIfAbsent(key,()=>[]).add(x);}
-    return Scaffold(backgroundColor:bg,appBar:AppBar(backgroundColor:bg,foregroundColor:ink,elevation:0,title:const Text('লেনদেন',style:TextStyle(fontWeight:FontWeight.w900)),actions:[IconButton(onPressed:loading?null:reload,icon:const Icon(Icons.refresh_rounded)),IconButton(onPressed:()async{await widget.onAdd();await reload();},icon:const Icon(Icons.add_rounded))]),body:SafeArea(child:Column(children:[
+    return Scaffold(backgroundColor:bg,appBar:AppBar(backgroundColor:bg,foregroundColor:ink,elevation:0,title:const Text('লেনদেন',style:TextStyle(fontWeight:FontWeight.w900)),actions:[PopupMenuButton<String>(tooltip:'এক্সপোর্ট',icon:const Icon(Icons.file_download_outlined),onSelected:(value){if(value=='csv')_exportCsv();},itemBuilder:(_)=>const[PopupMenuItem(value:'csv',child:Text('CSV'))]),IconButton(onPressed:loading?null:reload,icon:const Icon(Icons.refresh_rounded)),IconButton(onPressed:()async{await widget.onAdd();await reload();},icon:const Icon(Icons.add_rounded))]),body:SafeArea(child:Column(children:[
       Padding(padding:const EdgeInsets.fromLTRB(12,4,12,7),child:Row(children:[summary('মোট আয়',income,const Color(0xFF00A875),Icons.trending_up_rounded),const SizedBox(width:7),summary('মোট ব্যয়',expense,const Color(0xFFEF4444),Icons.trending_down_rounded)])),
       Padding(padding:const EdgeInsets.fromLTRB(12,0,12,7),child:Row(children:[summary('নিট ব্যালেন্স',income-expense,const Color(0xFF2588F5),Icons.account_balance_wallet_outlined),const SizedBox(width:7),summary('মোট লেনদেন',items.length.toDouble(),const Color(0xFF8B5CF6),Icons.receipt_long_rounded)])),
       Padding(padding:const EdgeInsets.fromLTRB(12,0,12,7),child:TextField(controller:search,onChanged: (_) => setState(() {}),decoration:InputDecoration(prefixIcon:const Icon(Icons.search_rounded),hintText:'বিবরণ, ক্যাটাগরি, ওয়ালেট খুঁজুন...',filled:true,fillColor:dark?const Color(0xFF12283A):Colors.white,border:OutlineInputBorder(borderRadius:BorderRadius.circular(12))))),

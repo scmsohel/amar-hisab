@@ -2853,7 +2853,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _menuRow(IconData icon, Color accent, String heading, String subtitle, VoidCallback onTap,
       bool dark, Color ink, Color muted, Color line, {bool last = false}) => Column(children: [
     InkWell(onTap: onTap, borderRadius: BorderRadius.circular(18), child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 5),
       child: Row(children: [
         Container(width: 40, height: 40, decoration: BoxDecoration(color: accent.withValues(alpha: .13), shape: BoxShape.circle),
           child: Icon(icon, color: accent, size: 24)),

@@ -1538,72 +1538,147 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _inviteExpiry = null;
       _inviteError = null;
     });
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final surface = dark ? const Color(0xFF142C3D) : Colors.white;
+    final ink = dark ? const Color(0xFFF3F7FA) : const Color(0xFF172B3D);
+    final muted = dark ? const Color(0xFFABC0D0) : const Color(0xFF718096);
+    final border = dark ? const Color(0xFF35536A) : const Color(0xFFE6EDF2);
     await showDialog<void>(
       context: context,
+      barrierDismissible: !_inviteLoading,
       builder: (dialogContext) => StatefulBuilder(
-        builder: (dialogContext, refreshDialog) => AlertDialog(
-          title: const Text('নতুন ব্যবহারকারী যোগ করুন'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text('একটি Invitation Code তৈরি করুন। কোডটি ৭ দিন বৈধ থাকবে এবং একবারই ব্যবহার করা যাবে।'),
-              if (_inviteCode != null && _inviteCode!.isNotEmpty) ...[
-                const SizedBox(height: 16),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(13),
-                  decoration: BoxDecoration(
-                    color: Theme.of(dialogContext).brightness == Brightness.dark
-                        ? const Color(0xFF1B3548)
-                        : const Color(0xFFF3F5F4),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('নতুন Invitation Code · বৈধ: $_inviteExpiry', style: const TextStyle(fontSize: 12)),
-                      const SizedBox(height: 8),
-                      SelectableText(_inviteCode!, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800, letterSpacing: .5)),
-                    ],
-                  ),
+        builder: (dialogContext, refreshDialog) => Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 22, vertical: 24),
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 420),
+            padding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
+            decoration: BoxDecoration(
+              color: surface,
+              borderRadius: BorderRadius.circular(27),
+              border: Border.all(color: border),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: dark ? .30 : .13),
+                  blurRadius: 30,
+                  offset: const Offset(0, 14),
                 ),
               ],
-              if (_inviteError != null) ...[
-                const SizedBox(height: 10),
-                Text(_inviteError!, style: TextStyle(
-                  color: _inviteError!.contains('কপি হয়েছে') ? Colors.green : Colors.red,
-                  fontSize: 12,
-                )),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text('নতুন ব্যবহারকারী যোগ করুন',
+                        style: TextStyle(color: ink, fontSize: 19, fontWeight: FontWeight.w900)),
+                    ),
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      onPressed: _inviteLoading ? null : () => Navigator.of(dialogContext).pop(),
+                      icon: Icon(Icons.close_rounded, color: muted),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  'একটি Invitation Code তৈরি করুন। কোডটি ৭ দিন বৈধ থাকবে এবং একবারই ব্যবহার করা যাবে।',
+                  style: TextStyle(color: muted, fontSize: 13, height: 1.5),
+                ),
+                if (_inviteCode != null && _inviteCode!.isNotEmpty) ...[
+                  const SizedBox(height: 18),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(15),
+                    decoration: BoxDecoration(
+                      color: dark ? const Color(0xFF203D50) : const Color(0xFFF2F6F4),
+                      borderRadius: BorderRadius.circular(17),
+                      border: Border.all(color: dark ? const Color(0xFF35596B) : const Color(0xFFE2ECE6)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(children: [
+                          const Icon(Icons.verified_rounded, color: Color(0xFF08A66A), size: 16),
+                          const SizedBox(width: 6),
+                          Expanded(child: Text('নতুন Invitation Code',
+                            style: TextStyle(color: muted, fontSize: 12, fontWeight: FontWeight.w600))),
+                          Text('৭ দিন বৈধ', style: TextStyle(color: muted, fontSize: 11)),
+                        ]),
+                        const SizedBox(height: 10),
+                        SelectableText(
+                          _inviteCode!,
+                          style: TextStyle(color: ink, fontSize: 17, fontWeight: FontWeight.w900, letterSpacing: .35),
+                        ),
+                        if (_inviteExpiry != null) ...[
+                          const SizedBox(height: 5),
+                          Text('মেয়াদ শেষ: $_inviteExpiry', style: TextStyle(color: muted, fontSize: 11)),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+                if (_inviteError != null) ...[
+                  const SizedBox(height: 10),
+                  Text(_inviteError!, style: TextStyle(
+                    color: _inviteError!.contains('কপি হয়েছে') ? const Color(0xFF08A66A) : Colors.red,
+                    fontSize: 12,
+                  )),
+                ],
+                const SizedBox(height: 20),
+                if (_inviteCode != null && _inviteCode!.isNotEmpty)
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        await Clipboard.setData(ClipboardData(text: _inviteCode!));
+                        if (!mounted) return;
+                        setState(() => _inviteError = 'Invitation Code কপি হয়েছে।');
+                        refreshDialog(() {});
+                      },
+                      icon: const Icon(Icons.copy_rounded, size: 17),
+                      label: const Text('কোড কপি করুন'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF1475B8),
+                        side: BorderSide(color: dark ? const Color(0xFF55748A) : const Color(0xFFCBD8E2)),
+                        minimumSize: const Size.fromHeight(46),
+                        shape: const StadiumBorder(),
+                      ),
+                    ),
+                  ),
+                if (_inviteCode != null && _inviteCode!.isNotEmpty)
+                  const SizedBox(height: 9),
+                Row(
+                  children: [
+                    TextButton(
+                      onPressed: _inviteLoading ? null : () => Navigator.of(dialogContext).pop(),
+                      child: Text('বন্ধ করুন', style: TextStyle(color: muted, fontWeight: FontWeight.w700)),
+                    ),
+                    const Spacer(),
+                    Flexible(
+                      child: FilledButton.icon(
+                        onPressed: _inviteLoading
+                            ? null
+                            : () => _createAdminInvitation(refreshDialog: () => refreshDialog(() {})),
+                        icon: _inviteLoading
+                            ? const SizedBox(width: 15, height: 15, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                            : const Icon(Icons.add_rounded, size: 18),
+                        label: Text(_inviteLoading ? 'তৈরি হচ্ছে...' : 'Invitation তৈরি করুন'),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: const Color(0xFF286092),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
+                          shape: const StadiumBorder(),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
-            ],
+            ),
           ),
-          actions: [
-            TextButton(
-              onPressed: _inviteLoading ? null : () => Navigator.of(dialogContext).pop(),
-              child: const Text('বন্ধ করুন'),
-            ),
-            if (_inviteCode != null && _inviteCode!.isNotEmpty)
-              OutlinedButton.icon(
-                onPressed: () async {
-                  await Clipboard.setData(ClipboardData(text: _inviteCode!));
-                  if (!mounted) return;
-                  setState(() => _inviteError = 'Invitation code কপি হয়েছে।');
-                  refreshDialog(() {});
-                },
-                icon: const Icon(Icons.copy_rounded, size: 16),
-                label: const Text('কোড কপি করুন'),
-              ),
-            FilledButton.icon(
-              onPressed: _inviteLoading
-                  ? null
-                  : () => _createAdminInvitation(refreshDialog: () => refreshDialog(() {})),
-              icon: _inviteLoading
-                  ? const SizedBox(width: 15, height: 15, child: CircularProgressIndicator(strokeWidth: 2))
-                  : const Icon(Icons.add_rounded, size: 18),
-              label: Text(_inviteLoading ? 'তৈরি হচ্ছে...' : 'Invitation তৈরি করুন'),
-            ),
-          ],
         ),
       ),
     );
@@ -2645,59 +2720,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         const SizedBox(height: 2),
                         Center(child: Text(email, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muted, fontSize: 14))),
                         const SizedBox(height: 10),
-                        if ((_user['role'] ?? '').toString().toLowerCase() == 'admin') ...[
-                          Center(child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: dark ? const Color(0xFF173A32) : const Color(0xFFE8F8EF),
-                              borderRadius: BorderRadius.circular(40),
-                              border: Border.all(color: const Color(0xFF08A66A).withValues(alpha: .45), width: 1.1),
-                              boxShadow: [BoxShadow(color: const Color(0xFF08A66A).withValues(alpha: .10), blurRadius: 9, offset: const Offset(0, 4))]),
-                            child: const Row(mainAxisSize: MainAxisSize.min, children: [
-                              Icon(Icons.verified_rounded, color: Color(0xFF08A66A), size: 19), SizedBox(width: 8),
-                              Text('Owner', style: TextStyle(color: Color(0xFF078653), fontSize: 13, fontWeight: FontWeight.w800)),
-                            ]),
-                          )),
-                          const SizedBox(height: 10),
-                        ],
-                        if ((_user['role'] ?? '').toString().toLowerCase() == 'admin')
-                          Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            padding: const EdgeInsets.fromLTRB(14, 13, 12, 13),
-                            decoration: BoxDecoration(
-                              color: surface,
-                              borderRadius: BorderRadius.circular(18),
-                              border: Border.all(color: line),
-                              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: .025), blurRadius: 10, offset: const Offset(0, 3))],
-                            ),
-                            child: Row(children: [
-                              Container(
-                                width: 40, height: 40,
-                                decoration: BoxDecoration(color: const Color(0xFF08A66A).withValues(alpha: .10), borderRadius: BorderRadius.circular(12)),
-                                child: const Icon(Icons.person_add_alt_1_rounded, color: Color(0xFF08A66A), size: 21),
-                              ),
-                              const SizedBox(width: 12),
-                              const Expanded(child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('নতুন ব্যবহারকারী যোগ করুন', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
-                                  SizedBox(height: 3),
-                                  Text('Invitation Code তৈরি ও কপি করুন', style: TextStyle(fontSize: 11, color: Colors.blueGrey)),
-                                ],
-                              )),
-                              const SizedBox(width: 8),
-                              FilledButton.icon(
-                                onPressed: _showInvitationDialog,
-                                icon: const Icon(Icons.add_rounded, size: 16),
-                                label: const Text('Invite'),
-                                style: FilledButton.styleFrom(
-                                  backgroundColor: const Color(0xFF079B6B),
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                                ),
-                              ),
-                            ]),
-                          ),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 6),
                           decoration: BoxDecoration(color: dark ? const Color(0xFF142C3D) : const Color(0xFFFFFCF9),
@@ -2779,6 +2801,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ]),
               ),
+              if ((_user['role'] ?? '').toString().toLowerCase() == 'admin')
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 7, 16, 5),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(18),
+                      onTap: _showInvitationDialog,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+                        decoration: BoxDecoration(
+                          color: dark ? const Color(0xFF153B37) : const Color(0xFFEAF8F1),
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: dark ? const Color(0xFF28685A) : const Color(0xFFCBEBDD)),
+                        ),
+                        child: Row(children: [
+                          Container(
+                            width: 38, height: 38,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF08A66A).withValues(alpha: .12),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(Icons.person_add_alt_1_rounded, color: Color(0xFF08A66A), size: 20),
+                          ),
+                          const SizedBox(width: 11),
+                          Expanded(child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('নতুন ব্যবহারকারী যোগ করুন',
+                                style: TextStyle(color: ink, fontSize: 13, fontWeight: FontWeight.w800)),
+                              const SizedBox(height: 2),
+                              Text('Invitation Code তৈরি ও কপি করুন',
+                                style: TextStyle(color: muted, fontSize: 10.5)),
+                            ],
+                          )),
+                          const SizedBox(width: 8),
+                          FilledButton.icon(
+                            onPressed: _showInvitationDialog,
+                            icon: const Icon(Icons.add_rounded, size: 15),
+                            label: const Text('Invite'),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: const Color(0xFF079B6B),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                              minimumSize: Size.zero,
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              shape: const StadiumBorder(),
+                            ),
+                          ),
+                        ]),
+                      ),
+                    ),
+                  ),
+                ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 5, 16, 10),
                 child: SizedBox(width: double.infinity, height: 46, child: OutlinedButton.icon(

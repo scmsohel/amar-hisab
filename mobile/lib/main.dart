@@ -2589,7 +2589,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ])),
                               OutlinedButton(onPressed: _resetAccount, child: const Text('হিসাব রিসেট')),
                             ]),
-                            Divider(height: 20, color: line),
+                            Divider(height: 8, thickness: 1, color: line),
                             Material(
                               color: Colors.transparent,
                               child: InkWell(

@@ -1858,17 +1858,94 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _resetAccount() async {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final dialogSurface = dark ? const Color(0xFF172B3D) : const Color(0xFFFFFFFF);
+    final dialogText = dark ? const Color(0xFFEAF2FA) : const Color(0xFF17212B);
+    final dialogMuted = dark ? const Color(0xFFB5C4D3) : const Color(0xFF64748B);
+    final dialogPanel = dark ? const Color(0xFF20384B) : const Color(0xFFF3F6F9);
     final confirmed = await showDialog<bool>(
       context: context,
+      barrierDismissible: false,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('হিসাব রিসেট করবেন?'),
-        content: const Text('সব লেনদেন, দেনা-পাওনা, বিল ও সঞ্চয়ের রেকর্ড মুছে যাবে। Wallet-এর নাম ও ডিজাইন থাকবে, তবে Opening Balance ৳০ হবে। এই কাজ Undo করা যাবে না।'),
+        backgroundColor: dialogSurface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 18,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+        contentPadding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
+        actionsPadding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+        title: Row(children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE5484D).withValues(alpha: dark ? .18 : .10),
+              borderRadius: BorderRadius.circular(15),
+            ),
+            child: const Icon(Icons.warning_amber_rounded, color: Color(0xFFE5484D), size: 26),
+          ),
+          const SizedBox(width: 13),
+          Expanded(child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('হিসাব রিসেট করবেন?', style: TextStyle(color: dialogText, fontSize: 19, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 3),
+              Text('এই কাজটি স্থায়ীভাবে কার্যকর হবে', style: TextStyle(color: dialogMuted, fontSize: 11, fontWeight: FontWeight.w500)),
+            ],
+          )),
+        ]),
+        content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(
+            'আপনার সব লেনদেন, দেনা-পাওনা, বিল ও সঞ্চয়ের রেকর্ড মুছে যাবে।',
+            style: TextStyle(color: dialogText, fontSize: 13, height: 1.55),
+          ),
+          const SizedBox(height: 14),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 12),
+            decoration: BoxDecoration(color: dialogPanel, borderRadius: BorderRadius.circular(16)),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                const Icon(Icons.check_circle_rounded, color: Color(0xFF16A36A), size: 18),
+                const SizedBox(width: 9),
+                Expanded(child: Text('Wallet-এর নাম ও ডিজাইন থাকবে', style: TextStyle(color: dialogText, fontSize: 12, fontWeight: FontWeight.w600))),
+              ]),
+              const SizedBox(height: 10),
+              Row(children: [
+                const Icon(Icons.account_balance_wallet_rounded, color: Color(0xFFD97706), size: 18),
+                const SizedBox(width: 9),
+                Expanded(child: Text('Opening Balance হবে ৳০', style: TextStyle(color: dialogText, fontSize: 12, fontWeight: FontWeight.w600))),
+              ]),
+              const SizedBox(height: 10),
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Icon(Icons.error_outline_rounded, color: Color(0xFFE5484D), size: 18),
+                const SizedBox(width: 9),
+                Expanded(child: Text('মুছে ফেলা ডেটা ফিরিয়ে আনা যাবে না', style: TextStyle(color: dialogMuted, fontSize: 12, fontWeight: FontWeight.w600))),
+              ]),
+            ]),
+          ),
+        ]),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('বাতিল')),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            style: TextButton.styleFrom(
+              foregroundColor: dialogMuted,
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              shape: const StadiumBorder(),
+            ),
+            child: const Text('বাতিল', style: TextStyle(fontWeight: FontWeight.w700)),
+          ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('রিসেট করুন'),
+            style: FilledButton.styleFrom(
+              backgroundColor: const Color(0xFFE94242),
+              foregroundColor: Colors.white,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 12),
+              shape: const StadiumBorder(),
+            ),
+            child: const Text('রিসেট করুন', style: TextStyle(fontWeight: FontWeight.w800)),
           ),
         ],
       ),

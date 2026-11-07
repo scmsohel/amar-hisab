@@ -2579,9 +2579,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             Row(children: [
-                              Container(width: 38, height: 38, decoration: BoxDecoration(color: const Color(0xFFEF4444).withValues(alpha: .09), borderRadius: BorderRadius.circular(12)),
-                                child: const Icon(Icons.monitor_heart_outlined, color: Color(0xFFEF4444), size: 21)),
-                              const SizedBox(width: 11),
+                              Container(width: 40, height: 40, decoration: BoxDecoration(color: const Color(0xFFEF4444).withValues(alpha: .09), borderRadius: BorderRadius.circular(12)),
+                                child: const Icon(Icons.monitor_heart_outlined, color: Color(0xFFEF4444), size: 22)),
+                              const SizedBox(width: 17),
                               const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                 Text('হিসাব রিসেট', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                                 SizedBox(height: 2),
@@ -2598,9 +2598,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 5),
                                   child: Row(children: [
-                                    Container(width: 38, height: 38, decoration: BoxDecoration(color: const Color(0xFF64748B).withValues(alpha: .10), borderRadius: BorderRadius.circular(12)),
-                                      child: const Icon(Icons.download_rounded, color: Color(0xFF334155), size: 21)),
-                                    const SizedBox(width: 11),
+                                    Container(width: 40, height: 40, decoration: BoxDecoration(color: const Color(0xFF64748B).withValues(alpha: .10), borderRadius: BorderRadius.circular(12)),
+                                      child: const Icon(Icons.download_rounded, color: Color(0xFF334155), size: 22)),
+                                    const SizedBox(width: 17),
                                     const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                       Text('ডেটা এক্সপোর্ট ও ব্যাকআপ', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                                       SizedBox(height: 2),

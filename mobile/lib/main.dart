@@ -7424,9 +7424,27 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
         ),
       );
 
-      await Printing.sharePdf(
-        bytes: await document.save(),
-        filename: 'amar_hisab_transactions_${_exportStamp()}.pdf',
+      final pdfBytes = await document.save();
+      if (!mounted) return;
+      final fileName = 'amar_hisab_transactions_${_exportStamp()}.pdf';
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (previewContext) => Scaffold(
+            appBar: AppBar(
+              title: const Text('PDF প্রিভিউ'),
+              centerTitle: true,
+            ),
+            body: PdfPreview(
+              build: (format) async => pdfBytes,
+              pdfFileName: fileName,
+              allowPrinting: true,
+              allowSharing: true,
+              canChangePageFormat: false,
+              canChangeOrientation: false,
+              canDebug: false,
+            ),
+          ),
+        ),
       );
     } catch (error) {
       if (mounted) {

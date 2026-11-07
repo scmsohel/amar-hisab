@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:excel/excel.dart';
+import 'package:excel/excel.dart' as xl;
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -6940,17 +6940,17 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
   }
 
   Future<void> _exportExcel(List<Map<String, dynamic>> rows) async {
-    final workbook = Excel.createExcel();
+    final workbook = xl.Excel.createExcel();
     final summarySheet = workbook['সারাংশ'];
     final income = rows.where((x) => kindOf(x) == 'আয়').fold<double>(0, (s, x) => s + amount(x['amount']));
     final expense = rows.where((x) => kindOf(x) == 'ব্যয়').fold<double>(0, (s, x) => s + amount(x['amount']));
-    summarySheet.appendRow([TextCellValue('বিবরণ'), TextCellValue('পরিমাণ')]);
-    summarySheet.appendRow([TextCellValue('মোট আয়'), TextCellValue(income.toStringAsFixed(2))]);
-    summarySheet.appendRow([TextCellValue('মোট ব্যয়'), TextCellValue(expense.toStringAsFixed(2))]);
-    summarySheet.appendRow([TextCellValue('নিট পার্থক্য'), TextCellValue((income - expense).toStringAsFixed(2))]);
-    summarySheet.appendRow([TextCellValue('মোট লেনদেন'), IntCellValue(rows.length)]);
+    summarySheet.appendRow([xl.TextCellValue('বিবরণ'), xl.TextCellValue('পরিমাণ')]);
+    summarySheet.appendRow([xl.TextCellValue('মোট আয়'), xl.TextCellValue(income.toStringAsFixed(2))]);
+    summarySheet.appendRow([xl.TextCellValue('মোট ব্যয়'), xl.TextCellValue(expense.toStringAsFixed(2))]);
+    summarySheet.appendRow([xl.TextCellValue('নিট পার্থক্য'), xl.TextCellValue((income - expense).toStringAsFixed(2))]);
+    summarySheet.appendRow([xl.TextCellValue('মোট লেনদেন'), xl.IntCellValue(rows.length)]);
     final transactionSheet = workbook['লেনদেন'];
-    for (final row in _exportRows(rows)) { transactionSheet.appendRow(row.map((v) => TextCellValue(v)).toList()); }
+    for (final row in _exportRows(rows)) { transactionSheet.appendRow(row.map((v) => xl.TextCellValue(v)).toList()); }
     final bytes = workbook.save();
     if (bytes == null) throw Exception('Excel ফাইল তৈরি করা যায়নি।');
     await _shareExportFile('xlsx', bytes);

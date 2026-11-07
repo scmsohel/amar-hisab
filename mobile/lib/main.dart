@@ -7314,7 +7314,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
     if (suffix == 'AM' && hour == 12) hour = 0;
     if (suffix == 'PM' && hour < 12) hour += 12;
     final formatted =
-        '\${hour.toString().padLeft(2, '0')}:\${minute.toString().padLeft(2, '0')}';
+        '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
     return formatted
         .replaceAll('0', '০').replaceAll('1', '১')
         .replaceAll('2', '২').replaceAll('3', '৩')

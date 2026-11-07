@@ -5135,23 +5135,84 @@ class _CategoryManagerScreenState extends State<_CategoryManagerScreen> {
         ]))),
       ]));
     }
-    return Scaffold(appBar:AppBar(title:const Text('ক্যাটাগরি ম্যানেজার',style:TextStyle(fontWeight:FontWeight.w900))),floatingActionButton:FloatingActionButton(onPressed:_saving?null:()=>_edit(),backgroundColor:const Color(0xFF08A66B),foregroundColor:Colors.white,child:const Icon(Icons.add_rounded)),body:_loading?const Center(child:CircularProgressIndicator()):ListView(padding:const EdgeInsets.fromLTRB(14,10,14,90),children:[
-      Text('আপনার আয় ও ব্যয়ের ক্যাটাগরি তৈরি, সম্পাদনা ও পরিচালনা করুন',style:TextStyle(color:Theme.of(context).hintColor)),
-      const SizedBox(height:14),
-      Row(children:[
-        Expanded(child:Container(padding:const EdgeInsets.all(13),decoration:BoxDecoration(color:const Color(0xFF08A66B).withValues(alpha:.08),borderRadius:BorderRadius.circular(15)),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[const Text('মোট আয় ক্যাটাগরি',style:TextStyle(fontSize:11)),Text(income.length.toString(),style:const TextStyle(fontSize:24,fontWeight:FontWeight.w900,color:Color(0xFF07834F)))]))),
-        const SizedBox(width:10),
-        Expanded(child:Container(padding:const EdgeInsets.all(13),decoration:BoxDecoration(color:const Color(0xFFEF4760).withValues(alpha:.08),borderRadius:BorderRadius.circular(15)),child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[const Text('মোট ব্যয় ক্যাটাগরি',style:TextStyle(fontSize:11)),Text(expense.length.toString(),style:const TextStyle(fontSize:24,fontWeight:FontWeight.w900,color:Color(0xFFEF4760)))]))),
+    final dark=Theme.of(context).brightness==Brightness.dark;
+    final bg=dark?const Color(0xFF071827):const Color(0xFFF5F7FB);
+    final surface=dark?const Color(0xFF10283D):Colors.white;
+    final muted=dark?const Color(0xFFA4B8CA):const Color(0xFF8191A4);
+    final line=dark?const Color(0xFF294158):const Color(0xFFE4EAF1);
+    const green=Color(0xFF00A875),red=Color(0xFFFF4D55);
+    Widget summary(String label,int count,Color accent,Color tint)=>Expanded(child:Container(
+      padding:const EdgeInsets.symmetric(horizontal:11,vertical:10),
+      decoration:BoxDecoration(color:dark?accent.withValues(alpha:.12):tint,borderRadius:BorderRadius.circular(16),border:Border.all(color:accent.withValues(alpha:.20))),
+      child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+        Text(label,style:TextStyle(fontSize:10,color:muted,fontWeight:FontWeight.w700)),
+        const SizedBox(height:2),
+        Text(count.toString(),style:TextStyle(fontSize:22,height:1.1,fontWeight:FontWeight.w900,color:accent)),
       ]),
-      const SizedBox(height:14),
-      Wrap(spacing:8,children:['সব','আয়','ব্যয়'].map((v)=>ChoiceChip(label:Text(v=='সব'?'সব (${_categories.length})':'$v (${_categories.where((c)=>c['type']==v).length})'),selected:_filter==v,onSelected:(_)=>setState(()=>_filter=v))).toList()),
-      const SizedBox(height:12),
-      TextField(onChanged:(v)=>setState(()=>_search=v),decoration:InputDecoration(prefixIcon:const Icon(Icons.search_rounded),hintText:'ক্যাটাগরি খুঁজুন...',filled:true,border:OutlineInputBorder(borderRadius:BorderRadius.circular(13),borderSide:BorderSide.none))),
-      const SizedBox(height:14),
-      if(_filter!='ব্যয়')section('আয়',income,const Color(0xFF08A66B)),
-      if(_filter!='আয়')section('ব্যয়',expense,const Color(0xFFEF4760)),
-      if(_saving)const LinearProgressIndicator(),
-    ]));
+    ));
+    return Scaffold(
+      backgroundColor:bg,
+      appBar:AppBar(
+        backgroundColor:bg,
+        surfaceTintColor:Colors.transparent,
+        leading:IconButton(icon:const Icon(Icons.arrow_back_rounded),onPressed:()=>Navigator.pop(context)),
+        title:const Text('ক্যাটাগরি ম্যানেজার',style:TextStyle(fontWeight:FontWeight.w900)),
+        actions:[IconButton(onPressed:_loading||_saving?null:_load,icon:_loading?const SizedBox(width:18,height:18,child:CircularProgressIndicator(strokeWidth:2)):const Icon(Icons.refresh_rounded)),const SizedBox(width:5)],
+      ),
+      body:SafeArea(top:false,child:_loading?const Center(child:CircularProgressIndicator()):ListView(
+        padding:const EdgeInsets.fromLTRB(13,8,13,22),
+        children:[
+          Text('আপনার আয় ও ব্যয়ের ক্যাটাগরি তৈরি, সম্পাদনা ও পরিচালনা করুন',style:TextStyle(color:muted,fontSize:12)),
+          const SizedBox(height:11),
+          Row(children:[
+            summary('মোট আয় ক্যাটাগরি',income.length,green,const Color(0xFFEAF8F2)),
+            const SizedBox(width:8),
+            summary('মোট ব্যয় ক্যাটাগরি',expense.length,red,const Color(0xFFFFEFF0)),
+          ]),
+          const SizedBox(height:10),
+          SizedBox(width:double.infinity,child:FilledButton.icon(
+            onPressed:_saving?null:()=>_edit(),
+            icon:const Icon(Icons.add_rounded,size:19),
+            label:const Text('নতুন ক্যাটাগরি যোগ করুন'),
+            style:FilledButton.styleFrom(backgroundColor:green,foregroundColor:Colors.white,elevation:0,padding:const EdgeInsets.symmetric(vertical:12),shape:RoundedRectangleBorder(borderRadius:BorderRadius.circular(24))),
+          )),
+          const SizedBox(height:10),
+          TextField(
+            onChanged:(v)=>setState(()=>_search=v),
+            decoration:InputDecoration(
+              prefixIcon:const Icon(Icons.search_rounded),
+              hintText:'ক্যাটাগরি খুঁজুন...',
+              filled:true,fillColor:surface,
+              contentPadding:const EdgeInsets.symmetric(vertical:12),
+              border:OutlineInputBorder(borderRadius:BorderRadius.circular(17),borderSide:BorderSide(color:line)),
+              enabledBorder:OutlineInputBorder(borderRadius:BorderRadius.circular(17),borderSide:BorderSide(color:line)),
+              focusedBorder:OutlineInputBorder(borderRadius:BorderRadius.circular(17),borderSide:const BorderSide(color:green)),
+            ),
+          ),
+          const SizedBox(height:9),
+          Row(children:['সব','আয়','ব্যয়'].map((v){
+            final selected=_filter==v;
+            final count=v=='সব'?_categories.length:_categories.where((c)=>c['type']==v).length;
+            return Padding(padding:const EdgeInsets.only(right:7),child:ChoiceChip(
+              label:Text('$v ($count)',style:TextStyle(fontSize:11,fontWeight:FontWeight.w700,color:selected?(dark?Colors.white:const Color(0xFF173B31)):muted)),
+              selected:selected,
+              onSelected:(_)=>setState(()=>_filter=v),
+              showCheckmark:false,
+              selectedColor:dark?const Color(0xFF174A3B):const Color(0xFFE2F2EC),
+              backgroundColor:surface,
+              side:BorderSide(color:selected?green:line),
+              shape:RoundedRectangleBorder(borderRadius:BorderRadius.circular(12)),
+              visualDensity:VisualDensity.compact,
+              padding:const EdgeInsets.symmetric(horizontal:8,vertical:3),
+            ));
+          }).toList()),
+          const SizedBox(height:10),
+          if(_filter!='ব্যয়')section('আয়',income,green),
+          if(_filter!='আয়')section('ব্যয়',expense,red),
+          if(_saving)const LinearProgressIndicator(),
+        ],
+      )),
+    );
   }
 }
 

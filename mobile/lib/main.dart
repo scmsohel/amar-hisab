@@ -5004,27 +5004,89 @@ class _CategoryManagerScreenState extends State<_CategoryManagerScreen> {
     final desc=TextEditingController(text:(item?['description']??'').toString());
     String type=(item?['type']??'আয়').toString(),icon=(item?['icon']??'Briefcase').toString(),color=(item?['color']??'#08a66b').toString();
     final icons=_transactionIconOptions.keys.toList(growable:false);
-    final result=await showDialog<Map<String,dynamic>>(context:context,builder:(dialogContext)=>StatefulBuilder(builder:(context,setDialog)=>AlertDialog(
-      title:Text(item==null?'নতুন ক্যাটাগরি যোগ করুন':'ক্যাটাগরি সম্পাদনা',style:const TextStyle(fontWeight:FontWeight.w800)),
-      content:SingleChildScrollView(child:Column(mainAxisSize:MainAxisSize.min,crossAxisAlignment:CrossAxisAlignment.start,children:[
-        const Text('ক্যাটাগরির ধরন',style:TextStyle(fontWeight:FontWeight.w700)),
-        const SizedBox(height:8),
-        SegmentedButton<String>(segments:const [ButtonSegment(value:'আয়',label:Text('↗ আয়')),ButtonSegment(value:'ব্যয়',label:Text('↘ ব্যয়'))],selected:{type},onSelectionChanged:(v)=>setDialog(()=>type=v.first)),
-        const SizedBox(height:14),
-        TextField(controller:name,decoration:const InputDecoration(labelText:'ক্যাটাগরির নাম *',hintText:'যেমন: বেতন, বাজার, ভাড়া',border:OutlineInputBorder())),
-        const SizedBox(height:14),
-        const Text('আইকন নির্বাচন',style:TextStyle(fontWeight:FontWeight.w700)),
-        const SizedBox(height:8),
-        SizedBox(height:140,child:SingleChildScrollView(physics:const ClampingScrollPhysics(),child:Wrap(spacing:7,runSpacing:7,children:icons.map((v)=>SizedBox(width:40,height:40,child:InkWell(onTap:()=>setDialog(()=>icon=v),child:Container(decoration:BoxDecoration(color:icon==v?const Color(0xFFDCFCEB):Theme.of(context).colorScheme.surfaceContainerHighest,borderRadius:BorderRadius.circular(12),border:Border.all(color:icon==v?const Color(0xFF08A66B):Colors.transparent,width:2)),child:Icon(_icon(v),color:icon==v?const Color(0xFF08A66B):null,size:20))))).toList()))),
-        const SizedBox(height:14),
-        const Text('রং',style:TextStyle(fontWeight:FontWeight.w700)),
-        const SizedBox(height:8),
-        Wrap(spacing:12,children:_colors.map((v)=>InkWell(onTap:()=>setDialog(()=>color=v),child:Container(width:28,height:28,decoration:BoxDecoration(color:_color(v),shape:BoxShape.circle,border:Border.all(color:color==v?Theme.of(context).colorScheme.onSurface:Colors.transparent,width:3))))).toList()),
-        const SizedBox(height:14),
-        TextField(controller:desc,maxLines:2,decoration:const InputDecoration(labelText:'বিবরণ (ঐচ্ছিক)',border:OutlineInputBorder())),
-      ])),
-      actions:[TextButton(onPressed:()=>Navigator.pop(dialogContext),child:const Text('বাতিল')),FilledButton(onPressed:(){if(name.text.trim().isEmpty)return;Navigator.pop(dialogContext,{'name':name.text.trim(),'type':type,'icon':icon,'color':color,'description':desc.text.trim()});},child:const Text('সংরক্ষণ'))],
-    )));
+    final result=await showDialog<Map<String,dynamic>>(
+      context:context,
+      barrierDismissible:false,
+      builder:(dialogContext)=>StatefulBuilder(builder:(context,setDialog){
+        final ink=Theme.of(context).colorScheme.onSurface;
+        final muted=Theme.of(context).hintColor;
+        final line=const Color(0xFFD9E4EA);
+        InputDecoration fieldDecoration(String hint)=>InputDecoration(
+          hintText:hint,
+          filled:true,
+          fillColor:const Color(0xFFF4F8FA),
+          contentPadding:const EdgeInsets.symmetric(horizontal:14,vertical:14),
+          border:OutlineInputBorder(borderRadius:BorderRadius.circular(12),borderSide:BorderSide(color:line)),
+          enabledBorder:OutlineInputBorder(borderRadius:BorderRadius.circular(12),borderSide:BorderSide(color:line)),
+          focusedBorder:OutlineInputBorder(borderRadius:BorderRadius.circular(12),borderSide:const BorderSide(color:Color(0xFF08A66B),width:1.4)),
+        );
+        Widget fieldLabel(String label)=>Padding(
+          padding:const EdgeInsets.only(bottom:6),
+          child:Text(label,style:const TextStyle(fontSize:12,fontWeight:FontWeight.w800)),
+        );
+        return Dialog(
+          insetPadding:const EdgeInsets.symmetric(horizontal:10,vertical:20),
+          shape:RoundedRectangleBorder(borderRadius:BorderRadius.circular(24)),
+          clipBehavior:Clip.antiAlias,
+          child:ConstrainedBox(
+            constraints:BoxConstraints(maxWidth:520,maxHeight:MediaQuery.of(context).size.height*.88),
+            child:Padding(
+              padding:const EdgeInsets.fromLTRB(18,14,18,14),
+              child:Column(mainAxisSize:MainAxisSize.min,crossAxisAlignment:CrossAxisAlignment.start,children:[
+                Row(children:[
+                  Expanded(child:Text(item==null?'নতুন ক্যাটাগরি যোগ করুন':'ক্যাটাগরি সম্পাদনা',style:TextStyle(fontSize:20,fontWeight:FontWeight.w900,color:ink))),
+                  IconButton(visualDensity:VisualDensity.compact,onPressed:()=>Navigator.pop(dialogContext),icon:Icon(Icons.close_rounded,color:muted)),
+                ]),
+                Text('আপনার আয় ও ব্যয়ের হিসাব সাজিয়ে রাখুন',style:TextStyle(fontSize:11,color:muted)),
+                const SizedBox(height:12),
+                Divider(height:1,color:line),
+                Flexible(child:SingleChildScrollView(
+                  padding:const EdgeInsets.only(top:14,bottom:12),
+                  child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[
+                    fieldLabel('ক্যাটাগরির ধরন'),
+                    Row(children:[
+                      Expanded(child:InkWell(
+                        borderRadius:BorderRadius.circular(12),
+                        onTap:()=>setDialog(()=>type='আয়'),
+                        child:Container(height:42,decoration:BoxDecoration(color:type=='আয়'?const Color(0xFFE3F7EF):Colors.transparent,borderRadius:BorderRadius.circular(12),border:Border.all(color:type=='আয়'?const Color(0xFF08A66B):line)),child:Center(child:Text('↗  আয়',style:TextStyle(fontWeight:FontWeight.w800,color:type=='আয়'?const Color(0xFF08A66B):muted)))),
+                      )),
+                      const SizedBox(width:8),
+                      Expanded(child:InkWell(
+                        borderRadius:BorderRadius.circular(12),
+                        onTap:()=>setDialog(()=>type='ব্যয়'),
+                        child:Container(height:42,decoration:BoxDecoration(color:type=='ব্যয়'?const Color(0xFFFFEEEE):Colors.transparent,borderRadius:BorderRadius.circular(12),border:Border.all(color:type=='ব্যয়'?const Color(0xFFEF4760):line)),child:Center(child:Text('↘  ব্যয়',style:TextStyle(fontWeight:FontWeight.w800,color:type=='ব্যয়'?const Color(0xFFEF4760):muted)))),
+                      )),
+                    ]),
+                    const SizedBox(height:14),
+                    fieldLabel('ক্যাটাগরির নাম *'),
+                    TextField(controller:name,textCapitalization:TextCapitalization.sentences,decoration:fieldDecoration('যেমন: বেতন, বাজার, ভাড়া')),
+                    const SizedBox(height:14),
+                    fieldLabel('আইকন নির্বাচন'),
+                    SizedBox(height:140,child:SingleChildScrollView(physics:const ClampingScrollPhysics(),child:Wrap(spacing:7,runSpacing:7,children:icons.map((v)=>SizedBox(width:40,height:40,child:InkWell(
+                      borderRadius:BorderRadius.circular(10),
+                      onTap:()=>setDialog(()=>icon=v),
+                      child:Container(decoration:BoxDecoration(color:icon==v?const Color(0xFFE3F7EF):const Color(0xFFF0F3F5),borderRadius:BorderRadius.circular(10),border:Border.all(color:icon==v?const Color(0xFF08A66B):Colors.transparent,width:1.5)),child:Icon(_icon(v),color:icon==v?const Color(0xFF08A66B):ink,size:20)),
+                    ))).toList()))),
+                    const SizedBox(height:14),
+                    fieldLabel('রং'),
+                    Wrap(spacing:10,runSpacing:8,children:_colors.map((v)=>InkWell(onTap:()=>setDialog(()=>color=v),child:Container(width:29,height:29,decoration:BoxDecoration(color:_color(v),shape:BoxShape.circle,border:Border.all(color:color==v?ink:Colors.transparent,width:2.5))))).toList()),
+                    const SizedBox(height:14),
+                    fieldLabel('বিবরণ (ঐচ্ছিক)'),
+                    TextField(controller:desc,maxLines:2,decoration:fieldDecoration('ক্যাটাগরি সম্পর্কে কিছু লিখুন')),
+                  ]),
+                )),
+                Divider(height:1,color:line),
+                const SizedBox(height:12),
+                Row(children:[
+                  Expanded(child:OutlinedButton(onPressed:()=>Navigator.pop(dialogContext),style:OutlinedButton.styleFrom(foregroundColor:muted,side:BorderSide(color:line),shape:RoundedRectangleBorder(borderRadius:BorderRadius.circular(24)),padding:const EdgeInsets.symmetric(vertical:13)),child:const Text('বাতিল'))),
+                  const SizedBox(width:9),
+                  Expanded(child:FilledButton(onPressed:(){if(name.text.trim().isEmpty){ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content:Text('ক্যাটাগরির নাম লিখুন।')));return;}Navigator.pop(dialogContext,{'name':name.text.trim(),'type':type,'icon':icon,'color':color,'description':desc.text.trim()});},style:FilledButton.styleFrom(backgroundColor:const Color(0xFF08A66B),foregroundColor:Colors.white,shape:RoundedRectangleBorder(borderRadius:BorderRadius.circular(24)),padding:const EdgeInsets.symmetric(vertical:13)),child:const Text('সংরক্ষণ',style:TextStyle(fontWeight:FontWeight.w800)))),
+                ]),
+            ),
+          ),
+        );
+      }),
+    );
     name.dispose();desc.dispose();
     if(result==null||!mounted)return;
     final clean=result['name'].toString();

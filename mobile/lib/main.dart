@@ -2657,6 +2657,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final muted = dark ? const Color(0xFFB2C3D5) : const Color(0xFF405274);
     final line = dark ? const Color(0xFF30485D) : const Color(0xFFE3EAF1);
     final name = (_user['name'] ?? _user['fullName'] ?? _user['full_name'] ?? 'ব্যবহারকারী').toString();
+    final isAdmin = (_user['role'] ?? '').toString().toLowerCase() == 'admin';
     final email = (_user['email'] ?? '').toString();
     final photo = (_user['avatarUrl'] ?? _user['avatar_url'] ?? _user['photoUrl'] ?? _user['photo_url'] ?? '').toString();
 
@@ -2726,8 +2727,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                           Flexible(child: Text(_loading ? 'লোড হচ্ছে...' : name, maxLines: 1, overflow: TextOverflow.ellipsis,
                             style: TextStyle(color: ink, fontSize: 20, fontWeight: FontWeight.w900))),
-                          const SizedBox(width: 9),
-                          const Icon(Icons.verified_rounded, color: Color(0xFF0DBB39), size: 34),
+                          if (isAdmin) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF0DBB39).withValues(alpha: .12),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: const Color(0xFF0DBB39).withValues(alpha: .35)),
+                              ),
+                              child: const Row(mainAxisSize: MainAxisSize.min, children: [
+                                Icon(Icons.shield_rounded, color: Color(0xFF0AAB35), size: 13),
+                                SizedBox(width: 4),
+                                Text('ADMIN', style: TextStyle(color: Color(0xFF07952D), fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: .5)),
+                              ]),
+                            ),
+                          ],
                         ]),
                         const SizedBox(height: 2),
                         Center(child: Text(email, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: muted, fontSize: 14))),

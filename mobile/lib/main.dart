@@ -6917,7 +6917,7 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
   String _exportStamp() {
     final now = DateTime.now();
     String two(int v) => v.toString().padLeft(2, '0');
-    return '\${now.year}\${two(now.month)}\${two(now.day)}_\${two(now.hour)}\${two(now.minute)}';
+    return '${now.year}${two(now.month)}${two(now.day)}_${two(now.hour)}${two(now.minute)}';
   }
 
   List<List<String>> _exportRows(List<Map<String, dynamic>> rows) => [
@@ -6928,14 +6928,14 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
 
   Future<void> _shareExportFile(String extension, List<int> bytes) async {
     final dir = await getTemporaryDirectory();
-    final file = File('\${dir.path}/amar_hisab_transactions_\${_exportStamp()}.$extension');
+    final file = File('${dir.path}/amar_hisab_transactions_${_exportStamp()}.$extension');
     await file.writeAsBytes(bytes, flush: true);
     await SharePlus.instance.share(ShareParams(files: [XFile(file.path)], text: 'Amar Hisab — লেনদেনের রিপোর্ট'));
   }
 
   Future<void> _exportCsv(List<Map<String, dynamic>> rows) async {
-    String quote(String value) => '\"\${value.replaceAll('\"', '\"\"')}\"';
-    final csv = '\uFEFF\${_exportRows(rows).map((r) => r.map(quote).join(',')).join('\\r\\n')}';
+    String quote(String value) => '\"${value.replaceAll('\"', '\"\"')}\"';
+    final csv = '\uFEFF${_exportRows(rows).map((r) => r.map(quote).join(',')).join('\r\n')}';
     await _shareExportFile('csv', utf8.encode(csv));
   }
 
@@ -6969,13 +6969,13 @@ class _TransactionsScreenState extends State<TransactionsScreen>{
     doc.addPage(pw.MultiPage(pageFormat: PdfPageFormat.a4, theme: pw.ThemeData.withFont(base: font, bold: font), margin: const pw.EdgeInsets.all(24), build: (context) => [
       pw.Text('আমার হিসাব — লেনদেন রিপোর্ট', style: pw.TextStyle(font: font, fontSize: 17)),
       pw.SizedBox(height: 5),
-      pw.Text('রিপোর্ট তৈরি: \${dateLabel(DateTime.now())}', style: const pw.TextStyle(fontSize: 9)),
+      pw.Text('রিপোর্ট তৈরি: ${dateLabel(DateTime.now())}', style: const pw.TextStyle(fontSize: 9)),
       pw.SizedBox(height: 12),
-      pw.Wrap(spacing: 16, runSpacing: 8, children: [pw.Text('মোট আয়: \${money(income)}'), pw.Text('মোট ব্যয়: \${money(expense)}'), pw.Text('নিট: \${money(income - expense)}'), pw.Text('লেনদেন: \${bn(rows.length.toString())}টি')]),
+      pw.Wrap(spacing: 16, runSpacing: 8, children: [pw.Text('মোট আয়: ${money(income)}'), pw.Text('মোট ব্যয়: ${money(expense)}'), pw.Text('নিট: ${money(income - expense)}'), pw.Text('লেনদেন: ${bn(rows.length.toString())}টি')]),
       pw.SizedBox(height: 14),
       pw.TableHelper.fromTextArray(headers: tableRows.first, data: tableRows.skip(1).toList(), headerStyle: pw.TextStyle(font: font, fontSize: 8), cellStyle: pw.TextStyle(font: font, fontSize: 7), headerDecoration: const pw.BoxDecoration(color: PdfColors.grey300), cellAlignment: pw.Alignment.centerLeft, cellPadding: const pw.EdgeInsets.all(4), border: pw.TableBorder.all(color: PdfColors.grey400, width: .4)),
     ]));
-    await Printing.sharePdf(bytes: await doc.save(), filename: 'amar_hisab_transactions_\${_exportStamp()}.pdf');
+    await Printing.sharePdf(bytes: await doc.save(), filename: 'amar_hisab_transactions_${_exportStamp()}.pdf');
   }
 
   Future<void> _handleExport(String format) async {

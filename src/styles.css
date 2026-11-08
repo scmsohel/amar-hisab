@@ -3327,28 +3327,32 @@
   scrollbar-width:thin;
   scrollbar-color:transparent transparent;
 }
-/* Dashboard recent transactions: keep card content-sized; scroll only when rows exceed the cap. */
+/* Recent transactions stretches to the side column; only its table body scrolls. */
 @media(min-width:1251px){
+  .bottom{align-items:stretch!important}
   .bottom>.dashboard-transactions{
-    display:block;
-    align-self:start!important;
-    height:auto!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-self:stretch!important;
+    height:100%!important;
     min-height:0!important;
     box-sizing:border-box;
   }
   .bottom>.dashboard-transactions .dashboard-transaction-table-wrap{
-    display:block;
-    min-height:0;
+    display:flex!important;
+    flex:1 1 auto!important;
+    flex-direction:column!important;
+    min-height:0!important;
   }
   .bottom>.dashboard-transactions .dashboard-transaction-table-wrap .table-scroll{
     display:block;
-    flex:none;
-    min-height:0;
-    max-height:520px;
-    overflow:auto;
+    flex:1 1 auto!important;
+    min-height:0!important;
+    max-height:none!important;
+    overflow:auto!important;
   }
   .bottom>.dashboard-transactions .dashboard-transaction-scroll-summary{
-    flex:none;
+    flex:0 0 auto!important;
   }
 }
 .dashboard-transactions .dashboard-transaction-table-wrap .table-scroll::-webkit-scrollbar{width:7px;height:7px}
@@ -6425,7 +6429,7 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
 
   .bottom {
     grid-template-columns: minmax(0, 2.45fr) minmax(280px, 1fr) !important;
-    align-items: start !important;
+    align-items: stretch !important;
   }
 }
 
@@ -6640,11 +6644,12 @@ html,body,#root,.app{max-width:100%;overflow-x:clip}
 }
 
 
-/* Keep the recent-transactions card independent from the height of the side widgets. */
+/* Keep the dashboard recent-transactions card aligned with the side-widget column. */
 @media(min-width:1251px){
+  .bottom{align-items:stretch!important}
   .bottom>.dashboard-transactions{
-    align-self:start!important;
-    height:auto!important;
+    align-self:stretch!important;
+    height:100%!important;
     min-height:0!important;
   }
 }

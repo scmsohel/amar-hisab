@@ -3321,7 +3321,7 @@
   min-height:0;
 }
 .dashboard-transactions .dashboard-transaction-table-wrap .table-scroll{
-  max-height:600px;
+  max-height:700px;
   overflow:auto;
   overscroll-behavior:contain;
   scrollbar-width:thin;
@@ -3346,9 +3346,9 @@
   }
   .bottom>.dashboard-transactions .dashboard-transaction-table-wrap .table-scroll{
     display:block;
-    flex:1 1 600px!important;
+    flex:1 1 700px!important;
     min-height:0!important;
-    max-height:600px!important;
+    max-height:700px!important;
     overflow-y:auto!important;
     overflow-x:auto!important;
     overscroll-behavior:contain;
